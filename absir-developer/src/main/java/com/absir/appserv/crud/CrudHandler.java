@@ -1,0 +1,167 @@
+/**
+ * Copyright 2013 ABSir's Studio
+ * 
+ * All right reserved
+ *
+ * Create on 2013-6-25 下午4:01:35
+ */
+package com.absir.appserv.crud;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import com.absir.appserv.system.bean.value.JaCrud;
+import com.absir.appserv.system.bean.value.JaCrud.Crud;
+import com.absir.appserv.system.dao.BeanDao;
+import com.absir.core.kernel.KernelLang.PropertyFilter;
+import com.absir.core.kernel.KernelObject;
+
+/**
+ * @author absir
+ * 
+ */
+public abstract class CrudHandler {
+
+	/** crud */
+	protected JaCrud.Crud crud;
+
+	/** filter */
+	protected PropertyFilter filter;
+
+	/** crudEntity */
+	protected CrudEntity crudEntity;
+
+	/** root */
+	protected Object root;
+
+	/** rootEntity */
+	protected Object rootEntity;
+
+	/** entityMap */
+	protected Map<String, Object> entityMap;
+
+	/** propertyPath */
+	protected String propertyPath;
+
+	/** entity */
+	protected Object entity;
+
+	/**
+	 * @param crud
+	 * @param filter
+	 * @param crudEntity
+	 * @param root
+	 */
+	public CrudHandler(JaCrud.Crud crud, PropertyFilter filter, CrudEntity crudEntity, Object root) {
+		this.crud = crud;
+		this.filter = filter;
+		this.crudEntity = crudEntity;
+		this.root = root;
+	}
+
+	/**
+	 * @return the crud
+	 */
+	public JaCrud.Crud getCrud() {
+		return crud;
+	}
+
+	/**
+	 * @return the filter
+	 */
+	public PropertyFilter getFilter() {
+		return filter;
+	}
+
+	/**
+	 * @return the crudEntity
+	 */
+	public CrudEntity getCrudEntity() {
+		return crudEntity;
+	}
+
+	/**
+	 * @return the root
+	 */
+	public Object getRoot() {
+		return root;
+	}
+
+	/**
+	 * @return the rootEntity
+	 */
+	public Object getRootEntity() {
+		if (rootEntity == null) {
+			if (crudEntity.getJoEntity().getEntityName() == null) {
+				if (crudEntity.getJoEntity().getEntityClass() == null) {
+					return (rootEntity = root);
+				}
+			}
+
+			rootEntity = BeanDao.getLoadedEntity(null, crudEntity.getJoEntity().getEntityName(), root);
+			if (rootEntity == null) {
+				rootEntity = root;
+			}
+		}
+
+		return rootEntity;
+	}
+
+	/**
+	 * @return the Entity
+	 */
+	public Object getEntity() {
+		if (propertyPath == filter.getPropertyPath()) {
+			if (entity != null) {
+				return entity;
+			}
+
+		} else {
+			propertyPath = filter.getPropertyPath();
+		}
+
+		if (entityMap == null) {
+			entityMap = new HashMap<String, Object>();
+
+		} else {
+			entity = entityMap.get(propertyPath);
+			if (entity != null) {
+				return entity;
+			}
+		}
+
+		entity = KernelObject.expressGetter(getRootEntity(), propertyPath);
+		entityMap.put(propertyPath, entity);
+		return entity;
+	}
+
+	/**
+	 * @author absir
+	 * 
+	 */
+	protected static abstract class CrudInvoker extends CrudHandler {
+
+		/**
+		 * @param crud
+		 * @param filter
+		 * @param crudEntity
+		 * @param root
+		 */
+		public CrudInvoker(Crud crud, PropertyFilter filter, CrudEntity crudEntity, Object root) {
+			super(crud, filter, crudEntity, root);
+			// TODO Auto-generated constructor stub
+		}
+
+		/**
+		 * @param crudProperty
+		 * @return
+		 */
+		public abstract boolean isSupport(CrudProperty crudProperty);
+
+		/**
+		 * @param crudProperty
+		 * @param entity
+		 */
+		public abstract void crudInvoke(CrudProperty crudProperty, Object entity);
+	}
+}

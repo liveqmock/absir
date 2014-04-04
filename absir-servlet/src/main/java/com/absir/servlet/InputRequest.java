@@ -1,0 +1,325 @@
+/**
+ * Copyright 2014 ABSir's Studio
+ * 
+ * All right reserved
+ *
+ * Create on 2014-1-8 下午5:09:53
+ */
+package com.absir.servlet;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Map;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.absir.binder.BinderData;
+import com.absir.core.helper.HelperIO;
+import com.absir.core.kernel.KernelCharset;
+import com.absir.core.kernel.KernelLang;
+import com.absir.server.in.InMethod;
+import com.absir.server.in.InModel;
+import com.absir.server.in.Input;
+import com.absir.server.on.OnPut;
+import com.absir.server.route.returned.ReturnedResolver;
+
+/**
+ * @author absir
+ * 
+ */
+@SuppressWarnings("unchecked")
+public class InputRequest extends Input {
+
+	/** uri */
+	private String uri;
+
+	/** method */
+	private InMethod method;
+
+	/** request */
+	private HttpServletRequest request;
+
+	/** response */
+	private HttpServletResponse response;
+
+	/** input */
+	private String input;
+
+	/**
+	 * @param uri
+	 * @param method
+	 * @param model
+	 * @param request
+	 * @param response
+	 */
+	public InputRequest(String uri, InMethod method, InModel model, HttpServletRequest request, HttpServletResponse response) {
+		super(model);
+		if (request instanceof HttpServletRequest) {
+			setId(((HttpServletRequest) request).getSession().getId());
+		}
+
+		this.uri = uri;
+		this.method = method;
+		this.request = request;
+		this.response = response;
+	}
+
+	/**
+	 * @return the request
+	 */
+	public HttpServletRequest getRequest() {
+		return request;
+	}
+
+	/**
+	 * @return the response
+	 */
+	public HttpServletResponse getResponse() {
+		return response;
+	}
+
+	/**
+	 * @return
+	 */
+	public BinderData getBinderData() {
+		if (binderData == null) {
+			binderData = new BinderRequest();
+		}
+
+		return binderData;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.server.in.Input#getUri()
+	 */
+	@Override
+	public String getUri() {
+		// TODO Auto-generated method stub
+		return uri;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.server.in.Input#getMethod()
+	 */
+	@Override
+	public InMethod getMethod() {
+		// TODO Auto-generated method stub
+		return method;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.server.in.Input#getAttribute(java.lang.String)
+	 */
+	@Override
+	public Object getAttribute(String name) {
+		// TODO Auto-generated method stub
+		return request.getAttribute(name);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.server.in.Input#setAttribute(java.lang.String,
+	 * java.lang.Object)
+	 */
+	@Override
+	public void setAttribute(String name, Object obj) {
+		// TODO Auto-generated method stub
+		request.setAttribute(name, obj);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.server.in.Input#getParam(java.lang.String)
+	 */
+	@Override
+	public String getParam(String name) {
+		// TODO Auto-generated method stub
+		return request.getParameter(name);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.server.in.Input#getParams(java.lang.String)
+	 */
+	@Override
+	public String[] getParams(String name) {
+		// TODO Auto-generated method stub
+		return request.getParameterValues(name);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.server.in.Input#getParamMap()
+	 */
+	@Override
+	public Map<String, Object> getParamMap() {
+		// TODO Auto-generated method stub
+		return request.getParameterMap();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.server.in.Input#getInputStream()
+	 */
+	@Override
+	public InputStream getInputStream() throws IOException {
+		// TODO Auto-generated method stub
+		return request.getInputStream();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.server.in.Input#getInput()
+	 */
+	@Override
+	public String getInput() {
+		// TODO Auto-generated method stub
+		if (input == null) {
+			try {
+				input = HelperIO.toString(getInputStream(), KernelCharset.DEFAULT);
+
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				input = KernelLang.NULL_STRING;
+			}
+		}
+
+		return input;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.server.in.Input#setCharacterEncoding(java.lang.String)
+	 */
+	@Override
+	public void setCharacterEncoding(String charset) {
+		// TODO Auto-generated method stub
+		response.setCharacterEncoding(charset);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.server.in.Input#setCharacterEncoding(java.lang.String)
+	 */
+	@Override
+	public void setContentTypeCharset(String contentTypeCharset) {
+		// TODO Auto-generated method stub
+		if (response instanceof HttpServletResponse) {
+			((HttpServletResponse) response).setHeader("content-type", contentTypeCharset);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.server.in.Input#getOutputStream()
+	 */
+	@Override
+	public OutputStream getOutputStream() throws IOException {
+		// TODO Auto-generated method stub
+		return response.getOutputStream();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.server.in.Input#write(byte[], int, int)
+	 */
+	@Override
+	public void write(byte[] b, int off, int len) throws IOException {
+		// TODO Auto-generated method stub
+		getOutputStream().write(b, off, len);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.server.in.Input#getReturnedResolver(com.absir.server.on.OnPut)
+	 */
+	@Override
+	public ReturnedResolver<Object> getReturnedResolver(OnPut onPut) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * @param name
+	 * @return
+	 */
+	public String getSession(String name) {
+		HttpSession session = request.getSession(false);
+		if (session == null) {
+			return null;
+		}
+
+		Object value = session.getAttribute(name);
+		return value == null ? null : value.toString();
+	}
+
+	/**
+	 * @param name
+	 * @param value
+	 */
+	public void setSession(String name, String value) {
+		request.getSession().setAttribute(name, value);
+	}
+
+	/**
+	 * @param name
+	 */
+	public void removeSession(String name) {
+		HttpSession session = request.getSession(false);
+		if (session != null) {
+			request.getSession().removeAttribute(name);
+		}
+	}
+
+	/**
+	 * @param name
+	 * @return
+	 */
+	public String getCookie(String name) {
+		Cookie cookie = InputCookies.getCookie(request, name);
+		return cookie == null ? null : cookie.getValue();
+	}
+
+	/**
+	 * @param name
+	 * @param value
+	 * @param path
+	 * @param remember
+	 */
+	public void setCookie(String name, String value, String path, long remember) {
+		Cookie cookie = new Cookie(name, value);
+		cookie.setPath(path);
+		cookie.setMaxAge((int) (remember / 1000));
+		response.addCookie(cookie);
+	}
+
+	/**
+	 * @param name
+	 * @param path
+	 */
+	public void removeCookie(String name, String path) {
+		setCookie(name, null, path, 0);
+	}
+}

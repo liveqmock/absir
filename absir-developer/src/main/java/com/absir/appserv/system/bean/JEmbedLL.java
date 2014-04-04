@@ -1,0 +1,87 @@
+/**
+ * Copyright 2013 ABSir's Studio
+ * 
+ * All right reserved
+ *
+ * Create on 2013-11-1 下午3:36:28
+ */
+package com.absir.appserv.system.bean;
+
+import java.io.Serializable;
+
+import javax.persistence.Embeddable;
+
+import com.absir.appserv.system.bean.value.JaLang;
+import com.absir.core.kernel.KernelObject;
+
+/**
+ * @author absir
+ * 
+ */
+@SuppressWarnings("serial")
+@Embeddable
+public class JEmbedLL implements Serializable {
+
+	/** eid */
+	@JaLang("编号")
+	private Long eid;
+
+	/** mid */
+	@JaLang("关联")
+	private long mid;
+
+	/**
+	 * @return the eid
+	 */
+	public Long getEid() {
+		return eid;
+	}
+
+	/**
+	 * @param eid
+	 *            the eid to set
+	 */
+	public void setEid(Long eid) {
+		this.eid = eid;
+	}
+
+	/**
+	 * @return the mid
+	 */
+	public long getMid() {
+		return mid;
+	}
+
+	/**
+	 * @param mid
+	 *            the mid to set
+	 */
+	public void setMid(long mid) {
+		this.mid = mid;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return KernelObject.hashCode(eid) + (int) mid;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (obj != null && obj instanceof JEmbedLL) {
+			JEmbedLL target = (JEmbedLL) obj;
+			return mid == target.mid && KernelObject.equals(eid, target.eid);
+		}
+
+		return false;
+	}
+}

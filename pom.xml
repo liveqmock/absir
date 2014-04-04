@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<groupId>com.absir</groupId>
+	<artifactId>parent</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<properties>
+		<com.absir.version>0.0.1-SNAPSHOT</com.absir.version>
+		<org.hibernate-version>4.3.4.Final</org.hibernate-version>
+	</properties>
+	<modelVersion>${com.absir.version}</modelVersion>
+	<modules>
+		<module>absir-lang</module>
+		<module>absir-io</module>
+		<module>absir-bean</module>
+		<module>absir-core</module>
+		<module>absir-context</module>
+		<module>absir-aop</module>
+		<module>absir-async</module>
+		<module>absir-hibernate</module>
+		<module>absir-server</module>
+		<module>absir-servlet</module>
+		<module>absir-webapp</module>
+		<module>absir-jooq</module>
+		<module>absir-boneCP</module>
+		<module>absir-developer</module>
+		<module>achieve-server</module>
+		<module>absir-developerImpl</module>
+		<module>absir-developerJsp</module>
+		<module>absir-jsp</module>
+		<module>absir-data</module>
+		<module>absir-game</module>
+		<module>absir-card</module>
+		<module>absir-socket</module>
+		<module>absir-alipay</module>
+	</modules>
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.2</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.2.1</version>
+				<configuration>
+					<encoding>UTF-8</encoding>
+					<attach>true</attach>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<!-- Distribution -->
+	<distributionManagement>
+		<snapshotRepository>
+			<id>nexus-snapshots</id>
+			<name>nexus distribution snapshot repository</name>
+			<url>http://o.absir.com:8080/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+</project>

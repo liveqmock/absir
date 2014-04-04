@@ -1,0 +1,99 @@
+/**
+ * Copyright 2014 ABSir's Studio
+ * 
+ * All right reserved
+ *
+ * Create on 2014-3-12 下午1:23:59
+ */
+package com.absir.appserv.system.security;
+
+import com.absir.bean.basis.Base;
+import com.absir.bean.basis.BeanConfig;
+import com.absir.bean.core.BeanFactoryUtils;
+import com.absir.bean.inject.value.Bean;
+import com.absir.bean.inject.value.Inject;
+import com.absir.core.kernel.KernelString;
+
+/**
+ * @author absir
+ * 
+ */
+@Base
+@Bean
+public class SecurityManager {
+
+	/** sessionKey */
+	private String sessionKey;
+
+	/** sessionLife */
+	private long sessionLife;
+
+	/** sessionExpiration */
+	private long sessionExpiration;
+
+	/** cookiePath */
+	private String cookiePath;
+
+	/**
+	 * 
+	 */
+	@Inject
+	private void initialize() {
+		BeanConfig beanConfig = BeanFactoryUtils.getBeanConfig();
+		if (sessionKey == null) {
+			sessionKey = beanConfig.getExpressionObject("security.session.key", null, String.class);
+			if (KernelString.isEmpty(sessionKey)) {
+				sessionKey = "ACHIEVE-SECURITY";
+			}
+		}
+
+		if (sessionLife <= 0) {
+			sessionLife = beanConfig.getExpressionValue("security.session.life", null, long.class);
+			if (sessionLife <= 60000) {
+				sessionLife = 600000;
+			}
+		}
+
+		if (sessionExpiration <= 0) {
+			sessionExpiration = beanConfig.getExpressionValue("security.session.expiration", null, long.class);
+			if (sessionExpiration >= 0 && sessionExpiration < sessionLife) {
+				sessionExpiration = sessionLife * 6;
+			}
+		}
+
+		if (cookiePath == null) {
+			cookiePath = beanConfig.getExpressionObject("security.cookie.Path", null, String.class);
+			if (KernelString.isEmpty(cookiePath)) {
+				cookiePath = "/";
+			}
+		}
+	}
+
+	/**
+	 * @return the sessionKey
+	 */
+	public String getSessionKey() {
+		return sessionKey;
+	}
+
+	/**
+	 * @return the sessionLife
+	 */
+	public long getSessionLife() {
+		return sessionLife;
+	}
+
+	/**
+	 * @return the sessionExpiration
+	 */
+	public long getSessionExpiration() {
+		return sessionExpiration;
+	}
+
+	/**
+	 * @return the cookiePath
+	 */
+	public String getCookiePath() {
+		return cookiePath;
+	}
+}

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/absir.iml" filepath="$PROJECT_DIR$/absir.iml" />
+      <module fileurl="file://$PROJECT_DIR$/absir-bean/absir-bean.iml" filepath="$PROJECT_DIR$/absir-bean/absir-bean.iml" />
+      <module fileurl="file://$PROJECT_DIR$/absir-io/absir-io.iml" filepath="$PROJECT_DIR$/absir-io/absir-io.iml" />
+      <module fileurl="file://$PROJECT_DIR$/absir-lang/absir-lang.iml" filepath="$PROJECT_DIR$/absir-lang/absir-lang.iml" />
+    </modules>
+  </component>
+</project>
+

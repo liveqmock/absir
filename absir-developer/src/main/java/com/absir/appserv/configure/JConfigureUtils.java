@@ -1,0 +1,150 @@
+/**
+ * Copyright 2013 ABSir's Studio
+ * 
+ * All right reserved
+ *
+ * Create on 2013-9-13 下午5:08:29
+ */
+package com.absir.appserv.configure;
+
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.absir.appserv.system.bean.JConfigure;
+import com.absir.appserv.system.helper.HelperAccessor;
+import com.absir.core.kernel.KernelClass;
+import com.absir.core.kernel.KernelObject;
+import com.absir.core.kernel.KernelString;
+
+/**
+ * @author absir
+ * 
+ */
+@SuppressWarnings({ "rawtypes", "unchecked" })
+public abstract class JConfigureUtils {
+
+	/** Configure_Class_Map_Instance */
+	private static Map<Serializable, JConfigureBase> Configure_Class_Map_Instance = new HashMap<Serializable, JConfigureBase>();
+
+	/**
+	 * @param cls
+	 */
+	public static <T extends JConfigureBase> T getConfigure(Class<T> cls) {
+		JConfigureBase configure = Configure_Class_Map_Instance.get(cls);
+		if (configure == null) {
+			synchronized (cls) {
+				configure = Configure_Class_Map_Instance.get(cls);
+				if (configure == null) {
+					configure = KernelClass.newInstance(cls);
+					try {
+						initConfigure(configure);
+
+					} catch (Exception e) {
+						// TODO: handle exception
+						e.printStackTrace();
+					}
+
+					Configure_Class_Map_Instance.put(cls, configure);
+				}
+			}
+		}
+
+		return (T) configure;
+	}
+
+	/**
+	 * @param configureBase
+	 */
+	private static void initConfigure(final JConfigureBase configureBase) {
+		final Class cls = configureBase.getClass();
+		for (Field field : HelperAccessor.getFields(configureBase.getClass())) {
+			String id = cls.getName() + "*" + field.getName();
+			JConfigure configure = configureBase.getConfigure(id);
+			if (configure == null) {
+				configure = new JConfigure();
+				configure.setId(id);
+
+			} else {
+				KernelObject.declaredSetter(configureBase, field, configureBase.set(configure.getValue(), field));
+			}
+
+			configureBase.fieldMapConfigure.put(field, configure);
+		}
+	}
+
+	/**
+	 * @param cls
+	 * @param args
+	 * @return
+	 */
+	public static <T extends JConfigureBase> String getConfigureId(Class<T> cls, Object... args) {
+		return cls.getName() + KernelString.implode(args, ',');
+	}
+
+	/**
+	 * @param cls
+	 * @param initargs
+	 * @return
+	 */
+	public <T extends JConfigureBase> T getConfigure(Class<T> cls, Object... initargs) {
+		return initargs.length == 0 ? getConfigure(cls) : getConfigure(cls, getConfigureId(cls, initargs), initargs);
+	}
+
+	/**
+	 * @param cls
+	 * @param configureKey
+	 * @param initargs
+	 * @return
+	 */
+	public static <T extends JConfigureBase> T getConfigure(Class<T> cls, String configureKey, Object... initargs) {
+		JConfigureBase configure = Configure_Class_Map_Instance.get(configureKey);
+		if (configure == null) {
+			synchronized (JConfigureUtils.class) {
+				configure = Configure_Class_Map_Instance.get(configureKey);
+				if (configure == null) {
+					configure = KernelClass.newInstance(cls, initargs);
+					initConfigure(configure);
+					Configure_Class_Map_Instance.put(configureKey, configure);
+				}
+			}
+		}
+
+		return (T) configure;
+	}
+
+	/**
+	 * @param cls
+	 */
+	public static <T extends JConfigureBase> void clearConfigure(Class<T> cls) {
+		synchronized (cls) {
+			JConfigureBase configure = Configure_Class_Map_Instance.get(cls);
+			if (configure != null) {
+				configure.merge();
+				Configure_Class_Map_Instance.remove(cls);
+			}
+		}
+	}
+
+	/**
+	 * @param cls
+	 * @param initargs
+	 */
+	public static <T extends JConfigureBase> void clearConfigure(Class<T> cls, Object... initargs) {
+		clearConfigure(getConfigureId(cls, initargs));
+	}
+
+	/**
+	 * @param configureKey
+	 */
+	public static <T extends JConfigureBase> void clearConfigure(String configureKey) {
+		synchronized (JConfigureUtils.class) {
+			JConfigureBase configure = Configure_Class_Map_Instance.get(configureKey);
+			if (configure != null) {
+				configure.merge();
+				Configure_Class_Map_Instance.remove(configureKey);
+			}
+		}
+	}
+}

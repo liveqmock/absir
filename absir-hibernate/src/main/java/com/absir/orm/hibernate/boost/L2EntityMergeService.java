@@ -10,6 +10,7 @@ package com.absir.orm.hibernate.boost;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -27,11 +28,10 @@ import org.hibernate.mapping.Property;
 import org.hibernate.persister.entity.EntityPersister;
 
 import com.absir.bean.basis.Base;
+import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.InjectOnce;
 import com.absir.bean.inject.value.Bean;
-import com.absir.bean.inject.value.Inject;
-import com.absir.bean.inject.value.InjectOrder;
-import com.absir.bean.inject.value.InjectType;
+import com.absir.bean.inject.value.Started;
 import com.absir.core.kernel.KernelReflect;
 import com.absir.orm.hibernate.SessionFactoryUtils;
 
@@ -50,9 +50,13 @@ public class L2EntityMergeService implements IEventService, PostInsertEventListe
 	/**
 	 * @param entityMerges
 	 */
-	@Inject(type = InjectType.Selectable)
-	@InjectOrder(Integer.MAX_VALUE)
-	protected void addEntityMerges(IEntityMerge[] entityMerges) {
+	@Started
+	protected void loadEntityMerges() {
+		List<IEntityMerge> entityMerges = BeanFactoryUtils.get().getBeanObjects(IEntityMerge.class);
+		if (entityMerges.isEmpty()) {
+			return;
+		}
+
 		Map<String, IEntityMerge> entityMergeBases = new HashMap<String, IEntityMerge>();
 		Class<?>[] parameterTypes = new Class<?>[] { String.class, Object.class, Integer.class };
 		for (IEntityMerge entityMerge : entityMerges) {

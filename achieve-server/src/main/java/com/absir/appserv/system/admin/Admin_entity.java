@@ -253,6 +253,7 @@ public class Admin_entity extends AdminServer {
 		InModel model = input.getModel();
 		model.put("entity", entity);
 		if (binderResult.hashErrors()) {
+			model.put("errors", binderResult.getPropertyErrors());
 			return "admin/entity/save.error";
 		}
 

@@ -373,7 +373,7 @@ public abstract class KernelDyna {
 		} else if (toClass == Date.class) {
 			return (T) toDate(str, DATE_ZERO);
 
-		} else if (toClass == Enum.class) {
+		} else if (toClass.isEnum()) {
 			return (T) toEnum(str, (Class<? extends Enum>) toClass);
 		}
 

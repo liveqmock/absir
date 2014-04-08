@@ -15,7 +15,7 @@ public interface IEntityMerge<T> {
 
 	/**
 	 * @author absir
-	 *
+	 * 
 	 */
 	public enum MergeType {
 

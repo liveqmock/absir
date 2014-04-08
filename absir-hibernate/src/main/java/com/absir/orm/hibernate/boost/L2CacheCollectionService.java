@@ -155,7 +155,9 @@ public class L2CacheCollectionService extends L2EntityMergeService {
 	public void onPostDelete(PostDeleteEvent event) {
 		// TODO Auto-generated method stub
 		super.onPostDelete(event);
-		changeds(event.getSession(), event.getEntity(), collectionMappedByCaches.get(event.getPersister().getEntityName()));
+		if (event.getPersister().hasCache()) {
+			changeds(event.getSession(), event.getEntity(), collectionMappedByCaches.get(event.getPersister().getEntityName()));
+		}
 	}
 
 	/*
@@ -169,16 +171,18 @@ public class L2CacheCollectionService extends L2EntityMergeService {
 	public void onPostUpdate(PostUpdateEvent event) {
 		// TODO Auto-generated method stub
 		super.onPostUpdate(event);
-		List<MappedByCache> mappedByCaches = collectionMappedByCaches.get(event.getPersister().getEntityName());
-		if (mappedByCaches == null) {
-			return;
-		}
+		if (event.getPersister().hasCache()) {
+			List<MappedByCache> mappedByCaches = collectionMappedByCaches.get(event.getPersister().getEntityName());
+			if (mappedByCaches == null) {
+				return;
+			}
 
-		for (int mappedBy : event.getDirtyProperties()) {
-			for (MappedByCache mappedByCache : mappedByCaches) {
-				if (mappedByCache.mappedBy == mappedBy) {
-					changed(event.getSession(), event.getOldState()[mappedBy], mappedByCache);
-					changed(event.getSession(), event.getState()[mappedBy], mappedByCache);
+			for (int mappedBy : event.getDirtyProperties()) {
+				for (MappedByCache mappedByCache : mappedByCaches) {
+					if (mappedByCache.mappedBy == mappedBy) {
+						changed(event.getSession(), event.getOldState()[mappedBy], mappedByCache);
+						changed(event.getSession(), event.getState()[mappedBy], mappedByCache);
+					}
 				}
 			}
 		}
@@ -195,7 +199,9 @@ public class L2CacheCollectionService extends L2EntityMergeService {
 	public void onPostInsert(PostInsertEvent event) {
 		// TODO Auto-generated method stub
 		super.onPostInsert(event);
-		changeds(event.getSession(), event.getEntity(), collectionMappedByCaches.get(event.getPersister().getEntityName()));
+		if (event.getPersister().hasCache()) {
+			changeds(event.getSession(), event.getEntity(), collectionMappedByCaches.get(event.getPersister().getEntityName()));
+		}
 	}
 
 	/**

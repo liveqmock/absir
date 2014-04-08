@@ -122,7 +122,7 @@ public class L2EntityMergeService implements IEventService, PostInsertEventListe
 	@Override
 	public boolean requiresPostCommitHanding(EntityPersister persister) {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	/*

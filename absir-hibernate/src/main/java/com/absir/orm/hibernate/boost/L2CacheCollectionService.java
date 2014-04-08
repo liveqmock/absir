@@ -26,7 +26,6 @@ import org.hibernate.event.spi.PostInsertEvent;
 import org.hibernate.event.spi.PostUpdateEvent;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
-import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.property.Getter;
 
 import com.absir.bean.basis.Base;
@@ -38,7 +37,7 @@ import com.absir.core.kernel.KernelString;
  * 
  */
 @SuppressWarnings({ "rawtypes", "serial" })
-@Base(order = -1)
+@Base
 @Bean
 public class L2CacheCollectionService extends L2EntityMergeService {
 
@@ -228,17 +227,5 @@ public class L2CacheCollectionService extends L2EntityMergeService {
 		}
 
 		session.getSessionFactory().getCache().evictCollection(mappedByCache.collectionKey, (Serializable) entity);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.hibernate.event.spi.PostInsertEventListener#requiresPostCommitHanding
-	 * (org.hibernate.persister.entity.EntityPersister)
-	 */
-	public boolean requiresPostCommitHanding(EntityPersister persister) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 }

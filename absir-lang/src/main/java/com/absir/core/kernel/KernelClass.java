@@ -133,14 +133,11 @@ public abstract class KernelClass {
 	 * @return
 	 */
 	public static boolean isMatchableFrom(Class cls, Class type) {
-		if (cls.isAssignableFrom(type)) {
+		if (type == null || type == Object.class || cls.isAssignableFrom(type)) {
 			return true;
 		}
 
-		if (cls == Object.class) {
-			return true;
-
-		} else if (cls == byte.class) {
+		if (cls == byte.class) {
 			return type == Byte.class;
 
 		} else if (cls == Byte.class) {
@@ -392,7 +389,7 @@ public abstract class KernelClass {
 		int similar = -1;
 		while (cls != null) {
 			if (similar < 0) {
-				if (cls == type) {
+				if (type == null || cls == type) {
 					similar = 0;
 
 				} else {

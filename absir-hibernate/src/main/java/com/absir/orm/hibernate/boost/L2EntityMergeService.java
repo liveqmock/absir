@@ -59,20 +59,22 @@ public class L2EntityMergeService implements IEventService, PostInsertEventListe
 		}
 
 		Map<String, IEntityMerge> entityMergeBases = new HashMap<String, IEntityMerge>();
-		Class<?>[] parameterTypes = new Class<?>[] { String.class, Object.class, Integer.class };
+		Class<?>[] parameterTypes = new Class<?>[] { String.class, null, MergeType.class };
 		for (IEntityMerge entityMerge : entityMerges) {
 			Method method = KernelReflect.assignableMethod(entityMerge.getClass(), "merge", parameterTypes);
-			Class<?> entityClass = method.getParameterTypes()[1];
-			String entityName = SessionFactoryUtils.getEntityName(entityClass);
-			if (entityName == null) {
-				for (Entry<String, Entry<Class<?>, SessionFactory>> entry : SessionFactoryUtils.get().getJpaEntityNameMapEntityClassFactory().entrySet()) {
-					if (entityClass.isAssignableFrom(entry.getValue().getKey())) {
-						entityMergeBases.put(entry.getValue().getKey().getName(), entityMerge);
+			if (method != null) {
+				Class<?> entityClass = method.getParameterTypes()[1];
+				String entityName = SessionFactoryUtils.getEntityName(entityClass);
+				if (entityName == null) {
+					for (Entry<String, Entry<Class<?>, SessionFactory>> entry : SessionFactoryUtils.get().getJpaEntityNameMapEntityClassFactory().entrySet()) {
+						if (entityClass.isAssignableFrom(entry.getValue().getKey())) {
+							entityMergeBases.put(entry.getValue().getKey().getName(), entityMerge);
+						}
 					}
-				}
 
-			} else {
-				nameMapEntityMerge.put(entityName, entityMerge);
+				} else {
+					nameMapEntityMerge.put(entityName, entityMerge);
+				}
 			}
 		}
 

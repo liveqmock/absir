@@ -519,7 +519,7 @@ public abstract class KernelReflect {
 						cacheable = false;
 						int similar = -2;
 						for (Method match : matchMethods) {
-							int sim = KernelClass.similar(parameterTypes, match.getParameterTypes());
+							int sim = KernelClass.similar(match.getParameterTypes(), parameterTypes);
 							if (similar < sim) {
 								similar = sim;
 								method = match;

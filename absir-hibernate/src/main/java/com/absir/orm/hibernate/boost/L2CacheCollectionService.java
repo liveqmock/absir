@@ -21,14 +21,9 @@ import javax.persistence.OneToMany;
 
 import org.hibernate.Session;
 import org.hibernate.annotations.Cache;
-import org.hibernate.event.service.spi.EventListenerRegistry;
-import org.hibernate.event.spi.EventType;
 import org.hibernate.event.spi.PostDeleteEvent;
-import org.hibernate.event.spi.PostDeleteEventListener;
 import org.hibernate.event.spi.PostInsertEvent;
-import org.hibernate.event.spi.PostInsertEventListener;
 import org.hibernate.event.spi.PostUpdateEvent;
-import org.hibernate.event.spi.PostUpdateEventListener;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.hibernate.persister.entity.EntityPersister;
@@ -43,9 +38,9 @@ import com.absir.core.kernel.KernelString;
  * 
  */
 @SuppressWarnings({ "rawtypes", "serial" })
-@Base
+@Base(order = -1)
 @Bean
-public class L2CacheCollectionService implements IEventService, PostInsertEventListener, PostUpdateEventListener, PostDeleteEventListener {
+public class L2CacheCollectionService extends L2EntityMergeService {
 
 	/**
 	 * @author absir
@@ -68,21 +63,6 @@ public class L2CacheCollectionService implements IEventService, PostInsertEventL
 
 	/** collectionMappedByCaches */
 	private Map<String, List<MappedByCache>> collectionMappedByCaches = new HashMap<String, List<MappedByCache>>();
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.absir.orm.hibernate.boost.IEventListener#setEventListenerRegistry
-	 * (org.hibernate.event.service.spi.EventListenerRegistry)
-	 */
-	@Override
-	public void setEventListenerRegistry(EventListenerRegistry eventListenerRegistry) {
-		// TODO Auto-generated method stub
-		eventListenerRegistry.appendListeners(EventType.POST_COMMIT_INSERT, this);
-		eventListenerRegistry.appendListeners(EventType.POST_COMMIT_UPDATE, this);
-		eventListenerRegistry.appendListeners(EventType.POST_COMMIT_DELETE, this);
-	}
 
 	/**
 	 * @param classes
@@ -175,6 +155,7 @@ public class L2CacheCollectionService implements IEventService, PostInsertEventL
 	@Override
 	public void onPostDelete(PostDeleteEvent event) {
 		// TODO Auto-generated method stub
+		super.onPostDelete(event);
 		changeds(event.getSession(), event.getEntity(), collectionMappedByCaches.get(event.getPersister().getEntityName()));
 	}
 
@@ -188,6 +169,7 @@ public class L2CacheCollectionService implements IEventService, PostInsertEventL
 	@Override
 	public void onPostUpdate(PostUpdateEvent event) {
 		// TODO Auto-generated method stub
+		super.onPostUpdate(event);
 		List<MappedByCache> mappedByCaches = collectionMappedByCaches.get(event.getPersister().getEntityName());
 		if (mappedByCaches == null) {
 			return;
@@ -213,6 +195,7 @@ public class L2CacheCollectionService implements IEventService, PostInsertEventL
 	@Override
 	public void onPostInsert(PostInsertEvent event) {
 		// TODO Auto-generated method stub
+		super.onPostInsert(event);
 		changeds(event.getSession(), event.getEntity(), collectionMappedByCaches.get(event.getPersister().getEntityName()));
 	}
 

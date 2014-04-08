@@ -7,6 +7,7 @@
  */
 package com.absir.appserv.system.admin;
 
+import com.absir.appserv.feature.menu.MenuContextUtils;
 import com.absir.appserv.system.server.value.Redirect;
 import com.absir.server.in.InModel;
 import com.absir.server.on.OnPut;
@@ -27,7 +28,7 @@ public class Admin_route extends AdminServer {
 	 */
 	@Redirect
 	public String route(OnPut onPut) {
-		return "/" + AdminServer.getRoute() + "/main";
+		return MenuContextUtils.getAdminRoute() + "/main";
 	}
 
 	/**

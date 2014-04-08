@@ -79,7 +79,7 @@ public abstract class ApiServer {
 
 		if (BeanFactoryUtils.getEnvironment().compareTo(Environment.DEBUG) <= 0) {
 			e.printStackTrace();
-			
+
 		} else if (!(e instanceof ServerException)) {
 			LOGGER.error("api error", e);
 		}

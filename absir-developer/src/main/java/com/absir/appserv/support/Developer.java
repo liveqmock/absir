@@ -68,7 +68,7 @@ public abstract class Developer {
 	}
 
 	/** RUNTIME_PATH */
-	public static final String RUNTIME_PATH = "META-RUNTIME/";
+	public static final String RUNTIME_PATH = "/META-RUNTIME/";
 
 	/** RUMTIME_LISTENERS */
 	private static final List<CallbackTemplate<Entry<String, File>>> RUMTIME_LISTENERS = new ArrayList<CallbackTemplate<Entry<String, File>>>();

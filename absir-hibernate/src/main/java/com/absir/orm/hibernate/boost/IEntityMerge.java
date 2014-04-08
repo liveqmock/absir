@@ -13,7 +13,27 @@ package com.absir.orm.hibernate.boost;
  */
 public interface IEntityMerge<T> {
 
-	// 0 persist 1 merge 2 delete
-	public void merge(String entityName, T entity, int type);
+	/**
+	 * @author absir
+	 *
+	 */
+	public enum MergeType {
+
+		/** INSERT */
+		INSERT,
+
+		/** UPDATE */
+		UPDATE,
+
+		/** DELETE */
+		DELETE;
+	}
+
+	/**
+	 * @param entityName
+	 * @param entity
+	 * @param mergeType
+	 */
+	public void merge(String entityName, T entity, MergeType mergeType);
 
 }

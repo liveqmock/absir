@@ -34,6 +34,7 @@ import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Started;
 import com.absir.core.kernel.KernelReflect;
 import com.absir.orm.hibernate.SessionFactoryUtils;
+import com.absir.orm.hibernate.boost.IEntityMerge.MergeType;
 
 /**
  * @author absir
@@ -135,7 +136,7 @@ public class L2EntityMergeService implements IEventService, PostInsertEventListe
 		String entityName = event.getPersister().getEntityName();
 		IEntityMerge entityMerge = nameMapEntityMerge.get(entityName);
 		if (entityMerge != null) {
-			entityMerge.merge(entityName, event.getEntity(), 2);
+			entityMerge.merge(entityName, event.getEntity(), MergeType.DELETE);
 		}
 	}
 
@@ -152,7 +153,7 @@ public class L2EntityMergeService implements IEventService, PostInsertEventListe
 		String entityName = event.getPersister().getEntityName();
 		IEntityMerge entityMerge = nameMapEntityMerge.get(entityName);
 		if (entityMerge != null) {
-			entityMerge.merge(entityName, event.getEntity(), 1);
+			entityMerge.merge(entityName, event.getEntity(), MergeType.UPDATE);
 		}
 	}
 
@@ -169,7 +170,7 @@ public class L2EntityMergeService implements IEventService, PostInsertEventListe
 		String entityName = event.getPersister().getEntityName();
 		IEntityMerge entityMerge = nameMapEntityMerge.get(entityName);
 		if (entityMerge != null) {
-			entityMerge.merge(entityName, event.getEntity(), 0);
+			entityMerge.merge(entityName, event.getEntity(), MergeType.INSERT);
 		}
 	}
 }

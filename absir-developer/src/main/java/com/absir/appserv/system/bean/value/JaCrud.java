@@ -39,9 +39,6 @@ public @interface JaCrud {
 		COMPLETE;
 	}
 
-	/** 全部处理 ALL */
-	public static final JaCrud.Crud[] ALL = new JaCrud.Crud[] { Crud.CREATE, Crud.UPDATE, Crud.DELETE };
-
 	/**
 	 * 处理工厂引用名
 	 * 

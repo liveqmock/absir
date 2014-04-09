@@ -9,7 +9,7 @@
 		<com.absir.version>0.0.1-SNAPSHOT</com.absir.version>
 		<org.hibernate-version>4.3.4.Final</org.hibernate-version>
 	</properties>
-	<modelVersion>${com.absir.version}</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
 	<modules>
 		<module>absir-lang</module>
 		<module>absir-io</module>
@@ -17,7 +17,7 @@
 		<module>absir-core</module>
 		<module>absir-context</module>
 		<module>absir-aop</module>
-		<module>absir-async</module>
+		<module>absir-asyn</module>
 		<module>absir-hibernate</module>
 		<module>absir-server</module>
 		<module>absir-servlet</module>
@@ -29,7 +29,6 @@
 		<module>absir-developerImpl</module>
 		<module>absir-developerJsp</module>
 		<module>absir-jsp</module>
-		<module>absir-data</module>
 		<module>absir-game</module>
 		<module>absir-card</module>
 		<module>absir-socket</module>

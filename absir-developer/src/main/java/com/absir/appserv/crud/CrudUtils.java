@@ -512,7 +512,7 @@ public abstract class CrudUtils {
 		if (crudProperty.jCrud != null) {
 			crudEntity.addCrudProperty(crudProperty);
 		}
-		
+
 		crudProperty.crudEntity = crudEntity;
 		if (crudField.getCruds() != null && !(crudField.getJoEntity() == null && crudField.getKeyJoEntity() == null)) {
 			CrudPropertyReference crudPropertyReference = null;

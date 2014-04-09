@@ -11,6 +11,6 @@ package com.absir.validator;
  * @author absir
  * 
  */
-public class ValidatorNotNull {
+public class ValidatorNotEmpty {
 
 }

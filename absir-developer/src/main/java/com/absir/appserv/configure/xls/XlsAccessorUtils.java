@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -277,6 +276,87 @@ public class XlsAccessorUtils {
 	}
 
 	/**
+	 * @author absir
+	 * 
+	 */
+	public static class XlsDaoBase extends XlsDao {
+
+		/** beans */
+		private List<Object> beans = new ArrayList<Object>();
+
+		/**
+		 * @param idType
+		 */
+		public XlsDaoBase(Class idType) {
+			super(idType);
+			// TODO Auto-generated constructor stub
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see com.absir.appserv.configure.xls.XlsDao#get(java.io.Serializable)
+		 */
+		@Override
+		public Object get(Serializable id) {
+			// TODO Auto-generated method stub
+			Integer index = (Integer) id;
+			return index < 0 || index >= beans.size() ? null : beans.get(index);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see com.absir.appserv.configure.xls.XlsDao#getAll()
+		 */
+		@Override
+		public Collection getAll() {
+			// TODO Auto-generated method stub
+			return beans;
+		}
+	}
+
+	/**
+	 * @author absir
+	 * 
+	 */
+	public static class XlsDaoBean extends XlsDao {
+
+		/** beans */
+		private Map<Serializable, Object> beans = new HashMap<Serializable, Object>();
+
+		/**
+		 * @param idType
+		 */
+		public XlsDaoBean(Class idType) {
+			super(idType);
+			// TODO Auto-generated constructor stub
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see com.absir.appserv.configure.xls.XlsDao#get(java.io.Serializable)
+		 */
+		@Override
+		public Object get(Serializable id) {
+			// TODO Auto-generated method stub
+			return beans.get(id);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see com.absir.appserv.configure.xls.XlsDao#getAll()
+		 */
+		@Override
+		public Collection getAll() {
+			// TODO Auto-generated method stub
+			return beans.values();
+		}
+	}
+
+	/**
 	 * @param hssfSheets
 	 * @param accessors
 	 * @param beanClass
@@ -286,9 +366,44 @@ public class XlsAccessorUtils {
 	 */
 	private static <T> List<T> readXlsBeans(HSSFSheet[] hssfSheets, int[][] accessors, Class<T> beanClass, XlsBase xlsBase, boolean cacheable) {
 		XlsAccessorContext xlsAccessorContext = new XlsAccessorContext(beanClass, xlsBase);
+		XlsDao<? extends XlsBase, Serializable> xlsDao = null;
+		XlsDaoBase xlsDaoBase = null;
+		XlsDaoBean xlsDaoBean = null;
+		if (cacheable) {
+			if (xlsAccessorContext.isXlsBean()) {
+				xlsDaoBean = new XlsDaoBean(xlsAccessorContext.getIdType());
+
+			} else {
+				xlsDaoBase = new XlsDaoBase(xlsAccessorContext.getIdType());
+			}
+
+			xlsDao = getXlsDao((Class<? extends XlsBase>) beanClass);
+			if (xlsDao == null) {
+				Base_Class_Map_Dao.put(beanClass, xlsDaoBase == null ? xlsDaoBean : xlsDaoBase);
+
+			} else {
+				if (xlsAccessorContext.isXlsBean()) {
+					for (XlsBase base : xlsDao.getAll()) {
+						xlsDaoBean.beans.put(base.getId(), base);
+					}
+
+					XlsDaoBean dao = (XlsDaoBean) xlsDao;
+					xlsDao = xlsDaoBean;
+					xlsDaoBean = dao;
+					dao.beans.clear();
+
+				} else {
+					xlsDaoBase.beans.addAll(xlsDao.getAll());
+					XlsDaoBase dao = (XlsDaoBase) xlsDao;
+					xlsDao = xlsDaoBase;
+					xlsDaoBase = dao;
+					dao.beans.clear();
+				}
+			}
+		}
+
 		int length = hssfSheets.length;
 		final List<T> beans = new ArrayList<T>();
-		XlsDao<? extends XlsBase, Serializable> xlsDao = cacheable ? getXlsDao((Class<? extends XlsBase>) beanClass) : null;
 		for (int i = 0; i < length; i++) {
 			HSSFSheet hssfSheet = hssfSheets[i];
 			int[] frclrc = accessors[i];
@@ -341,75 +456,47 @@ public class XlsAccessorUtils {
 			}
 
 			if (cacheable) {
-				Class<? extends Serializable> idType = xlsAccessorContext.getIdType();
-				if (xlsAccessorContext.isXlsBean()) {
-					final Map<Serializable, XlsBase> beanMap = new TreeMap<Serializable, XlsBase>();
-					for (XlsBean xlsBean : (List<XlsBean>) beans) {
-						if (xlsBean.getId() != null) {
-							beanMap.put(xlsBean.getId(), xlsBean);
+				for (int j = 0; j < size; j++) {
+					Object bean = beans.get(first + j);
+					if (xlsDaoBase == null) {
+						Serializable id = ((XlsBase) bean).getId();
+						if (id != null) {
+							xlsDaoBean.beans.put(id, bean);
 						}
+
+					} else {
+						xlsDaoBase.beans.add(bean);
 					}
-
-					Base_Class_Map_Dao.put(beanClass, new XlsDao(idType) {
-
-						@Override
-						public XlsBase get(Serializable id) {
-							// TODO Auto-generated method stub
-							return beanMap.get(id);
-						}
-
-						@Override
-						public Collection<? extends XlsBase> getAll() {
-							// TODO Auto-generated method stub
-							return beanMap.values();
-						}
-
-					});
-
-				} else {
-					Base_Class_Map_Dao.put(beanClass, new XlsDao(idType) {
-
-						@Override
-						public XlsBase get(Serializable id) {
-							// TODO Auto-generated method stub
-							Integer index = (Integer) id;
-							return index < 0 || index >= beans.size() ? null : (XlsBase) beans.get(index);
-						}
-
-						@Override
-						public Collection<? extends XlsBase> getAll() {
-							// TODO Auto-generated method stub
-							return (Collection<? extends XlsBase>) beans;
-						}
-					});
 				}
 			}
 
-			boolean isXlsBase = XlsBase.class.isAssignableFrom(beanClass);
-			Field updateTime = isXlsBase && JiUpdate.class.isAssignableFrom(beanClass) ? KernelReflect.declaredField(beanClass, "updateTime") : null;
-			if (updateTime != null) {
-				if (HelperAccessor.isAccessor(updateTime)) {
-					updateTime = null;
-				}
-			}
-
-			long updateTimeMillis = System.currentTimeMillis();
-			Object updateTimeValue = updateTime == null ? null : KernelDyna.to(updateTimeMillis, updateTime.getType());
 			for (int j = 0; j < size; j++) {
 				Object bean = beans.get(j + first);
 				xlsAccessorContext.setObject(bean, cells.get(j), xlsBase, null);
-				if (isXlsBase) {
-					((XlsBase) bean).initializing();
+			}
+		}
+
+		if (XlsBase.class.isAssignableFrom(beanClass) && JiUpdate.class.isAssignableFrom(beanClass)) {
+			Field updateTime = KernelReflect.declaredField(beanClass, "updateTime");
+			Object updateTimeValue = null;
+			long updateTimeMillis = 0;
+			String updateEid = null;
+			if (updateTime != null && !HelperAccessor.isAccessor(updateTime)) {
+				updateTimeMillis = System.currentTimeMillis();
+				updateTimeValue = KernelDyna.to(updateTimeMillis, updateTime.getType());
+				updateEid = beanClass.getSimpleName();
+			}
+
+			for (XlsBase bean : (List<XlsBase>) beans) {
+				bean.initializing();
+				Serializable id = bean.getId();
+				if (id == null) {
+					continue;
 				}
 
-				if (updateTime != null) {
-					Serializable id = ((XlsBase) bean).getId();
-					if (id == null) {
-						continue;
-					}
-
+				if (updateTimeValue != null) {
 					JEmbedSS embedSS = new JEmbedSS();
-					embedSS.setEid(beanClass.getSimpleName());
+					embedSS.setEid(updateEid);
 					embedSS.setMid(KernelDyna.to(id, String.class));
 					JUpdateXls updateXls = BeanService.ME.get(JUpdateXls.class, embedSS);
 					String serialize = HelperJson.encodeNull(bean);

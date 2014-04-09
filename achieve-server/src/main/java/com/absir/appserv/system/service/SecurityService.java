@@ -180,11 +180,11 @@ public abstract class SecurityService implements ISecurityService {
 			InputRequest inputRequest = (InputRequest) input;
 			JiUserBase userBase = ME.getUserBase(username);
 			if (userBase == null) {
-				throw new ServerException(ServerStatus.NO_USERNAME);
+				throw new ServerException(ServerStatus.NO_USER);
 			}
 
 			if (!validator(userBase, password)) {
-				throw new ServerException(ServerStatus.NO_PASSWORD);
+				throw new ServerException(ServerStatus.NO_USER, "password");
 			}
 
 			if (userBase.getUserRoleLevel() >= roleLevel) {

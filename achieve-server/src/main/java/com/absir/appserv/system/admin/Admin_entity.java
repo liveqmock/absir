@@ -56,7 +56,7 @@ public class Admin_entity extends AdminServer {
 	protected ICrudSupply getCrudSupply(String entityName, Input input) {
 		ICrudSupply crudSupply = CrudService.ME.getCrudSupply(entityName);
 		if (crudSupply == null) {
-			throw new ServerException(ServerStatus.ERROR_LOGIN);
+			throw new ServerException(ServerStatus.IN_404);
 		}
 
 		if (input != null) {

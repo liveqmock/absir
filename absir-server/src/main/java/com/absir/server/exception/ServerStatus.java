@@ -25,14 +25,11 @@ public enum ServerStatus {
 	/** NO_LOGIN */
 	NO_LOGIN(202),
 
-	/** NO_USERNAME */
-	NO_USERNAME(203),
-
-	/** NO_PASSWORD */
-	NO_PASSWORD(204),
+	/** NO_USER */
+	NO_USER(203),
 
 	/** NO_VERIFY */
-	NO_VERIFY(205),
+	NO_VERIFY(204),
 
 	/** ON_TIMEOUT */
 	ON_TIMEOUT(301),
@@ -55,8 +52,8 @@ public enum ServerStatus {
 	/** IN_404 */
 	IN_404(404),
 
-	/** ERROR_LOGIN */
-	ERROR_LOGIN(500),
+	/** IN_405 */
+	IN_405(405),
 
 	;
 

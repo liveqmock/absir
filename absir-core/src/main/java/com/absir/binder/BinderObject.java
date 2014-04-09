@@ -7,12 +7,42 @@
  */
 package com.absir.binder;
 
+import com.absir.property.Property;
 import com.absir.property.PropertyObject;
 
 /**
  * @author absir
  * 
  */
-public abstract class BinderObject implements PropertyObject<Binder> {
+public class BinderObject implements PropertyObject<Binder> {
 
+	private Binder binder;
+
+	/**
+	 * @return the binder
+	 */
+	public Binder getBinder() {
+		return binder;
+	}
+
+	/**
+	 * @param binder
+	 *            the binder to set
+	 */
+	public void setBinder(Binder binder) {
+		this.binder = binder;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.property.PropertyObject#getPropertyData(com.absir.property.
+	 * Property)
+	 */
+	@Override
+	public Binder getPropertyData(Property property) {
+		// TODO Auto-generated method stub
+		return binder;
+	}
 }

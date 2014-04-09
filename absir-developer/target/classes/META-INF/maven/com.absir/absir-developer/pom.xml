@@ -19,7 +19,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.absir</groupId>
-			<artifactId>absir-async</artifactId>
+			<artifactId>absir-asyn</artifactId>
 			<version>${com.absir.version}</version>
 		</dependency>
 		<dependency>

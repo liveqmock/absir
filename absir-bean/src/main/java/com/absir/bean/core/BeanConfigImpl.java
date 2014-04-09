@@ -72,8 +72,8 @@ public class BeanConfigImpl implements BeanConfig {
 
 		BeanFactory beanFactory = BeanFactoryUtils.get();
 		this.beanConfig = beanFactory == null ? null : beanFactory.getBeanConfig();
-		this.classPath = classPath;
-		this.resourcePath = classPath;
+		setClassPath(classPath);
+		setResourcePath(classPath);
 		Set<String> propertyFilenames = new HashSet<String>();
 		Set<String> loadedPropertyFilenames = new HashSet<String>();
 		Map<String, CallbackTemplate<String>> beanConfigTemplates = new HashMap<String, CallbackTemplate<String>>();
@@ -93,6 +93,22 @@ public class BeanConfigImpl implements BeanConfig {
 				break;
 			}
 		}
+	}
+
+	/**
+	 * @param classPath
+	 */
+	private void setClassPath(String classPath) {
+		this.classPath = classPath;
+		System.setProperty("classPath", classPath);
+	}
+
+	/**
+	 * @param resourcePath
+	 */
+	private void setResourcePath(String resourcePath) {
+		this.resourcePath = resourcePath;
+		System.setProperty("resourcePath", resourcePath);
 	}
 
 	/**
@@ -125,7 +141,7 @@ public class BeanConfigImpl implements BeanConfig {
 			public void doWith(String template) {
 				// TODO Auto-generated method stub
 				template = getResourcePath(template);
-				resourcePath = HelperFileName.normalizeNoEndSeparator(template) + HelperFileName.SYSTEM_SEPARATOR;
+				setResourcePath(HelperFileName.normalizeNoEndSeparator(template) + HelperFileName.SYSTEM_SEPARATOR);
 			}
 
 		});

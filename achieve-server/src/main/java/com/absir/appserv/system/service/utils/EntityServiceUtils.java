@@ -12,7 +12,7 @@ import java.util.List;
 import com.absir.appserv.jdbc.JdbcCondition;
 import com.absir.appserv.jdbc.JdbcPage;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
-import com.absir.appserv.system.domain.value.DCondition;
+import com.absir.appserv.system.domain.DCondition;
 import com.absir.appserv.system.service.EntityService;
 import com.absir.bean.basis.Configure;
 import com.absir.server.in.Input;

@@ -30,7 +30,9 @@ public class SocketReceiverContext extends InDispatcher<SocketChannel, Serializa
 	private ServerContext serverContext;
 
 	/** UN_REGISTER_ID */
-	public static final Serializable UN_REGISTER_ID = new String();
+	@SuppressWarnings("serial")
+	public static final Serializable UN_REGISTER_ID = new Serializable() {
+	};
 
 	/**
 	 * @param serverContext

@@ -20,7 +20,7 @@ import com.absir.appserv.system.bean.base.JbRecycleBase;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.bean.proxy.JpRecycleBase;
 import com.absir.appserv.system.bean.value.JaRecycle;
-import com.absir.appserv.system.domain.value.DCondition;
+import com.absir.appserv.system.domain.DCondition;
 import com.absir.appserv.system.service.utils.AccessServiceUtils;
 import com.absir.appserv.system.service.utils.BeanServiceUtils;
 import com.absir.appserv.system.service.utils.CrudServiceUtils;

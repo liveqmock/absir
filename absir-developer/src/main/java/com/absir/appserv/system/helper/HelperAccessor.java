@@ -12,8 +12,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.Transient;
-
 import com.absir.core.util.UtilAccessor;
 import com.absir.core.util.UtilAccessor.Accessor;
 import com.absir.property.PropertyUtils;
@@ -29,7 +27,7 @@ public class HelperAccessor {
 	 * @return
 	 */
 	public static boolean isAccessor(Field field) {
-		return (field.getModifiers() & PropertyUtils.TRANSIENT_MODIFIER) == 0 && field.getAnnotation(Transient.class) == null;
+		return (field.getModifiers() & PropertyUtils.TRANSIENT_MODIFIER) == 0;
 	}
 
 	/**

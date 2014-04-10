@@ -5,7 +5,7 @@
  *
  * Create on 2013-5-23 下午2:59:01
  */
-package com.absir.appserv.system.domain.value;
+package com.absir.appserv.system.domain;
 
 import java.util.List;
 import java.util.Map;

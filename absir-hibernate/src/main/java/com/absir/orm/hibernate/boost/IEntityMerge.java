@@ -33,7 +33,8 @@ public interface IEntityMerge<T> {
 	 * @param entityName
 	 * @param entity
 	 * @param mergeType
+	 * @param mergeEvent
 	 */
-	public void merge(String entityName, T entity, MergeType mergeType);
+	public void merge(String entityName, T entity, MergeType mergeType, Object mergeEvent);
 
 }

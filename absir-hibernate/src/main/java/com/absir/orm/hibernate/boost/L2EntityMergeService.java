@@ -138,7 +138,7 @@ public class L2EntityMergeService implements IEventService, PostInsertEventListe
 		String entityName = event.getPersister().getEntityName();
 		IEntityMerge entityMerge = nameMapEntityMerge.get(entityName);
 		if (entityMerge != null) {
-			entityMerge.merge(entityName, event.getEntity(), MergeType.DELETE);
+			entityMerge.merge(entityName, event.getEntity(), MergeType.DELETE, event);
 		}
 	}
 
@@ -155,7 +155,7 @@ public class L2EntityMergeService implements IEventService, PostInsertEventListe
 		String entityName = event.getPersister().getEntityName();
 		IEntityMerge entityMerge = nameMapEntityMerge.get(entityName);
 		if (entityMerge != null) {
-			entityMerge.merge(entityName, event.getEntity(), MergeType.UPDATE);
+			entityMerge.merge(entityName, event.getEntity(), MergeType.UPDATE, event);
 		}
 	}
 
@@ -172,7 +172,7 @@ public class L2EntityMergeService implements IEventService, PostInsertEventListe
 		String entityName = event.getPersister().getEntityName();
 		IEntityMerge entityMerge = nameMapEntityMerge.get(entityName);
 		if (entityMerge != null) {
-			entityMerge.merge(entityName, event.getEntity(), MergeType.INSERT);
+			entityMerge.merge(entityName, event.getEntity(), MergeType.INSERT, event);
 		}
 	}
 }

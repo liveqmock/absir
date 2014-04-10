@@ -21,7 +21,7 @@ import com.absir.appserv.jdbc.JdbcPage;
 import com.absir.appserv.system.bean.proxy.JiBase;
 import com.absir.appserv.system.bean.proxy.JiUpdate;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
-import com.absir.appserv.system.domain.value.DCondition;
+import com.absir.appserv.system.domain.DCondition;
 import com.absir.appserv.system.helper.HelperCondition;
 import com.absir.appserv.system.helper.HelperJson;
 import com.absir.appserv.system.service.BeanService;

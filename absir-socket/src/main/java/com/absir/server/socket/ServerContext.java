@@ -24,8 +24,8 @@ public class ServerContext {
 	/** server */
 	private JbServer server;
 
-	/** inline */
-	private long inline;
+	/** online */
+	private long online;
 
 	/** closed */
 	private boolean closed;
@@ -50,10 +50,10 @@ public class ServerContext {
 	}
 
 	/**
-	 * @return the inline
+	 * @return the online
 	 */
-	public long getInline() {
-		return inline;
+	public long getOnline() {
+		return online;
 	}
 
 	/**
@@ -86,7 +86,7 @@ public class ServerContext {
 		synchronized (channelContexts) {
 			SocketChannelContext context = channelContexts.put(id, channelContext);
 			if (context == null) {
-				++inline;
+				++online;
 			}
 		}
 	}
@@ -99,7 +99,7 @@ public class ServerContext {
 		synchronized (channelContexts) {
 			SocketChannelContext context = channelContexts.remove(id);
 			if (context != null) {
-				--inline;
+				--online;
 			}
 
 			return context;

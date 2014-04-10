@@ -497,13 +497,14 @@ public abstract class KernelString {
 	public static interface ImplodeBuilder {
 
 		/**
-		 * @param index
+		 * @param builder
 		 * @param glue
+		 * @param index
 		 * @param value
 		 * @param target
 		 * @return
 		 */
-		public Object glue(String glue, int index, Object value, Object target);
+		public Object glue(StringBuilder builder, Object glue, int index, Object value, Object target);
 	}
 
 	/**
@@ -559,7 +560,7 @@ public abstract class KernelString {
 				builder.append(value);
 
 			} else {
-				implode(builder, imploder, glue, index, value, target);
+				implode(imploder, builder, index, value, target, glue);
 			}
 
 			if (++index >= length) {
@@ -602,7 +603,7 @@ public abstract class KernelString {
 				builder.append(value);
 
 			} else {
-				implode(builder, imploder, glue, index, value, target);
+				implode(imploder, builder, index, value, target, glue);
 			}
 
 			if (++index >= length) {
@@ -645,7 +646,7 @@ public abstract class KernelString {
 				builder.append(entry.getKey());
 
 			} else {
-				implode(builder, imploder, glue, index, entry.getKey(), target);
+				implode(imploder, builder, index, entry.getKey(), target, glue);
 			}
 
 			if (++index >= length) {
@@ -661,7 +662,7 @@ public abstract class KernelString {
 				builder.append(entry.getValue());
 
 			} else {
-				implode(builder, imploder, glue, index, entry.getValue(), target);
+				implode(imploder, builder, index, entry.getValue(), target, glue);
 			}
 
 			if (++index >= length) {
@@ -682,29 +683,14 @@ public abstract class KernelString {
 	 * @param value
 	 * @param target
 	 */
-	protected static void implode(StringBuilder builder, ImplodeBuilder imploder, Object glue, int index, Object value, Object target) {
-		Object result = imploder.glue((String) glue, index, value, target);
-		if (result instanceof Object[]) {
-			Object[] res = (Object[]) result;
-			if (res.length > 1) {
-				glue = res[0];
-				value = res[1];
-			}
-
-			result = null;
-		}
-
-		if (result == null) {
+	protected static void implode(ImplodeBuilder imploder, StringBuilder builder, int index, Object value, Object target, Object glue) {
+		value = imploder.glue(builder, glue, index, value, target);
+		if (value != builder) {
 			if (glue != null) {
 				builder.append(glue);
 			}
 
-			if (value != null) {
-				builder.append(value);
-			}
-
-		} else {
-			builder.append(result);
+			builder.append(value);
 		}
 	}
 }

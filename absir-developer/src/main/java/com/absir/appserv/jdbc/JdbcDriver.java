@@ -79,9 +79,10 @@ public class JdbcDriver {
 	protected ImplodeBuilder insertImplodeBuilder = new ImplodeBuilder() {
 
 		@Override
-		public Object glue(String glue, int index, Object value, Object target) {
+		public Object glue(StringBuilder builder, Object glue, int index, Object value, Object target) {
 			// TODO Auto-generated method stub
-			return insertGlue(glue, index, value, (Object[]) target);
+			insertGlue(builder, glue, index, value, (Object[]) target);
+			return builder;
 		}
 
 	};
@@ -98,13 +99,14 @@ public class JdbcDriver {
 	}
 
 	/**
+	 * @param builder
 	 * @param glue
 	 * @param index
 	 * @param value
 	 * @param target
 	 * @return
 	 */
-	protected Object insertGlue(String glue, int index, Object value, Object[] target) {
+	protected void insertGlue(StringBuilder builder, Object glue, int index, Object value, Object[] target) {
 		if (index == 1) {
 			StringBuilder buffer = (StringBuilder) target[0];
 			Collection collection = (Collection) target[1];
@@ -114,10 +116,14 @@ public class JdbcDriver {
 
 			buffer.append("?");
 			collection.add(value);
-			return "";
-		}
 
-		return null;
+		} else {
+			if (glue != null) {
+				builder.append(glue);
+			}
+
+			builder.append(value);
+		}
 	}
 
 	/**
@@ -136,12 +142,11 @@ public class JdbcDriver {
 	protected ImplodeBuilder conditionImplodeBuilder = new ImplodeBuilder() {
 
 		@Override
-		public Object glue(String glue, int index, Object value, Object target) {
+		public Object glue(StringBuilder builder, Object glue, int index, Object value, Object target) {
 			// TODO Auto-generated method stub
 			Object[] targets = (Object[]) target;
 			if (index == 0) {
-				targets[0] = conditionGlue(glue, index, value);
-				return "";
+				targets[0] = conditionGlue(builder, glue, index, value);
 
 			} else {
 				if (value == null) {
@@ -168,8 +173,10 @@ public class JdbcDriver {
 					}
 				}
 
-				return targets[0];
+				builder.append(targets[0]);
 			}
+
+			return builder;
 		}
 	};
 
@@ -201,7 +208,7 @@ public class JdbcDriver {
 	 * @param target
 	 * @return
 	 */
-	protected String conditionGlue(String glue, int index, Object value) {
+	protected String conditionGlue(StringBuilder builder, Object glue, int index, Object value) {
 		String str = String.valueOf(value);
 		if (str.indexOf(' ') < 0) {
 			str += " = ?";
@@ -272,9 +279,10 @@ public class JdbcDriver {
 	protected ImplodeBuilder updateImplodeBuilder = new ImplodeBuilder() {
 
 		@Override
-		public Object glue(String glue, int index, Object value, Object target) {
+		public Object glue(StringBuilder builder, Object glue, int index, Object value, Object target) {
 			// TODO Auto-generated method stub
-			return updateGlue(glue, index, value, (Collection) target);
+			updateGlue(builder, glue, index, value, (Collection) target);
+			return builder;
 		}
 	};
 
@@ -288,19 +296,23 @@ public class JdbcDriver {
 	}
 
 	/**
+	 * @param builder
 	 * @param glue
 	 * @param index
 	 * @param value
 	 * @param target
-	 * @return
 	 */
-	protected Object updateGlue(String glue, int index, Object value, Collection target) {
+	protected void updateGlue(StringBuilder builder, Object glue, int index, Object value, Collection target) {
 		if (index == 1) {
 			target.add(value);
-			return new Object[] { glue, "?" };
+			value = '?';
 		}
 
-		return null;
+		if (glue != null) {
+			builder.append(builder);
+		}
+
+		builder.append(value);
 	}
 
 	/**
@@ -335,7 +347,7 @@ public class JdbcDriver {
 		}
 
 		if (maxResults > 0) {
-			queryString += " LIMIT " + firstResult + "," + maxResults;
+			queryString += " LIMIT " + firstResult + ", " + maxResults;
 
 		} else if (firstResult > 0) {
 			queryString += " LIMIT " + firstResult;

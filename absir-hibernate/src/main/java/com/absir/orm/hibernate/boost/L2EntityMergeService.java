@@ -59,7 +59,7 @@ public class L2EntityMergeService implements IEventService, PostInsertEventListe
 		}
 
 		Map<String, IEntityMerge> entityMergeBases = new HashMap<String, IEntityMerge>();
-		Class<?>[] parameterTypes = new Class<?>[] { String.class, null, MergeType.class };
+		Class<?>[] parameterTypes = new Class<?>[] { String.class, null, MergeType.class, Object.class };
 		for (IEntityMerge entityMerge : entityMerges) {
 			Method method = KernelReflect.assignableMethod(entityMerge.getClass(), "merge", parameterTypes);
 			if (method != null) {

@@ -45,10 +45,10 @@ public class BinderResult extends PropertyErrors {
 	 * @return the propertyPath
 	 */
 	public String getPropertyPath() {
-		if(propertyFilter == null) {
+		if (propertyFilter == null) {
 			propertyFilter = new PropertyFilter();
 		}
-		
+
 		return propertyFilter.getPropertyPath();
 	}
 
@@ -94,9 +94,9 @@ public class BinderResult extends PropertyErrors {
 	 * 
 	 */
 	public void ready() {
-		if(propertyFilter == null) {
+		if (propertyFilter == null) {
 			propertyFilter = new PropertyFilter();
-			
+
 		} else {
 			propertyFilter.setPropertyPath("");
 		}

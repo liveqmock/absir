@@ -25,7 +25,7 @@ import com.absir.property.PropertyError;
  * @author absir
  * 
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class BinderRequest extends BinderData {
 
 	/*
@@ -94,7 +94,7 @@ public class BinderRequest extends BinderData {
 	 */
 	@Override
 	protected <T> T bindArray(Object obj, String name, Class<T> toClass, Type toType) {
-		if (obj.getClass() == String[].class && toClass.isArray()) {
+		if (obj.getClass() == String[].class) {
 			String[] params = (String[]) obj;
 			if (params.length == 1) {
 				Class<?> valueClass = null;
@@ -130,5 +130,54 @@ public class BinderRequest extends BinderData {
 		}
 
 		return super.bindArray(obj, name, toClass, toType);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.binder.BinderData#bindCollection(java.lang.Object,
+	 * java.lang.String, java.lang.Class, java.lang.reflect.Type,
+	 * java.util.Collection)
+	 */
+	@Override
+	protected <T extends Collection> T bindCollection(Object obj, String name, Class<T> toClass, Type toType, Collection toObject) {
+		if (obj.getClass() == String[].class) {
+			String[] params = (String[]) obj;
+			if (params.length == 1) {
+				Class<?> valueClass = null;
+				if (toType instanceof Class) {
+					valueClass = (Class<?>) toType;
+					if (KernelClass.isBasicClass(valueClass)) {
+						Object value = KernelDyna.stringNull(params[0], toClass);
+						if (value != null) {
+							toObject = toCollection(toClass, toObject);
+							if (toObject != null) {
+								toObject.add(value);
+							}
+
+							return (T) toObject;
+						}
+
+					} else {
+						valueClass = null;
+					}
+				}
+
+				if (valueClass == null) {
+					toObject = super.bindCollection(obj, name, toClass, toType, toObject);
+					List<PropertyError> propertyErrors = getBinderResult().getPropertyErrors();
+					int size = propertyErrors.size();
+					if (size == 0 || !propertyErrors.get(size - 1).getPropertyPath().equals(getBinderResult().getPropertyPath() + "[0]")) {
+						return (T) toObject;
+					}
+
+					propertyErrors.remove(size - 1);
+				}
+
+				return super.bindCollection(StringUtils.split(params[0], ','), name, toClass, toType, toObject);
+			}
+		}
+
+		return super.bindCollection(obj, name, toClass, toType, toObject);
 	}
 }

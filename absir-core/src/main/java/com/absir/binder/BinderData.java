@@ -243,7 +243,15 @@ public class BinderData extends DynaBinder {
 			value = property.getType() == null ? bind(value, beanName, property.getField().getGenericType()) : bind(value, beanName, property.getType());
 		}
 
-		property.getAccessor().set(toObject, value);
+		try {
+			property.getAccessor().set(toObject, value);
+
+		} catch (Throwable e) {
+			// TODO: handle exception
+			binderResult.addPropertyError("Fail to convert", value);
+			return;
+		}
+
 		if (binderResult.isValidation()) {
 			List<Validator> validators = validatorSupply.getPropertyObject(propertyData);
 			if (validators != null) {

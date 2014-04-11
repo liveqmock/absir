@@ -26,6 +26,6 @@ public abstract class ContextService extends ContextBase {
 	@Override
 	public final boolean stepDone(long contextTime) {
 		step(contextTime);
-		return true;
+		return false;
 	}
 }

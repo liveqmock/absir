@@ -12,7 +12,6 @@ import java.io.PrintWriter;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
@@ -23,6 +22,7 @@ import com.absir.appserv.system.crud.UploadCrudFactory;
 import com.absir.appserv.system.helper.HelperHtml;
 import com.absir.server.value.Body;
 import com.absir.server.value.Server;
+import com.absir.servlet.InputRequest;
 
 /**
  * @author absir
@@ -37,8 +37,8 @@ public class Asset_excel extends AssetServer {
 	 * @return
 	 */
 	@Body
-	public Object route(int index, HttpServletRequest request) {
-		return route(index, false, request);
+	public Object route(int index, InputRequest input) {
+		return route(index, false, input);
 	}
 
 	/**
@@ -48,8 +48,8 @@ public class Asset_excel extends AssetServer {
 	 * @return
 	 */
 	@Body
-	public Object route(int index, boolean orientation, HttpServletRequest request) {
-		FileItem excel = UploadCrudFactory.getUploadFile(request, "excel");
+	public Object route(int index, boolean orientation, InputRequest input) {
+		FileItem excel = UploadCrudFactory.getUploadFile(input, "excel");
 		if (excel != null) {
 			try {
 				HSSFWorkbook hssfWorkbook = new HSSFWorkbook(excel.getInputStream());

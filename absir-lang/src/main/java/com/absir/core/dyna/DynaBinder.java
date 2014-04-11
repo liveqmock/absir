@@ -467,6 +467,36 @@ public class DynaBinder {
 	}
 
 	/**
+	 * @param toClass
+	 * @param toObject
+	 * @return
+	 */
+	protected Collection toCollection(Class<? extends Collection> toClass, Collection toObject) {
+		if (toObject != null) {
+			try {
+				toObject.clear();
+
+			} catch (Exception e) {
+				// TODO: handle exception
+				toObject = null;
+			}
+		}
+
+		if (toObject == null) {
+			if (toClass.isAssignableFrom(ArrayList.class)) {
+				toClass = ArrayList.class;
+
+			} else if (toClass.isAssignableFrom(HashSet.class)) {
+				toClass = HashSet.class;
+			}
+
+			toObject = newInstance(toClass);
+		}
+
+		return toObject;
+	}
+
+	/**
 	 * @param obj
 	 * @param name
 	 * @param toClass
@@ -475,23 +505,8 @@ public class DynaBinder {
 	 * @return
 	 */
 	protected <T extends Collection> T bindCollection(Object obj, String name, Class<T> toClass, Type toType, Collection toObject) {
-		if (toObject == null) {
-			if (toClass.isAssignableFrom(ArrayList.class)) {
-				toClass = (Class<T>) ArrayList.class;
-
-			} else if (toClass.isAssignableFrom(HashSet.class)) {
-				toClass = (Class<T>) HashSet.class;
-			}
-
-			try {
-				toObject = newInstance(toClass);
-
-			} catch (Exception e) {
-			}
-		}
-
+		toObject = toCollection(toClass, toObject);
 		if (toObject != null) {
-			toObject.clear();
 			if (obj instanceof Collection) {
 				int index = 0;
 				for (Object ob : (Collection) obj) {
@@ -545,6 +560,16 @@ public class DynaBinder {
 	 * @return
 	 */
 	protected <T extends Map> T bindMap(Map obj, String name, String keyName, Class<T> toClass, Type toType, Type keyType, Map toObject) {
+		if (toObject != null) {
+			try {
+				toObject.clear();
+
+			} catch (Exception e) {
+				// TODO: handle exception
+				toObject = null;
+			}
+		}
+
 		if (toObject == null) {
 			if (toClass.isAssignableFrom(HashMap.class)) {
 				toClass = (Class<T>) HashMap.class;

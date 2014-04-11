@@ -73,14 +73,17 @@ public class DActitity<T extends JiActivity> {
 		long contextTime = ContextUtils.getContextTime();
 		if (mergeType == MergeType.DELETE) {
 			if (entity.getBeginTime() > contextTime && entity.getPassTime() < contextTime) {
-				nextTime = contextTime + DELAY_NEXT_TIME;
+				contextTime += DELAY_NEXT_TIME;
+				if (nextTime > contextTime) {
+					nextTime = contextTime;
+				}
 			}
 
 		} else {
 			if (mergeType == MergeType.INSERT) {
 				if (contextTime < entity.getPassTime()) {
-					if (nextTime > entity.getBeginTime()) {
-						contextTime = entity.getBeginTime() + DELAY_NEXT_TIME;
+					contextTime += DELAY_NEXT_TIME;
+					if (nextTime > contextTime) {
 						nextTime = contextTime <= entity.getBeginTime() ? contextTime : entity.getBeginTime();
 					}
 				}

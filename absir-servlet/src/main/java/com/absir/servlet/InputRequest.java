@@ -10,16 +10,27 @@ package com.absir.servlet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+
 import com.absir.binder.BinderData;
+import com.absir.context.core.ContextUtils;
 import com.absir.core.helper.HelperIO;
 import com.absir.core.kernel.KernelCharset;
+import com.absir.core.kernel.KernelCollection;
 import com.absir.core.kernel.KernelLang;
 import com.absir.server.in.InMethod;
 import com.absir.server.in.InModel;
@@ -48,6 +59,37 @@ public class InputRequest extends Input {
 
 	/** input */
 	private String input;
+
+	/** parameterMap */
+	private Map<String, Object> parameterMap;
+
+	/** PARAMETER_MAP_NAME */
+	private static final String PARAMETER_MAP_NAME = InputRequest.class.getName() + "@PARAMETER_MAP_NAME";
+
+	/** SERVLET_FILE_UPLOAD_DEFAULT */
+	private static final ServletFileUpload SERVLET_FILE_UPLOAD_DEFAULT = new ServletFileUpload(new DiskFileItemFactory());
+
+	/**
+	 * @param request
+	 * @return
+	 * @throws FileUploadException
+	 */
+	public static Map<String, List<FileItem>> parseParameterMap(HttpServletRequest request) {
+		Object fileItems = request.getAttribute(PARAMETER_MAP_NAME);
+		if (fileItems == null || !(fileItems instanceof Map)) {
+			try {
+				fileItems = SERVLET_FILE_UPLOAD_DEFAULT.parseParameterMap(request);
+
+			} catch (Exception e) {
+				// TODO: handle exception
+				fileItems = KernelLang.NULL_MAP;
+			}
+
+			request.setAttribute(PARAMETER_MAP_NAME, fileItems);
+		}
+
+		return (Map<String, List<FileItem>>) fileItems;
+	}
 
 	/**
 	 * @param uri
@@ -168,7 +210,46 @@ public class InputRequest extends Input {
 	@Override
 	public Map<String, Object> getParamMap() {
 		// TODO Auto-generated method stub
-		return request.getParameterMap();
+		if (parameterMap == null) {
+			if (method != InMethod.GET) {
+				String contentType = request.getContentType();
+				if (contentType != null && contentType.startsWith("multipart/form-data")) {
+					Map<String, List<FileItem>> fileItems = parseParameterMap(request);
+					if (!fileItems.isEmpty()) {
+						parameterMap = new HashMap<String, Object>();
+						for (Entry<String, List<FileItem>> entry : fileItems.entrySet()) {
+							List<String> parameters = null;
+							for (FileItem item : entry.getValue()) {
+								if (item.isFormField()) {
+									if (parameters == null) {
+										parameters = new ArrayList<String>();
+									}
+
+									parameters.add(new String(item.get(), ContextUtils.getCharset()));
+								}
+							}
+
+							if (parameters != null) {
+								parameterMap.put(entry.getKey(), KernelCollection.toArray(parameters, String.class));
+							}
+						}
+
+						return parameterMap;
+					}
+				}
+			}
+
+			parameterMap = (Map<String, Object>) (Object) KernelLang.NULL_MAP;
+		}
+
+		return (Object) parameterMap == KernelLang.NULL_MAP ? request.getParameterMap() : parameterMap;
+	}
+
+	/**
+	 * @return
+	 */
+	public Map<String, List<FileItem>> parseParameterMap() {
+		return parseParameterMap(request);
 	}
 
 	/*

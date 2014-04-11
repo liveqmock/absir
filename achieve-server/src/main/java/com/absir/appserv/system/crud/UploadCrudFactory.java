@@ -9,16 +9,9 @@ package com.absir.appserv.system.crud;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +42,6 @@ import com.absir.servlet.InputRequest;
  * @author absir
  * 
  */
-@SuppressWarnings("unchecked")
 public class UploadCrudFactory implements ICrudFactory {
 
 	/** uploadPath */
@@ -58,14 +50,8 @@ public class UploadCrudFactory implements ICrudFactory {
 	/** uploadUrl */
 	private static String uploadUrl;
 
-	/** servletFileUpload */
-	private static ServletFileUpload servletFileUpload = new ServletFileUpload(new DiskFileItemFactory());
-
 	/** LOGGER */
 	private static final Logger LOGGER = LoggerFactory.getLogger(UploadCrudFactory.class);
-
-	/** UPLOADMAP_STRING_NAME */
-	private static final String UPLOADMAP_STRING_NAME = UploadCrudFactory.class.getName() + "@" + "upload_map";
 
 	/**
 	 * @return
@@ -82,41 +68,12 @@ public class UploadCrudFactory implements ICrudFactory {
 	}
 
 	/**
-	 * @return the servletFileUpload
-	 */
-	public static ServletFileUpload getServletFileUpload() {
-		return servletFileUpload;
-	}
-
-	/**
-	 * @param request
-	 * @return
-	 * @throws FileUploadException
-	 */
-	public static Map<String, List<FileItem>> getUploadMap(HttpServletRequest request) {
-		Object fileItems = request.getAttribute(UPLOADMAP_STRING_NAME);
-		if (fileItems == null || !(fileItems instanceof Map)) {
-			try {
-				fileItems = servletFileUpload.parseParameterMap(request);
-
-			} catch (Exception e) {
-				// TODO: handle exception
-				fileItems = new HashMap<String, List<FileItem>>();
-			}
-
-			request.setAttribute(UPLOADMAP_STRING_NAME, fileItems);
-		}
-
-		return (Map<String, List<FileItem>>) fileItems;
-	}
-
-	/**
 	 * @param name
 	 * @param fileItem
 	 * @return
 	 */
-	public static FileItem getUploadFile(HttpServletRequest request, String name) {
-		List<FileItem> fileItems = getUploadMap(request).get(name);
+	public static FileItem getUploadFile(InputRequest input, String name) {
+		List<FileItem> fileItems = input.parseParameterMap().get(name);
 		return fileItems == null || fileItems.isEmpty() ? null : fileItems.get(0);
 	}
 
@@ -257,7 +214,7 @@ public class UploadCrudFactory implements ICrudFactory {
 			// TODO Auto-generated method stub
 			String field = handler.getFilter().getPropertyPath();
 			if (input instanceof InputRequest) {
-				FileItem file = getUploadFile(((InputRequest) input).getRequest(), field + "_file");
+				FileItem file = getUploadFile((InputRequest) input, field + "_file");
 				if (file != null && !KernelString.isEmpty(file.getName())) {
 					verifyMultipartFile(field, file, crudProperty.getjCrud().getParameters(), errors);
 					return file;

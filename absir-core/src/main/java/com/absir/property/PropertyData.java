@@ -7,7 +7,6 @@
  */
 package com.absir.property;
 
-
 /**
  * @author absir
  * 

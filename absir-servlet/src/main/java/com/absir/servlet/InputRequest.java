@@ -199,7 +199,8 @@ public class InputRequest extends Input {
 	@Override
 	public String[] getParams(String name) {
 		// TODO Auto-generated method stub
-		return request.getParameterValues(name);
+		Object values = getParamMap().get(name);
+		return values == null || !(values instanceof String[]) ? null : (String[]) values;
 	}
 
 	/*

@@ -30,7 +30,7 @@ import com.absir.binder.BinderData;
 import com.absir.binder.BinderResult;
 import com.absir.binder.BinderUtils;
 import com.absir.core.kernel.KernelLang.PropertyFilter;
-import com.absir.core.kernel.KernelObject;
+import com.absir.core.util.UtilAccessor;
 import com.absir.orm.value.JoEntity;
 import com.absir.server.exception.ServerException;
 import com.absir.server.exception.ServerStatus;
@@ -239,7 +239,7 @@ public class Admin_entity extends AdminServer {
 		String[] subtables = input.getParams("!subtables");
 		if (subtables != null) {
 			for (String subtable : subtables) {
-				KernelObject.declaredSet(entity, subtable, null);
+				UtilAccessor.set(entity, subtable, null);
 			}
 		}
 

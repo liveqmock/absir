@@ -65,7 +65,7 @@ public class BinderUtils {
 				}
 			}
 
-			String[] propertyPaths = propertyPath.split("\\.");
+			String[] propertyPaths = propertyPath.replace("[", ".[").split("\\.");
 			dataValue = addDataObject(propertyPaths, 0, propertyPaths.length, entry.getValue(), dataObject);
 			if (dataObject == null) {
 				dataObject = dataValue;
@@ -105,8 +105,7 @@ public class BinderUtils {
 						}
 
 						List<Object> dataList = (List<Object>) dataObject;
-						length = dataList.size() - index;
-						for (int i = 0; i <= length; i++) {
+						for (int i = dataList.size() - index; i <= 0; i++) {
 							dataList.add(null);
 						}
 

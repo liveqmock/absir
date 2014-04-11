@@ -72,7 +72,7 @@ public class DActitity<T extends JiActivity> {
 	public void merge(T entity, MergeType mergeType, Object mergeEvent) {
 		long contextTime = ContextUtils.getContextTime();
 		if (mergeType == MergeType.DELETE) {
-			if (entity.getBeginTime() > contextTime && entity.getPassTime() < contextTime) {
+			if (entity.getBeginTime() < contextTime && entity.getPassTime() > contextTime) {
 				contextTime += DELAY_NEXT_TIME;
 				if (nextTime > contextTime) {
 					nextTime = contextTime;
@@ -81,79 +81,58 @@ public class DActitity<T extends JiActivity> {
 
 		} else {
 			if (mergeType == MergeType.INSERT) {
-				if (contextTime < entity.getPassTime()) {
-					contextTime += DELAY_NEXT_TIME;
-					if (nextTime > contextTime) {
-						nextTime = contextTime <= entity.getBeginTime() ? contextTime : entity.getBeginTime();
+				if (entity.getPassTime() > contextTime) {
+					if (entity.getBeginTime() <= contextTime) {
+						contextTime += DELAY_NEXT_TIME;
+						if (nextTime > contextTime) {
+							nextTime = contextTime;
+						}
+
+					} else {
+						if (entity.getBeginTime() < nextTime) {
+							contextTime += DELAY_NEXT_TIME;
+							nextTime = contextTime <= entity.getBeginTime() ? contextTime : entity.getBeginTime();
+						}
 					}
 				}
 
 			} else {
 				PostUpdateEvent postUpdateEvent = (PostUpdateEvent) mergeEvent;
-				Long beginTime = null;
-				Long passTime = null;
+				long beginTime = entity.getBeginTime();
+				long passTime = entity.getPassTime();
 				String[] propertyNames = postUpdateEvent.getPersister().getPropertyNames();
 				int update = 2;
 				for (int i : postUpdateEvent.getDirtyProperties()) {
 					if ("beginTime".equals(propertyNames[i])) {
-						beginTime = KernelDyna.to(postUpdateEvent.getOldState()[i], Long.class);
+						beginTime = KernelDyna.to(postUpdateEvent.getOldState()[i], long.class);
 						if (--update == 0) {
 							break;
 						}
 
 					} else if ("passTime".equals(propertyNames[i])) {
-						passTime = KernelDyna.to(postUpdateEvent.getOldState()[i], Long.class);
+						passTime = KernelDyna.to(postUpdateEvent.getOldState()[i], long.class);
 						if (--update == 0) {
 							break;
 						}
 					}
 				}
 
-				if (beginTime != null) {
-					if (merge(contextTime, entity.getBeginTime(), beginTime)) {
-						return;
-					}
-				}
-
-				if (passTime != null) {
-					if (merge(contextTime, entity.getPassTime(), passTime)) {
-						return;
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * @param currentTime
-	 * @param oldTime
-	 */
-	private boolean merge(long contextTime, long currentTime, long oldTime) {
-		if (contextTime <= currentTime) {
-			oldTime = contextTime >= oldTime ? 0 : 1;
-
-		} else {
-			if (contextTime <= oldTime) {
-				oldTime = 0;
-
-			} else {
-				if (nextTime > currentTime) {
+				if ((beginTime <= contextTime && passTime > contextTime) || (entity.getBeginTime() <= contextTime && entity.getPassTime() > contextTime)) {
 					contextTime += DELAY_NEXT_TIME;
-					nextTime = contextTime < currentTime ? contextTime : contextTime;
+					if (nextTime > contextTime) {
+						nextTime = contextTime;
+					}
+
+				} else {
+					if (entity.getPassTime() > contextTime) {
+						if (entity.getBeginTime() < nextTime) {
+							contextTime += DELAY_NEXT_TIME;
+							nextTime = contextTime <= entity.getBeginTime() ? contextTime : entity.getBeginTime();
+						}
+					}
 				}
-
-				return true;
 			}
 		}
-
-		if (oldTime == 0) {
-			contextTime += DELAY_NEXT_TIME;
-			if (nextTime > contextTime) {
-				nextTime = contextTime;
-			}
-		}
-
-		return false;
 	}
 
 	/**

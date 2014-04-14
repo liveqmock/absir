@@ -81,13 +81,13 @@ public class SocketReceiverContext extends InDispatcher<SocketChannel, InputSock
 				try {
 					Serializable id = SocketServerContext.get().getSessionResolver().register(socketChannel, serverContext, buffer);
 					if (id == null) {
-						SocketChannelResolver.ME.writeByteBuffer(socketChannel, 0, null, SocketServerContext.get().getFailed());
 						socketBuffer.setId(null);
+						SocketChannelResolver.ME.writeByteBuffer(socketChannel, 0, null, SocketServerContext.get().getFailed());
 
 					} else {
+						socketBuffer.setId(id);
 						SocketChannelResolver.ME.writeByteBuffer(socketChannel, 0, null, SocketServerContext.get().getOk());
 						serverContext.loginSocketChannelContext(id, createSocketChannelContext(id, socketChannel));
-						socketBuffer.setId(id);
 					}
 
 				} catch (Throwable e) {

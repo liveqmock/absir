@@ -119,9 +119,9 @@ public class SocketChannelResolver implements ParameterResolver<Object> {
 	 * @throws IOException
 	 */
 	public void writeByteBuffer(SocketChannel socketChannel, int headerLength, SocketHeaderProccesor headerProccesor, byte[] bytes) throws IOException {
-		int length = headerLength + bytes.length;
-		byte[] buffer = new byte[4 + length];
-		KernelByte.setLength(buffer, 0, length);
+		int length = bytes.length;
+		byte[] buffer = new byte[4 + headerLength + length];
+		KernelByte.setLength(buffer, 0, headerLength + length);
 		KernelByte.copy(bytes, buffer, 0, 4 + headerLength, length);
 		if (headerProccesor != null) {
 			headerProccesor.writeSocketHeader(headerLength, buffer);

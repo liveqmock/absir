@@ -56,6 +56,7 @@ public class InputSocket extends Input implements SocketHeaderProccesor {
 		super(model);
 		// TODO Auto-generated constructor stub
 		this.socketChannel = socketChannel;
+		setId(inputSocketAtt.getId());
 		uri = inputSocketAtt.getUrl();
 		input = inputSocketAtt.getInput();
 		flag = inputSocketAtt.getFlag();

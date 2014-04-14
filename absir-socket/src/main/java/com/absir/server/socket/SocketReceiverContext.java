@@ -18,13 +18,14 @@ import com.absir.server.in.InDispatcher;
 import com.absir.server.in.InMethod;
 import com.absir.server.in.InModel;
 import com.absir.server.in.Input;
+import com.absir.server.socket.InputSocket.InputSocketAtt;
 import com.absir.server.socket.resolver.SocketChannelResolver;
 
 /**
  * @author absir
  * 
  */
-public class SocketReceiverContext extends InDispatcher<SocketChannel, Serializable> implements SocketReceiver<Serializable> {
+public class SocketReceiverContext extends InDispatcher<SocketChannel, InputSocketAtt> implements SocketReceiver<Serializable> {
 
 	/** serverContext */
 	private ServerContext serverContext;
@@ -80,11 +81,11 @@ public class SocketReceiverContext extends InDispatcher<SocketChannel, Serializa
 				try {
 					Serializable id = SocketServerContext.get().getSessionResolver().register(socketChannel, serverContext, buffer);
 					if (id == null) {
-						SocketChannelResolver.ME.writeByteBuffer(socketChannel, SocketServerContext.get().getFailed());
+						SocketChannelResolver.ME.writeByteBuffer(socketChannel, 0, null, SocketServerContext.get().getFailed());
 						socketBuffer.setId(null);
 
 					} else {
-						SocketChannelResolver.ME.writeByteBuffer(socketChannel, SocketServerContext.get().getOk());
+						SocketChannelResolver.ME.writeByteBuffer(socketChannel, 0, null, SocketServerContext.get().getOk());
 						serverContext.loginSocketChannelContext(id, createSocketChannelContext(id, socketChannel));
 						socketBuffer.setId(id);
 					}
@@ -143,7 +144,10 @@ public class SocketReceiverContext extends InDispatcher<SocketChannel, Serializa
 				// TODO Auto-generated method stub
 				try {
 					if (!doBeat(id, socketChannel, buffer, SocketServerContext.get().getBeat())) {
-						on(new String(buffer, ContextUtils.getCharset()), socketChannel, id);
+						if (buffer.length > 1) {
+							InputSocketAtt inputSocketAtt = new InputSocketAtt(id, buffer);
+							on(inputSocketAtt.getUrl(), socketChannel, inputSocketAtt);
+						}
 					}
 
 				} catch (Throwable e) {
@@ -171,7 +175,7 @@ public class SocketReceiverContext extends InDispatcher<SocketChannel, Serializa
 				}
 			}
 
-			SocketChannelResolver.ME.writeByteBuffer(socketChannel, beat);
+			SocketChannelResolver.ME.writeByteBuffer(socketChannel, 0, null, beat);
 			serverContext.getChannelContexts().get(id).retainAt();
 			SocketServerContext.get().getSessionResolver().doBeat(id, socketChannel, serverContext);
 			return true;
@@ -211,10 +215,9 @@ public class SocketReceiverContext extends InDispatcher<SocketChannel, Serializa
 	 * java.lang.Object, java.lang.Object)
 	 */
 	@Override
-	protected Input input(String uri, InMethod inMethod, InModel model, SocketChannel req, Serializable res) {
+	protected Input input(String uri, InMethod inMethod, InModel model, SocketChannel req, InputSocketAtt res) {
 		// TODO Auto-generated method stub
-		InputSocket socketInput = new InputSocket(model, uri, null, req);
-		socketInput.setId(res);
+		InputSocket socketInput = new InputSocket(model, req, res);
 		return socketInput;
 	}
 }

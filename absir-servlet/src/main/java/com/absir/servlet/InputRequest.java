@@ -160,6 +160,28 @@ public class InputRequest extends Input {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see com.absir.server.in.Input#setStatus(int)
+	 */
+	@Override
+	public void setStatus(int status) {
+		// TODO Auto-generated method stub
+		response.setStatus(status);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.server.in.Input#paramDebug()
+	 */
+	@Override
+	public boolean paramDebug() {
+		// TODO Auto-generated method stub
+		return request.getParameter("DEBUG") != null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.absir.server.in.Input#getAttribute(java.lang.String)
 	 */
 	@Override

@@ -17,12 +17,13 @@ import com.absir.bean.basis.Base;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Value;
+import com.absir.core.kernel.KernelByte;
 import com.absir.server.in.Input;
 import com.absir.server.on.OnPut;
 import com.absir.server.route.RouteMethod;
 import com.absir.server.route.parameter.ParameterResolver;
-import com.absir.server.socket.SocketBuffer;
 import com.absir.server.socket.InputSocket;
+import com.absir.server.socket.SocketBuffer;
 
 /**
  * @author absir
@@ -98,20 +99,32 @@ public class SocketChannelResolver implements ParameterResolver<Object> {
 	}
 
 	/**
+	 * @author absir
+	 * 
+	 */
+	public interface SocketHeaderProccesor {
+
+		/**
+		 * @param headerLength
+		 * @param buffer
+		 */
+		public void writeSocketHeader(int headerLength, byte[] buffer);
+	}
+
+	/**
 	 * @param socketChannel
+	 * @param headerLength
+	 * @param headCallback
 	 * @param bytes
 	 * @throws IOException
 	 */
-	public void writeByteBuffer(SocketChannel socketChannel, byte[] bytes) throws IOException {
-		int length = bytes.length;
+	public void writeByteBuffer(SocketChannel socketChannel, int headerLength, SocketHeaderProccesor headerProccesor, byte[] bytes) throws IOException {
+		int length = headerLength + bytes.length;
 		byte[] buffer = new byte[4 + length];
-		buffer[0] = (byte) (length);
-		buffer[1] = (byte) (length >> 8);
-		buffer[2] = (byte) (length >> 16);
-		buffer[3] = (byte) (length >> 24);
-
-		for (int i = 0; i < length; i++) {
-			buffer[i + 4] = bytes[i];
+		KernelByte.setLength(buffer, 0, length);
+		KernelByte.copy(bytes, buffer, 0, 4 + headerLength, length);
+		if (headerProccesor != null) {
+			headerProccesor.writeSocketHeader(headerLength, buffer);
 		}
 
 		socketChannel.write(ByteBuffer.wrap(buffer));

@@ -15,7 +15,9 @@ import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.Map;
 
+import com.absir.bean.basis.Environment;
 import com.absir.bean.core.BeanConfigImpl;
+import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.binder.BinderData;
 import com.absir.context.core.Bean;
 import com.absir.context.core.ContextUtils;
@@ -153,6 +155,20 @@ public abstract class Input extends Bean<Serializable> implements IAttributes {
 	 * @return
 	 */
 	public abstract InMethod getMethod();
+
+	/**
+	 * @param status
+	 */
+	public abstract void setStatus(int status);
+
+	/**
+	 * @return
+	 */
+	public boolean isDebug() {
+		return BeanFactoryUtils.getEnvironment().compareTo(Environment.DEBUG) <= 0 && paramDebug();
+	}
+
+	public abstract boolean paramDebug();
 
 	/**
 	 * @param name

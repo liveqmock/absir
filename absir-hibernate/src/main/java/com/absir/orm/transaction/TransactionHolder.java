@@ -40,6 +40,7 @@ public abstract class TransactionHolder implements ISessionHolder {
 	public TransactionHolder(ISessionHolder holderBefore, TransactionAttribute transactionAttribute) {
 		if (holderBefore == null) {
 			nested = (byte) (transactionAttribute.isRequired() ? 1 : 2);
+			readOnly = (byte) (transactionAttribute.isReadOnly() ? 1 : 0);
 
 		} else {
 			if (transactionAttribute.isNested()) {

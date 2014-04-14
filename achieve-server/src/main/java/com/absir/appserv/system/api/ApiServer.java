@@ -73,18 +73,12 @@ public abstract class ApiServer {
 	@Body
 	@OnException(Throwable.class)
 	protected Object onException(Throwable e, Input input) {
-		InputRequest inputRequest = null;
-		if (input instanceof InputRequest) {
-			inputRequest = (InputRequest) input;
-			inputRequest.getResponse().setStatus(HttpStatus.SC_NOT_ACCEPTABLE);
-		}
-
+		input.setStatus(HttpStatus.SC_NOT_ACCEPTABLE);
 		if (BeanFactoryUtils.getEnvironment() == Environment.DEVELOP) {
 			e.printStackTrace();
 		}
 
-		if (BeanFactoryUtils.getEnvironment() == Environment.DEVELOP || !(e instanceof ServerException)
-				|| (BeanFactoryUtils.getEnvironment() != Environment.PRODUCT && inputRequest != null && inputRequest.getParam("DEBUG") != null)) {
+		if (BeanFactoryUtils.getEnvironment() == Environment.DEVELOP || !(e instanceof ServerException) || input.isDebug()) {
 			LOGGER.error("api error", e);
 		}
 

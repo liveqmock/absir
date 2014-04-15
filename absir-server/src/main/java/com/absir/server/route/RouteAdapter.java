@@ -63,8 +63,8 @@ public class RouteAdapter {
 			// find match min - max
 			int m;
 			int compare = 0;
-			int mMin = 0;
-			int mMax = Integer.MAX_VALUE;
+			int mMin = Integer.MAX_VALUE;
+			int mMax = -1;
 			while (min < max) {
 				m = (min + max) / 2;
 				compare = compare(routeMatchers.get(m), uries, length);
@@ -77,13 +77,12 @@ public class RouteAdapter {
 
 				} else {
 					if (compare == 0) {
-						if (mMax > m) {
-							mMax = m;
+						if (mMin > m) {
+							mMin = m;
 						}
 
-					} else {
-						if (mMin < m) {
-							mMin = m;
+						if (mMax < m) {
+							mMax = m;
 						}
 					}
 
@@ -95,30 +94,12 @@ public class RouteAdapter {
 				}
 			}
 
-			if (mMax == Integer.MAX_VALUE) {
+			if (mMax == -1) {
 				max = -1;
 
 			} else {
-				while (mMin < mMax) {
-					m = (mMin + mMax) / 2;
-					if (compare(routeMatchers.get(m), uries, length) <= 0) {
-						if (mMax == m) {
-							break;
-						}
-
-						mMax = m;
-
-					} else {
-						if (mMin == m) {
-							break;
-						}
-
-						mMin = m;
-					}
-				}
-
-				max = min;
-				min = mMax;
+				min = mMin;
+				max = mMax;
 			}
 		}
 

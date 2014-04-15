@@ -19,7 +19,6 @@ import com.absir.server.in.InMethod;
 import com.absir.server.in.InModel;
 import com.absir.server.in.Input;
 import com.absir.server.socket.InputSocket.InputSocketAtt;
-import com.absir.server.socket.resolver.SocketChannelResolver;
 
 /**
  * @author absir
@@ -82,11 +81,11 @@ public class SocketReceiverContext extends InDispatcher<SocketChannel, InputSock
 					Serializable id = SocketServerContext.get().getSessionResolver().register(socketChannel, serverContext, buffer);
 					if (id == null) {
 						socketBuffer.setId(null);
-						SocketChannelResolver.ME.writeByteBuffer(socketChannel, 0, null, SocketServerContext.get().getFailed());
+						InputSocket.writeByteBuffer(socketChannel, SocketServerContext.get().getFailed());
 
 					} else {
 						socketBuffer.setId(id);
-						SocketChannelResolver.ME.writeByteBuffer(socketChannel, 0, null, SocketServerContext.get().getOk());
+						InputSocket.writeByteBuffer(socketChannel, SocketServerContext.get().getOk());
 						serverContext.loginSocketChannelContext(id, createSocketChannelContext(id, socketChannel));
 					}
 
@@ -175,7 +174,7 @@ public class SocketReceiverContext extends InDispatcher<SocketChannel, InputSock
 				}
 			}
 
-			SocketChannelResolver.ME.writeByteBuffer(socketChannel, 0, null, beat);
+			InputSocket.writeByteBuffer(socketChannel, beat);
 			serverContext.getChannelContexts().get(id).retainAt();
 			SocketServerContext.get().getSessionResolver().doBeat(id, socketChannel, serverContext);
 			return true;

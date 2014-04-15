@@ -105,26 +105,28 @@ public class SocketChannelResolver implements ParameterResolver<Object> {
 	public interface SocketHeaderProccesor {
 
 		/**
+		 * @param callbackIndex
 		 * @param headerLength
 		 * @param buffer
 		 */
-		public void writeSocketHeader(int headerLength, byte[] buffer);
+		public void writeSocketHeader(int callbackIndex, int headerLength, byte[] buffer);
 	}
 
 	/**
 	 * @param socketChannel
+	 * @param callbackIndex
 	 * @param headerLength
-	 * @param headCallback
+	 * @param headerProccesor
 	 * @param bytes
 	 * @throws IOException
 	 */
-	public void writeByteBuffer(SocketChannel socketChannel, int headerLength, SocketHeaderProccesor headerProccesor, byte[] bytes) throws IOException {
+	public void writeByteBuffer(SocketChannel socketChannel, int callbackIndex, int headerLength, SocketHeaderProccesor headerProccesor, byte[] bytes) throws IOException {
 		int length = bytes.length;
 		byte[] buffer = new byte[4 + headerLength + length];
 		KernelByte.setLength(buffer, 0, headerLength + length);
 		KernelByte.copy(bytes, buffer, 0, 4 + headerLength, length);
 		if (headerProccesor != null) {
-			headerProccesor.writeSocketHeader(headerLength, buffer);
+			headerProccesor.writeSocketHeader(callbackIndex, headerLength, buffer);
 		}
 
 		socketChannel.write(ByteBuffer.wrap(buffer));

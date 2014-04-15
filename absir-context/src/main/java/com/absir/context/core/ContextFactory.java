@@ -273,7 +273,7 @@ public class ContextFactory {
 	private <T extends Context<ID>, ID extends Serializable> T getContext(Map<Serializable, Context> contextMap, Class<T> ctxClass, ID id, Class<?> cls, boolean concurrent) {
 		Context context = contextMap.get(id);
 		if (context == null) {
-			String tokenId = UtilAbsir.getId(cls, id);
+			String tokenId = concurrent ? UtilAbsir.getId(cls, id) : null;
 			synchronized (concurrent ? getToken(tokenId) : contextMap) {
 				try {
 					context = contextMap.get(id);
@@ -309,7 +309,7 @@ public class ContextFactory {
 					}
 
 				} finally {
-					if (context instanceof ContextBean) {
+					if (concurrent) {
 						clearToken(tokenId);
 					}
 				}

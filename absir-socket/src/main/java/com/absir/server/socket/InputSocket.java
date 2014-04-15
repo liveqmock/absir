@@ -51,8 +51,10 @@ public class InputSocket extends Input implements SocketHeaderProccesor {
 
 	/**
 	 * @param model
+	 * @param inputSocketAtt
+	 * @param socketChannel
 	 */
-	public InputSocket(InModel model, SocketChannel socketChannel, InputSocketAtt inputSocketAtt) {
+	public InputSocket(InModel model, InputSocketAtt inputSocketAtt, SocketChannel socketChannel) {
 		super(model);
 		// TODO Auto-generated constructor stub
 		this.socketChannel = socketChannel;
@@ -144,6 +146,13 @@ public class InputSocket extends Input implements SocketHeaderProccesor {
 		 */
 		public byte getFlag() {
 			return flag;
+		}
+
+		/**
+		 * @return
+		 */
+		public InMethod getMethod() {
+			return (flag & POST_FLAG) == 0 ? InMethod.GET : InMethod.POST;
 		}
 
 		/**

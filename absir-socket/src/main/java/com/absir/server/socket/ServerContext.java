@@ -8,6 +8,7 @@
 package com.absir.server.socket;
 
 import java.io.Serializable;
+import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -93,16 +94,16 @@ public class ServerContext {
 
 	/**
 	 * @param id
+	 * @param socketChannel
 	 * @return
 	 */
-	public SocketChannelContext logoutSocketChannelContext(Serializable id) {
+	public void logoutSocketChannelContext(Serializable id, SocketChannel socketChannel) {
 		synchronized (channelContexts) {
-			SocketChannelContext context = channelContexts.remove(id);
-			if (context != null) {
+			SocketChannelContext channelContext = channelContexts.get(id);
+			if (channelContext != null && channelContext.getSocketChannel() == socketChannel) {
 				--online;
+				channelContexts.remove(id);
 			}
-
-			return context;
 		}
 	}
 

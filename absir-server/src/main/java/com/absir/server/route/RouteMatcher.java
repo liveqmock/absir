@@ -45,6 +45,7 @@ public class RouteMatcher extends InMatcher {
 	public RouteMatcher(RouteAction routeAction, String mapping, String suffix, List<InMethod> inMethods, String[] parameterNames, RouteParameter routeParameter) {
 		super(mapping, suffix);
 		this.routeAction = routeAction;
+		inMethods = routeAction.getRouteMethod().resolveMethods(inMethods);
 		this.inMethods = inMethods == null || inMethods.isEmpty() ? null : KernelCollection.toArray(inMethods, InMethod.class);
 		this.parameterNames = parameterNames;
 		this.routeParameter = routeParameter;

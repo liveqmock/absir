@@ -18,13 +18,15 @@ import com.absir.server.in.InDispatcher;
 import com.absir.server.in.InMethod;
 import com.absir.server.in.InModel;
 import com.absir.server.in.Input;
+import com.absir.server.on.OnPut;
+import com.absir.server.route.returned.ReturnedResolverBody;
 import com.absir.server.socket.InputSocket.InputSocketAtt;
 
 /**
  * @author absir
  * 
  */
-public class SocketReceiverContext extends InDispatcher<SocketChannel, InputSocketAtt> implements SocketReceiver<Serializable> {
+public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketChannel> implements SocketReceiver<Serializable> {
 
 	/** serverContext */
 	private ServerContext serverContext;
@@ -118,7 +120,7 @@ public class SocketReceiverContext extends InDispatcher<SocketChannel, InputSock
 	@Override
 	public void unRegister(Serializable id, SocketChannel socketChannel) throws Throwable {
 		// TODO Auto-generated method stub
-		serverContext.logoutSocketChannelContext(id);
+		serverContext.logoutSocketChannelContext(id, socketChannel);
 		SocketServerContext.get().getSessionResolver().unRegister(id, socketChannel, serverContext);
 	}
 
@@ -145,7 +147,7 @@ public class SocketReceiverContext extends InDispatcher<SocketChannel, InputSock
 					if (!doBeat(id, socketChannel, buffer, SocketServerContext.get().getBeat())) {
 						if (buffer.length > 1) {
 							InputSocketAtt inputSocketAtt = new InputSocketAtt(id, buffer);
-							on(inputSocketAtt.getUrl(), socketChannel, inputSocketAtt);
+							on(inputSocketAtt.getUrl(), inputSocketAtt, socketChannel);
 						}
 					}
 
@@ -189,9 +191,9 @@ public class SocketReceiverContext extends InDispatcher<SocketChannel, InputSock
 	 * @see com.absir.server.in.IDispatcher#getInMethod(java.lang.Object)
 	 */
 	@Override
-	public InMethod getInMethod(SocketChannel req) {
+	public InMethod getInMethod(InputSocketAtt req) {
 		// TODO Auto-generated method stub
-		return InMethod.GET;
+		return req.getMethod();
 	}
 
 	/*
@@ -201,7 +203,7 @@ public class SocketReceiverContext extends InDispatcher<SocketChannel, InputSock
 	 * java.lang.Object)
 	 */
 	@Override
-	public String decodeUri(String uri, SocketChannel req) {
+	public String decodeUri(String uri, InputSocketAtt req) {
 		// TODO Auto-generated method stub
 		return uri;
 	}
@@ -214,9 +216,26 @@ public class SocketReceiverContext extends InDispatcher<SocketChannel, InputSock
 	 * java.lang.Object, java.lang.Object)
 	 */
 	@Override
-	protected Input input(String uri, InMethod inMethod, InModel model, SocketChannel req, InputSocketAtt res) {
+	protected Input input(String uri, InMethod inMethod, InModel model, InputSocketAtt req, SocketChannel res) {
 		// TODO Auto-generated method stub
 		InputSocket socketInput = new InputSocket(model, req, res);
 		return socketInput;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.server.in.InDispatcher#resolveReturnedValue(java.lang.Object,
+	 * com.absir.server.on.OnPut)
+	 */
+	@Override
+	public void resolveReturnedValue(Object routeBean, OnPut onPut) throws Throwable {
+		// TODO Auto-generated method stub
+		if (onPut.getReturnValue() == null && onPut.getReturnedResolver() != null && onPut.getReturnedResolver() instanceof ReturnedResolverBody) {
+			onPut.setReturnValue('Y');
+		}
+
+		super.resolveReturnedValue(routeBean, onPut);
 	}
 }

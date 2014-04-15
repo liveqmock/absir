@@ -11,6 +11,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
@@ -18,10 +20,12 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import com.absir.bean.basis.Base;
 import com.absir.bean.inject.value.Bean;
 import com.absir.core.kernel.KernelArray;
+import com.absir.server.in.InMethod;
 import com.absir.server.in.Input;
 import com.absir.server.on.OnPut;
 import com.absir.server.route.RouteMethod;
 import com.absir.server.route.parameter.ParameterResolver;
+import com.absir.server.route.parameter.ParameterResolverMethod;
 import com.absir.server.route.returned.ReturnedResolverBody;
 import com.absir.server.value.Body;
 
@@ -31,7 +35,7 @@ import com.absir.server.value.Body;
  */
 @Base
 @Bean
-public class ServerResolverBody extends ReturnedResolverBody implements ParameterResolver<Boolean> {
+public class ServerResolverBody extends ReturnedResolverBody implements ParameterResolver<Boolean>, ParameterResolverMethod {
 
 	/** objectMapper */
 	protected ObjectMapper objectMapper = generateObjectMapper();
@@ -76,6 +80,27 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 
 		InputStream inputStream = input.getInputStream();
 		return inputStream == null ? objectMapper.readValue(input.getInput(), parameterType) : objectMapper.readValue(inputStream, parameterType);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.server.route.parameter.ParameterResolverMethod#resolveMethods
+	 * (java.lang.Object, java.util.List)
+	 */
+	@Override
+	public List<InMethod> resolveMethods(Object parameter, List<InMethod> inMethods) {
+		// TODO Auto-generated method stub
+		if (inMethods == null) {
+			inMethods = new ArrayList<InMethod>();
+		}
+
+		if (inMethods.isEmpty()) {
+			inMethods.add(InMethod.POST);
+		}
+
+		return inMethods;
 	}
 
 	/*

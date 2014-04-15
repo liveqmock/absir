@@ -39,6 +39,16 @@ public class KernelByte {
 	}
 
 	/**
+	 * @param length
+	 * @return
+	 */
+	public static byte[] getLengthBytes(int length) {
+		byte[] destination = new byte[4];
+		setLength(destination, 0, length);
+		return destination;
+	}
+
+	/**
 	 * @param source
 	 * @param destination
 	 * @param sourceIndex

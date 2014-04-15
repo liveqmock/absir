@@ -8,12 +8,15 @@
 package com.absir.server.route;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 import com.absir.core.kernel.KernelLang;
 import com.absir.server.exception.ServerException;
 import com.absir.server.exception.ServerStatus;
+import com.absir.server.in.InMethod;
 import com.absir.server.on.OnPut;
 import com.absir.server.route.parameter.ParameterResolver;
+import com.absir.server.route.parameter.ParameterResolverMethod;
 import com.absir.server.route.returned.ReturnedResolver;
 
 /**
@@ -60,6 +63,24 @@ public class RouteMethod {
 	 */
 	public Method getMethod() {
 		return method;
+	}
+
+	/**
+	 * @param inMethods
+	 * @return
+	 */
+	public List<InMethod> resolveMethods(List<InMethod> inMethods) {
+		if (parameterResolvers != null) {
+			int length = parameterResolvers.length;
+			for (int i = 0; i < length; i++) {
+				ParameterResolver parameterResolver = parameterResolvers[i];
+				if (parameterResolver != null && parameterResolver instanceof ParameterResolverMethod) {
+					inMethods = ((ParameterResolverMethod) parameterResolver).resolveMethods(parameters[i], inMethods);
+				}
+			}
+		}
+
+		return inMethods;
 	}
 
 	/**

@@ -81,8 +81,8 @@ public class UploadCrudFactory implements ICrudFactory {
 	 * @param uploadPath
 	 */
 	@Inject(type = InjectType.Selectable)
-	protected void setUploadDir(@Value(value = "${resource.upload.path:}", defaultValue = "upload") String uploadPath,
-			@Value(value = "${resource.upload.url:}", defaultValue = "upload") String uploadUrl) {
+	protected void setUploadDir(@Value(value = "${resource.upload.path}", defaultValue = "upload") String uploadPath,
+			@Value(value = "${resource.upload.url}", defaultValue = "upload") String uploadUrl) {
 		if (KernelString.isEmpty(uploadPath)) {
 			return;
 		}
@@ -144,7 +144,7 @@ public class UploadCrudFactory implements ICrudFactory {
 		 * @param errors
 		 */
 		public void verify(String field, FileItem file, PropertyErrors errors) {
-			if (extensions != null && !KernelArray.contain(extensions, HelperFileName.getExtension(HelperFileName.getExtension(file.getName()).toLowerCase()))) {
+			if (extensions != null && !KernelArray.contain(extensions, HelperFileName.getExtension(file.getName()).toLowerCase())) {
 				errors.rejectValue(field, "error file type", null);
 				return;
 			}

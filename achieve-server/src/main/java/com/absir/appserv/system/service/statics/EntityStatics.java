@@ -14,6 +14,7 @@ import java.util.List;
 
 import com.absir.appserv.dyna.DynaBinderUtils;
 import com.absir.appserv.support.Developer;
+import com.absir.appserv.system.crud.UploadCrudFactory;
 import com.absir.appserv.system.dao.BeanDao;
 import com.absir.appserv.system.service.utils.AccessServiceUtils;
 import com.absir.appserv.system.service.utils.CrudServiceUtils;
@@ -214,5 +215,13 @@ public class EntityStatics {
 	public static void setSharedObject(String runtimeName, Object value, IAttributes attributes) {
 		attributes.setAttribute(runtimeName, value);
 		Developer.setRuntime(runtimeName, value);
+	}
+
+	/**
+	 * @param uploadPath
+	 * @return
+	 */
+	public static String getUploadUrl(String uploadPath) {
+		return UploadCrudFactory.getUploadUrl() + uploadPath;
 	}
 }

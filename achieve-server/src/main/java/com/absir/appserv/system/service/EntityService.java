@@ -31,7 +31,6 @@ import com.absir.binder.BinderResult;
 import com.absir.core.dyna.DynaBinder;
 import com.absir.core.kernel.KernelClass;
 import com.absir.core.kernel.KernelLang.PropertyFilter;
-import com.absir.core.kernel.KernelString;
 import com.absir.orm.hibernate.SessionFactoryUtils;
 import com.absir.server.exception.ServerException;
 import com.absir.server.exception.ServerStatus;
@@ -426,7 +425,8 @@ public class EntityService {
 			modelMap.put("updateTime", System.currentTimeMillis());
 		}
 
-		modelMap.put(KernelString.capitalize(entityName), list(entityName, crudSupply, user, condition, null, null, 0, 0));
+		// KernelString.capitalize(entityName)
+		modelMap.put(entityName, list(entityName, crudSupply, user, condition, null, null, 0, 0));
 		if (getEntityNameRecycle(entityName)) {
 			entityName += JpRecycleBase.RECYCLE;
 			List recycles = list(entityName, getCrudSupply(entityName), user, condition, null, null, 0, 0);
@@ -441,7 +441,7 @@ public class EntityService {
 				}
 			}
 
-			modelMap.put(KernelString.capitalize(entityName), recycles);
+			modelMap.put(entityName, recycles);
 		}
 	}
 

@@ -18,7 +18,9 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 import com.absir.bean.basis.Base;
+import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
+import com.absir.bean.inject.value.Inject;
 import com.absir.core.kernel.KernelArray;
 import com.absir.server.in.InMethod;
 import com.absir.server.in.Input;
@@ -37,16 +39,26 @@ import com.absir.server.value.Body;
 @Bean
 public class ServerResolverBody extends ReturnedResolverBody implements ParameterResolver<Boolean>, ParameterResolverMethod {
 
+	/** ME */
+	public static final ServerResolverBody ME = BeanFactoryUtils.get(ServerResolverBody.class);
+
 	/** objectMapper */
-	protected ObjectMapper objectMapper = generateObjectMapper();
+	protected ObjectMapper objectMapper;
+
+	/**
+	 * @return the objectMapper
+	 */
+	public ObjectMapper getObjectMapper() {
+		return objectMapper;
+	}
 
 	/**
 	 * @return
 	 */
-	protected ObjectMapper generateObjectMapper() {
-		ObjectMapper objectMapper = new ObjectMapper();
+	@Inject
+	protected void initResolver() {
+		objectMapper = new ObjectMapper();
 		objectMapper.setSerializationInclusion(Inclusion.NON_NULL);
-		return objectMapper;
 	}
 
 	/*

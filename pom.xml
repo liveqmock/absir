@@ -33,6 +33,7 @@
 		<module>absir-card</module>
 		<module>absir-socket</module>
 		<module>absir-alipay</module>
+		<module>absir-ab</module>
 	</modules>
 	<dependencies>
 		<dependency>

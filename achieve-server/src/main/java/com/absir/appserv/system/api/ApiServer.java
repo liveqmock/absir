@@ -95,7 +95,7 @@ public abstract class ApiServer {
 		}
 
 		if (BeanFactoryUtils.getEnvironment() == Environment.DEVELOP || input.isDebug() || !(e instanceof ServerException)) {
-			LOGGER.error("api error", e);
+			LOGGER.error("", e);
 		}
 
 		return new MessageCode(e);

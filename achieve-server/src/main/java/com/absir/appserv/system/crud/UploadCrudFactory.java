@@ -81,8 +81,7 @@ public class UploadCrudFactory implements ICrudFactory {
 	 * @param uploadPath
 	 */
 	@Inject(type = InjectType.Selectable)
-	protected void setUploadDir(@Value(value = "${resource.upload.path}", defaultValue = "upload") String uploadPath,
-			@Value(value = "${resource.upload.url}", defaultValue = "upload") String uploadUrl) {
+	protected void setUploadDir(@Value(value = "${resource.upload.path}", defaultValue = "upload") String uploadPath, @Value(value = "${resource.upload.url}", defaultValue = "upload") String uploadUrl) {
 		if (KernelString.isEmpty(uploadPath)) {
 			return;
 		}

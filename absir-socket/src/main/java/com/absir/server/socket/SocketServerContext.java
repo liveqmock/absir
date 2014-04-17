@@ -74,6 +74,14 @@ public class SocketServerContext extends ContextBase {
 	@Value("server.socket.bufferSize")
 	private int bufferSize = 256;
 
+	/** bufferSize */
+	@Value("server.socket.receiveBufferSize")
+	private int receiveBufferSize = 20480;
+
+	/** bufferSize */
+	@Value("server.socket.sendBufferSize")
+	private int sendBufferSize = 20480;
+
 	/** beat */
 	@Value("server.socket.beat")
 	protected byte[] beat = "b".getBytes();
@@ -340,7 +348,8 @@ public class SocketServerContext extends ContextBase {
 		if (socketServer == null) {
 			socketServer = new SocketServer();
 			try {
-				socketServer.start(serverContext.getServer().getPort(), backlog, serverContext.getServer().getInetAddress(), bufferSize, createSocketReceiverContext(serverContext));
+				socketServer.start(serverContext.getServer().getPort(), backlog, serverContext.getServer().getInetAddress(), bufferSize, receiveBufferSize, sendBufferSize,
+						createSocketReceiverContext(serverContext));
 				socketServerMap.put(id, socketServer);
 
 			} catch (Throwable e) {

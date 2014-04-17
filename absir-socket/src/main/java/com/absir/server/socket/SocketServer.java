@@ -43,10 +43,13 @@ public class SocketServer {
 	 * @param backlog
 	 * @param inetAddress
 	 * @param bufferSize
+	 * @param receiveBufferSize
+	 * @param sendBufferSize
 	 * @param receiver
 	 * @throws IOException
 	 */
-	public synchronized void start(int port, int backlog, InetAddress inetAddress, final int bufferSize, final SocketReceiver receiver) throws IOException {
+	public synchronized void start(int port, int backlog, InetAddress inetAddress, final int bufferSize, int receiveBufferSize, final int sendBufferSize, final SocketReceiver receiver)
+			throws IOException {
 		if (serverSocketChannel != null) {
 			throw new ServerException(ServerStatus.IN_FAILED);
 		}
@@ -54,6 +57,7 @@ public class SocketServer {
 		// 初始化监听服务
 		serverSocketChannel = ServerSocketChannel.open();
 		serverSocketChannel.configureBlocking(false);
+		serverSocketChannel.socket().setReceiveBufferSize(receiveBufferSize);
 		serverSocketChannel.socket().bind(new InetSocketAddress(inetAddress, port), backlog);
 
 		// 接受请求
@@ -76,6 +80,7 @@ public class SocketServer {
 								// 接受请求
 								SocketChannel socketChannel = ((ServerSocketChannel) key.channel()).accept();
 								socketChannel.configureBlocking(false);
+								socketChannel.socket().setSendBufferSize(sendBufferSize);
 								try {
 									if (receiver.accept(socketChannel)) {
 										socketChannel.register(selector, SelectionKey.OP_READ);

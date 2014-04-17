@@ -7,6 +7,7 @@
  */
 package com.absir.appserv.system.server;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
@@ -17,10 +18,12 @@ import java.util.List;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
+import com.absir.appserv.system.helper.HelperServer;
 import com.absir.bean.basis.Base;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Inject;
+import com.absir.context.core.ContextUtils;
 import com.absir.core.kernel.KernelArray;
 import com.absir.server.in.InMethod;
 import com.absir.server.in.Input;
@@ -129,17 +132,40 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 			Input input = onPut.getInput();
 			input.setCharacterEncoding(charset);
 			input.setContentTypeCharset(contentTypeCharset);
-			if (returnValue instanceof String) {
-				onPut.getInput().write((String) returnValue);
-
-			} else {
-				OutputStream outputStream = input.getOutputStream();
-				if (outputStream == null) {
-					input.write(objectMapper.writeValueAsString(returnValue));
+			if (input.isDebug()) {
+				if (returnValue instanceof String) {
+					onPut.getInput().write((String) returnValue);
 
 				} else {
-					objectMapper.writeValue(outputStream, returnValue);
+					OutputStream outputStream = input.getOutputStream();
+					if (outputStream == null) {
+						input.write(objectMapper.writeValueAsBytes(returnValue));
+
+					} else {
+						objectMapper.writeValue(outputStream, returnValue);
+					}
 				}
+
+			} else {
+				byte[] zipBytes;
+				if (returnValue instanceof String) {
+					zipBytes = ((String) returnValue).getBytes(ContextUtils.getCharset());
+
+				} else {
+					zipBytes = objectMapper.writeValueAsBytes(returnValue);
+					OutputStream outputStream = input.getOutputStream();
+					if (outputStream == null) {
+						ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+						HelperServer.zipCompress(zipBytes, 0, zipBytes.length, outStream);
+						zipBytes = outStream.toByteArray();
+
+					} else {
+						HelperServer.zipCompress(zipBytes, 0, zipBytes.length, outputStream);
+						return;
+					}
+				}
+
+				input.write(zipBytes);
 			}
 		}
 	}

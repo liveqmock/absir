@@ -7,6 +7,7 @@
  */
 package com.absir.server.socket;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -37,9 +38,6 @@ public class InputSocket extends Input implements SocketHeaderProccesor {
 	/** uri */
 	private String uri;
 
-	/** input */
-	private String input;
-
 	/** status */
 	private int status;
 
@@ -48,6 +46,18 @@ public class InputSocket extends Input implements SocketHeaderProccesor {
 
 	/** input */
 	private int callbackIndex;
+
+	/** input */
+	private String input;
+
+	/** inputStream */
+	private byte[] inputBuffer;
+
+	/** inputPos */
+	private int inputPos;
+
+	/** inputCount */
+	private int inputCount;
 
 	/**
 	 * @param model
@@ -60,9 +70,13 @@ public class InputSocket extends Input implements SocketHeaderProccesor {
 		this.socketChannel = socketChannel;
 		setId(inputSocketAtt.getId());
 		uri = inputSocketAtt.getUrl();
-		input = inputSocketAtt.getInput();
 		flag = inputSocketAtt.getFlag();
 		callbackIndex = inputSocketAtt.getCallbackIndex();
+		inputBuffer = inputSocketAtt.getBuffer();
+		if (inputBuffer != null) {
+			inputCount = inputSocketAtt.getPostDataLength();
+			inputPos = inputBuffer.length - inputCount;
+		}
 	}
 
 	/**
@@ -135,13 +149,6 @@ public class InputSocket extends Input implements SocketHeaderProccesor {
 		}
 
 		/**
-		 * @return the input
-		 */
-		public String getInput() {
-			return postDataLength == 0 ? null : new String(buffer, buffer.length - postDataLength, postDataLength, ContextUtils.getCharset());
-		}
-
-		/**
 		 * @return the flag
 		 */
 		public byte getFlag() {
@@ -160,6 +167,20 @@ public class InputSocket extends Input implements SocketHeaderProccesor {
 		 */
 		public int getCallbackIndex() {
 			return callbackIndex;
+		}
+
+		/**
+		 * @return the buffer
+		 */
+		public byte[] getBuffer() {
+			return buffer;
+		}
+
+		/**
+		 * @return the postDataLength
+		 */
+		public int getPostDataLength() {
+			return postDataLength;
 		}
 	}
 
@@ -242,12 +263,17 @@ public class InputSocket extends Input implements SocketHeaderProccesor {
 	@Override
 	public InputStream getInputStream() throws IOException {
 		// TODO Auto-generated method stub
-		return null;
+		return inputBuffer == null ? null : new ByteArrayInputStream(inputBuffer, inputPos, inputCount);
 	}
 
 	@Override
 	public String getInput() {
 		// TODO Auto-generated method stub
+		if (input == null && inputBuffer != null) {
+			input = new String(inputBuffer, inputPos, inputCount, ContextUtils.getCharset());
+			inputBuffer = null;
+		}
+
 		return input;
 	}
 

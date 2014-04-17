@@ -89,7 +89,7 @@ public abstract class ApiServer {
 	@Bodys
 	@OnException(Throwable.class)
 	protected Object onException(Throwable e, Input input) {
-		input.setStatus(HttpStatus.SC_ACCEPTED);
+		input.setStatus(HttpStatus.SC_BAD_REQUEST);
 		if (BeanFactoryUtils.getEnvironment() == Environment.DEVELOP) {
 			e.printStackTrace();
 		}

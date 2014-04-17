@@ -23,7 +23,7 @@ import com.absir.server.value.Body;
  */
 @Base(order = -128)
 @Bean
-public class ReturnedResolverBody implements ReturnedResolver<Object> {
+public class ReturnedResolverBody implements ReturnedResolver<Class<?>> {
 
 	/** charset */
 	protected String charset = ContextUtils.getCharset().displayName();
@@ -54,9 +54,9 @@ public class ReturnedResolverBody implements ReturnedResolver<Object> {
 	 * .reflect.Method)
 	 */
 	@Override
-	public Object getReturned(Method method) {
+	public Class<?> getReturned(Method method) {
 		// TODO Auto-generated method stub
-		return method.getAnnotation(Body.class) == null ? null : Boolean.TRUE;
+		return method.getAnnotation(Body.class) == null ? null : Body.class;
 	}
 
 	/*
@@ -67,7 +67,7 @@ public class ReturnedResolverBody implements ReturnedResolver<Object> {
 	 * (java.lang.Object, java.lang.Object, com.absir.server.on.OnPut)
 	 */
 	@Override
-	public void resolveReturnedValue(Object returnValue, Object returned, OnPut onPut) throws Exception {
+	public void resolveReturnedValue(Object returnValue, Class<?> returned, OnPut onPut) throws Exception {
 		// TODO Auto-generated method stub
 		if (returnValue != null) {
 			Input input = onPut.getInput();

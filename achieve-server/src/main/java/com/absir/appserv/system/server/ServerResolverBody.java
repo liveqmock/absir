@@ -37,7 +37,7 @@ import com.absir.server.value.Body;
  */
 @Base
 @Bean
-public class ServerResolverBody extends ReturnedResolverBody implements ParameterResolver<Boolean>, ParameterResolverMethod {
+public class ServerResolverBody extends ReturnedResolverBody implements ParameterResolver<Class<?>>, ParameterResolverMethod {
 
 	/** ME */
 	public static final ServerResolverBody ME = BeanFactoryUtils.get(ServerResolverBody.class);
@@ -69,9 +69,9 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 	 * java.lang.annotation.Annotation[][], java.lang.reflect.Method)
 	 */
 	@Override
-	public Boolean getParameter(int i, String[] parameterNames, Class<?>[] parameterTypes, Annotation[][] annotations, Method method) {
+	public Class<?> getParameter(int i, String[] parameterNames, Class<?>[] parameterTypes, Annotation[][] annotations, Method method) {
 		// TODO Auto-generated method stub
-		return KernelArray.getAssignable(annotations[i], Body.class) == null ? null : Boolean.TRUE;
+		return KernelArray.getAssignable(annotations[i], Body.class) == null ? null : Body.class;
 	}
 
 	/*
@@ -83,7 +83,7 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 	 * java.lang.String, com.absir.server.route.RouteMethod)
 	 */
 	@Override
-	public Object getParameterValue(OnPut onPut, Boolean parameter, Class<?> parameterType, String beanName, RouteMethod routeMethod) throws Exception {
+	public Object getParameterValue(OnPut onPut, Class<?> parameter, Class<?> parameterType, String beanName, RouteMethod routeMethod) throws Exception {
 		// TODO Auto-generated method stub
 		Input input = onPut.getInput();
 		if (String.class.isAssignableFrom(parameterType)) {
@@ -123,7 +123,7 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 	 * (java.lang.Object, java.lang.Object, com.absir.server.on.OnPut)
 	 */
 	@Override
-	public void resolveReturnedValue(Object returnValue, Object returned, OnPut onPut) throws Exception {
+	public void resolveReturnedValue(Object returnValue, Class<?> returned, OnPut onPut) throws Exception {
 		// TODO Auto-generated method stub
 		if (returnValue != null) {
 			Input input = onPut.getInput();

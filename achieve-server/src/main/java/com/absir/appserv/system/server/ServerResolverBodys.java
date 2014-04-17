@@ -30,6 +30,7 @@ import com.absir.server.route.RouteMethod;
 import com.absir.server.route.parameter.ParameterResolver;
 import com.absir.server.route.parameter.ParameterResolverMethod;
 import com.absir.server.route.returned.ReturnedResolver;
+import com.absir.server.value.Body;
 
 /**
  * @author absir
@@ -37,7 +38,7 @@ import com.absir.server.route.returned.ReturnedResolver;
  */
 @Base
 @Bean
-public class ServerResolverBodys implements ParameterResolver<Boolean>, ParameterResolverMethod, ReturnedResolver<Boolean> {
+public class ServerResolverBodys implements ParameterResolver<Class<?>>, ParameterResolverMethod, ReturnedResolver<Class<?>> {
 
 	/*
 	 * (non-Javadoc)
@@ -47,9 +48,9 @@ public class ServerResolverBodys implements ParameterResolver<Boolean>, Paramete
 	 * java.lang.annotation.Annotation[][], java.lang.reflect.Method)
 	 */
 	@Override
-	public Boolean getParameter(int i, String[] parameterNames, Class<?>[] parameterTypes, Annotation[][] annotations, Method method) {
+	public Class<?> getParameter(int i, String[] parameterNames, Class<?>[] parameterTypes, Annotation[][] annotations, Method method) {
 		// TODO Auto-generated method stub
-		return KernelArray.getAssignable(annotations[i], Bodys.class) == null ? null : Boolean.TRUE;
+		return KernelArray.getAssignable(annotations[i], Bodys.class) == null ? null : Body.class;
 	}
 
 	/*
@@ -61,7 +62,7 @@ public class ServerResolverBodys implements ParameterResolver<Boolean>, Paramete
 	 * java.lang.String, com.absir.server.route.RouteMethod)
 	 */
 	@Override
-	public Object getParameterValue(OnPut onPut, Boolean parameter, Class<?> parameterType, String beanName, RouteMethod routeMethod) throws Exception {
+	public Object getParameterValue(OnPut onPut, Class<?> parameter, Class<?> parameterType, String beanName, RouteMethod routeMethod) throws Exception {
 		// TODO Auto-generated method stub
 		if (onPut.getInput().isDebug()) {
 			return ServerResolverBody.ME.getParameterValue(onPut, parameter, parameterType, beanName, routeMethod);
@@ -79,7 +80,7 @@ public class ServerResolverBodys implements ParameterResolver<Boolean>, Paramete
 	 * @return
 	 * @throws Exception
 	 */
-	public Object scParameterValue(OnPut onPut, Boolean parameter, Class<?> parameterType, String beanName, RouteMethod routeMethod) throws Exception {
+	public Object scParameterValue(OnPut onPut, Class<?> parameter, Class<?> parameterType, String beanName, RouteMethod routeMethod) throws Exception {
 		Input input = onPut.getInput();
 		InputStream inputStream = input.getInputStream();
 		if (inputStream == null) {
@@ -129,9 +130,9 @@ public class ServerResolverBodys implements ParameterResolver<Boolean>, Paramete
 	 * .reflect.Method)
 	 */
 	@Override
-	public Boolean getReturned(Method method) {
+	public Class<?> getReturned(Method method) {
 		// TODO Auto-generated method stub
-		return method.getAnnotation(Bodys.class) == null ? null : Boolean.TRUE;
+		return method.getAnnotation(Bodys.class) == null ? null : Body.class;
 	}
 
 	/*
@@ -142,7 +143,7 @@ public class ServerResolverBodys implements ParameterResolver<Boolean>, Paramete
 	 * (java.lang.Object, java.lang.Object, com.absir.server.on.OnPut)
 	 */
 	@Override
-	public void resolveReturnedValue(Object returnValue, Boolean returned, OnPut onPut) throws Exception {
+	public void resolveReturnedValue(Object returnValue, Class<?> returned, OnPut onPut) throws Exception {
 		// TODO Auto-generated method stub
 		if (onPut.getInput().isDebug()) {
 			ServerResolverBody.ME.resolveReturnedValue(returnValue, returned, onPut);
@@ -158,7 +159,7 @@ public class ServerResolverBodys implements ParameterResolver<Boolean>, Paramete
 	 * @param onPut
 	 * @throws Exception
 	 */
-	public void scResolveReturnedValue(Object returnValue, Boolean returned, OnPut onPut) throws Exception {
+	public void scResolveReturnedValue(Object returnValue, Class<?> returned, OnPut onPut) throws Exception {
 		if (returnValue != null) {
 			ServerResolverBody serverResolverBody = ServerResolverBody.ME;
 			Input input = onPut.getInput();

@@ -19,8 +19,8 @@ import com.absir.server.in.InMethod;
 import com.absir.server.in.InModel;
 import com.absir.server.in.Input;
 import com.absir.server.on.OnPut;
-import com.absir.server.route.returned.ReturnedResolverBody;
 import com.absir.server.socket.InputSocket.InputSocketAtt;
+import com.absir.server.value.Body;
 
 /**
  * @author absir
@@ -232,8 +232,8 @@ public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketCh
 	@Override
 	public void resolveReturnedValue(Object routeBean, OnPut onPut) throws Throwable {
 		// TODO Auto-generated method stub
-		if (onPut.getReturnValue() == null && onPut.getReturnedResolver() != null && onPut.getReturnedResolver() instanceof ReturnedResolverBody) {
-			onPut.setReturnValue('Y');
+		if (onPut.getReturnValue() == null && onPut.getReturned() == Body.class) {
+			onPut.setReturnValue("");
 		}
 
 		super.resolveReturnedValue(routeBean, onPut);

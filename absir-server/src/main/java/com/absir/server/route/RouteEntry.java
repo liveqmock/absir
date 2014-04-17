@@ -280,10 +280,11 @@ public class RouteEntry {
 		try {
 			onPut.open();
 			invoke(routeBean, onPut, routeEntry);
-			dispatcher.resolveReturnedValue(routeBean, onPut);
 			if (onPut.getReturnThrowable() != null) {
 				throw onPut.getReturnThrowable();
 			}
+			
+			dispatcher.resolveReturnedValue(routeBean, onPut);
 
 		} catch (Throwable e) {
 			if (e instanceof InvocationTargetException) {

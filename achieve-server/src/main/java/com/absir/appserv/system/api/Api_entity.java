@@ -24,6 +24,7 @@ import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.domain.DCondition;
 import com.absir.appserv.system.helper.HelperCondition;
 import com.absir.appserv.system.helper.HelperJson;
+import com.absir.appserv.system.server.value.Bodys;
 import com.absir.appserv.system.service.BeanService;
 import com.absir.appserv.system.service.EntityService;
 import com.absir.appserv.system.service.SecurityService;
@@ -38,7 +39,6 @@ import com.absir.server.exception.ServerException;
 import com.absir.server.exception.ServerStatus;
 import com.absir.server.in.InMethod;
 import com.absir.server.in.Input;
-import com.absir.server.value.Body;
 import com.absir.server.value.Mapping;
 import com.absir.server.value.Nullable;
 import com.absir.server.value.Param;
@@ -89,7 +89,7 @@ public class Api_entity extends ApiServer {
 	 * @param input
 	 * @return
 	 */
-	public List<Object> gets(String entityName, @Body Object[] ids, Input input) {
+	public List<Object> gets(String entityName, @Bodys Object[] ids, Input input) {
 		JiUserBase user = SecurityService.ME.getUserBase(input);
 		if (!(SessionFactoryUtils.entityPermission(entityName, JePermission.SELECT) || AuthServiceUtils.selectPermission(entityName, user))) {
 			throw new ServerException(ServerStatus.ON_DENIED);
@@ -155,7 +155,7 @@ public class Api_entity extends ApiServer {
 	 * @return
 	 */
 	@Mapping(method = InMethod.POST)
-	public JdbcEntities list(String entityName, @Body JdbcPage jdbcPage, Input input) {
+	public JdbcEntities list(String entityName, @Bodys JdbcPage jdbcPage, Input input) {
 		JiUserBase user = SecurityService.ME.getUserBase(input);
 		if (!(SessionFactoryUtils.entityPermission(entityName, JePermission.SELECT) || AuthServiceUtils.selectPermission(entityName, user))) {
 			throw new ServerException(ServerStatus.ON_DENIED);
@@ -201,7 +201,7 @@ public class Api_entity extends ApiServer {
 	 * @return
 	 */
 	@Mapping(method = InMethod.POST)
-	public JdbcEntities search(String entityName, @Param @Nullable String condition, @Param @Nullable String queue, @Body JdbcPage jdbcPage, Input input) {
+	public JdbcEntities search(String entityName, @Param @Nullable String condition, @Param @Nullable String queue, @Bodys JdbcPage jdbcPage, Input input) {
 		ICrudSupply crudSupply = EntityService.ME.getCrudSupply(entityName);
 		JiUserBase user = SecurityService.ME.getUserBase(input);
 		if (!(SessionFactoryUtils.entityPermission(entityName, JePermission.SELECT) && AuthServiceUtils.selectPermission(entityName, user))) {
@@ -330,7 +330,7 @@ public class Api_entity extends ApiServer {
 	 * @param input
 	 * @return
 	 */
-	public Map<String, Object> changed(@Body EntityNames entityNames, Input input) {
+	public Map<String, Object> changed(@Bodys EntityNames entityNames, Input input) {
 		JiUserBase user = SecurityService.ME.getUserBase(input);
 		Map<String, Object> modelMap = new HashMap<String, Object>();
 		if (entityNames.names != null) {
@@ -369,7 +369,7 @@ public class Api_entity extends ApiServer {
 	 * @param input
 	 * @return
 	 */
-	public Object insert(String entityName, @Body Object entityObject, Input input) {
+	public Object insert(String entityName, @Bodys Object entityObject, Input input) {
 		ICrudSupply crudSupply = EntityService.ME.getCrudSupply(entityName);
 		if (!(SessionFactoryUtils.entityPermission(entityName, JePermission.INSERT))) {
 			throw new ServerException(ServerStatus.ON_DENIED);
@@ -388,7 +388,7 @@ public class Api_entity extends ApiServer {
 	 * @param input
 	 * @return
 	 */
-	public Object inserts(String entityName, @Body List<?> entityList, Input input) {
+	public Object inserts(String entityName, @Bodys List<?> entityList, Input input) {
 		ICrudSupply crudSupply = EntityService.ME.getCrudSupply(entityName);
 		if (!SessionFactoryUtils.entityPermission(entityName, JePermission.INSERT)) {
 			throw new ServerException(ServerStatus.ON_DENIED);
@@ -407,7 +407,7 @@ public class Api_entity extends ApiServer {
 	 * @param input
 	 * @return
 	 */
-	public Object update(String entityName, @Body Object entityObject, Input input) {
+	public Object update(String entityName, @Bodys Object entityObject, Input input) {
 		ICrudSupply crudSupply = EntityService.ME.getCrudSupply(entityName);
 		if (!SessionFactoryUtils.entityPermission(entityName, JePermission.UPDATE)) {
 			throw new ServerException(ServerStatus.ON_DENIED);
@@ -426,7 +426,7 @@ public class Api_entity extends ApiServer {
 	 * @param input
 	 * @return
 	 */
-	public List<Object> updates(String entityName, @Body List<?> entityList, Input input) {
+	public List<Object> updates(String entityName, @Bodys List<?> entityList, Input input) {
 		ICrudSupply crudSupply = EntityService.ME.getCrudSupply(entityName);
 		if (!SessionFactoryUtils.entityPermission(entityName, JePermission.UPDATE)) {
 			throw new ServerException(ServerStatus.ON_DENIED);
@@ -463,7 +463,7 @@ public class Api_entity extends ApiServer {
 	 * @param input
 	 * @return
 	 */
-	public List<Object> deletes(String entityName, @Body Object[] ids, Input input) {
+	public List<Object> deletes(String entityName, @Bodys Object[] ids, Input input) {
 		ICrudSupply crudSupply = EntityService.ME.getCrudSupply(entityName);
 		JiUserBase user = SecurityService.ME.getUserBase(input);
 		if (!(SessionFactoryUtils.entityPermission(entityName, JePermission.DELETE) && AuthServiceUtils.deletePermission(entityName, user))) {
@@ -479,7 +479,7 @@ public class Api_entity extends ApiServer {
 	 * @param input
 	 * @return
 	 */
-	public Map<String, Object> sync(String entityName, @Body Map<?, ?> entityMap, Input input) {
+	public Map<String, Object> sync(String entityName, @Bodys Map<?, ?> entityMap, Input input) {
 		Map<String, Object> modelMap = new HashMap<String, Object>();
 		sync(entityName, SecurityService.ME.getUserBase(input), entityMap, modelMap, input);
 		return modelMap;
@@ -490,7 +490,7 @@ public class Api_entity extends ApiServer {
 	 * @param input
 	 * @return
 	 */
-	public Map<String, Object> syncs(@Body Map<String, Map<?, ?>> entityMaps, Input input) {
+	public Map<String, Object> syncs(@Bodys Map<String, Map<?, ?>> entityMaps, Input input) {
 		JiUserBase user = SecurityService.ME.getUserBase(input);
 		Map<String, Object> modelMap = new HashMap<String, Object>();
 		for (Entry<String, Map<?, ?>> entry : entityMaps.entrySet()) {
@@ -527,7 +527,7 @@ public class Api_entity extends ApiServer {
 	 * @param input
 	 * @return
 	 */
-	public Map<String, Object> mirror(String entityName, @Body List<?> entityList, Input input) {
+	public Map<String, Object> mirror(String entityName, @Bodys List<?> entityList, Input input) {
 		Map<String, Object> modelMap = new HashMap<String, Object>();
 		mirror(entityName, SecurityService.ME.getUserBase(input), entityList, modelMap, input);
 		return modelMap;
@@ -538,7 +538,7 @@ public class Api_entity extends ApiServer {
 	 * @param input
 	 * @return
 	 */
-	public Map<String, Object> mirrors(@Body Map<String, List<?>> entityMaps, Input input) {
+	public Map<String, Object> mirrors(@Bodys Map<String, List<?>> entityMaps, Input input) {
 		JiUserBase user = SecurityService.ME.getUserBase(input);
 		Map<String, Object> modelMap = new HashMap<String, Object>();
 		for (Entry<String, List<?>> entry : entityMaps.entrySet()) {
@@ -575,7 +575,7 @@ public class Api_entity extends ApiServer {
 	 * @param input
 	 * @return
 	 */
-	public Map<String, Object> multiple(@Body EntityMutiple mutiple, Input input) {
+	public Map<String, Object> multiple(@Bodys EntityMutiple mutiple, Input input) {
 		Map<String, Object> modelMap = new HashMap<String, Object>();
 		JiUserBase user = SecurityService.ME.getUserBase(input);
 		if (mutiple.mirrors != null) {

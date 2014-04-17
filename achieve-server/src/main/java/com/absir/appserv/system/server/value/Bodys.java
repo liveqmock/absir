@@ -16,12 +16,8 @@ import java.lang.annotation.Target;
  * @author absir
  * 
  */
-@Target({ ElementType.METHOD })
+@Target({ ElementType.PARAMETER, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Bodys {
 
-	/**
-	 * @return
-	 */
-	boolean forward() default false;
 }

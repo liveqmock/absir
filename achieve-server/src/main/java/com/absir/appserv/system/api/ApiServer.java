@@ -19,16 +19,16 @@ import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.helper.HelperJson;
 import com.absir.appserv.system.security.SecurityContext;
 import com.absir.appserv.system.security.SecurityManager;
+import com.absir.appserv.system.server.value.Bodys;
 import com.absir.appserv.system.service.SecurityService;
 import com.absir.bean.basis.Environment;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.server.exception.ServerException;
+import com.absir.server.exception.ServerStatus;
 import com.absir.server.in.Input;
 import com.absir.server.in.Interceptor;
 import com.absir.server.on.OnPut;
-import com.absir.server.value.After;
 import com.absir.server.value.Before;
-import com.absir.server.value.Body;
 import com.absir.server.value.Interceptors;
 import com.absir.server.value.Mapping;
 import com.absir.server.value.OnException;
@@ -46,22 +46,38 @@ public abstract class ApiServer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ApiServer.class);
 
 	/**
+	 * 统一返回类型 权限判断
+	 * 
 	 * @param input
 	 * @throws Throwable
 	 */
+	@Bodys
 	@Before
 	protected SecurityContext onAuthentication(Input input) throws Throwable {
 		return SecurityService.ME.getSecurityContext(input);
 	}
 
 	/**
-	 * 统一返回类型
+	 * 消息对象
 	 * 
-	 * @param onPut
+	 * @author absir
+	 * 
 	 */
-	@Body
-	@After
-	protected void after(OnPut onPut) {
+	public static class MessageCode {
+
+		/** message */
+		public String message;
+
+		/** error */
+		public int code;
+
+		/**
+		 * @param e
+		 */
+		public MessageCode(Throwable e) {
+			message = e.toString();
+			code = e instanceof ServerException ? ((ServerException) e).getServerStatus().getCode() : ServerStatus.ON_ERROR.getCode();
+		}
 	}
 
 	/**
@@ -70,7 +86,7 @@ public abstract class ApiServer {
 	 * @param e
 	 * @return
 	 */
-	@Body
+	@Bodys
 	@OnException(Throwable.class)
 	protected Object onException(Throwable e, Input input) {
 		input.setStatus(HttpStatus.SC_ACCEPTED);
@@ -78,11 +94,11 @@ public abstract class ApiServer {
 			e.printStackTrace();
 		}
 
-		if (BeanFactoryUtils.getEnvironment() == Environment.DEVELOP || !(e instanceof ServerException) || input.isDebug()) {
+		if (BeanFactoryUtils.getEnvironment() == Environment.DEVELOP || input.isDebug() || !(e instanceof ServerException)) {
 			LOGGER.error("api error", e);
 		}
 
-		return e;
+		return new MessageCode(e);
 	}
 
 	/**

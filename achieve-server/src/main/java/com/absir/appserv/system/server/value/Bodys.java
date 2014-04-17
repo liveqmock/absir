@@ -16,9 +16,9 @@ import java.lang.annotation.Target;
  * @author absir
  * 
  */
-@Target({ ElementType.PARAMETER, ElementType.METHOD })
+@Target({ ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Redirect {
+public @interface Bodys {
 
 	/**
 	 * @return

@@ -32,6 +32,20 @@ public class ReturnedResolverBody implements ReturnedResolver<Object> {
 	@Value("server.body.contentType")
 	protected String contentTypeCharset = "text/html;" + charset;
 
+	/**
+	 * @return the charset
+	 */
+	public String getCharset() {
+		return charset;
+	}
+
+	/**
+	 * @return the contentTypeCharset
+	 */
+	public String getContentTypeCharset() {
+		return contentTypeCharset;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 

@@ -72,15 +72,15 @@ public class SocketServerContext extends ContextBase {
 
 	/** bufferSize */
 	@Value("server.socket.bufferSize")
-	private int bufferSize = 256;
+	private int bufferSize = 1024;
 
 	/** bufferSize */
 	@Value("server.socket.receiveBufferSize")
-	private int receiveBufferSize = 20480;
+	private int receiveBufferSize = 10240;
 
 	/** bufferSize */
 	@Value("server.socket.sendBufferSize")
-	private int sendBufferSize = 20480;
+	private int sendBufferSize = 10240;
 
 	/** beat */
 	@Value("server.socket.beat")

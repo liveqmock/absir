@@ -144,6 +144,7 @@ public abstract class InDispatcher<T, R> implements IDispatcher<T> {
 			if (routeExceptions != null) {
 				for (RouteException routeException : routeExceptions) {
 					if (routeException.invoke(e, routeBean, onPut)) {
+						resolveReturnedValue(routeBean, onPut);
 						return true;
 					}
 				}

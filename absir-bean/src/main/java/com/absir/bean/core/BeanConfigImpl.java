@@ -57,7 +57,7 @@ public class BeanConfigImpl implements BeanConfig {
 	 * @param beanConfigProvider
 	 * @param beanConfig
 	 */
-	protected BeanConfigImpl(IBeanConfigProvider beanConfigProvider) {
+	public BeanConfigImpl(IBeanConfigProvider beanConfigProvider) {
 		this(beanConfigProvider, null);
 	}
 
@@ -65,7 +65,7 @@ public class BeanConfigImpl implements BeanConfig {
 	 * @param beanConfigProvider
 	 * @param classPath
 	 */
-	protected BeanConfigImpl(IBeanConfigProvider beanConfigProvider, String classPath) {
+	public BeanConfigImpl(IBeanConfigProvider beanConfigProvider, String classPath) {
 		if (classPath == null) {
 			classPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
 		}

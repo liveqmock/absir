@@ -110,28 +110,6 @@ public abstract class InDispatcher<T, R> implements IDispatcher<T> {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * com.absir.server.in.IDispatcher#resolveReturnedValue(java.lang.Object,
-	 * com.absir.server.on.OnPut)
-	 */
-	@Override
-	public void resolveReturnedValue(Object routeBean, OnPut onPut) throws Throwable {
-		// TODO Auto-generated method stub
-		ReturnedResolver<Object> returnedResolver = onPut.getReturnedResolver();
-		if (returnedResolver == null) {
-			// onPut.setReturned(null);
-			returnedResolver = onPut.getInput().getReturnedResolver(onPut);
-			if (returnedResolver == null) {
-				return;
-			}
-		}
-
-		returnedResolver.resolveReturnedValue(onPut.getReturnValue(), onPut.getReturned(), onPut);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see com.absir.server.in.IDispatcher#returnThrowable(java.lang.Throwable,
 	 * java.lang.Object, com.absir.server.on.OnPut)
 	 */
@@ -152,5 +130,27 @@ public abstract class InDispatcher<T, R> implements IDispatcher<T> {
 		}
 
 		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.server.in.IDispatcher#resolveReturnedValue(java.lang.Object,
+	 * com.absir.server.on.OnPut)
+	 */
+	@Override
+	public void resolveReturnedValue(Object routeBean, OnPut onPut) throws Throwable {
+		// TODO Auto-generated method stub
+		ReturnedResolver<Object> returnedResolver = onPut.getReturnedResolver();
+		if (returnedResolver == null) {
+			// onPut.setReturned(null);
+			returnedResolver = onPut.getInput().getReturnedResolver(onPut);
+			if (returnedResolver == null) {
+				return;
+			}
+		}
+
+		returnedResolver.resolveReturnedValue(onPut.getReturnValue(), onPut.getReturned(), onPut);
 	}
 }

@@ -8,6 +8,7 @@
 package com.absir.appserv.data;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +40,7 @@ public class DataQueryFactory extends AopMethodDefineAbstract<DataQueryIntercept
 	@Override
 	public List<BeanDefine> getBeanDefines(BeanFactoryImpl beanFactory, Class<?> beanType) {
 		// TODO Auto-generated method stub
-		if (beanType.isInterface()) {
+		if (beanType.isInterface() || Modifier.isAbstract(beanType.getModifiers())) {
 			Respository respository = beanType.getAnnotation(Respository.class);
 			if (respository != null) {
 				DataQueryDefine beanDefine = new DataQueryDefine(BeanDefineType.getBeanName(respository.value(), beanType), beanType, respository.name());

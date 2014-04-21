@@ -23,8 +23,17 @@ import com.absir.aop.AopProxyHandler;
 @SuppressWarnings("rawtypes")
 public class DataQueryInterceptor extends AopInterceptorAbstract<DataQueryDetached> {
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.aop.AopInterceptorAbstract#before(java.lang.Object,
+	 * java.util.Iterator, java.lang.Object, com.absir.aop.AopProxyHandler,
+	 * java.lang.reflect.Method, java.lang.Object[],
+	 * net.sf.cglib.proxy.MethodProxy)
+	 */
 	@Override
-	public Object before(Iterator<AopInterceptor> iterator, DataQueryDetached interceptor, AopProxyHandler proxyHandler, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+	public Object before(Object proxy, Iterator<AopInterceptor> iterator, DataQueryDetached interceptor, AopProxyHandler proxyHandler, Method method, Object[] args, MethodProxy methodProxy)
+			throws Throwable {
 		// TODO Auto-generated method stub
 		return interceptor.invoke(args);
 	}

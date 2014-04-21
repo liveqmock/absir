@@ -23,18 +23,17 @@ import com.absir.aop.AopProxyHandler;
 @SuppressWarnings("rawtypes")
 public class TransactionInterceptor extends AopInterceptorAbstract<TransactionManager> {
 
-	/**
-	 * @param iterator
-	 * @param interceptor
-	 * @param proxyHandler
-	 * @param method
-	 * @param args
-	 * @param proxy
-	 * @return
-	 * @throws Throwable
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.aop.AopInterceptorAbstract#before(java.lang.Object,
+	 * java.util.Iterator, java.lang.Object, com.absir.aop.AopProxyHandler,
+	 * java.lang.reflect.Method, java.lang.Object[],
+	 * net.sf.cglib.proxy.MethodProxy)
 	 */
 	@Override
-	public Object before(Iterator<AopInterceptor> iterator, TransactionManager interceptor, AopProxyHandler proxyHandler, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+	public Object before(Object proxy, Iterator<AopInterceptor> iterator, TransactionManager interceptor, AopProxyHandler proxyHandler, Method method, Object[] args, MethodProxy methodProxy)
+			throws Throwable {
 		// TODO Auto-generated method stub
 		interceptor.open();
 		return AopProxyHandler.VOID;
@@ -44,17 +43,17 @@ public class TransactionInterceptor extends AopInterceptorAbstract<TransactionMa
 	 * (non-Javadoc)
 	 * 
 	 * @see com.absir.aop.AopInterceptorAbstract#after(java.lang.Object,
-	 * java.lang.Object, com.absir.aop.AopProxyHandler, java.lang.Object,
+	 * java.lang.Object, java.lang.Object, com.absir.aop.AopProxyHandler,
 	 * java.lang.reflect.Method, java.lang.Object[], java.lang.Throwable)
 	 */
 	@Override
-	public Object after(TransactionManager interceptor, Object value, AopProxyHandler proxyHandler, Object beanObject, Method method, Object[] args, Throwable e) throws Throwable {
+	public Object after(Object proxy, Object returnValue, TransactionManager interceptor, AopProxyHandler proxyHandler, Method method, Object[] args, Throwable e) throws Throwable {
 		// TODO Auto-generated method stub
 		e = interceptor.close(e);
 		if (e != null) {
 			throw e;
 		}
 
-		return value;
+		return returnValue;
 	}
 }

@@ -35,22 +35,22 @@ public interface AopInterceptor<T> {
 	 * @param proxyHandler
 	 * @param method
 	 * @param args
-	 * @param proxy
+	 * @param methodProxy
 	 * @return
 	 * @throws Throwable
 	 */
-	public Object before(Iterator<AopInterceptor> iterator, T interceptor, AopProxyHandler proxyHandler, Method method, Object[] args, MethodProxy proxy) throws Throwable;
+	public Object before(Object proxy, Iterator<AopInterceptor> iterator, T interceptor, AopProxyHandler proxyHandler, Method method, Object[] args, MethodProxy methodProxy) throws Throwable;
 
 	/**
+	 * @param proxy
+	 * @param returnValue
 	 * @param interceptor
-	 * @param value
 	 * @param proxyHandler
-	 * @param beanObject
 	 * @param method
 	 * @param args
 	 * @param e
 	 * @return
 	 * @throws Throwable
 	 */
-	public Object after(T interceptor, Object value, AopProxyHandler proxyHandler, Object beanObject, Method method, Object[] args, Throwable e) throws Throwable;
+	public Object after(Object proxy, Object returnValue, T interceptor, AopProxyHandler proxyHandler, Method method, Object[] args, Throwable e) throws Throwable;
 }

@@ -40,24 +40,26 @@ public class AysncRunable {
 	}
 
 	/**
+	 * @param proxy
 	 * @param iterator
 	 * @param proxyHandler
 	 * @param method
 	 * @param args
-	 * @param proxy
+	 * @param methodProxy
 	 * @throws Throwable
 	 */
-	public void aysnc(final Iterator<AopInterceptor> iterator, final AopProxyHandler proxyHandler, final Method method, final Object[] args, final MethodProxy proxy) throws Throwable {
+	public void aysnc(final Object proxy, final Iterator<AopInterceptor> iterator, final AopProxyHandler proxyHandler, final Method method, final Object[] args, final MethodProxy methodProxy)
+			throws Throwable {
 		aysncRun(new Runnable() {
 
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
 				try {
-					proxyHandler.intercept(iterator, method, args, proxy);
+					proxyHandler.invoke(proxy, iterator, method, args, methodProxy);
 
 				} catch (Throwable e) {
-					LOGGER.error("failed!", e);
+					LOGGER.error("", e);
 				}
 			}
 		});

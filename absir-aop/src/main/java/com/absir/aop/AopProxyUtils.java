@@ -68,9 +68,12 @@ public class AopProxyUtils {
 			interfaces = new HashSet<Class<?>>();
 		}
 
-		Class<?> beanClass = null;
 		if (beanObject != null) {
-			beanClass = beanObject.getClass();
+			Class<?> beanClass = beanObject.getClass();
+			if (beanType == null) {
+				beanType = beanClass;
+			}
+
 			while (beanClass != null && beanClass != Object.class) {
 				for (Class<?> iCls : beanClass.getInterfaces()) {
 					interfaces.add(iCls);
@@ -78,21 +81,18 @@ public class AopProxyUtils {
 
 				beanClass = beanClass.getSuperclass();
 			}
-
-			beanClass = beanObject.getClass();
 		}
 
 		if (beanType == null) {
-			beanType = beanClass;
+			impl = false;
 
 		} else {
 			if (beanType.isInterface()) {
+				impl = false;
 				interfaces.add(beanType);
 
-			} else {
-				if (beanClass == null && Modifier.isFinal(beanType.getModifiers())) {
-					beanClass = beanType;
-				}
+			} else if (Modifier.isFinal(beanType.getModifiers())) {
+				impl = false;
 			}
 		}
 
@@ -105,22 +105,18 @@ public class AopProxyUtils {
 			iterfaceArray = KernelCollection.toArray(interfaces, Class.class);
 		}
 
-		if (beanClass != null && (beanClass.isInterface() || Modifier.isFinal(beanClass.getModifiers()))) {
-			beanClass = null;
+		if (jdk) {
+			return (AopProxy) java.lang.reflect.Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), iterfaceArray, new AopProxyJDK(beanType, beanObject));
 		}
 
-		if (impl || beanType != null) {
-			Enhancer enhancer = new Enhancer();
-			if (!(beanClass == null)) {
-				enhancer.setSuperclass(beanClass);
-			}
-
-			enhancer.setInterfaces(iterfaceArray);
-			enhancer.setCallback(new AopProxyCglib(beanType, beanObject));
-			return (AopProxy) enhancer.create();
+		Enhancer enhancer = new Enhancer();
+		if (impl && beanType != null) {
+			enhancer.setSuperclass(beanType);
 		}
 
-		return (AopProxy) java.lang.reflect.Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), iterfaceArray, new AopProxyJDK(beanType, beanObject));
+		enhancer.setInterfaces(iterfaceArray);
+		enhancer.setCallback(new AopProxyCglib(beanType, beanObject));
+		return (AopProxy) enhancer.create();
 	}
 
 	/**
@@ -148,16 +144,31 @@ public class AopProxyUtils {
 
 	/**
 	 * @param beanObject
+	 * @param aopInterceptor
 	 * @return
 	 */
 	public static AopProxy proxyInterceptor(Object beanObject, AopInterceptor aopInterceptor) {
+		return proxyInterceptor(beanObject, null, aopInterceptor);
+	}
+
+	/**
+	 * @param beanObject
+	 * @param beanType
+	 * @param aopInterceptor
+	 * @return
+	 */
+	public static AopProxy proxyInterceptor(Object beanObject, Class<?> beanType, AopInterceptor aopInterceptor) {
 		AopProxy aopProxy = null;
-		if (beanObject instanceof AopProxy) {
-			aopProxy = (AopProxy) beanObject;
+		if (beanObject == null || !(beanObject instanceof AopProxy)) {
+			if (beanType == null) {
+				beanType = beanObject.getClass();
+			}
+
+			Proxy proxy = beanType.getAnnotation(Proxy.class);
+			aopProxy = getProxy(beanObject, beanType, null, proxy == null ? false : proxy.jdk(), proxy == null ? true : proxy.impl());
 
 		} else {
-			Proxy proxy = beanObject.getClass().getAnnotation(Proxy.class);
-			aopProxy = getProxy(beanObject, proxy == null ? false : proxy.jdk(), proxy == null ? false : proxy.impl());
+			aopProxy = (AopProxy) beanObject;
 		}
 
 		if (aopInterceptor != null) {

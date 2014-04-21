@@ -86,17 +86,19 @@ public class DataQueryDefine extends BeanDefineAbstractor {
 	public Object getBeanObject(BeanFactory beanFactory) {
 		// TODO Auto-generated method stub
 		BeanDefine beanDefine = null;
-		for (Class<?> cls : beanType.getInterfaces()) {
-			beanDefine = beanFactory.getBeanDefine(null, cls);
-			if (beanDefine != null) {
-				if (BeanFactoryImpl.getBeanDefine(beanDefine, DataQueryDefine.class) == null && beanDefine.getBeanScope() == BeanScope.SINGLETON) {
-					break;
-				}
+		if (beanType.isInterface()) {
+			for (Class<?> cls : beanType.getInterfaces()) {
+				beanDefine = beanFactory.getBeanDefine(null, cls);
+				if (beanDefine != null) {
+					if (BeanFactoryImpl.getBeanDefine(beanDefine, DataQueryDefine.class) == null && beanDefine.getBeanScope() == BeanScope.SINGLETON) {
+						break;
+					}
 
-				beanDefine = null;
+					beanDefine = null;
+				}
 			}
 		}
 
-		return AopProxyUtils.getProxy(beanDefine == null ? null : beanDefine.getBeanObject(beanFactory), beanType, null, true, true);
+		return AopProxyUtils.proxyInterceptor(beanDefine == null ? null : beanDefine.getBeanObject(beanFactory), beanType, null);
 	}
 }

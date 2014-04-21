@@ -39,9 +39,9 @@ public interface SocketSessionResolver {
 	 * @param id
 	 * @param socketChannel
 	 * @param serverContext
-	 * @throws Throwable
+	 * @return
 	 */
-	public void doBeat(Serializable id, SocketChannel socketChannel, ServerContext serverContext) throws Throwable;
+	public boolean doBeat(Serializable id, SocketChannel socketChannel, ServerContext serverContext);
 
 	/**
 	 * @param id

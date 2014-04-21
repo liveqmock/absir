@@ -87,8 +87,9 @@ public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketCh
 
 					} else {
 						socketBuffer.setId(id);
-						InputSocket.writeByteBuffer(socketChannel, SocketServerContext.get().getOk());
-						serverContext.loginSocketChannelContext(id, createSocketChannelContext(id, socketChannel));
+						if (InputSocket.writeByteBuffer(socketChannel, SocketServerContext.get().getOk())) {
+							serverContext.loginSocketChannelContext(id, createSocketChannelContext(id, socketChannel));
+						}
 					}
 
 				} catch (Throwable e) {
@@ -143,17 +144,19 @@ public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketCh
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
-				try {
-					if (!doBeat(id, socketChannel, buffer, SocketServerContext.get().getBeat())) {
-						if (buffer.length > 1) {
-							InputSocketAtt inputSocketAtt = new InputSocketAtt(id, buffer);
-							on(inputSocketAtt.getUrl(), inputSocketAtt, socketChannel);
-						}
-					}
+				if (!doBeat(id, socketChannel, buffer, SocketServerContext.get().getBeat())) {
+					if (buffer.length > 1) {
+						InputSocketAtt inputSocketAtt = new InputSocketAtt(id, buffer);
+						try {
+							if (on(inputSocketAtt.getUrl(), inputSocketAtt, socketChannel)) {
+								return;
+							}
 
-				} catch (Throwable e) {
-					// TODO Auto-generated catch block
-					SocketServer.close(socketChannel);
+						} catch (Throwable e) {
+						}
+
+						InputSocket.writeByteBufferSuccess(socketChannel, false, inputSocketAtt.getCallbackIndex(), NONE_RESPONSE_BYTES);
+					}
 				}
 			}
 		});
@@ -167,7 +170,7 @@ public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketCh
 	 * @return
 	 * @throws IOException
 	 */
-	protected boolean doBeat(Serializable id, final SocketChannel socketChannel, byte[] buffer, final byte[] beat) throws Throwable {
+	protected boolean doBeat(final Serializable id, final SocketChannel socketChannel, byte[] buffer, final byte[] beat) {
 		int length = beat.length;
 		if (buffer.length == length) {
 			for (int i = 0; i < length; i++) {
@@ -176,9 +179,18 @@ public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketCh
 				}
 			}
 
-			InputSocket.writeByteBuffer(socketChannel, beat);
 			serverContext.getChannelContexts().get(id).retainAt();
-			SocketServerContext.get().getSessionResolver().doBeat(id, socketChannel, serverContext);
+			ContextUtils.getThreadPoolExecutor().execute(new Runnable() {
+
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					if (SocketServerContext.get().getSessionResolver().doBeat(id, socketChannel, serverContext)) {
+						InputSocket.writeByteBuffer(socketChannel, beat);
+					}
+				}
+			});
+
 			return true;
 		}
 
@@ -222,6 +234,12 @@ public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketCh
 		return socketInput;
 	}
 
+	/** NONE_RESPONSE */
+	private static final String NONE_RESPONSE = "";
+
+	/** NONE_RESPONSE_BYTES */
+	private static final byte[] NONE_RESPONSE_BYTES = NONE_RESPONSE.getBytes();
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -233,7 +251,7 @@ public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketCh
 	public void resolveReturnedValue(Object routeBean, OnPut onPut) throws Throwable {
 		// TODO Auto-generated method stub
 		if (onPut.getReturnValue() == null && onPut.getReturned() == Body.class) {
-			onPut.setReturnValue("");
+			onPut.setReturnValue(NONE_RESPONSE);
 		}
 
 		super.resolveReturnedValue(routeBean, onPut);

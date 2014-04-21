@@ -10,7 +10,6 @@ package com.absir.appserv.system.api;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.commons.httpclient.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,7 +88,7 @@ public abstract class ApiServer {
 	@Bodys
 	@OnException(Throwable.class)
 	protected Object onException(Throwable e, Input input) {
-		input.setStatus(HttpStatus.SC_BAD_REQUEST);
+		input.setStatus(ServerStatus.ON_ERROR.getCode());
 		if (BeanFactoryUtils.getEnvironment() == Environment.DEVELOP) {
 			e.printStackTrace();
 		}

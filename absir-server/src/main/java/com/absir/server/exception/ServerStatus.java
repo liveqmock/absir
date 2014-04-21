@@ -19,41 +19,41 @@ public enum ServerStatus {
 	/** ON_SUCCESS */
 	ON_SUCCESS(200),
 
-	/** ON_FAIL */
-	ON_FAIL(201),
+	/** ON_DELETED */
+	ON_DELETED(204),
 
-	/** NO_LOGIN */
-	NO_LOGIN(202),
+	/** ON_FAIL */
+	ON_FAIL(220),
 
 	/** NO_USER */
-	NO_USER(203),
+	NO_USER(220),
 
 	/** NO_VERIFY */
-	NO_VERIFY(204),
+	NO_VERIFY(221),
 
 	/** ON_TIMEOUT */
-	ON_TIMEOUT(301),
-
-	/** ON_DELETED */
-	ON_DELETED(302),
-
-	/** ON_FORBIDDEN */
-	ON_FORBIDDEN(303),
+	ON_TIMEOUT(222),
 
 	/** ON_DENIED */
 	ON_DENIED(304),
 
-	/** NO_PARAM */
-	NO_PARAM(400),
-
 	/** ON_ERROR */
-	ON_ERROR(401),
+	ON_ERROR(400),
+
+	/** NO_LOGIN */
+	NO_LOGIN(402),
+
+	/** ON_FORBIDDEN */
+	ON_FORBIDDEN(403),
 
 	/** IN_404 */
 	IN_404(404),
 
 	/** IN_405 */
 	IN_405(405),
+
+	/** NO_PARAM */
+	NO_PARAM(437),
 
 	;
 

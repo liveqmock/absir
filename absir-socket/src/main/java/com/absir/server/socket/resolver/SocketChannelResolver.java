@@ -7,10 +7,8 @@
  */
 package com.absir.server.socket.resolver;
 
-import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
 import com.absir.bean.basis.Base;
@@ -99,37 +97,17 @@ public class SocketChannelResolver implements ParameterResolver<Object> {
 	}
 
 	/**
-	 * @author absir
-	 * 
-	 */
-	public interface SocketHeaderProccesor {
-
-		/**
-		 * @param callbackIndex
-		 * @param headerLength
-		 * @param buffer
-		 */
-		public void writeSocketHeader(int callbackIndex, int headerLength, byte[] buffer);
-	}
-
-	/**
 	 * @param socketChannel
-	 * @param callbackIndex
 	 * @param headerLength
-	 * @param headerProccesor
 	 * @param bytes
-	 * @throws IOException
+	 * @return
 	 */
-	public void writeByteBuffer(SocketChannel socketChannel, int callbackIndex, int headerLength, SocketHeaderProccesor headerProccesor, byte[] bytes) throws IOException {
+	public byte[] writeByteBuffer(SocketChannel socketChannel, int headerLength, byte[] bytes) {
 		int length = bytes.length;
 		byte[] buffer = new byte[4 + headerLength + length];
 		KernelByte.setLength(buffer, 0, headerLength + length);
 		KernelByte.copy(bytes, buffer, 0, 4 + headerLength, length);
-		if (headerProccesor != null) {
-			headerProccesor.writeSocketHeader(callbackIndex, headerLength, buffer);
-		}
-
-		socketChannel.write(ByteBuffer.wrap(buffer));
+		return buffer;
 	}
 
 	/*

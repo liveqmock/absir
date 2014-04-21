@@ -12,25 +12,26 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.Map;
 
 import com.absir.context.core.ContextUtils;
 import com.absir.core.kernel.KernelByte;
 import com.absir.core.kernel.KernelDyna;
+import com.absir.server.exception.ServerStatus;
 import com.absir.server.in.InMethod;
 import com.absir.server.in.InModel;
 import com.absir.server.in.Input;
 import com.absir.server.on.OnPut;
 import com.absir.server.route.returned.ReturnedResolver;
 import com.absir.server.socket.resolver.SocketChannelResolver;
-import com.absir.server.socket.resolver.SocketChannelResolver.SocketHeaderProccesor;
 
 /**
  * @author absir
  * 
  */
-public class InputSocket extends Input implements SocketHeaderProccesor {
+public class InputSocket extends Input {
 
 	/** socketChannel */
 	private SocketChannel socketChannel;
@@ -39,7 +40,7 @@ public class InputSocket extends Input implements SocketHeaderProccesor {
 	private String uri;
 
 	/** status */
-	private int status;
+	private int status = ServerStatus.ON_SUCCESS.getCode();
 
 	/** flag */
 	private byte flag;
@@ -298,33 +299,10 @@ public class InputSocket extends Input implements SocketHeaderProccesor {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.absir.server.socket.resolver.SocketChannelResolver.SocketHeaderProccesor
-	 * #writeSocketHeader(int, int, byte[])
-	 */
-	@Override
-	public void writeSocketHeader(int callbackIndex, int headerLength, byte[] buffer) {
-		// TODO Auto-generated method stub
-		byte flag = 0;
-		if (headerLength >= 5) {
-			flag |= InputSocketAtt.CALL_BACK_FLAG;
-			KernelByte.setLength(buffer, 5, callbackIndex);
-		}
-
-		if (status != 0) {
-			flag += InputSocketAtt.DEBUG_FLAG;
-		}
-
-		buffer[4] = flag;
-	}
-
 	@Override
 	public void write(byte[] b, int off, int len) throws IOException {
 		// TODO Auto-generated method stub
-		SocketChannelResolver.ME.writeByteBuffer(socketChannel, callbackIndex, callbackIndex == 0 ? 1 : 5, this, b);
+		writeByteBufferSuccess(socketChannel, status == ServerStatus.ON_SUCCESS.getCode() ? true : false, callbackIndex, b);
 	}
 
 	/*
@@ -342,35 +320,65 @@ public class InputSocket extends Input implements SocketHeaderProccesor {
 	/**
 	 * @param socketChannel
 	 * @param bytes
-	 * @throws IOException
+	 * @return
 	 */
-	public static void writeByteBuffer(SocketChannel socketChannel, byte[] bytes) throws IOException {
-		SocketChannelResolver.ME.writeByteBuffer(socketChannel, 0, 0, null, bytes);
-	}
+	public static boolean writeByteBuffer(SocketChannel socketChannel, byte[] bytes) {
+		byte[] buffer = SocketChannelResolver.ME.writeByteBuffer(socketChannel, 0, bytes);
+		try {
+			socketChannel.write(ByteBuffer.wrap(buffer));
+			return true;
 
-	/** SOCKET_HEADER_PROCCESOR */
-	private static final SocketHeaderProccesor SOCKET_HEADER_PROCCESOR = new SocketHeaderProccesor() {
-
-		@Override
-		public void writeSocketHeader(int callbackIndex, int headerLength, byte[] buffer) {
-			// TODO Auto-generated method stub
-			byte flag = 0;
-			if (headerLength >= 5) {
-				flag |= InputSocketAtt.CALL_BACK_FLAG;
-				KernelByte.setLength(buffer, 5, callbackIndex);
-			}
-
-			buffer[4] = flag;
+		} catch (Throwable e) {
+			SocketServer.close(socketChannel);
+			return false;
 		}
-	};
+	}
 
 	/**
 	 * @param socketChannel
 	 * @param callbackIndex
 	 * @param bytes
-	 * @throws IOException
+	 * @return
 	 */
-	public static void writeByteBuffer(SocketChannel socketChannel, int callbackIndex, byte[] bytes) throws IOException {
-		SocketChannelResolver.ME.writeByteBuffer(socketChannel, callbackIndex, callbackIndex == 0 ? 1 : 5, SOCKET_HEADER_PROCCESOR, bytes);
+	public static boolean writeByteBuffer(SocketChannel socketChannel, int callbackIndex, byte[] bytes) {
+		return writeByteBuffer(socketChannel, (byte) 0, callbackIndex, bytes);
+	}
+
+	/**
+	 * @param socketChannel
+	 * @param flag
+	 * @param callbackIndex
+	 * @param bytes
+	 * @return
+	 */
+	public static boolean writeByteBuffer(SocketChannel socketChannel, byte flag, int callbackIndex, byte[] bytes) {
+		int headerLength = callbackIndex == 0 ? 1 : 5;
+		byte[] buffer = SocketChannelResolver.ME.writeByteBuffer(socketChannel, headerLength, bytes);
+		headerLength = buffer.length - bytes.length - headerLength;
+		if (callbackIndex != 0) {
+			flag |= InputSocketAtt.CALL_BACK_FLAG;
+			KernelByte.setLength(buffer, headerLength + 1, callbackIndex);
+		}
+
+		buffer[headerLength] = flag;
+		try {
+			socketChannel.write(ByteBuffer.wrap(buffer));
+			return true;
+
+		} catch (Throwable e) {
+			SocketServer.close(socketChannel);
+			return false;
+		}
+	}
+
+	/**
+	 * @param socketChannel
+	 * @param success
+	 * @param callbackIndex
+	 * @param bytes
+	 * @return
+	 */
+	public static boolean writeByteBufferSuccess(SocketChannel socketChannel, boolean success, int callbackIndex, byte[] bytes) {
+		return writeByteBuffer(socketChannel, success == true ? 0 : InputSocketAtt.DEBUG_FLAG, callbackIndex, bytes);
 	}
 }

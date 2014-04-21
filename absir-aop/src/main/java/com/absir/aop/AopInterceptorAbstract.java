@@ -47,13 +47,13 @@ public class AopInterceptorAbstract<T> implements AopInterceptor<T> {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.absir.aop.AopInterceptor#before(java.util.Iterator,
-	 * java.lang.Object, com.absir.aop.AopProxyHandler,
+	 * @see com.absir.aop.AopInterceptor#before(java.lang.Object,
+	 * java.util.Iterator, java.lang.Object, com.absir.aop.AopProxyHandler,
 	 * java.lang.reflect.Method, java.lang.Object[],
 	 * net.sf.cglib.proxy.MethodProxy)
 	 */
 	@Override
-	public Object before(Iterator<AopInterceptor> iterator, T interceptor, AopProxyHandler proxyHandler, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+	public Object before(Object proxy, Iterator<AopInterceptor> iterator, T interceptor, AopProxyHandler proxyHandler, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
 		// TODO Auto-generated method stub
 		return AopProxyHandler.VOID;
 	}
@@ -62,12 +62,12 @@ public class AopInterceptorAbstract<T> implements AopInterceptor<T> {
 	 * (non-Javadoc)
 	 * 
 	 * @see com.absir.aop.AopInterceptor#after(java.lang.Object,
-	 * java.lang.Object, com.absir.aop.AopProxyHandler, java.lang.Object,
+	 * java.lang.Object, java.lang.Object, com.absir.aop.AopProxyHandler,
 	 * java.lang.reflect.Method, java.lang.Object[], java.lang.Throwable)
 	 */
 	@Override
-	public Object after(T interceptor, Object value, AopProxyHandler proxyHandler, Object beanObject, Method method, Object[] args, Throwable e) throws Throwable {
+	public Object after(Object proxy, Object returnValue, T interceptor, AopProxyHandler proxyHandler, Method method, Object[] args, Throwable e) throws Throwable {
 		// TODO Auto-generated method stub
-		return value;
+		return returnValue;
 	}
 }

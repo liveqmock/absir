@@ -38,7 +38,7 @@ public class AopProxyHandler {
 		AOP_PROXY_METHOD_ZERO.put("getAopInterceptors", 2);
 		AOP_PROXY_METHOD_ZERO.put("hashCode", 3);
 		AOP_PROXY_METHOD_ZERO.put("toString", 4);
-
+		// AOP_PROXY_METHOD_ONE
 		AOP_PROXY_METHOD_ONE.put("equals", 0);
 	}
 
@@ -75,14 +75,14 @@ public class AopProxyHandler {
 	}
 
 	/**
-	 * @param obj
+	 * @param proxy
 	 * @param method
 	 * @param args
-	 * @param proxy
+	 * @param methodProxy
 	 * @return
 	 * @throws Throwable
 	 */
-	public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+	public Object intercept(Object proxy, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
 		int length = args == null ? 0 : args.length;
 		if (length == 0) {
 			Integer interceptor = AOP_PROXY_METHOD_ZERO.get(method.getName());
@@ -115,19 +115,19 @@ public class AopProxyHandler {
 			}
 		}
 
-		return intercept(aopInterceptors.iterator(), method, args, proxy);
+		return invoke(proxy, aopInterceptors.iterator(), method, args, methodProxy);
 	}
 
 	/**
+	 * @param proxy
 	 * @param iterator
-	 * @param obj
 	 * @param method
 	 * @param args
-	 * @param proxy
+	 * @param methodProxy
 	 * @return
 	 * @throws Throwable
 	 */
-	public Object intercept(Iterator<AopInterceptor> iterator, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+	public Object invoke(Object proxy, Iterator<AopInterceptor> iterator, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
 		while (iterator.hasNext()) {
 			AopInterceptor aopInterceptor = iterator.next();
 			Object interceptor = aopInterceptor.getInterceptor(this, beanObject, method, args);
@@ -135,9 +135,9 @@ public class AopProxyHandler {
 				Object value = null;
 				Throwable ex = null;
 				try {
-					value = aopInterceptor.before(iterator, interceptor, this, method, args, proxy);
+					value = aopInterceptor.before(proxy, iterator, interceptor, this, method, args, methodProxy);
 					if (value == VOID) {
-						value = intercept(iterator, method, args, proxy);
+						value = invoke(proxy, iterator, method, args, methodProxy);
 					}
 
 					return value;
@@ -147,23 +147,23 @@ public class AopProxyHandler {
 					throw e;
 
 				} finally {
-					value = aopInterceptor.after(interceptor, value, this, beanObject, method, args, ex);
+					value = aopInterceptor.after(proxy, value, interceptor, this, method, args, ex);
 				}
 			}
 		}
 
-		return invoke(method, args, proxy);
+		return invoke(proxy, method, args, methodProxy);
 	}
 
 	/**
-	 * @param obj
+	 * @param proxy
 	 * @param method
 	 * @param args
-	 * @param proxy
+	 * @param methodProxy
 	 * @return
 	 * @throws Throwable
 	 */
-	public Object invoke(Method method, Object[] args, MethodProxy proxy) throws Throwable {
+	public Object invoke(Object proxy, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
 		return method.invoke(beanObject, args);
 	}
 }

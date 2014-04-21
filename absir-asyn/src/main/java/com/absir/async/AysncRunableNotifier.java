@@ -42,6 +42,9 @@ public class AysncRunableNotifier extends AysncRunable {
 	 */
 	private static class NotifierIterator {
 
+		/** proxy */
+		private Object proxy;
+
 		/** iterator */
 		private Iterator<AopInterceptor> iterator;
 
@@ -54,29 +57,31 @@ public class AysncRunableNotifier extends AysncRunable {
 		/** args */
 		private Object[] args;
 
-		/** proxy */
-		private MethodProxy proxy;
+		/** methodProxy */
+		private MethodProxy methodProxy;
 	}
 
 	/**
+	 * @param proxy
 	 * @param iterator
 	 * @param proxyHandler
 	 * @param method
 	 * @param args
-	 * @param proxy
+	 * @param methodProxy
 	 * @return
 	 */
-	public Runnable notifierRunable(final Iterator<AopInterceptor> iterator, final AopProxyHandler proxyHandler, final Method method, final Object[] args, final MethodProxy proxy) {
+	public Runnable notifierRunable(final Object proxy, final Iterator<AopInterceptor> iterator, final AopProxyHandler proxyHandler, final Method method, final Object[] args,
+			final MethodProxy methodProxy) {
 		return new Runnable() {
 
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
 				try {
-					proxyHandler.intercept(iterator, method, args, proxy);
+					proxyHandler.invoke(proxy, iterator, method, args, methodProxy);
 
 				} catch (Throwable e) {
-					LOGGER.error("failed!", e);
+					LOGGER.error("", e);
 
 				} finally {
 					NotifierIterator iterator = null;
@@ -91,7 +96,7 @@ public class AysncRunableNotifier extends AysncRunable {
 						}
 					}
 
-					aysncRun(notifierRunable(iterator.iterator, iterator.proxyHandler, iterator.method, iterator.args, iterator.proxy));
+					aysncRun(notifierRunable(iterator.proxy, iterator.iterator, iterator.proxyHandler, iterator.method, iterator.args, iterator.methodProxy));
 				}
 			}
 		};
@@ -100,12 +105,13 @@ public class AysncRunableNotifier extends AysncRunable {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.absir.async.AysncRunable#aysnc(java.util.Iterator,
-	 * com.absir.aop.AopProxyHandler, java.lang.reflect.Method,
-	 * java.lang.Object[], net.sf.cglib.proxy.MethodProxy)
+	 * @see com.absir.async.AysncRunable#aysnc(java.lang.Object,
+	 * java.util.Iterator, com.absir.aop.AopProxyHandler,
+	 * java.lang.reflect.Method, java.lang.Object[],
+	 * net.sf.cglib.proxy.MethodProxy)
 	 */
 	@Override
-	public void aysnc(final Iterator<AopInterceptor> iterator, final AopProxyHandler proxyHandler, final Method method, final Object[] args, final MethodProxy proxy) throws Throwable {
+	public void aysnc(Object proxy, Iterator<AopInterceptor> iterator, AopProxyHandler proxyHandler, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
 		// TODO Auto-generated method stub
 		synchronized (this) {
 			if (notifying) {
@@ -113,17 +119,18 @@ public class AysncRunableNotifier extends AysncRunable {
 					notifierIterator = new NotifierIterator();
 				}
 
+				notifierIterator.proxy = proxy;
 				notifierIterator.iterator = iterator;
 				notifierIterator.proxyHandler = proxyHandler;
 				notifierIterator.method = method;
 				notifierIterator.args = args;
-				notifierIterator.proxy = proxy;
+				notifierIterator.methodProxy = methodProxy;
 				return;
 			}
 
 			notifying = true;
 		}
 
-		aysncRun(notifierRunable(iterator, proxyHandler, method, args, proxy));
+		aysncRun(notifierRunable(proxy, iterator, proxyHandler, method, args, methodProxy));
 	}
 }

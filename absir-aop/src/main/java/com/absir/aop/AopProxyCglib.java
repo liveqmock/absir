@@ -30,16 +30,22 @@ public class AopProxyCglib extends AopProxyHandler implements MethodInterceptor 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.absir.aop.AopProxyAbstract#invoke(java.lang.reflect.Method,
-	 * java.lang.Object[], net.sf.cglib.proxy.MethodProxy)
+	 * @see com.absir.aop.AopProxyHandler#invoke(java.lang.Object,
+	 * java.lang.reflect.Method, java.lang.Object[],
+	 * net.sf.cglib.proxy.MethodProxy)
 	 */
 	@Override
-	public Object invoke(Method method, Object[] args, MethodProxy proxy) throws Throwable {
+	public Object invoke(Object proxy, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
 		// TODO Auto-generated method stub
-		if (!method.isAccessible()) {
-			method.setAccessible(true);
-		}
+		if (beanObject == null) {
+			return methodProxy.invokeSuper(proxy, args);
 
-		return method.invoke(beanObject, args);
+		} else {
+			if (!method.isAccessible()) {
+				method.setAccessible(true);
+			}
+
+			return method.invoke(beanObject, args);
+		}
 	}
 }

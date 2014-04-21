@@ -9,6 +9,7 @@ package com.absir.appserv.system.bean.base;
 
 import javax.persistence.MappedSuperclass;
 
+import com.absir.appserv.system.assoc.DeveloperAssoc;
 import com.absir.appserv.system.bean.value.JaEdit;
 import com.absir.appserv.system.bean.value.JaLang;
 import com.absir.appserv.system.bean.value.JeEditable;
@@ -23,7 +24,7 @@ public class JbUser extends JbBean {
 
 	@JaLang("开发者")
 	@JaEdit(editable = JeEditable.DISABLE)
-	@JaField(assocClasses = JbPermission.class, referenceEntityName = "developerAssocDao")
+	@JaField(assocClasses = JbPermission.class, referencEntityClass = DeveloperAssoc.class)
 	private boolean developer;
 
 	/**

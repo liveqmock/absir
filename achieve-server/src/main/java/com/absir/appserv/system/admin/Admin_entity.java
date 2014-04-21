@@ -297,6 +297,7 @@ public class Admin_entity extends AdminServer {
 	 * @param input
 	 * @return
 	 */
+	@Mapping(method = InMethod.POST)
 	public String delete(String entityName, @Param String[] ids, Input input) {
 		ICrudSupply crudSupply = getCrudSupply(entityName, null);
 		JiUserBase user = SecurityService.ME.getUserBase(input);

@@ -54,7 +54,7 @@ public class JtJsonValue implements UserType, Serializable {
 	@Override
 	public int[] sqlTypes() {
 		// TODO Auto-generated method stub
-		return new int[] { Types.VARCHAR };
+		return new int[] { Types.LONGVARCHAR };
 	}
 
 	/*

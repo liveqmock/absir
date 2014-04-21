@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
+import com.absir.appserv.system.service.impl.BeanServiceBase;
 import com.absir.appserv.system.service.impl.BeanServiceImpl;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.orm.transaction.TransactionAttribute;
@@ -24,7 +25,7 @@ import com.absir.orm.transaction.value.Transaction;
 public interface BeanService {
 
 	/** ME */
-	public static final BeanService ME = BeanFactoryUtils.get(BeanServiceImpl.class);
+	public static final BeanServiceBase ME = BeanFactoryUtils.get(BeanServiceImpl.class);
 
 	/** TRANSACTION_READ_ONLY */
 	public static final TransactionAttribute TRANSACTION_READ_ONLY = new TransactionAttribute(true, null, false, true, 0);

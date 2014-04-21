@@ -16,7 +16,7 @@ import java.util.List;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import com.absir.appserv.game.utils.GameUtils;
-import com.absir.appserv.system.bean.dto.JiBaseSerializer;
+import com.absir.appserv.system.bean.dto.IBaseSerializer;
 import com.absir.appserv.system.bean.proxy.JiBase;
 
 /**
@@ -36,7 +36,7 @@ public abstract class OObject<T extends OObject> implements JiBase {
 	protected boolean invincible;
 
 	// 目标卡牌
-	@JsonSerialize(using = JiBaseSerializer.class)
+	@JsonSerialize(using = IBaseSerializer.class)
 	protected T target;
 
 	// 血量

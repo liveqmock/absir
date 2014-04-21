@@ -3,25 +3,26 @@
  * 
  * All right reserved
  *
- * Create on 2013-10-29 下午12:41:38
+ * Create on 2013-10-29 下午12:29:09
  */
 package com.absir.appserv.system.bean.dto;
 
 import java.io.IOException;
-import java.util.Collection;
 
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.SerializerProvider;
 
-import com.absir.appserv.system.bean.proxy.JiBase;
+import com.absir.appserv.system.helper.HelperBase;
+import com.absir.context.bean.IBase;
 
 /**
  * @author absir
  * 
  */
-public class JiBaseCollectionSerializer extends JsonSerializer<Collection<? extends JiBase>> {
+@SuppressWarnings("rawtypes")
+public class IBeanLazySerializer extends JsonSerializer<IBase> {
 
 	/*
 	 * (non-Javadoc)
@@ -31,14 +32,8 @@ public class JiBaseCollectionSerializer extends JsonSerializer<Collection<? exte
 	 * org.codehaus.jackson.map.SerializerProvider)
 	 */
 	@Override
-	public void serialize(Collection<? extends JiBase> value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonProcessingException {
+	public void serialize(IBase value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonProcessingException {
 		// TODO Auto-generated method stub
-		jgen.writeStartArray();
-		for (JiBase base : value) {
-			jgen.writeObject(base.getId());
-		}
-
-		jgen.writeEndArray();
+		jgen.writeObject(HelperBase.getLazyId(value));
 	}
-
 }

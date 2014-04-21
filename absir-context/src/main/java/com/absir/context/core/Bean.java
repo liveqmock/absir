@@ -9,13 +9,11 @@ package com.absir.context.core;
 
 import java.io.Serializable;
 
-import com.absir.context.bean.IBean;
-
 /**
  * @author absir
  * 
  */
-public class Bean<ID extends Serializable> implements IBean<ID> {
+public class Bean<ID extends Serializable> extends Base<ID> {
 
 	/** id */
 	private ID id;

@@ -15,18 +15,17 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import com.absir.appserv.dyna.DynaBinderUtils;
-import com.absir.appserv.system.bean.proxy.JiBase;
 import com.absir.appserv.system.bean.value.JaLang;
 import com.absir.bean.core.BeanFactoryUtils;
+import com.absir.context.core.Base;
 import com.absir.core.helper.HelperFile;
-import com.absir.core.kernel.KernelObject;
 
 /**
  * @author absir
  * 
  */
 @SuppressWarnings({ "unchecked" })
-public class XlsBase implements JiBase {
+public class XlsBase extends Base<Serializable> {
 
 	/** id */
 	@JaLang("编号")
@@ -43,35 +42,6 @@ public class XlsBase implements JiBase {
 	 */
 	public Serializable getId() {
 		return id;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		return KernelObject.hashCode(id);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object equal) {
-		if (equal == null) {
-			return false;
-		}
-
-		if (getClass().isAssignableFrom(equal.getClass())) {
-			return KernelObject.equals(((XlsBean<?>) equal).getId(), id);
-
-		} else {
-			return equal.equals(id);
-		}
 	}
 
 	/**

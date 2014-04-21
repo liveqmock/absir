@@ -13,6 +13,6 @@ import java.io.Serializable;
  * @author absir
  * 
  */
-public interface IContextBean<ID extends Serializable> extends IBean<ID>, IContext {
+public interface IContextBean<ID extends Serializable> extends IBase<ID>, IContext {
 
 }

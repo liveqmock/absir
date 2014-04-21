@@ -3,25 +3,26 @@
  * 
  * All right reserved
  *
- * Create on 2013-10-24 下午2:23:23
+ * Create on 2013-10-29 下午12:41:38
  */
 package com.absir.appserv.system.bean.dto;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.SerializerProvider;
 
-import com.absir.appserv.system.bean.proxy.JiBase;
-import com.absir.core.dyna.DynaBinder;
+import com.absir.context.bean.IBase;
 
 /**
  * @author absir
  * 
  */
-public class JiBaseKeySerializer extends JsonSerializer<JiBase> {
+@SuppressWarnings("rawtypes")
+public class IBeanCollectionSerializer extends JsonSerializer<Collection<? extends IBase>> {
 
 	/*
 	 * (non-Javadoc)
@@ -31,8 +32,14 @@ public class JiBaseKeySerializer extends JsonSerializer<JiBase> {
 	 * org.codehaus.jackson.map.SerializerProvider)
 	 */
 	@Override
-	public void serialize(JiBase value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonProcessingException {
+	public void serialize(Collection<? extends IBase> value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonProcessingException {
 		// TODO Auto-generated method stub
-		jgen.writeFieldName(DynaBinder.to(value.getId(), String.class));
+		jgen.writeStartArray();
+		for (IBase base : value) {
+			jgen.writeObject(base.getId());
+		}
+
+		jgen.writeEndArray();
 	}
+
 }

@@ -12,19 +12,20 @@ import java.util.Collection;
 
 import org.hibernate.proxy.HibernateProxy;
 
-import com.absir.appserv.system.bean.proxy.JiBase;
+import com.absir.context.bean.IBase;
 
 /**
  * @author absir
  * 
  */
+@SuppressWarnings("rawtypes")
 public class HelperBase {
 
 	/**
 	 * @param base
 	 * @return
 	 */
-	public static Serializable getLazyId(JiBase base) {
+	public static Serializable getLazyId(IBase base) {
 		if (base == null) {
 			return null;
 		}
@@ -41,7 +42,7 @@ public class HelperBase {
 	 * @param bases
 	 * @return
 	 */
-	public static Serializable[] getBaseIds(JiBase[] bases) {
+	public static Serializable[] getBaseIds(IBase[] bases) {
 		int length = bases.length;
 		Serializable[] ids = new Serializable[length];
 		for (int i = 0; i < length; i++) {
@@ -55,10 +56,10 @@ public class HelperBase {
 	 * @param bases
 	 * @return
 	 */
-	public static Serializable[] getBaseIds(Collection<? extends JiBase> bases) {
+	public static Serializable[] getBaseIds(Collection<? extends IBase> bases) {
 		Serializable[] ids = new Serializable[bases.size()];
 		int i = -1;
-		for (JiBase base : bases) {
+		for (IBase base : bases) {
 			ids[++i] = base.getId();
 		}
 

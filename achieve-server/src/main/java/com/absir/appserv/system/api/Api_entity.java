@@ -18,7 +18,6 @@ import com.absir.appserv.feature.transaction.TransactionIntercepter;
 import com.absir.appserv.jdbc.JdbcCondition;
 import com.absir.appserv.jdbc.JdbcEntities;
 import com.absir.appserv.jdbc.JdbcPage;
-import com.absir.appserv.system.bean.proxy.JiBase;
 import com.absir.appserv.system.bean.proxy.JiUpdate;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.domain.DCondition;
@@ -32,6 +31,7 @@ import com.absir.appserv.system.service.utils.AuthServiceUtils;
 import com.absir.appserv.system.service.utils.CrudServiceUtils;
 import com.absir.appserv.system.service.utils.EntityServiceUtils;
 import com.absir.appserv.system.service.utils.SearchServiceUtils;
+import com.absir.context.bean.IBase;
 import com.absir.core.kernel.KernelLang.PropertyFilter;
 import com.absir.orm.hibernate.SessionFactoryUtils;
 import com.absir.orm.value.JePermission;
@@ -48,7 +48,7 @@ import com.absir.server.value.Server;
  * @author absir
  * 
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({ "rawtypes", "unchecked" })
 @Server
 public class Api_entity extends ApiServer {
 
@@ -311,11 +311,11 @@ public class Api_entity extends ApiServer {
 	 */
 	public Map<String, Object> changedId(String entityName, long updateTime, int pageIndex, int pageSize, Input input) {
 		Map<String, Object> modelMap = changed(entityName, updateTime, pageIndex, pageSize, input);
-		List<JiBase> entities = (List<JiBase>) modelMap.get("entities");
+		List<IBase> entities = (List<IBase>) modelMap.get("entities");
 		int size = entities.size();
-		if (size > 0 && entities.get(0) instanceof JiBase) {
+		if (size > 0 && entities.get(0) instanceof IBase) {
 			List<Object> changeIds = new ArrayList<Object>(size);
-			for (JiBase base : entities) {
+			for (IBase base : entities) {
 				changeIds.add(base.getId());
 			}
 

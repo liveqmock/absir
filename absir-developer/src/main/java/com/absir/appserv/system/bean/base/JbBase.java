@@ -7,14 +7,17 @@
  */
 package com.absir.appserv.system.bean.base;
 
+import java.io.Serializable;
+
 import javax.persistence.MappedSuperclass;
 
-import com.absir.appserv.system.bean.proxy.JiBase;
+import com.absir.context.core.Base;
 
 /**
  * @author absir
  * 
  */
 @MappedSuperclass
-public abstract class JbBase implements JiBase {
+public abstract class JbBase extends Base<Serializable> {
+
 }

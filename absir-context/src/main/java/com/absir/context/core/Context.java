@@ -9,14 +9,11 @@ package com.absir.context.core;
 
 import java.io.Serializable;
 
-import com.absir.context.bean.IBean;
-import com.absir.core.kernel.KernelObject;
-
 /**
  * @author absir
  * 
  */
-public abstract class Context<ID extends Serializable> implements IBean<ID> {
+public abstract class Context<ID extends Serializable> extends Base<ID> {
 
 	/** id */
 	private ID id;
@@ -33,30 +30,6 @@ public abstract class Context<ID extends Serializable> implements IBean<ID> {
 	 */
 	protected void setId(ID id) {
 		this.id = id;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		return KernelObject.hashCode(id);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null || obj.getClass() != getClass()) {
-			return false;
-		}
-
-		return KernelObject.equals(id, ((Context<?>) obj).id);
 	}
 
 	/**

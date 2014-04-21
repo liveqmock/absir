@@ -9,11 +9,13 @@ package com.absir.appserv.system.bean.proxy;
 
 import java.io.Serializable;
 
+import com.absir.context.bean.IBase;
+
 /**
  * @author absir
  * 
  */
-public interface JiBase {
+public interface JiBase extends IBase<Serializable> {
 
 	/**
 	 * @return

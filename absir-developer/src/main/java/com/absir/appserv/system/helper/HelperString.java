@@ -12,7 +12,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.absir.appserv.system.bean.proxy.JiBase;
+import com.absir.context.bean.IBase;
 import com.absir.core.dyna.DynaBinder;
 import com.absir.core.kernel.KernelString;
 import com.absir.core.kernel.KernelString.ImplodeBuilder;
@@ -21,6 +21,7 @@ import com.absir.core.kernel.KernelString.ImplodeBuilder;
  * @author absir
  * 
  */
+@SuppressWarnings("rawtypes")
 public class HelperString extends StringUtils {
 
 	/** PARAM_MAP_IMPLODE_BUILDER */
@@ -29,8 +30,8 @@ public class HelperString extends StringUtils {
 		@Override
 		public Object glue(StringBuilder builder, Object glue, int index, Object value, Object target) {
 			// TODO Auto-generated method stub
-			if (index == 0 && value != null && value instanceof JiBase) {
-				value = ((JiBase) value).getId();
+			if (index == 0 && value != null && value instanceof IBase) {
+				value = ((IBase) value).getId();
 			}
 
 			return value;

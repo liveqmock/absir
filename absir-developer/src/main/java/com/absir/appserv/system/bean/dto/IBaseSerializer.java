@@ -14,13 +14,14 @@ import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.SerializerProvider;
 
-import com.absir.appserv.system.bean.proxy.JiBase;
+import com.absir.context.bean.IBase;
 
 /**
  * @author absir
  * 
  */
-public class JiBaseSerializer extends JsonSerializer<JiBase> {
+@SuppressWarnings("rawtypes")
+public class IBaseSerializer extends JsonSerializer<IBase> {
 
 	/*
 	 * (non-Javadoc)
@@ -30,7 +31,7 @@ public class JiBaseSerializer extends JsonSerializer<JiBase> {
 	 * org.codehaus.jackson.map.SerializerProvider)
 	 */
 	@Override
-	public void serialize(JiBase value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonProcessingException {
+	public void serialize(IBase value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonProcessingException {
 		// TODO Auto-generated method stub
 		jgen.writeObject(value.getId());
 	}

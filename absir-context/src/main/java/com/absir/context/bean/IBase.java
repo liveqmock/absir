@@ -13,7 +13,7 @@ import java.io.Serializable;
  * @author absir
  * 
  */
-public interface IBean<ID extends Serializable> {
+public interface IBase<ID extends Serializable> {
 
 	/**
 	 * @return

@@ -186,6 +186,7 @@ public class SocketServer {
 	 */
 	public static void close(SocketChannel socketChannel) {
 		try {
+			// new Exception().printStackTrace();
 			socketChannel.close();
 
 		} catch (Throwable e) {

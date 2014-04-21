@@ -118,12 +118,7 @@ public class ServerContext {
 			SocketChannelContext socketChannelContext = entry.getValue();
 			if (socketChannelContext.stepDone(contextTime)) {
 				iterator.remove();
-				try {
-					socketChannelContext.getSocketChannel().close();
-
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-				}
+				SocketServer.close(socketChannelContext.getSocketChannel());
 			}
 		}
 	}

@@ -68,7 +68,7 @@ public class ServerResolverBodys implements ParameterResolver<Class<?>>, Paramet
 			return ServerResolverBody.ME.getParameterValue(onPut, parameter, parameterType, beanName, routeMethod);
 		}
 
-		return scParameterValue(onPut, parameter, parameterType, beanName, routeMethod);
+		return sParameterValue(onPut, parameter, parameterType, beanName, routeMethod);
 	}
 
 	/**
@@ -80,7 +80,7 @@ public class ServerResolverBodys implements ParameterResolver<Class<?>>, Paramet
 	 * @return
 	 * @throws Exception
 	 */
-	public Object scParameterValue(OnPut onPut, Class<?> parameter, Class<?> parameterType, String beanName, RouteMethod routeMethod) throws Exception {
+	public Object sParameterValue(OnPut onPut, Class<?> parameter, Class<?> parameterType, String beanName, RouteMethod routeMethod) throws Exception {
 		Input input = onPut.getInput();
 		InputStream inputStream = input.getInputStream();
 		if (inputStream == null) {
@@ -149,7 +149,7 @@ public class ServerResolverBodys implements ParameterResolver<Class<?>>, Paramet
 			ServerResolverBody.ME.resolveReturnedValue(returnValue, returned, onPut);
 
 		} else {
-			scResolveReturnedValue(returnValue, returned, onPut);
+			sResolveReturnedValue(returnValue, returned, onPut);
 		}
 	}
 
@@ -159,7 +159,7 @@ public class ServerResolverBodys implements ParameterResolver<Class<?>>, Paramet
 	 * @param onPut
 	 * @throws Exception
 	 */
-	public void scResolveReturnedValue(Object returnValue, Class<?> returned, OnPut onPut) throws Exception {
+	public void sResolveReturnedValue(Object returnValue, Class<?> returned, OnPut onPut) throws Exception {
 		if (returnValue != null) {
 			ServerResolverBody serverResolverBody = ServerResolverBody.ME;
 			Input input = onPut.getInput();

@@ -19,10 +19,10 @@ public class KernelByte {
 	 * @return
 	 */
 	public static int getLength(byte[] destination, int destionationIndex) {
-		int length = destination[destionationIndex];
-		length += destination[++destionationIndex] << 8;
-		length += destination[++destionationIndex] << 16;
-		length += destination[++destionationIndex] << 24;
+		int length = destination[destionationIndex] & 0xFF;
+		length += (destination[++destionationIndex] & 0xFF) << 8;
+		length += (destination[++destionationIndex] & 0xFF) << 16;
+		length += (destination[++destionationIndex] & 0xFF) << 24;
 		return length;
 	}
 

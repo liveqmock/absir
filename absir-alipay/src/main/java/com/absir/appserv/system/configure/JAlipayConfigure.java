@@ -17,7 +17,7 @@ import com.absir.appserv.system.bean.value.JaLang;
  * @author absir
  * 
  */
-@MaEntity(parent = { @MaMenu("支付配置") }, name = "支付宝")
+@MaEntity(parent = { @MaMenu("接口配置") }, name = "支付宝")
 public class JAlipayConfigure extends JConfigureBase {
 
 	@JaLang("支付宝帐号")

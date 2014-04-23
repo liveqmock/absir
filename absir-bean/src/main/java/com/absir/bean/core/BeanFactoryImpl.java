@@ -279,6 +279,29 @@ public final class BeanFactoryImpl implements BeanFactory {
 					throw new RuntimeException("BeanName = " + beanName + " is " + beanDefineMap + " not match " + beanType);
 				}
 
+				if (beanName != null) {
+					int beanNameLength = beanName.length();
+					if (beanNameLength > 0 && !beanDefineMap.isEmpty()) {
+						Map<String, Object> beanDefines = new HashMap<String, Object>();
+						if (beanNameLength > 0) {
+							for (Entry<String, Object> entry : beanDefineMap.entrySet()) {
+								beanName = entry.getKey();
+								int length = beanName.length();
+								if (length > 7 && beanName.endsWith("Service")) {
+									beanName = KernelString.uncapitalize(beanName.substring(0, length - 7));
+
+								} else if (beanName.length() >= beanNameLength) {
+									beanName = beanName.substring(beanNameLength);
+								}
+
+								beanDefines.put(beanName, entry.getValue());
+							}
+						}
+
+						beanDefineMap = beanDefines;
+					}
+				}
+
 				return DynaBinder.to(beanDefineMap, beanClass);
 			}
 		}

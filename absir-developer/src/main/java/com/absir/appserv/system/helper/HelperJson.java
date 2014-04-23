@@ -33,7 +33,7 @@ import com.absir.core.kernel.KernelCharset;
 public class HelperJson {
 
 	/** OBJECT_MAPPER */
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	static {
 		// OBJECT_MAPPER.setVisibility(JsonMethod.FIELD, Visibility.ANY);

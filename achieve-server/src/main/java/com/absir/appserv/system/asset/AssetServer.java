@@ -16,6 +16,4 @@ import com.absir.server.value.Mapping;
 @Mapping("/asset")
 public abstract class AssetServer {
 
-	/** ROUTE */
-	static final String ROUTE = "asset";
 }

@@ -2,10 +2,30 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/absir.iml" filepath="$PROJECT_DIR$/absir.iml" />
+      <module fileurl="file://$PROJECT_DIR$/absir-ab/absir-ab.iml" filepath="$PROJECT_DIR$/absir-ab/absir-ab.iml" />
+      <module fileurl="file://$PROJECT_DIR$/absir-alipay/absir-alipay.iml" filepath="$PROJECT_DIR$/absir-alipay/absir-alipay.iml" />
+      <module fileurl="file://$PROJECT_DIR$/absir-aop/absir-aop.iml" filepath="$PROJECT_DIR$/absir-aop/absir-aop.iml" />
+      <module fileurl="file://$PROJECT_DIR$/absir-asyn/absir-asyn.iml" filepath="$PROJECT_DIR$/absir-asyn/absir-asyn.iml" />
       <module fileurl="file://$PROJECT_DIR$/absir-bean/absir-bean.iml" filepath="$PROJECT_DIR$/absir-bean/absir-bean.iml" />
+      <module fileurl="file://$PROJECT_DIR$/absir-boneCP/absir-boneCP.iml" filepath="$PROJECT_DIR$/absir-boneCP/absir-boneCP.iml" />
+      <module fileurl="file://$PROJECT_DIR$/absir-card/absir-card.iml" filepath="$PROJECT_DIR$/absir-card/absir-card.iml" />
+      <module fileurl="file://$PROJECT_DIR$/absir-context/absir-context.iml" filepath="$PROJECT_DIR$/absir-context/absir-context.iml" />
+      <module fileurl="file://$PROJECT_DIR$/absir-core/absir-core.iml" filepath="$PROJECT_DIR$/absir-core/absir-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/absir-developer/absir-developer.iml" filepath="$PROJECT_DIR$/absir-developer/absir-developer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/absir-developerImpl/absir-developerImpl.iml" filepath="$PROJECT_DIR$/absir-developerImpl/absir-developerImpl.iml" />
+      <module fileurl="file://$PROJECT_DIR$/absir-developerJsp/absir-developerJsp.iml" filepath="$PROJECT_DIR$/absir-developerJsp/absir-developerJsp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/absir-game/absir-game.iml" filepath="$PROJECT_DIR$/absir-game/absir-game.iml" />
+      <module fileurl="file://$PROJECT_DIR$/absir-hibernate/absir-hibernate.iml" filepath="$PROJECT_DIR$/absir-hibernate/absir-hibernate.iml" />
       <module fileurl="file://$PROJECT_DIR$/absir-io/absir-io.iml" filepath="$PROJECT_DIR$/absir-io/absir-io.iml" />
+      <module fileurl="file://$PROJECT_DIR$/absir-jooq/absir-jooq.iml" filepath="$PROJECT_DIR$/absir-jooq/absir-jooq.iml" />
+      <module fileurl="file://$PROJECT_DIR$/absir-jsp/absir-jsp.iml" filepath="$PROJECT_DIR$/absir-jsp/absir-jsp.iml" />
       <module fileurl="file://$PROJECT_DIR$/absir-lang/absir-lang.iml" filepath="$PROJECT_DIR$/absir-lang/absir-lang.iml" />
+      <module fileurl="file://$PROJECT_DIR$/absir-server/absir-server.iml" filepath="$PROJECT_DIR$/absir-server/absir-server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/absir-servlet/absir-servlet.iml" filepath="$PROJECT_DIR$/absir-servlet/absir-servlet.iml" />
+      <module fileurl="file://$PROJECT_DIR$/absir-socket/absir-socket.iml" filepath="$PROJECT_DIR$/absir-socket/absir-socket.iml" />
+      <module fileurl="file://$PROJECT_DIR$/absir-webapp/absir-webapp.iml" filepath="$PROJECT_DIR$/absir-webapp/absir-webapp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/achieve-server/achieve-server.iml" filepath="$PROJECT_DIR$/achieve-server/achieve-server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/parent.iml" filepath="$PROJECT_DIR$/parent.iml" />
     </modules>
   </component>
 </project>

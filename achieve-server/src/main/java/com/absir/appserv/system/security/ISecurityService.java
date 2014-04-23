@@ -35,6 +35,14 @@ public interface ISecurityService {
 	 * @return
 	 */
 	public boolean validator(JiUserBase userBase, String password);
+	
+	
+	/**
+	 * @param username
+	 * @param password
+	 * @return
+	 */
+	public JiUserBase openUserBase(String username, String password);
 
 	/**
 	 * @param name

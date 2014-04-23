@@ -193,9 +193,14 @@ public class BeanFactoryProvider implements IBeanConfigProvider {
 		Map<String, Entry<Integer, BeanDefine>> beanDefineBases = new HashMap<String, Entry<Integer, BeanDefine>>();
 		for (Class<?> beanType : beanTypes) {
 			List<BeanDefine> beanDefines = null;
+			Environment environment = beanFactory.getBeanConfig().getEnvironment();
 			for (IBeanDefineSupply beanDefineSupply : beanDefineSupplies) {
 				if ((beanDefines = beanDefineSupply.getBeanDefines(beanFactory, beanType)) != null) {
 					Base base = beanType.getAnnotation(Base.class);
+					if (base != null && base.environment().compareTo(environment) < 0) {
+						continue;
+					}
+
 					for (BeanDefine beanDefine : beanDefines) {
 						if (beanDefine != null) {
 							BeanDefine registerBeanDefine = beanFactory.getBeanDefineComponent(beanDefine.getBeanComponent());

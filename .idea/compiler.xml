@@ -22,16 +22,56 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
+        <module name="absir-ab" />
+        <module name="absir-alipay" />
+        <module name="absir-aop" />
+        <module name="absir-asyn" />
         <module name="absir-bean" />
+        <module name="absir-boneCP" />
+        <module name="absir-card" />
+        <module name="absir-context" />
+        <module name="absir-core" />
+        <module name="absir-developer" />
+        <module name="absir-developerImpl" />
+        <module name="absir-developerJsp" />
+        <module name="absir-game" />
+        <module name="absir-hibernate" />
         <module name="absir-io" />
+        <module name="absir-jooq" />
+        <module name="absir-jsp" />
         <module name="absir-lang" />
+        <module name="absir-server" />
+        <module name="absir-servlet" />
+        <module name="absir-socket" />
+        <module name="absir-webapp" />
+        <module name="achieve-server" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="absir" target="1.6" />
+      <module name="absir-ab" target="1.6" />
+      <module name="absir-alipay" target="1.6" />
+      <module name="absir-aop" target="1.6" />
+      <module name="absir-asyn" target="1.6" />
       <module name="absir-bean" target="1.6" />
+      <module name="absir-boneCP" target="1.6" />
+      <module name="absir-card" target="1.6" />
+      <module name="absir-context" target="1.6" />
+      <module name="absir-core" target="1.6" />
+      <module name="absir-developer" target="1.6" />
+      <module name="absir-developerImpl" target="1.6" />
+      <module name="absir-developerJsp" target="1.6" />
+      <module name="absir-game" target="1.6" />
+      <module name="absir-hibernate" target="1.6" />
       <module name="absir-io" target="1.6" />
+      <module name="absir-jooq" target="1.6" />
+      <module name="absir-jsp" target="1.6" />
       <module name="absir-lang" target="1.6" />
+      <module name="absir-server" target="1.6" />
+      <module name="absir-servlet" target="1.6" />
+      <module name="absir-socket" target="1.6" />
+      <module name="absir-webapp" target="1.6" />
+      <module name="achieve-server" target="1.6" />
+      <module name="parent" target="1.6" />
     </bytecodeTargetLevel>
   </component>
 </project>

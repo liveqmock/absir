@@ -21,7 +21,7 @@ import com.absir.core.kernel.KernelCharset;
 public class HelperEncrypt {
 
 	/** BYTE_SECRETS */
-	private static byte BYTE_SECRETS[] = "#$@^&%".getBytes();
+	public static final byte BYTE_SECRETS[] = "#$@^&%".getBytes();
 
 	/** HEX_DIGITS */
 	private static char HEX_DIGITS[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
@@ -42,15 +42,18 @@ public class HelperEncrypt {
 		int j, k;
 		for (int i = j = k = 0; i < len; i++) {
 			byte byt = outBuffer[i];
-			if (k < sel) {
-				byt ^= secrets[k];
-				k++;
-			} else {
-				k = 0;
+			if (sel > 0) {
+				if (k < sel) {
+					byt ^= secrets[k];
+					k++;
+
+				} else {
+					k = 0;
+				}
 			}
 
-			str[j++] = HEX_DIGITS[byt >>> 4 & 0xf];
-			str[j++] = HEX_DIGITS[byt & 0xf];
+			str[j++] = HEX_DIGITS[byt >>> 4 & 0x0F];
+			str[j++] = HEX_DIGITS[byt & 0x0F];
 		}
 
 		return new String(str);
@@ -80,7 +83,7 @@ public class HelperEncrypt {
 	 * @return
 	 */
 	public static String encryption(String algorithm, String string) {
-		return encryption(algorithm, string, BYTE_SECRETS);
+		return encryption(algorithm, string, null);
 	}
 
 	/**
@@ -107,7 +110,7 @@ public class HelperEncrypt {
 	 * @return
 	 */
 	public static String encryptionMD5(String string) {
-		return encryption("MD5", string, BYTE_SECRETS);
+		return encryption("MD5", string, null);
 	}
 
 	/**

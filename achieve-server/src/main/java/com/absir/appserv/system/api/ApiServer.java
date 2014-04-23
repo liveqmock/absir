@@ -8,18 +8,17 @@
 package com.absir.appserv.system.api;
 
 import java.util.Iterator;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.absir.appserv.feature.transaction.TransactionIntercepter;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
-import com.absir.appserv.system.helper.HelperJson;
 import com.absir.appserv.system.security.SecurityContext;
 import com.absir.appserv.system.security.SecurityManager;
 import com.absir.appserv.system.server.value.Bodys;
 import com.absir.appserv.system.service.SecurityService;
+import com.absir.appserv.system.service.impl.IdentityServiceLocal;
 import com.absir.bean.basis.Environment;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.server.exception.ServerException;
@@ -136,20 +135,7 @@ public abstract class ApiServer {
 		 * @return
 		 */
 		protected JiUserBase getInputUserBase(InputRequest inputRequest) {
-			String identity = inputRequest.getRequest().getHeader("identity");
-			if (identity != null) {
-				Map<?, ?> identityMap = HelperJson.decodeMap(identity);
-				String username = String.valueOf(identityMap.get("username"));
-				String password = String.valueOf(identityMap.get("password"));
-				JiUserBase userBase = SecurityService.ME.getUserBase(username);
-				if (userBase != null && !(SecurityService.ME.validator(userBase, password))) {
-					userBase = null;
-				}
-
-				return userBase;
-			}
-
-			return null;
+			return IdentityServiceLocal.getUserBase(inputRequest.getRequest().getHeader("identity"));
 		}
 	}
 }

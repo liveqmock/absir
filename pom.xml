@@ -34,6 +34,8 @@
 		<module>absir-socket</module>
 		<module>absir-alipay</module>
 		<module>absir-ab</module>
+		<module>absir-duoku</module>
+		<module>absir-open</module>
 	</modules>
 	<dependencies>
 		<dependency>

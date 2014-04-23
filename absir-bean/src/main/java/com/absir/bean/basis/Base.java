@@ -24,4 +24,9 @@ public @interface Base {
 	 * @return
 	 */
 	int order() default 0;
+
+	/**
+	 * @return
+	 */
+	Environment environment() default Environment.PRODUCT;
 }

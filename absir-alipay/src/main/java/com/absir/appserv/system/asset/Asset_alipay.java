@@ -11,12 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.hibernate.NonUniqueObjectException;
-
-import com.absir.appserv.system.bean.JTrader;
 import com.absir.appserv.system.configure.value.OAlipayOrder;
-import com.absir.appserv.system.pay.utils.PayUtils;
-import com.absir.appserv.system.service.BeanService;
 import com.absir.core.kernel.KernelString;
 import com.absir.server.in.Input;
 import com.absir.server.value.Attribute;
@@ -68,19 +63,19 @@ public class Asset_alipay extends AssetServer {
 	public String notify(@Attribute Map<String, String> params) {
 		if (AlipayNotify.verify(params, Signature.RSA)) {
 			OAlipayOrder alipayOrder = getAlipayOrder(params);
-			JTrader trader = new JTrader();
-			trader.setId(alipayOrder.tradeNo);
-			trader.setOrderNo(alipayOrder.outTradeNo);
-			trader.setCreateTime(System.currentTimeMillis());
-			try {
-				BeanService.ME.persist(trader);
-				if (PayUtils.process(trader)) {
-					return "success";
-				}
-
-			} catch (NonUniqueObjectException e) {
-				// TODO: handle exception
-			}
+//			JPayTrader trader = new JPayTrader();
+//			trader.setId(alipayOrder.tradeNo);
+//			trader.setOrderNo(alipayOrder.outTradeNo);
+//			trader.setCreateTime(System.currentTimeMillis());
+//			try {
+//				BeanService.ME.persist(trader);
+//				if (PayUtils.notify(trader)) {
+//					return "success";
+//				}
+//
+//			} catch (NonUniqueObjectException e) {
+//				// TODO: handle exception
+//			}
 		}
 
 		return "fail";

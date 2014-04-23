@@ -41,7 +41,7 @@ public abstract class JConfigureUtils {
 					try {
 						initConfigure(configure);
 
-					} catch (Exception e) {
+					} catch (Throwable e) {
 						// TODO: handle exception
 						e.printStackTrace();
 					}

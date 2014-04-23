@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -67,7 +68,21 @@ public class BeanConfigImpl implements BeanConfig {
 	 */
 	public BeanConfigImpl(IBeanConfigProvider beanConfigProvider, String classPath) {
 		if (classPath == null) {
-			classPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
+			URL resourceURL = Thread.currentThread().getContextClassLoader().getResource("");
+			if (resourceURL == null) {
+				try {
+					classPath = BeanConfigImpl.class.getResource("").getPath();
+					int length = classPath.length();
+					classPath = classPath.substring((length > 4 && "file:".equals(classPath.substring(0, 5).toLowerCase())) ? 5 : 0, length - BeanConfigImpl.class.getPackage().getName().length() - 3);
+					classPath = HelperFileName.getFullPath(classPath);
+
+				} catch (Throwable e) {
+					classPath = "file:///";
+				}
+
+			} else {
+				classPath = resourceURL.getPath();
+			}
 		}
 
 		BeanFactory beanFactory = BeanFactoryUtils.get();

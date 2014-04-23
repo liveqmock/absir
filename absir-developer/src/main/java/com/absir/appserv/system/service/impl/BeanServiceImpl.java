@@ -7,6 +7,8 @@
  */
 package com.absir.appserv.system.service.impl;
 
+import org.hibernate.SessionFactory;
+
 import com.absir.bean.basis.Basis;
 import com.absir.bean.inject.value.Bean;
 import com.absir.orm.hibernate.SessionFactoryUtils;
@@ -24,5 +26,12 @@ public class BeanServiceImpl extends BeanServiceBase {
 	 */
 	public BeanServiceImpl() {
 		super(SessionFactoryUtils.get().getSessionFactory());
+	}
+
+	/**
+	 * @param sessionFactory
+	 */
+	public BeanServiceImpl(SessionFactory sessionFactory) {
+		super(sessionFactory);
 	}
 }

@@ -861,7 +861,7 @@ public final class BeanFactoryImpl implements BeanFactory {
 	 * @param beanDefine
 	 */
 	private void unRegisterStackBeanDefine(String name, BeanDefine beanDefine) {
-		Stack<BeanDefine> beanDefineStatck = beanNameDefineMapStack.get(beanDefine.getBeanName());
+		Stack<BeanDefine> beanDefineStatck = beanNameDefineMapStack.get(name);
 		if (beanDefineStatck == null || beanDefineStatck.size() <= 0) {
 			unRegisterBeanDefine(name, null, beanDefine);
 

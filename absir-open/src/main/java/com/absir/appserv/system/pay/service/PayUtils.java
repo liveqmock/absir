@@ -41,15 +41,15 @@ public abstract class PayUtils {
 	 */
 	public static boolean validator(String platform, JPayTrade payTrade) {
 		JePayStatus status = payTrade.getStatus();
-		if (status == null || status.compareTo(JePayStatus.ERROR) > 0) {
-			return false;
-		}
-
-		if (payInterfaceMap != null) {
-			IPayInterface payInterface = payInterfaceMap.get(platform);
-			if (payInterface != null) {
-				return payInterface.validator(payTrade);
+		if (status == null || status.compareTo(JePayStatus.ERROR) <= 0) {
+			if (payInterfaceMap != null) {
+				IPayInterface payInterface = payInterfaceMap.get(platform);
+				if (payInterface != null) {
+					return payInterface.validator(payTrade);
+				}
 			}
+
+			return false;
 		}
 
 		return false;
@@ -65,7 +65,13 @@ public abstract class PayUtils {
 				JPayHistory payHistory = new JPayHistory();
 				payHistory.setId(payTrade.getId());
 				BeanService.ME.persist(payHistory);
-				return payService.proccess(payTrade);
+				Object tradeObject = payService.proccess(payTrade);
+				if (tradeObject != null) {
+					payTrade.setStatus(JePayStatus.COMPLETE);
+					BeanService.ME.merge(payTrade);
+				}
+
+				return tradeObject;
 
 			} catch (Exception e) {
 				// TODO: handle exception
@@ -97,11 +103,7 @@ public abstract class PayUtils {
 	public static Object notify(IPayInterface payInterface, JPayTrade payTrade, JePayStatus payStatus) {
 		if (payStatus == JePayStatus.PAYED || payStatus == JePayStatus.COMPLETE) {
 			if (payTrade.getStatus() != JePayStatus.COMPLETE) {
-				Object tradeObject = proccess(payTrade);
-				// tradeObject == null ? JePayStatus.PAYED :
-				payTrade.setStatus(JePayStatus.COMPLETE);
-				BeanService.ME.merge(payTrade);
-				return tradeObject;
+				return proccess(payTrade);
 			}
 
 		} else if (payTrade.getStatus() == null) {

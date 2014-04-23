@@ -95,7 +95,7 @@ public class DuoKuService implements IdentityService, IPayInterface {
 		ResultData resultData = HelperClient.openConnection(url + "?appid=" + DUO_KU_CONFIGURE.getAppid() + "&appkey=" + DUO_KU_CONFIGURE.getAppkey() + "&orderid=" + orderId + "&clientsecret="
 				+ clientsecret, null, ResultData.class);
 		if (resultData != null) {
-			if ((int) Math.floor(payTrade.getAmount()) == resultData.Amount) {
+			if ((int) Math.ceil(payTrade.getAmount()) == resultData.Amount) {
 				// 查询失败
 				if (resultData.Result == 3) {
 					return false;

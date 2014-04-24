@@ -9,9 +9,9 @@ package com.absir.appserv.system.asset;
 
 import com.absir.appserv.system.bean.JPayTrade;
 import com.absir.appserv.system.bean.value.JePayStatus;
-import com.absir.appserv.system.pay.service.PayUtils;
 import com.absir.appserv.system.service.BeanService;
 import com.absir.appserv.system.service.DuoKuService;
+import com.absir.appserv.system.service.utils.PayUtils;
 import com.absir.bean.inject.value.Inject;
 import com.absir.context.core.ContextUtils;
 import com.absir.server.value.Body;
@@ -29,14 +29,19 @@ public class Asset_duoku extends AssetServer {
 	private DuoKuService duoKuService;
 
 	/**
-	 * @param inputRequest
+	 * @param orderid
+	 * @param amount
+	 * @param result
+	 * @param cardtype
+	 * @param timetamp
+	 * @param client_secret
 	 * @return
 	 */
 	@Body
-	public String pay(@Param String orderid, @Param float amount, final @Param int result, @Param String cardtype, @Param long timetamp, @Param String client_secret) {
+	public String notify(@Param String orderid, @Param float amount, final @Param int result, @Param String cardtype, @Param long timetamp, @Param String client_secret) {
 		final JPayTrade payTrade = BeanService.ME.get(JPayTrade.class, orderid);
 		if (payTrade != null) {
-			if (payTrade.getPlatform() != null) {
+			if (payTrade.getStatus() != null) {
 				// 订单重复通知,且上次通知无异常
 				return "ERROR_REPEAT";
 			}

@@ -5,16 +5,16 @@
  *
  * Create on 2013-11-14 上午10:04:28
  */
-package com.absir.appserv.system.pay.service;
+package com.absir.appserv.system.service.utils;
 
 import java.util.Map;
 
 import com.absir.appserv.system.bean.JPayHistory;
 import com.absir.appserv.system.bean.JPayTrade;
 import com.absir.appserv.system.bean.value.JePayStatus;
-import com.absir.appserv.system.pay.IPayInterface;
-import com.absir.appserv.system.pay.IPayProccessor;
 import com.absir.appserv.system.service.BeanService;
+import com.absir.appserv.system.service.IPayInterface;
+import com.absir.appserv.system.service.IPayProccessor;
 import com.absir.bean.basis.Configure;
 import com.absir.bean.inject.value.Inject;
 import com.absir.bean.inject.value.InjectType;
@@ -65,16 +65,16 @@ public abstract class PayUtils {
 				JPayHistory payHistory = new JPayHistory();
 				payHistory.setId(payTrade.getId());
 				BeanService.ME.persist(payHistory);
-				Object tradeObject = payService.proccess(payTrade);
-				if (tradeObject != null) {
-					payTrade.setStatus(JePayStatus.COMPLETE);
-					BeanService.ME.merge(payTrade);
-				}
-
-				return tradeObject;
+				return payService.proccess(payTrade);
 
 			} catch (Exception e) {
 				// TODO: handle exception
+
+			} finally {
+				if (payTrade.getStatus() != JePayStatus.COMPLETE) {
+					payTrade.setStatus(JePayStatus.COMPLETE);
+					BeanService.ME.merge(payTrade);
+				}
 			}
 		}
 

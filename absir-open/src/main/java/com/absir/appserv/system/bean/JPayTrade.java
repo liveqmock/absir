@@ -33,6 +33,11 @@ public class JPayTrade extends JbBase {
 	@JaEdit(types = "dateTime", groups = JaEdit.GROUP_LIST)
 	private long createTime = ContextUtils.getContextTime();
 
+	/** uid */
+	@JaLang("用户名")
+	@JaEdit(groups = JaEdit.GROUP_LIST)
+	private String uid;
+
 	/** name */
 	@JaLang("商品类名")
 	@JaEdit(groups = JaEdit.GROUP_LIST)
@@ -92,6 +97,21 @@ public class JPayTrade extends JbBase {
 	 */
 	public void setCreateTime(long createTime) {
 		this.createTime = createTime;
+	}
+
+	/**
+	 * @return the uid
+	 */
+	public String getUid() {
+		return uid;
+	}
+
+	/**
+	 * @param uid
+	 *            the uid to set
+	 */
+	public void setUid(String uid) {
+		this.uid = uid;
 	}
 
 	/**

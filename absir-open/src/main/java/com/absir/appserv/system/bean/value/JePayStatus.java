@@ -19,9 +19,9 @@ public enum JePayStatus {
 	@JaLang("交易错误")
 	ERROR,
 
-	@JaLang("交易关闭")
-	CLOSED,
-
 	@JaLang("交易完成")
 	COMPLETE,
+
+	@JaLang("交易关闭")
+	CLOSED,
 }

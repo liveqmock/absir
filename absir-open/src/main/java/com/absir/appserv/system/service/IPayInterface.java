@@ -5,7 +5,7 @@
  *
  * Create on 2013-11-14 上午10:03:48
  */
-package com.absir.appserv.system.pay;
+package com.absir.appserv.system.service;
 
 import com.absir.appserv.system.bean.JPayTrade;
 

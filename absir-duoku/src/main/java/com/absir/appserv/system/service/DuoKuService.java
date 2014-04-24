@@ -15,7 +15,7 @@ import com.absir.appserv.system.bean.value.OErrorData;
 import com.absir.appserv.system.configure.JDuoKuConfigure;
 import com.absir.appserv.system.helper.HelperClient;
 import com.absir.appserv.system.helper.HelperEncrypt;
-import com.absir.appserv.system.pay.IPayInterface;
+import com.absir.appserv.system.service.IPayInterface;
 import com.absir.bean.inject.value.Bean;
 
 /**

@@ -7,6 +7,7 @@
  */
 package com.absir.appserv.system.bean;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -59,6 +60,7 @@ public class JPayTrade extends JbBase {
 
 	/** orderNo */
 	@JaLang("支付订单号")
+	@Column(length = 1024)
 	private String tradeNo;
 
 	/** platform */

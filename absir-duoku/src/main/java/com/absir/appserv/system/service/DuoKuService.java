@@ -15,7 +15,6 @@ import com.absir.appserv.system.bean.value.OErrorData;
 import com.absir.appserv.system.configure.JDuoKuConfigure;
 import com.absir.appserv.system.helper.HelperClient;
 import com.absir.appserv.system.helper.HelperEncrypt;
-import com.absir.appserv.system.service.IPayInterface;
 import com.absir.bean.inject.value.Bean;
 
 /**
@@ -28,6 +27,9 @@ public class DuoKuService implements IdentityService, IPayInterface {
 	/** DUO_KU_CONFIGURE */
 	public static final JDuoKuConfigure DUO_KU_CONFIGURE = JConfigureUtils.getConfigure(JDuoKuConfigure.class);
 
+	/** PLAT_FORM_NAME */
+	public static final String PLAT_FORM_NAME = "DuoKu";
+
 	/** CHECH_SESSION_URL */
 	private static final String CHECH_SESSION_URL = "http://sdk.m.duoku.com/openapi/sdk/checksession";
 
@@ -36,9 +38,6 @@ public class DuoKuService implements IdentityService, IPayInterface {
 
 	/** CARD_RESULT_SANDBOX */
 	private static final String CARD_RESULT_SANDBOX = "http://sdk.m.duoku.com/openapi/sdk/duokoo_card_result";
-
-	/** PLAT_FORM_NAME */
-	public static final String PLAT_FORM_NAME = "DuoKu";
 
 	/*
 	 * (non-Javadoc)
@@ -58,7 +57,7 @@ public class DuoKuService implements IdentityService, IPayInterface {
 			OErrorData errorData = HelperClient.openConnection(CHECH_SESSION_URL + "?appid=" + DUO_KU_CONFIGURE.getAppid() + "&appkey=" + DUO_KU_CONFIGURE.getAppkey() + "&uid=" + uid + "&sessionid="
 					+ sessionId + "&clientsecret=" + clientsecret, null, OErrorData.class);
 			if (errorData != null && errorData.error_code == 0) {
-				return SecurityService.ME.openUserBase(PLAT_FORM_NAME + '@' + uid, null);
+				return SecurityService.ME.openUserBase(uid, null, PLAT_FORM_NAME);
 			}
 		}
 

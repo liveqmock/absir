@@ -280,18 +280,26 @@ public final class BeanFactoryImpl implements BeanFactory {
 				}
 
 				if (beanName != null) {
-					int beanNameLength = beanName.length();
-					if (beanNameLength > 0 && !beanDefineMap.isEmpty()) {
+					String beanNamePrefix = beanName;
+					int beanNamePrefixLength = beanNamePrefix.length();
+					if (beanNamePrefixLength > 0 && !beanDefineMap.isEmpty()) {
+						if (beanNamePrefixLength == 1 && "*".equals(beanNamePrefix)) {
+							beanNamePrefixLength = 0;
+
+						} else {
+							beanNamePrefix = KernelString.capitalize(beanNamePrefix);
+						}
+
 						Map<String, Object> beanDefines = new HashMap<String, Object>();
-						if (beanNameLength > 0) {
+						if (beanNamePrefixLength > 0) {
 							for (Entry<String, Object> entry : beanDefineMap.entrySet()) {
 								beanName = entry.getKey();
 								int length = beanName.length();
 								if (length > 7 && beanName.endsWith("Service")) {
 									beanName = KernelString.uncapitalize(beanName.substring(0, length - 7));
 
-								} else if (beanName.length() >= beanNameLength) {
-									beanName = beanName.substring(beanNameLength);
+								} else if (beanNamePrefixLength > 0 && beanNamePrefixLength < beanName.length() && beanName.startsWith(beanNamePrefix)) {
+									beanName = beanName.substring(beanNamePrefixLength);
 								}
 
 								beanDefines.put(beanName, entry.getValue());

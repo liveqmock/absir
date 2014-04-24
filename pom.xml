@@ -36,6 +36,7 @@
 		<module>absir-ab</module>
 		<module>absir-duoku</module>
 		<module>absir-open</module>
+		<module>absir-iap</module>
 	</modules>
 	<dependencies>
 		<dependency>

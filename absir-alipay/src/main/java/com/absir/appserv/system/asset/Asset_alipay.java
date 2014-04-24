@@ -62,20 +62,23 @@ public class Asset_alipay extends AssetServer {
 	@Body
 	public String notify(@Attribute Map<String, String> params) {
 		if (AlipayNotify.verify(params, Signature.RSA)) {
+			@SuppressWarnings("unused")
 			OAlipayOrder alipayOrder = getAlipayOrder(params);
-//			JPayTrader trader = new JPayTrader();
-//			trader.setId(alipayOrder.tradeNo);
-//			trader.setOrderNo(alipayOrder.outTradeNo);
-//			trader.setCreateTime(System.currentTimeMillis());
-//			try {
-//				BeanService.ME.persist(trader);
-//				if (PayUtils.notify(trader)) {
-//					return "success";
-//				}
-//
-//			} catch (NonUniqueObjectException e) {
-//				// TODO: handle exception
-//			}
+			// JPayTrader trader = new JPayTrader();
+			// trader.setId(alipayOrder.tradeNo);
+			// trader.setOrderNo(alipayOrder.outTradeNo);
+			// trader.setCreateTime(System.currentTimeMillis());
+			// try {
+			// BeanService.ME.persist(trader);
+			// if (PayUtils.notify(trader)) {
+			// return "success";
+			// }
+			//
+			// } catch (NonUniqueObjectException e) {
+			// // TODO: handle exception
+			// }
+
+			return "success";
 		}
 
 		return "fail";

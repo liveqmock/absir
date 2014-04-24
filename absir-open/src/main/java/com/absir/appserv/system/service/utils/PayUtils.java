@@ -63,7 +63,12 @@ public abstract class PayUtils {
 		if (payService != null) {
 			try {
 				JPayHistory payHistory = new JPayHistory();
-				payHistory.setId(payTrade.getId());
+				String id = payTrade.getTradeNo();
+				if (id == null) {
+					id = payTrade.getId();
+				}
+
+				payHistory.setId(id);
 				BeanService.ME.persist(payHistory);
 				return payService.proccess(payTrade);
 

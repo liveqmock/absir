@@ -7,6 +7,7 @@
  */
 package com.absir.appserv.system.bean;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -25,6 +26,7 @@ public class JPayHistory extends JbBase {
 	/** id */
 	@JaLang("支付订单号")
 	@Id
+	@Column(length = 1024)
 	private String id;
 
 	/** createTime */

@@ -115,16 +115,16 @@ public abstract class ContextUtils implements IBeanDefineEager {
 	public static <T extends Context<ID>, ID extends Serializable> T findContext(Class<T> ctxClass, ID id) {
 		Map<Serializable, Context> contextMap = contextFactory.findContextMap(ctxClass);
 		if (contextMap != null) {
-			synchronized (contextMap) {
-				Context context = contextMap.get(id);
-				if (context != null && ctxClass.isAssignableFrom(context.getClass())) {
-					if (context instanceof ContextBean) {
-						((ContextBean) context).retainAt();
-					}
+			// synchronized (contextMap) {
+			Context context = contextMap.get(id);
+			if (context != null && ctxClass.isAssignableFrom(context.getClass())) {
+				// if (context instanceof ContextBean) {
+				// ((ContextBean) context).retainAt();
+				// }
 
-					return (T) context;
-				}
+				return (T) context;
 			}
+			// }
 		}
 
 		return null;

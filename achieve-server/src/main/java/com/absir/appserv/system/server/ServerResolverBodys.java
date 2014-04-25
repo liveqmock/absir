@@ -95,7 +95,7 @@ public class ServerResolverBodys implements ParameterResolver<Class<?>>, Paramet
 				inputStream = new ByteArrayInputStream(input.getInput().getBytes(ContextUtils.getCharset()));
 			}
 		}
-		
+
 		GZIPInputStream gzipInputStream = new GZIPInputStream(inputStream);
 		try {
 			return ServerResolverBody.ME.getObjectMapper().readValue(gzipInputStream, parameterType);

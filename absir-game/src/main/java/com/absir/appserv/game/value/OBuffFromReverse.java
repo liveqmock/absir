@@ -23,7 +23,7 @@ public abstract class OBuffFromReverse<T, O extends OObject> extends OBuffRevers
 	 * 
 	 */
 	public OBuffFromReverse() {
-		formType = KernelClass.componentClass(formType);
+		formType = KernelClass.argumentClass(formType);
 	}
 
 	/*

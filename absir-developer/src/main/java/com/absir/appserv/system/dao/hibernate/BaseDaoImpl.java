@@ -79,7 +79,7 @@ public class BaseDaoImpl<T, ID extends Serializable> implements BaseDao<T, ID> {
 	 */
 	public BaseDaoImpl() {
 		if (baseClass == null) {
-			baseClass = KernelClass.componentClass(getClass().getGenericSuperclass());
+			baseClass = KernelClass.argumentClass(getClass().getGenericSuperclass(), true);
 		}
 
 		Base_Class_Map_Dao.put(baseClass, this);

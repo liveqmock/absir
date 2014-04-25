@@ -23,7 +23,7 @@ public abstract class OBuffFrom<T, O extends OObject> extends OBuff<O> implement
 	 * 
 	 */
 	public OBuffFrom() {
-		formType = KernelClass.componentClass(formType);
+		formType = KernelClass.argumentClass(formType);
 	}
 
 	/*

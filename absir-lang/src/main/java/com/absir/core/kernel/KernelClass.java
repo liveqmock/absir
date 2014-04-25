@@ -16,6 +16,7 @@ import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -335,11 +336,69 @@ public abstract class KernelClass {
 	 * @return
 	 */
 	public static Class componentClass(Type type) {
+		return argumentClass(type, false);
+	}
+
+	/**
+	 * @param type
+	 * @return
+	 */
+	public static Class[] componentClasses(Type type) {
+		return argumentClasses(type, false);
+	}
+
+	/**
+	 * @param cls
+	 * @return
+	 */
+	public static Class argumentClass(Class<?> cls) {
+		if (cls.isArray()) {
+			return cls.getComponentType();
+		}
+
+		Class superClass = argumentClass(cls.getGenericSuperclass(), true);
+		return superClass == cls.getSuperclass() ? cls : superClass;
+	}
+
+	/**
+	 * @param cls
+	 * @return
+	 */
+	public static Class[] argumentClasses(Class<?> cls) {
+		if (cls.isArray()) {
+			return new Class[] { cls.getComponentType() };
+		}
+
+		Class[] superClasses = argumentClasses(cls.getGenericSuperclass(), true);
+		if (superClasses.length == 1 && superClasses[0] == cls.getSuperclass()) {
+			superClasses[0] = cls;
+		}
+
+		return superClasses;
+	}
+
+	/**
+	 * @param cls
+	 * @return
+	 */
+	public static boolean isArgumentClass(Class cls) {
+		return cls != null && (cls.isArray() || Collection.class.isAssignableFrom(cls) || Map.class.isAssignableFrom(cls));
+	}
+
+	/**
+	 * @param type
+	 * @return
+	 */
+	public static Class argumentClass(Type type, boolean force) {
 		Type componentType = type;
 		while (type != null) {
 			Type[] types = typeArguments(type);
 			if (types == null || types.length <= 0) {
 				Class cls = rawClass(type);
+				if (!(force || isArgumentClass(cls))) {
+					break;
+				}
+
 				if (cls.isArray()) {
 					return cls.getComponentType();
 
@@ -357,14 +416,19 @@ public abstract class KernelClass {
 
 	/**
 	 * @param type
+	 * @param force
 	 * @return
 	 */
-	public static Class[] componentClasses(Type type) {
+	public static Class[] argumentClasses(Type type, boolean force) {
 		Type componentType = type;
 		while (type != null) {
 			Type[] types = typeArguments(type);
 			if (types == null || types.length <= 0) {
 				Class cls = rawClass(type);
+				if (!(force || isArgumentClass(cls))) {
+					break;
+				}
+
 				if (cls.isArray()) {
 					return new Class[] { cls.getComponentType() };
 

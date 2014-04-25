@@ -44,7 +44,7 @@ public class DActitity<T extends JiActivity> {
 	 */
 	public DActitity(String entityName) {
 		if (entityName == null) {
-			entityName = SessionFactoryUtils.getJpaEntityName(KernelClass.componentClass(getClass()));
+			entityName = SessionFactoryUtils.getJpaEntityName(KernelClass.argumentClass(getClass()));
 		}
 
 		this.entityName = entityName;

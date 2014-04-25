@@ -23,7 +23,7 @@ public abstract class OBuffFromRound<T, O extends OObject> extends OBuffRound<O>
 	 * 
 	 */
 	public OBuffFromRound() {
-		formType = KernelClass.componentClass(getClass());
+		formType = KernelClass.argumentClass(getClass());
 	}
 
 	/*

@@ -50,6 +50,6 @@ public class DeveloperAssoc implements IAssocDao {
 			Conditions excludeConditions) {
 		// TODO Auto-generated method stub
 		excludeConditions.add(jdbcCondition.getCurrentPropertyAlias() + ".developer");
-		excludeConditions.add(true);
+		excludeConditions.add(false);
 	}
 }

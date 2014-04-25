@@ -60,9 +60,9 @@ public abstract class PropertySupply<O extends PropertyObject<T>, T> {
 	@Inject(type = InjectType.Selectable)
 	public void setPropertyResolvers(PropertyResolver[] propertyResolvers) {
 		List<PropertyResolver> propertyResolveList = new ArrayList<PropertyResolver>();
-		Class<?> objectClass = KernelClass.componentClass(getClass());
+		Class<?> objectClass = KernelClass.argumentClass(getClass());
 		for (PropertyResolver propertyResolver : propertyResolvers) {
-			if (objectClass == KernelClass.componentClass(propertyResolver.getClass())) {
+			if (objectClass == KernelClass.argumentClass(propertyResolver.getClass())) {
 				propertyResolveList.add(propertyResolver);
 			}
 		}

@@ -39,7 +39,9 @@ public interface IAssocDao {
 	 * @param strategies
 	 * @param jdbcCondition
 	 * @param includeConditions
+	 *            (或者条件)
 	 * @param excludeConditions
+	 *            (必需条件)
 	 */
 	public void assocConditions(String rootEntityName, JiUserBase user, JePermission permission, Object strategies, JdbcCondition jdbcCondition, Conditions includeConditions,
 			Conditions excludeConditions);

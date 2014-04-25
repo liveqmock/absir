@@ -15,7 +15,7 @@ import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.SerializerProvider;
 
 import com.absir.appserv.system.helper.HelperBase;
-import com.absir.context.bean.IBase;
+import com.absir.core.base.IBase;
 
 /**
  * @author absir

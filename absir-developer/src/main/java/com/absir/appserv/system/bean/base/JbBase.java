@@ -11,7 +11,7 @@ import java.io.Serializable;
 
 import javax.persistence.MappedSuperclass;
 
-import com.absir.context.core.Base;
+import com.absir.core.base.Base;
 
 /**
  * @author absir

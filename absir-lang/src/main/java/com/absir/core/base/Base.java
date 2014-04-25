@@ -5,11 +5,10 @@
  *
  * Create on 2014-1-15 下午4:58:40
  */
-package com.absir.context.core;
+package com.absir.core.base;
 
 import java.io.Serializable;
 
-import com.absir.context.bean.IBase;
 import com.absir.core.kernel.KernelObject;
 
 /**

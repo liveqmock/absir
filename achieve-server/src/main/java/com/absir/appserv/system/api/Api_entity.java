@@ -31,7 +31,7 @@ import com.absir.appserv.system.service.utils.AuthServiceUtils;
 import com.absir.appserv.system.service.utils.CrudServiceUtils;
 import com.absir.appserv.system.service.utils.EntityServiceUtils;
 import com.absir.appserv.system.service.utils.SearchServiceUtils;
-import com.absir.context.bean.IBase;
+import com.absir.core.base.IBase;
 import com.absir.core.kernel.KernelLang.PropertyFilter;
 import com.absir.orm.hibernate.SessionFactoryUtils;
 import com.absir.orm.value.JePermission;

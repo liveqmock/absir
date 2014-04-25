@@ -9,6 +9,8 @@ package com.absir.context.core;
 
 import java.io.Serializable;
 
+import com.absir.core.base.Base;
+
 /**
  * @author absir
  * 

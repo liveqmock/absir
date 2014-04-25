@@ -9,7 +9,7 @@ package com.absir.appserv.system.bean.proxy;
 
 import java.io.Serializable;
 
-import com.absir.context.bean.IBase;
+import com.absir.core.base.IBase;
 
 /**
  * @author absir

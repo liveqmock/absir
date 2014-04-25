@@ -12,7 +12,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.absir.context.bean.IBase;
+import com.absir.core.base.IBase;
 import com.absir.core.dyna.DynaBinder;
 import com.absir.core.kernel.KernelString;
 import com.absir.core.kernel.KernelString.ImplodeBuilder;

@@ -17,7 +17,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import com.absir.appserv.dyna.DynaBinderUtils;
 import com.absir.appserv.system.bean.value.JaLang;
 import com.absir.bean.core.BeanFactoryUtils;
-import com.absir.context.core.Base;
+import com.absir.core.base.Base;
 import com.absir.core.helper.HelperFile;
 
 /**

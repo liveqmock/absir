@@ -5,7 +5,7 @@
  *
  * Create on 2014-1-14 下午3:15:31
  */
-package com.absir.context.bean;
+package com.absir.core.base;
 
 import java.io.Serializable;
 

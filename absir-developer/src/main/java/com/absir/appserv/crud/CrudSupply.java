@@ -15,7 +15,7 @@ import com.absir.appserv.jdbc.JdbcCondition;
 import com.absir.appserv.jdbc.JdbcPage;
 import com.absir.appserv.system.bean.value.JaCrud.Crud;
 import com.absir.appserv.system.helper.HelperQuery;
-import com.absir.context.bean.IBase;
+import com.absir.core.base.IBase;
 import com.absir.core.kernel.KernelLang.BreakException;
 import com.absir.core.kernel.KernelLang.FilterTemplate;
 import com.absir.core.kernel.KernelList;

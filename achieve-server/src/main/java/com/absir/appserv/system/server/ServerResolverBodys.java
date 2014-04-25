@@ -20,6 +20,7 @@ import java.util.zip.GZIPInputStream;
 import com.absir.appserv.system.helper.HelperServer;
 import com.absir.appserv.system.server.value.Bodys;
 import com.absir.bean.basis.Base;
+import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
 import com.absir.context.core.ContextUtils;
 import com.absir.core.kernel.KernelArray;
@@ -39,6 +40,9 @@ import com.absir.server.value.Body;
 @Base
 @Bean
 public class ServerResolverBodys implements ParameterResolver<Class<?>>, ParameterResolverMethod, ReturnedResolver<Class<?>> {
+
+	/** ME */
+	public static final ServerResolverBodys ME = BeanFactoryUtils.get(ServerResolverBodys.class);
 
 	/*
 	 * (non-Javadoc)
@@ -165,7 +169,8 @@ public class ServerResolverBodys implements ParameterResolver<Class<?>>, Paramet
 			Input input = onPut.getInput();
 			input.setCharacterEncoding(serverResolverBody.getCharset());
 			input.setContentTypeCharset(serverResolverBody.getContentTypeCharset());
-			byte[] bufferBytes = returnValue instanceof String ? ((String) returnValue).getBytes(ContextUtils.getCharset()) : serverResolverBody.getObjectMapper().writeValueAsBytes(returnValue);
+			byte[] bufferBytes = returnValue.getClass() == String.class ? ((String) returnValue).getBytes(ContextUtils.getCharset()) : serverResolverBody.getObjectMapper().writeValueAsBytes(
+					returnValue);
 			OutputStream outputStream = input.getOutputStream();
 			if (outputStream == null) {
 				ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

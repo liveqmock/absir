@@ -86,7 +86,7 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 	public Object getParameterValue(OnPut onPut, Class<?> parameter, Class<?> parameterType, String beanName, RouteMethod routeMethod) throws Exception {
 		// TODO Auto-generated method stub
 		Input input = onPut.getInput();
-		if (String.class.isAssignableFrom(parameterType)) {
+		if (parameterType == String.class) {
 			return input.getInput();
 		}
 
@@ -129,7 +129,7 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 			Input input = onPut.getInput();
 			input.setCharacterEncoding(charset);
 			input.setContentTypeCharset(contentTypeCharset);
-			if (returnValue instanceof String) {
+			if (returnValue.getClass() == String.class) {
 				onPut.getInput().write((String) returnValue);
 
 			} else {

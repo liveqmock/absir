@@ -7,14 +7,14 @@
  */
 package com.absir.appserv.game.value;
 
-import com.absir.appserv.system.bean.proxy.JiBase;
+import com.absir.core.base.Base;
 
 /**
  * @author absir
  * 
  */
 @SuppressWarnings("rawtypes")
-public abstract class OBuff<T extends OObject> implements JiBase {
+public abstract class OBuff<T extends OObject> extends Base<Integer> {
 
 	private Integer id;
 

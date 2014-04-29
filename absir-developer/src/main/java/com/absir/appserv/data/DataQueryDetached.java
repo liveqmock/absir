@@ -8,14 +8,27 @@
 package com.absir.appserv.data;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.metadata.ClassMetadata;
+import org.hibernate.transform.ResultTransformer;
+import org.hibernate.transform.Transformers;
 
+import com.absir.appserv.jdbc.JdbcPage;
 import com.absir.appserv.system.dao.BeanDao;
 import com.absir.appserv.system.dao.utils.QueryDaoUtils;
-import com.absir.core.kernel.KernelList;
+import com.absir.appserv.system.helper.HelperString;
+import com.absir.core.base.Base;
+import com.absir.core.dyna.DynaBinder;
+import com.absir.core.kernel.KernelClass;
+import com.absir.core.kernel.KernelObject;
+import com.absir.core.kernel.KernelString;
+import com.absir.orm.hibernate.SessionFactoryUtils;
 
 /**
  * @author absir
@@ -27,16 +40,243 @@ public class DataQueryDetached {
 	/** sql */
 	private String sql;
 
-	/** list */
-	private boolean single;
+	/** nativeSql */
+	private boolean nativeSql;
+
+	/** sessionFactory */
+	private SessionFactory sessionFactory;
+
+	/** returnType */
+	private Class<?> returnType;
+
+	/** cacheable */
+	private boolean cacheable;
+
+	/** queryReturnInvoker */
+	private QueryReturnInvoker queryReturnInvoker;
+
+	/** parameterMetas */
+	private Object[] parameterMetas;
+
+	/** countQueryDetached */
+	private DataQueryDetached countQueryDetached;
+
+	/** resultTransformer */
+	private ResultTransformer resultTransformer;
+
+	/**
+	 * @author absir
+	 * 
+	 */
+	private static enum QueryReturnInvoker {
+
+		EXECUTE {
+			@Override
+			public Object invoke(Query query, Class<?> returnType) {
+				// TODO Auto-generated method stub
+				return DynaBinder.to(query.executeUpdate(), returnType);
+			}
+		},
+
+		ITERATE {
+			@Override
+			public Object invoke(Query query, Class<?> returnType) {
+				// TODO Auto-generated method stub
+				return query.iterate();
+			}
+		},
+
+		SINGLE {
+			@Override
+			public Object invoke(Query query, Class<?> returnType) {
+				// TODO Auto-generated method stub
+				Iterator iterator = query.iterate();
+				return iterator.hasNext() ? DynaBinder.to(iterator.next(), returnType) : null;
+			}
+		},
+
+		COLLECTION {
+			@Override
+			public Object invoke(Query query, Class<?> returnType) {
+				// TODO Auto-generated method stub
+				Collection toObject = KernelClass.newInstance(DynaBinder.toCollectionClass((Class<Collection>) returnType));
+				Iterator iterator = query.iterate();
+				while (iterator.hasNext()) {
+					toObject.add(iterator.next());
+				}
+
+				return toObject;
+			}
+		},
+
+		MAP {
+			@Override
+			public Object invoke(Query query, Class<?> returnType) {
+				// TODO Auto-generated method stub
+				Map toObject = KernelClass.newInstance(DynaBinder.toMapClass((Class<Map>) returnType));
+				Iterator iterator = query.iterate();
+				boolean base = false;
+				SessionImplementor session = null;
+				ClassMetadata classMetadata = null;
+				while (iterator.hasNext()) {
+					Object bean = iterator.next();
+					if (!base && classMetadata == null) {
+						if (bean instanceof Base) {
+							base = true;
+
+						} else {
+							session = (SessionImplementor) KernelObject.declaredGet(query, "session");
+							classMetadata = SessionFactoryUtils.getClassMetadata(null, bean.getClass(), session.getFactory());
+						}
+					}
+
+					toObject.put(base ? ((Base) bean).getId() : classMetadata.getIdentifier(bean, session), bean);
+				}
+
+				return toObject;
+			}
+		},
+
+		;
+
+		public abstract Object invoke(Query query, Class<?> returnType);
+	}
 
 	/**
 	 * @param sql
 	 * @param nativeSql
+	 * @param sessionName
+	 * @param returnType
+	 * @param cacheable
+	 * @param parameterTypes
+	 * @param parameterNames
+	 * @param firstResultsPos
+	 * @param maxResultsPos
 	 */
-	public DataQueryDetached(String sql, boolean nativeSql, String name, Class<?> returnType) {
+	public DataQueryDetached(String sql, boolean nativeSql, String sessionName, Class<?> returnType, boolean cacheable, Class<?>[] parameterTypes, String[] parameterNames, int firstResultsPos,
+			int maxResultsPos) {
 		this.sql = sql;
-		single = !Collection.class.isAssignableFrom(returnType);
+		this.nativeSql = nativeSql;
+		sessionFactory = KernelString.isEmpty(sessionName) ? null : SessionFactoryUtils.get().getNameMapSessionFactory(sessionName);
+		this.returnType = returnType;
+		this.cacheable = cacheable;
+		if (returnType == null) {
+			queryReturnInvoker = QueryReturnInvoker.EXECUTE;
+
+		} else {
+			if (Iterator.class.isAssignableFrom(returnType)) {
+				queryReturnInvoker = QueryReturnInvoker.ITERATE;
+
+			} else if (Collection.class.isAssignableFrom(returnType)) {
+				queryReturnInvoker = QueryReturnInvoker.COLLECTION;
+
+			} else if (Map.class.isAssignableFrom(returnType)) {
+				queryReturnInvoker = QueryReturnInvoker.MAP;
+
+			} else if (!Query.class.isAssignableFrom(returnType)) {
+				int pos = HelperString.indexOfIgnoreCase(sql, "SELECT");
+				if (pos <= 0 || HelperString.trimToNull(sql.substring(0, pos)) != null) {
+					queryReturnInvoker = QueryReturnInvoker.SINGLE;
+
+				} else {
+					queryReturnInvoker = QueryReturnInvoker.EXECUTE;
+				}
+			}
+
+			// NULL IS Query
+		}
+
+		int jdbcPagePos = -1;
+		int length = parameterTypes.length;
+		parameterMetas = new Object[length];
+		for (int i = 0; i < length; i++) {
+			if (i == firstResultsPos) {
+				// firstResultsPos
+				parameterMetas[i] = Integer.class;
+
+			} else if (i == maxResultsPos) {
+				// maxResultsPos
+				parameterMetas[i] = Long.class;
+
+			} else {
+				Class<?> parameterType = parameterTypes[i];
+				if (parameterType == null) {
+					// ingore parameter
+					parameterMetas[i] = void.class;
+
+				} else if (Session.class.isAssignableFrom(parameterType)) {
+					// session parameter
+					parameterMetas[i] = Session.class;
+
+				} else if (JdbcPage.class.isAssignableFrom(parameterType)) {
+					// jdbcPage parameter
+					jdbcPagePos = i;
+					parameterMetas[i] = JdbcPage.class;
+				}
+			}
+		}
+
+		if (parameterNames != null) {
+			for (int i = 0; i < length; i++) {
+				if (parameterMetas[i] == null) {
+					String parameterName = parameterNames[i];
+					if (!KernelString.isEmpty(parameterName) && sql.indexOf(':' + parameterName) > 0) {
+						parameterMetas[i] = parameterName;
+					}
+				}
+			}
+		}
+
+		if (jdbcPagePos >= 0) {
+			int selectPos = HelperString.indexOfIgnoreCase(sql, "SELECT");
+			if (selectPos > 0) {
+				int fromPos = HelperString.indexOfIgnoreCase(sql, "FROM", selectPos);
+				if (fromPos > 0) {
+					int splitPos = HelperString.indexOf(sql, ',', selectPos);
+					// generate count sql
+					String countSql = "SELECT COUNT(" + sql.substring(selectPos + 7, splitPos > 0 ? splitPos : (fromPos - 1)) + ") " + sql.substring(fromPos);
+					// ingore parameter jdbcPage
+					parameterTypes[jdbcPagePos] = void.class;
+					// ingore parameter firstResultsPos
+					if (firstResultsPos >= 0 && firstResultsPos < length) {
+						parameterTypes[firstResultsPos] = void.class;
+					}
+
+					// ingore parameter maxResultsPos
+					if (maxResultsPos >= 0 && maxResultsPos < length) {
+						parameterTypes[maxResultsPos] = void.class;
+					}
+
+					countQueryDetached = new DataQueryDetached(countSql, nativeSql, sessionName, Integer.class, cacheable, parameterTypes, parameterNames, -1, -1);
+				}
+			}
+		}
+
+		// parameterMetas is null
+		for (length--; length >= 0; length--) {
+			if (parameterMetas[length] != null) {
+				break;
+			}
+		}
+
+		if (length < 0) {
+			parameterMetas = null;
+		}
+	}
+
+	/**
+	 * @return the resultTransformer
+	 */
+	public ResultTransformer getResultTransformer() {
+		return resultTransformer;
+	}
+
+	/**
+	 * @param resultTransformer
+	 *            the resultTransformer to set
+	 */
+	public void setResultTransformer(ResultTransformer resultTransformer) {
+		this.resultTransformer = resultTransformer;
 	}
 
 	/**
@@ -44,10 +284,86 @@ public class DataQueryDetached {
 	 * @return
 	 */
 	public Object invoke(Object[] parameters) {
-		Session session = BeanDao.getSession();
-		Query query = session.createQuery(sql);
-		QueryDaoUtils.setParameterArray(query, parameters);
-		List list = query.list();
-		return single ? KernelList.get(list, 0) : list;
+		Session session = null;
+		JdbcPage jdbcPage = null;
+		int length = parameters.length;
+		if (parameterMetas != null) {
+			for (int i = 0; i < length; i++) {
+				Object parameterMeta = parameterMetas[i];
+				if (parameterMeta == Session.class) {
+					session = (Session) parameters[i];
+
+				} else if (parameterMeta == JdbcPage.class) {
+					jdbcPage = (JdbcPage) parameters[i];
+				}
+			}
+		}
+
+		if (session == null) {
+			session = sessionFactory == null ? BeanDao.getSession() : sessionFactory.getCurrentSession();
+		}
+
+		Query query = nativeSql ? session.createSQLQuery(sql) : session.createQuery(sql);
+		query.setCacheable(cacheable);
+		if (resultTransformer == null) {
+			if (queryReturnInvoker == QueryReturnInvoker.SINGLE) {
+				query.setResultTransformer(Transformers.aliasToBean(returnType));
+			}
+
+		} else {
+			query.setResultTransformer(resultTransformer);
+		}
+
+		if (jdbcPage == null) {
+			for (int i = 0; i < length; i++) {
+				Object parameterMeta = parameterMetas[i];
+				if (parameterMeta == Integer.class) {
+					// setFirstResult
+					query.setFirstResult((Integer) parameters[i]);
+
+				} else if (parameterMeta == Long.class) {
+					// setMaxResults
+					query.setMaxResults((Integer) parameters[i]);
+				}
+			}
+
+		} else if (countQueryDetached != null) {
+			// jdbcPage countQueryDetached
+			jdbcPage.setTotalCount((Integer) countQueryDetached.invoke(parameters));
+			query.setFirstResult(jdbcPage.getFirstResult());
+			query.setMaxResults(jdbcPage.getPageSize());
+		}
+
+		if (parameterMetas == null) {
+			QueryDaoUtils.setParameterArray(query, parameters);
+
+		} else {
+			int position = 0;
+			for (int i = 0; i < length; i++) {
+				Object parameterMeta = parameterMetas[i];
+				if (parameterMeta == null) {
+					query.setParameter(position++, parameters[i]);
+
+				} else if (parameterMeta.getClass() == String.class) {
+					Object parameter = parameters[i];
+					if (parameter == null) {
+						query.setParameter((String) parameterMeta, parameter);
+
+					} else if (parameter.getClass().isArray()) {
+						// set Parameter Array
+						query.setParameterList((String) parameterMeta, (Object[]) parameter);
+
+					} else if (Collection.class.isAssignableFrom(parameter.getClass())) {
+						// set Parameter Collection
+						query.setParameterList((String) parameterMeta, (Collection) parameter);
+
+					} else {
+						query.setParameter((String) parameterMeta, parameter);
+					}
+				}
+			}
+		}
+
+		return queryReturnInvoker == null ? query : queryReturnInvoker.invoke(query, returnType);
 	}
 }

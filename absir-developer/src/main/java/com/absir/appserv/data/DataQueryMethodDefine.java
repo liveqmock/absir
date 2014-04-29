@@ -7,16 +7,26 @@
  */
 package com.absir.appserv.data;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
+
+import org.hibernate.transform.Transformers;
 
 import com.absir.aop.AopImplDefine;
 import com.absir.aop.AopMethodDefineAbstract;
+import com.absir.appserv.data.value.FirstResults;
+import com.absir.appserv.data.value.MaxResults;
 import com.absir.appserv.data.value.Query;
 import com.absir.appserv.data.value.Session;
 import com.absir.bean.basis.Basis;
 import com.absir.bean.basis.BeanDefine;
+import com.absir.bean.core.BeanDefineDiscover;
 import com.absir.bean.core.BeanFactoryImpl;
 import com.absir.bean.inject.value.Bean;
+import com.absir.core.kernel.KernelArray;
+import com.absir.core.kernel.KernelClass;
 
 /**
  * @author absir
@@ -24,7 +34,7 @@ import com.absir.bean.inject.value.Bean;
  */
 @Basis
 @Bean
-public class DataQueryFactory extends AopMethodDefineAbstract<DataQueryInterceptor, DataQueryDetached, String> {
+public class DataQueryMethodDefine extends AopMethodDefineAbstract<DataQueryInterceptor, DataQueryDetached, String> {
 
 	/*
 	 * (non-Javadoc)
@@ -74,7 +84,42 @@ public class DataQueryFactory extends AopMethodDefineAbstract<DataQueryIntercept
 	public DataQueryDetached getAopInterceptor(DataQueryDetached interceptor, String variable, Class<?> beanType, Method method) {
 		// TODO Auto-generated method stub
 		Query query = method.getAnnotation(Query.class);
-		return query == null ? null : new DataQueryDetached(query.value(), query.nativeQuery(), null, method.getReturnType());
+		if (query == null) {
+			return null;
+		}
+		Class<?>[] parameterTypes = method.getParameterTypes();
+		int length = parameterTypes.length;
+		Annotation[][] annotations = method.getParameterAnnotations();
+		int firstResultsPos = -1;
+		int maxResultsPos = -1;
+		for (int i = 0; i < length; i++) {
+			if (KernelClass.isMatchableFrom(parameterTypes[i], int.class)) {
+				if (KernelArray.getAssignable(annotations[i], FirstResults.class) != null) {
+					firstResultsPos = i;
+
+				} else if (KernelArray.getAssignable(annotations[i], MaxResults.class) != null) {
+					maxResultsPos = i;
+				}
+			}
+		}
+
+		DataQueryDetached queryDetached = new DataQueryDetached(query.value(), query.nativeQuery(), variable, method.getReturnType(), query.cacheable(), parameterTypes,
+				BeanDefineDiscover.paramterNames(method), firstResultsPos, maxResultsPos);
+		// setResultTransformer
+		Class<?> aliasType = query.aliasType();
+		if (aliasType == null || aliasType == void.class) {
+
+		} else if (aliasType == Map.class) {
+			queryDetached.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+
+		} else if (aliasType == List.class) {
+			queryDetached.setResultTransformer(Transformers.TO_LIST);
+
+		} else {
+			queryDetached.setResultTransformer(Transformers.aliasToBean(aliasType));
+		}
+
+		return queryDetached;
 	}
 
 	/*

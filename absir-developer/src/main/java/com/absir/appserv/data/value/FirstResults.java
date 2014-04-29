@@ -16,27 +16,8 @@ import java.lang.annotation.Target;
  * @author absir
  * 
  */
-@Target({ ElementType.METHOD })
+@Target({ ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Query {
+public @interface FirstResults {
 
-	/**
-	 * @return
-	 */
-	String value();
-
-	/**
-	 * @return
-	 */
-	boolean nativeQuery() default false;
-
-	/**
-	 * @return
-	 */
-	boolean cacheable() default false;
-
-	/**
-	 * @return
-	 */
-	Class<?> aliasType() default void.class;
 }

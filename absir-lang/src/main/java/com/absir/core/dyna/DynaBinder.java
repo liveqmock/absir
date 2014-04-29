@@ -90,6 +90,33 @@ public class DynaBinder {
 		INSTANCE.mapBind(map, toObject);
 	}
 
+	/**
+	 * @param toClass
+	 * @return
+	 */
+	public static <T extends Collection> Class<T> toCollectionClass(Class<T> toClass) {
+		if (toClass.isAssignableFrom(ArrayList.class)) {
+			toClass = (Class<T>) ArrayList.class;
+
+		} else if (toClass.isAssignableFrom(HashSet.class)) {
+			toClass = (Class<T>) HashSet.class;
+		}
+
+		return toClass;
+	}
+
+	/**
+	 * @param toClass
+	 * @return
+	 */
+	public static <T extends Map> Class<T> toMapClass(Class<T> toClass) {
+		if (toClass.isAssignableFrom(HashMap.class)) {
+			toClass = (Class<T>) HashMap.class;
+		}
+
+		return toClass;
+	}
+
 	/** converts */
 	protected final List<? extends DynaConvert> converts = new ArrayList<DynaConvert>();
 
@@ -483,14 +510,7 @@ public class DynaBinder {
 		}
 
 		if (toObject == null) {
-			if (toClass.isAssignableFrom(ArrayList.class)) {
-				toClass = ArrayList.class;
-
-			} else if (toClass.isAssignableFrom(HashSet.class)) {
-				toClass = HashSet.class;
-			}
-
-			toObject = newInstance(toClass);
+			toObject = newInstance(toCollectionClass(toClass));
 		}
 
 		return toObject;
@@ -571,11 +591,7 @@ public class DynaBinder {
 		}
 
 		if (toObject == null) {
-			if (toClass.isAssignableFrom(HashMap.class)) {
-				toClass = (Class<T>) HashMap.class;
-			}
-
-			toObject = newInstance(toClass);
+			toObject = newInstance(toMapClass(toClass));
 		}
 
 		if (toObject != null) {

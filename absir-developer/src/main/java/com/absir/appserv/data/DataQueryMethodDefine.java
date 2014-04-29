@@ -130,6 +130,6 @@ public class DataQueryMethodDefine extends AopMethodDefineAbstract<DataQueryInte
 	@Override
 	public int getOrder() {
 		// TODO Auto-generated method stub
-		return Integer.MAX_VALUE;
+		return 2048;
 	}
 }

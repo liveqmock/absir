@@ -13,16 +13,29 @@ package com.absir.orm.transaction;
  */
 public abstract class TransactionHolder implements ISessionHolder {
 
-	// 0 false|false 1 true|true 2 false|true 3 true|false
-	/** readOnly */
-	protected byte readOnly;
+	/** READONLY_FLAG */
+	public static final int READONLY_FLAG = 0x01;
+
+	/** READONLY_EQ_FLAG */
+	public static final int READONLY_EQ_FLAG = READONLY_FLAG << 1;
+
+	/** NESTED_FLAG */
+	public static final int NESTED_FLAG = READONLY_EQ_FLAG << 1;
+
+	/** NESTED_EQ_FLAG */
+	public static final int NESTED_EQ_FLAG = NESTED_FLAG << 1;
+
+	/** REQUIRED_FLAG */
+	public static final int REQUIRED_FLAG = NESTED_EQ_FLAG << 1;
+
+	/** REQUIRED_EQ_FLAG */
+	public static final int REQUIRED_EQ_FLAG = REQUIRED_FLAG << 1;
+
+	/** flag */
+	protected int flag;
 
 	/** rollback */
 	protected Class<?>[] rollback;
-
-	// 0 false 1 true 2 null 3 empty
-	/** nested */
-	protected byte nested;
 
 	/** timeout */
 	protected long timeout;
@@ -38,23 +51,38 @@ public abstract class TransactionHolder implements ISessionHolder {
 	 * @param transactionAttributeBefore
 	 */
 	public TransactionHolder(ISessionHolder holderBefore, TransactionAttribute transactionAttribute) {
-		if (holderBefore == null) {
-			nested = (byte) (transactionAttribute.isRequired() ? 1 : 2);
-			readOnly = (byte) (transactionAttribute.isReadOnly() ? 1 : 0);
+		if (holderBefore == null || transactionAttribute.isNested()) {
+			flag |= NESTED_FLAG;
 
 		} else {
-			if (transactionAttribute.isNested()) {
-				nested = (byte) (transactionAttribute.isRequired() ? 1 : 3);
+			if (holderBefore.isReadOnly() == transactionAttribute.isReadOnly()) {
+				flag |= READONLY_EQ_FLAG;
+			}
 
-			} else {
-				readOnly = (byte) (holderBefore.isReadOnly() == transactionAttribute.isReadOnly() ? (holderBefore.isReadOnly() ? 1 : 0) : (holderBefore.isReadOnly() ? 3 : 2));
-				if (transactionAttribute.getTimeout() > 0) {
-					timeout = holderBefore.getTimeout();
-					if (timeout == 0) {
-						timeout = -1;
-					}
+			// if (holderBefore.isRequired()) {
+			// flag |= REQUIRED_FLAG;
+			// flag |= REQUIRED_EQ_FLAG;
+			//
+			// } else
+			if (holderBefore.isRequired() == transactionAttribute.isRequired()) {
+				flag |= REQUIRED_EQ_FLAG;
+			}
+
+			// recard holderBefore timeout
+			if (transactionAttribute.getTimeout() > 0) {
+				timeout = holderBefore.getTimeout();
+				if (timeout < 0 || timeout == transactionAttribute.getTimeout()) {
+					timeout = 0;
 				}
 			}
+		}
+
+		if (transactionAttribute.isReadOnly()) {
+			flag |= READONLY_FLAG;
+		}
+
+		if (transactionAttribute.isRequired()) {
+			flag |= REQUIRED_FLAG;
 		}
 
 		// self rollback set
@@ -68,52 +96,24 @@ public abstract class TransactionHolder implements ISessionHolder {
 	 */
 	@Override
 	public boolean isReadOnly() {
-		return readOnly == 1 || readOnly == 2;
+		return (flag & READONLY_FLAG) != 0;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.orm.transaction.ISessionHolder#isRequired()
+	 */
+	@Override
+	public boolean isRequired() {
+		return (flag & REQUIRED_FLAG) != 0;
 	}
 
 	/**
-	 * @return the readOnly
+	 * @return the flag
 	 */
-	public byte getReadOnly() {
-		return readOnly;
-	}
-
-	/**
-	 * @param readonly
-	 *            the readonly to set
-	 */
-	public void setReadOnly(byte readonly) {
-		this.readOnly = readonly;
-	}
-
-	/**
-	 * @return the rollback
-	 */
-	public Class<?>[] getRollback() {
-		return rollback;
-	}
-
-	/**
-	 * @param rollback
-	 *            the rollback to set
-	 */
-	public void setRollback(Class<?>[] rollback) {
-		this.rollback = rollback;
-	}
-
-	/**
-	 * @return the nested
-	 */
-	public byte getNested() {
-		return nested;
-	}
-
-	/**
-	 * @param nested
-	 *            the nested to set
-	 */
-	public void setNested(byte nested) {
-		this.nested = nested;
+	public int getFlag() {
+		return flag;
 	}
 
 	/**
@@ -124,10 +124,9 @@ public abstract class TransactionHolder implements ISessionHolder {
 	}
 
 	/**
-	 * @param timeout
-	 *            the timeout to set
+	 * @return the rollback
 	 */
-	public void setTimeout(long timeout) {
-		this.timeout = timeout;
+	public Class<?>[] getRollback() {
+		return rollback;
 	}
 }

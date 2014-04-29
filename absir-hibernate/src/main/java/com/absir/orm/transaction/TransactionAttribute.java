@@ -26,7 +26,7 @@ public class TransactionAttribute {
 	private boolean required;
 
 	/** timeout */
-	private long timeout;
+	private int timeout;
 
 	/**
 	 * 
@@ -42,12 +42,16 @@ public class TransactionAttribute {
 	 * @param timeout
 	 * @return
 	 */
-	public TransactionAttribute(boolean readonly, Class<?>[] rollback, boolean nested, boolean required, long timeout) {
+	public TransactionAttribute(boolean readonly, Class<?>[] rollback, boolean nested, boolean required, int timeout) {
 		this.readOnly = readonly;
 		this.rollback = rollback;
 		this.nested = nested;
-		this.required = required;
 		this.timeout = timeout;
+		if (required == false && (rollback != null || timeout > 0)) {
+			required = true;
+		}
+
+		this.required = required;
 	}
 
 	/**
@@ -81,7 +85,7 @@ public class TransactionAttribute {
 	/**
 	 * @return the timeout
 	 */
-	public long getTimeout() {
+	public int getTimeout() {
 		return timeout;
 	}
 }

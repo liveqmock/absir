@@ -16,6 +16,11 @@ public interface ISessionHolder {
 	/**
 	 * @return
 	 */
+	public boolean isRequired();
+
+	/**
+	 * @return
+	 */
 	public boolean isReadOnly();
 
 	/**

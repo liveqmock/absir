@@ -76,7 +76,7 @@ public class TransactionManager {
 	 * @param required
 	 * @param timeout
 	 */
-	public void setTransactionAttribute(String transactionName, boolean readonly, Class<?>[] rollback, boolean nested, boolean required, long timeout) {
+	public void setTransactionAttribute(String transactionName, boolean readonly, Class<?>[] rollback, boolean nested, boolean required, int timeout) {
 		if (transactionName == null || "".equals(transactionName)) {
 			setTransactionAttribute(new TransactionAttribute(readonly, rollback, nested, required, timeout));
 

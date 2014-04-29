@@ -43,10 +43,10 @@ public @interface Transaction {
 	/**
 	 * @return
 	 */
-	boolean required() default true;
+	boolean required() default false;
 
 	/**
 	 * @return
 	 */
-	long timeout() default -1;
+	int timeout() default -1;
 }

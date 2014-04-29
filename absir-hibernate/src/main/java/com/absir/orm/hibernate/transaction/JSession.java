@@ -32,16 +32,7 @@ public class JSession {
 	 * @param session
 	 */
 	public JSession(Session session) {
-		this(session, session.beginTransaction());
-	}
-
-	/**
-	 * @param session
-	 * @param transaction
-	 */
-	public JSession(Session session, Transaction transaction) {
 		this.session = session;
-		this.transaction = transaction;
 	}
 
 	/**
@@ -52,14 +43,6 @@ public class JSession {
 	}
 
 	/**
-	 * @param session
-	 *            the session to set
-	 */
-	public void setSession(Session session) {
-		this.session = session;
-	}
-
-	/**
 	 * @return the transaction
 	 */
 	public Transaction getTransaction() {
@@ -67,10 +50,13 @@ public class JSession {
 	}
 
 	/**
-	 * @param transaction
-	 *            the transaction to set
+	 * @return
 	 */
-	public void setTransaction(Transaction transaction) {
-		this.transaction = transaction;
+	public Transaction openTransaction() {
+		if (transaction == null) {
+			transaction = session.beginTransaction();
+		}
+
+		return transaction;
 	}
 }

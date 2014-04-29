@@ -11,6 +11,7 @@ import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.context.spi.CurrentSessionContext;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 
@@ -110,67 +111,63 @@ public class JSessionContext implements CurrentSessionContext, ISessionContext {
 			@Override
 			public void close(Throwable e) {
 				// TODO Auto-generated method stub
-				if (nested == 0) {
-					JSession jSession = jTransactionSession.getCurrentSession();
-					if (jSession != null) {
-						if (readOnly == 2) {
-							jSession.getSession().setFlushMode(FlushMode.COMMIT);
-							jSession.getSession().setDefaultReadOnly(false);
+				boolean nested = (flag & TransactionHolder.NESTED_FLAG) != 0;
+				JSession jSession = nested ? jTransactionSession.closeCurrentSession() : jTransactionSession.getCurrentSession();
+				if (jSession != null) {
+					if (nested) {
+						try {
+							if (!isReadOnly()) {
+								Transaction transaction = jSession.getTransaction();
+								if (transaction != null) {
+									if (e == null || rollback == null || !KernelClass.isAssignableFrom(rollback, e.getClass())) {
+										transaction.commit();
 
-						} else if (readOnly == 3) {
-							jSession.getSession().setFlushMode(FlushMode.MANUAL);
-							jSession.getSession().setDefaultReadOnly(true);
+									} else {
+										transaction.rollback();
+									}
+
+								} else {
+									jSession.getSession().flush();
+								}
+							}
+
+						} finally {
+							// close session
+							jSession.getSession().close();
+						}
+
+					} else {
+						if ((flag & READONLY_EQ_FLAG) == 0) {
+							if (isReadOnly()) {
+								jSession.getSession().setFlushMode(FlushMode.COMMIT);
+								jSession.getSession().setDefaultReadOnly(false);
+
+							} else {
+								jSession.getSession().setFlushMode(FlushMode.MANUAL);
+								jSession.getSession().setDefaultReadOnly(true);
+							}
 						}
 
 						if (timeout != 0) {
 							jSession.getTransaction().setTimeout((int) timeout);
 						}
 					}
-
-				} else {
-					JSession jSession = jTransactionSession.closeCurrentSession();
-					if (jSession != null) {
-						if (readOnly == 0 || readOnly == 2) {
-							if (e == null || rollback == null || !KernelClass.isAssignableFrom(rollback, e.getClass())) {
-								jSession.getTransaction().commit();
-
-							} else {
-								jSession.getTransaction().rollback();
-							}
-						}
-
-						jSession.getSession().close();
-					}
 				}
 			}
 		};
 
-		JSession jSession = null;
-		switch (transactionHolder.getNested()) {
-		case 0:
-			jSession = jTransactionSession.getCurrentSession();
-			if (jSession != null) {
-				if (transactionHolder.getReadOnly() >= 2) {
-					if (transactionAttribute.isReadOnly()) {
-						jSession.getSession().setFlushMode(FlushMode.MANUAL);
-						jSession.getSession().setDefaultReadOnly(true);
-
-					} else {
-						jSession.getSession().setFlushMode(FlushMode.COMMIT);
-						jSession.getSession().setDefaultReadOnly(false);
-					}
-				}
-
-				if (transactionHolder.getTimeout() != 0) {
-					jSession.getTransaction().setTimeout((int) transactionAttribute.getTimeout());
-				}
-			}
-
-			break;
-
-		case 1:
+		int flag = transactionHolder.getFlag();
+		boolean nested = (flag & TransactionHolder.NESTED_FLAG) != 0;
+		JSession jSession;
+		if (nested) {
 			jSession = new JSession(sessionFactory.openSession());
 			jTransactionSession.openCurrentSession(jSession);
+
+		} else {
+			jSession = jTransactionSession.getCurrentSession();
+		}
+
+		if (nested || (flag & TransactionHolder.READONLY_EQ_FLAG) == 0) {
 			if (transactionAttribute.isReadOnly()) {
 				jSession.getSession().setFlushMode(FlushMode.MANUAL);
 				jSession.getSession().setDefaultReadOnly(true);
@@ -179,16 +176,16 @@ public class JSessionContext implements CurrentSessionContext, ISessionContext {
 				jSession.getSession().setFlushMode(FlushMode.COMMIT);
 				jSession.getSession().setDefaultReadOnly(false);
 			}
+		}
 
-			if (transactionAttribute.getTimeout() > 0) {
-				jSession.getTransaction().setTimeout((int) transactionAttribute.getTimeout());
+		if (nested || (flag & TransactionHolder.REQUIRED_EQ_FLAG) == 0) {
+			if (transactionAttribute.isRequired()) {
+				Transaction transaction = jSession.openTransaction();
+				int timeout = transactionAttribute.getTimeout();
+				if (timeout > 0) {
+					transaction.setTimeout(timeout);
+				}
 			}
-
-			break;
-
-		default:
-			jTransactionSession.pushCurrentSession();
-			break;
 		}
 
 		return transactionHolder;

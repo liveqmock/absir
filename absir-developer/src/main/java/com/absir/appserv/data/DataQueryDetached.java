@@ -200,7 +200,7 @@ public class DataQueryDetached {
 
 			} else {
 				Class<?> parameterType = parameterTypes[i];
-				if (parameterType == null) {
+				if (parameterType == null || parameterType == void.class) {
 					// ingore parameter
 					parameterMetas[i] = void.class;
 
@@ -229,7 +229,7 @@ public class DataQueryDetached {
 
 		if (jdbcPagePos >= 0) {
 			int selectPos = HelperString.indexOfIgnoreCase(sql, "SELECT");
-			if (selectPos > 0) {
+			if (selectPos >= 0) {
 				int fromPos = HelperString.indexOfIgnoreCase(sql, "FROM", selectPos);
 				if (fromPos > 0) {
 					int splitPos = HelperString.indexOf(sql, ',', selectPos);
@@ -306,7 +306,7 @@ public class DataQueryDetached {
 		Query query = nativeSql ? session.createSQLQuery(sql) : session.createQuery(sql);
 		query.setCacheable(cacheable);
 		if (resultTransformer == null) {
-			if (queryReturnInvoker == QueryReturnInvoker.SINGLE) {
+			if (nativeSql && queryReturnInvoker == QueryReturnInvoker.SINGLE) {
 				query.setResultTransformer(Transformers.aliasToBean(returnType));
 			}
 
@@ -314,20 +314,7 @@ public class DataQueryDetached {
 			query.setResultTransformer(resultTransformer);
 		}
 
-		if (jdbcPage == null) {
-			for (int i = 0; i < length; i++) {
-				Object parameterMeta = parameterMetas[i];
-				if (parameterMeta == Integer.class) {
-					// setFirstResult
-					query.setFirstResult((Integer) parameters[i]);
-
-				} else if (parameterMeta == Long.class) {
-					// setMaxResults
-					query.setMaxResults((Integer) parameters[i]);
-				}
-			}
-
-		} else if (countQueryDetached != null) {
+		if (!(jdbcPage == null || countQueryDetached == null)) {
 			// jdbcPage countQueryDetached
 			jdbcPage.setTotalCount((Integer) countQueryDetached.invoke(parameters));
 			query.setFirstResult(jdbcPage.getFirstResult());
@@ -342,9 +329,19 @@ public class DataQueryDetached {
 			for (int i = 0; i < length; i++) {
 				Object parameterMeta = parameterMetas[i];
 				if (parameterMeta == null) {
+					// set parameter position
 					query.setParameter(position++, parameters[i]);
 
+				} else if (parameterMeta == Integer.class) {
+					// setFirstResult
+					query.setFirstResult((Integer) parameters[i]);
+
+				} else if (parameterMeta == Long.class) {
+					// setMaxResults
+					query.setMaxResults((Integer) parameters[i]);
+
 				} else if (parameterMeta.getClass() == String.class) {
+					// set parameter name
 					Object parameter = parameters[i];
 					if (parameter == null) {
 						query.setParameter((String) parameterMeta, parameter);

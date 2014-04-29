@@ -119,10 +119,6 @@ public class JSessionContext implements CurrentSessionContext, ISessionContext {
 						try {
 							if (!isReadOnly()) {
 								Transaction transaction = jSession.getTransaction();
-								if (transaction == null) {
-									transaction = jSession.openTransaction();
-								}
-
 								if (transaction != null) {
 									if (e == null || rollback == null || !KernelClass.isAssignableFrom(rollback, e.getClass())) {
 										transaction.commit();
@@ -184,7 +180,7 @@ public class JSessionContext implements CurrentSessionContext, ISessionContext {
 		}
 
 		if (nested || (flag & TransactionHolder.REQUIRED_EQ_FLAG) == 0) {
-			if (transactionHolder.isRequired()) {
+			if (transactionHolder.isRequired() || !transactionHolder.isReadOnly()) {
 				Transaction transaction = jSession.openTransaction();
 				int timeout = transactionAttribute.getTimeout();
 				if (timeout > 0) {

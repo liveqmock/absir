@@ -18,15 +18,10 @@ import java.lang.annotation.Target;
  */
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Respository {
+public @interface Session {
 
 	/**
 	 * @return
 	 */
-	String value() default "";
-
-	/**
-	 * @return
-	 */
-	String name() default "";
+	String value();
 }

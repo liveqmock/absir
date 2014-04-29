@@ -13,7 +13,6 @@ import com.absir.appserv.system.bean.base.JbStragety;
 import com.absir.appserv.system.bean.proxy.JiUpdate;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.domain.DCondition;
-import com.absir.bean.inject.value.Bean;
 import com.absir.orm.hibernate.SessionFactoryUtils;
 import com.absir.orm.value.JePermission;
 
@@ -21,7 +20,6 @@ import com.absir.orm.value.JePermission;
  * @author absir
  * 
  */
-@Bean
 public abstract class AccessServiceUtils {
 
 	/**

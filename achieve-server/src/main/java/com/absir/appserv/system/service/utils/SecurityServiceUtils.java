@@ -9,14 +9,12 @@ package com.absir.appserv.system.service.utils;
 
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.service.SecurityService;
-import com.absir.bean.inject.value.Bean;
 import com.absir.server.on.OnPut;
 
 /**
  * @author absir
  * 
  */
-@Bean
 public abstract class SecurityServiceUtils {
 
 	/**

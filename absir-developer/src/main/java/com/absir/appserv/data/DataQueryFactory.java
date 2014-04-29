@@ -8,17 +8,13 @@
 package com.absir.appserv.data;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
 
+import com.absir.aop.AopImplDefine;
 import com.absir.aop.AopMethodDefineAbstract;
 import com.absir.appserv.data.value.Query;
-import com.absir.appserv.data.value.Respository;
+import com.absir.appserv.data.value.Session;
 import com.absir.bean.basis.Basis;
 import com.absir.bean.basis.BeanDefine;
-import com.absir.bean.config.IBeanDefineSupply;
-import com.absir.bean.core.BeanDefineType;
 import com.absir.bean.core.BeanFactoryImpl;
 import com.absir.bean.inject.value.Bean;
 
@@ -28,30 +24,7 @@ import com.absir.bean.inject.value.Bean;
  */
 @Basis
 @Bean
-public class DataQueryFactory extends AopMethodDefineAbstract<DataQueryInterceptor, DataQueryDetached, String> implements IBeanDefineSupply {
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.absir.bean.config.IBeanDefineSupply#getBeanDefines(com.absir.bean
-	 * .core.BeanFactoryImpl, java.lang.Class)
-	 */
-	@Override
-	public List<BeanDefine> getBeanDefines(BeanFactoryImpl beanFactory, Class<?> beanType) {
-		// TODO Auto-generated method stub
-		if (beanType.isInterface() || Modifier.isAbstract(beanType.getModifiers())) {
-			Respository respository = beanType.getAnnotation(Respository.class);
-			if (respository != null) {
-				DataQueryDefine beanDefine = new DataQueryDefine(BeanDefineType.getBeanName(respository.value(), beanType), beanType, respository.name());
-				List<BeanDefine> beanDefines = new ArrayList<BeanDefine>();
-				beanDefines.add(beanDefine);
-				return beanDefines;
-			}
-		}
-
-		return null;
-	}
+public class DataQueryFactory extends AopMethodDefineAbstract<DataQueryInterceptor, DataQueryDetached, String> {
 
 	/*
 	 * (non-Javadoc)
@@ -63,7 +36,7 @@ public class DataQueryFactory extends AopMethodDefineAbstract<DataQueryIntercept
 	@Override
 	public DataQueryInterceptor getAopInterceptor(BeanDefine beanDefine, Object beanObject) {
 		// TODO Auto-generated method stub
-		return BeanFactoryImpl.getBeanDefine(beanDefine, DataQueryDefine.class) == null ? null : new DataQueryInterceptor();
+		return BeanFactoryImpl.getBeanDefine(beanDefine, AopImplDefine.class) == null ? null : new DataQueryInterceptor();
 	}
 
 	/*
@@ -75,7 +48,8 @@ public class DataQueryFactory extends AopMethodDefineAbstract<DataQueryIntercept
 	 */
 	@Override
 	public String getVariable(DataQueryInterceptor aopInterceptor, BeanDefine beanDefine, Object beanObject) {
-		return BeanFactoryImpl.getBeanDefine(beanDefine, DataQueryDefine.class).getName();
+		Session session = beanDefine.getBeanType().getAnnotation(Session.class);
+		return session == null ? null : session.value();
 	}
 
 	/*

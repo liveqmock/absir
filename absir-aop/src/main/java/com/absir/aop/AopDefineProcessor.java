@@ -17,14 +17,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.absir.aop.value.Impl;
 import com.absir.bean.basis.Basis;
 import com.absir.bean.basis.BeanDefine;
 import com.absir.bean.basis.BeanFactory;
 import com.absir.bean.config.IBeanDefineProcessor;
+import com.absir.bean.config.IBeanDefineSupply;
 import com.absir.bean.config.IBeanFactoryAware;
+import com.absir.bean.core.BeanDefineType;
 import com.absir.bean.core.BeanFactoryImpl;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.InjectBeanFactory;
+import com.absir.bean.inject.value.Bean;
 import com.absir.core.kernel.KernelArray;
 import com.absir.core.kernel.KernelClass;
 import com.absir.core.kernel.KernelCollection;
@@ -37,7 +41,7 @@ import com.absir.core.kernel.KernelLang.CallbackBreak;
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
 @Basis
-public class AopDefineProcessor implements IBeanDefineProcessor, IBeanFactoryAware {
+public class AopDefineProcessor implements IBeanDefineSupply, IBeanDefineProcessor, IBeanFactoryAware {
 
 	/*
 	 * (non-Javadoc)
@@ -48,6 +52,31 @@ public class AopDefineProcessor implements IBeanDefineProcessor, IBeanFactoryAwa
 	public int getOrder() {
 		// TODO Auto-generated method stub
 		return -255;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.bean.config.IBeanDefineSupply#getBeanDefines(com.absir.bean
+	 * .core.BeanFactoryImpl, java.lang.Class)
+	 */
+	@Override
+	public List<BeanDefine> getBeanDefines(BeanFactoryImpl beanFactory, Class<?> beanType) {
+		// TODO Auto-generated method stub
+		Impl basic = beanType.getAnnotation(Impl.class);
+		if (basic != null || beanType.isInterface() || Modifier.isAbstract(beanType.getModifiers())) {
+			Bean bean = beanType.getAnnotation(Bean.class);
+			if (basic != null || bean != null) {
+				AopImplDefine beanDefine = new AopImplDefine(BeanDefineType.getBeanName(bean == null ? null : bean.value(), beanType), beanType, bean == null ? null : bean.scope(),
+						basic == null ? null : basic.value());
+				List<BeanDefine> beanDefines = new ArrayList<BeanDefine>();
+				beanDefines.add(beanDefine);
+				return beanDefines;
+			}
+		}
+
+		return null;
 	}
 
 	/*

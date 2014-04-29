@@ -5,35 +5,43 @@
  *
  * Create on 2014-3-13 下午5:25:49
  */
-package com.absir.appserv.data;
+package com.absir.aop;
 
-import com.absir.aop.AopProxyUtils;
+import java.util.List;
+
 import com.absir.bean.basis.BeanDefine;
 import com.absir.bean.basis.BeanFactory;
 import com.absir.bean.basis.BeanScope;
 import com.absir.bean.core.BeanDefineAbstractor;
 import com.absir.bean.core.BeanFactoryImpl;
+import com.absir.core.kernel.KernelString;
 
 /**
  * @author absir
  * 
  */
-public class DataQueryDefine extends BeanDefineAbstractor {
+public class AopImplDefine extends BeanDefineAbstractor {
 
 	/** beanType */
 	private Class<?> beanType;
 
-	/** name */
-	private String name;
+	/** beanScope */
+	private BeanScope beanScope;
+
+	/** implName */
+	private String implName;
 
 	/**
 	 * @param beanName
 	 * @param beanType
+	 * @param beanScope
+	 * @param implName
 	 */
-	public DataQueryDefine(String beanName, Class<?> beanType, String name) {
+	public AopImplDefine(String beanName, Class<?> beanType, BeanScope beanScope, String implName) {
 		this.beanName = beanName;
 		this.beanType = beanType;
-		this.name = name;
+		this.beanScope = beanScope == null ? BeanScope.SINGLETON : beanScope;
+		this.implName = KernelString.isEmpty(implName) ? null : implName;
 	}
 
 	/*
@@ -51,7 +59,7 @@ public class DataQueryDefine extends BeanDefineAbstractor {
 	 * @return the name
 	 */
 	public String getName() {
-		return name;
+		return implName;
 	}
 
 	/*
@@ -62,7 +70,7 @@ public class DataQueryDefine extends BeanDefineAbstractor {
 	@Override
 	public BeanScope getBeanScope() {
 		// TODO Auto-generated method stub
-		return BeanScope.SINGLETON;
+		return beanScope;
 	}
 
 	/*
@@ -74,6 +82,15 @@ public class DataQueryDefine extends BeanDefineAbstractor {
 	public Object getBeanComponent() {
 		// TODO Auto-generated method stub
 		return beanType;
+	}
+
+	/**
+	 * @param beanDefine
+	 * @param cls
+	 * @return
+	 */
+	private boolean circleBeanDefine(BeanDefine beanDefine, Class<?> cls) {
+		return beanType == beanDefine.getBeanType() || !(BeanFactoryImpl.getBeanDefine(beanDefine, AopImplDefine.class) == null || beanDefine.getBeanType() == cls);
 	}
 
 	/*
@@ -88,13 +105,28 @@ public class DataQueryDefine extends BeanDefineAbstractor {
 		BeanDefine beanDefine = null;
 		if (beanType.isInterface()) {
 			for (Class<?> cls : beanType.getInterfaces()) {
-				beanDefine = beanFactory.getBeanDefine(null, cls);
-				if (beanDefine != null) {
-					if (BeanFactoryImpl.getBeanDefine(beanDefine, DataQueryDefine.class) == null && beanDefine.getBeanScope() == BeanScope.SINGLETON) {
-						break;
+				if (implName == null) {
+					List<BeanDefine> beanDefines = beanFactory.getBeanDefines(cls);
+					if (beanDefines.size() > 1) {
+						for (BeanDefine define : beanDefines) {
+							if (circleBeanDefine(define, cls)) {
+								continue;
+							}
+
+							beanDefine = define;
+							break;
+						}
 					}
 
-					beanDefine = null;
+				} else {
+					beanDefine = beanFactory.getBeanDefine(implName, cls);
+					if (beanDefine != null && circleBeanDefine(beanDefine, cls)) {
+						beanDefine = null;
+					}
+				}
+
+				if (beanDefine != null) {
+					break;
 				}
 			}
 		}

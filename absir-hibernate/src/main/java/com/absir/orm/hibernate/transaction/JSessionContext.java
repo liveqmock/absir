@@ -102,9 +102,10 @@ public class JSessionContext implements CurrentSessionContext, ISessionContext {
 	 * @return
 	 */
 	public static ISessionHolder open(SessionFactory sessionFactory, ISessionHolder sessionHolder, TransactionAttribute transactionAttribute, final JTransactionSession jTransactionSession) {
-		if (jTransactionSession.getCurrentSession() == null && !transactionAttribute.isRequired()) {
-			return null;
-		}
+		// if (jTransactionSession.getCurrentSession() == null &&
+		// !transactionAttribute.isRequired()) {
+		// return null;
+		// }
 
 		TransactionHolder transactionHolder = new TransactionHolder(sessionHolder, transactionAttribute) {
 
@@ -118,6 +119,10 @@ public class JSessionContext implements CurrentSessionContext, ISessionContext {
 						try {
 							if (!isReadOnly()) {
 								Transaction transaction = jSession.getTransaction();
+								if (transaction == null) {
+									transaction = jSession.openTransaction();
+								}
+
 								if (transaction != null) {
 									if (e == null || rollback == null || !KernelClass.isAssignableFrom(rollback, e.getClass())) {
 										transaction.commit();
@@ -126,7 +131,7 @@ public class JSessionContext implements CurrentSessionContext, ISessionContext {
 										transaction.rollback();
 									}
 
-								} else {
+								} else if (!isRequired()) {
 									jSession.getSession().flush();
 								}
 							}
@@ -168,7 +173,7 @@ public class JSessionContext implements CurrentSessionContext, ISessionContext {
 		}
 
 		if (nested || (flag & TransactionHolder.READONLY_EQ_FLAG) == 0) {
-			if (transactionAttribute.isReadOnly()) {
+			if (transactionHolder.isReadOnly()) {
 				jSession.getSession().setFlushMode(FlushMode.MANUAL);
 				jSession.getSession().setDefaultReadOnly(true);
 
@@ -179,7 +184,7 @@ public class JSessionContext implements CurrentSessionContext, ISessionContext {
 		}
 
 		if (nested || (flag & TransactionHolder.REQUIRED_EQ_FLAG) == 0) {
-			if (transactionAttribute.isRequired()) {
+			if (transactionHolder.isRequired()) {
 				Transaction transaction = jSession.openTransaction();
 				int timeout = transactionAttribute.getTimeout();
 				if (timeout > 0) {

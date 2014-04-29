@@ -47,7 +47,7 @@ public class TransactionAttribute {
 		this.rollback = rollback;
 		this.nested = nested;
 		this.timeout = timeout;
-		if (required == false && (rollback != null || timeout > 0)) {
+		if (required == false && ((rollback != null && rollback.length > 0) || timeout > 0)) {
 			required = true;
 		}
 

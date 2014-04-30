@@ -18,34 +18,34 @@ import com.absir.property.value.PropertyInfo;
  * 
  */
 @SuppressWarnings({ "rawtypes" })
-public abstract class PropertyResolver<O extends PropertyObject> implements InjectOnce {
+public interface PropertyResolver<O extends PropertyObject> extends InjectOnce {
 
 	/**
 	 * @param property
 	 * @param field
 	 * @return
 	 */
-	public abstract O getPropertyObject(O propertyObject, Field field);
+	public O getPropertyObject(O propertyObject, Field field);
 
 	/**
 	 * @param property
 	 * @param method
 	 * @return
 	 */
-	public abstract O getPropertyObjectGetter(O propertyObject, Method method);
+	public O getPropertyObjectGetter(O propertyObject, Method method);
 
 	/**
 	 * @param propertyObject
 	 * @param method
 	 * @return
 	 */
-	public abstract O getPropertyObjectSetter(O propertyObject, Method method);
+	public O getPropertyObjectSetter(O propertyObject, Method method);
 
 	/**
 	 * @param propertyObject
 	 * @param propertyInfos
 	 * @return
 	 */
-	public abstract O getPropertyObject(O propertyObject, PropertyInfo[] propertyInfos);
+	public O getPropertyObject(O propertyObject, PropertyInfo[] propertyInfos);
 
 }

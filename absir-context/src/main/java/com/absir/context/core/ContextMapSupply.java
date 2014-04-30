@@ -7,6 +7,7 @@
  */
 package com.absir.context.core;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -27,6 +28,17 @@ public class ContextMapSupply extends PropertySupply<CompareObject, CompareAbstr
 
 	/** compareObject */
 	private CompareObject compareObject = new CompareObject();
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.property.PropertySupply#getIngoreAnnotationClass()
+	 */
+	@Override
+	public Class<? extends Annotation> getIngoreAnnotationClass() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	/*
 	 * (non-Javadoc)

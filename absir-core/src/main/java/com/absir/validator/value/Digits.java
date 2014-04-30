@@ -20,8 +20,4 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Digits {
 
-	/**
-	 * @return
-	 */
-	String message() default "";
 }

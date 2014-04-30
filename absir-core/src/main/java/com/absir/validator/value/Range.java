@@ -20,4 +20,14 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Range {
 
+	/**
+	 * @return
+	 */
+	float min() default 0;
+
+	/**
+	 * @return
+	 */
+	float max() default 65535;
+
 }

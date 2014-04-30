@@ -11,10 +11,13 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
+import com.absir.core.kernel.KernelList;
 import com.absir.core.kernel.KernelString;
 import com.absir.property.value.BeanName;
 import com.absir.property.value.Prop;
@@ -75,8 +78,9 @@ public class PropertyUtils {
 				boolean propertyTree = false;
 				if (propertyHolder == null) {
 					propertyHolder = new PropertyHolder();
+					Class_Map_Property_Holder.put(beanClass, propertyHolder);
 					propertyHolder.holded(propertySupply.getSupplyIndex());
-					propertyMap = new TreeMap<String, Object>();
+					propertyMap = new LinkedHashMap<String, Object>();
 					propertyTree = true;
 
 				} else if (!propertyHolder.holded(propertyIndex)) {
@@ -86,6 +90,14 @@ public class PropertyUtils {
 				if (propertyMap != null) {
 					addPropertyMap(propertyMap, propertyTree, beanClass, propertySupply);
 					propertyHolder.doHolded(propertyIndex, beanClass, propertyMap, propertyTree);
+					if (propertyTree) {
+						List<PropertyContext> propertyContexts = new ArrayList(propertyMap.values());
+						KernelList.sortOrderable(propertyContexts);
+						propertyMap.clear();
+						for (PropertyContext propertyContext : propertyContexts) {
+							propertyMap.put(propertyContext.getName(), propertyContext);
+						}
+					}
 				}
 			}
 		}

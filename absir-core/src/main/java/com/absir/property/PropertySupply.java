@@ -7,6 +7,7 @@
  */
 package com.absir.property;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -44,6 +45,9 @@ public abstract class PropertySupply<O extends PropertyObject<T>, T> {
 	/** propertyResolvers */
 	private PropertyResolver[] propertyResolvers;
 
+	/** ingoreAnnotationClass */
+	protected Class<? extends Annotation> ingoreAnnotationClass;
+
 	/**
 	 * 
 	 */
@@ -60,20 +64,22 @@ public abstract class PropertySupply<O extends PropertyObject<T>, T> {
 	@Inject(type = InjectType.Selectable)
 	public void setPropertyResolvers(PropertyResolver[] propertyResolvers) {
 		List<PropertyResolver> propertyResolveList = new ArrayList<PropertyResolver>();
-		Class<?> objectClass = KernelClass.argumentClass(getClass());
+		Class<?> propertyObjectClass = KernelClass.argumentClass(getClass());
 		for (PropertyResolver propertyResolver : propertyResolvers) {
-			if (objectClass == KernelClass.argumentClass(propertyResolver.getClass())) {
+			if (propertyObjectClass == KernelClass.argumentClass(propertyResolver.getClass())) {
 				propertyResolveList.add(propertyResolver);
 			}
 		}
 
 		if (!propertyResolveList.isEmpty()) {
-			if (!Orderable.class.isAssignableFrom(objectClass)) {
+			if (!Orderable.class.isAssignableFrom(propertyObjectClass)) {
 				KernelList.sortCommonObjects(propertyResolveList);
 			}
 
 			this.propertyResolvers = KernelCollection.toArray(propertyResolveList, PropertyResolver.class);
 		}
+
+		ingoreAnnotationClass = getIngoreAnnotationClass();
 	}
 
 	/**
@@ -82,6 +88,11 @@ public abstract class PropertySupply<O extends PropertyObject<T>, T> {
 	public int getSupplyIndex() {
 		return supplyIndex;
 	}
+
+	/**
+	 * @return
+	 */
+	public abstract Class<? extends Annotation> getIngoreAnnotationClass();
 
 	/**
 	 * @param beanClass
@@ -106,12 +117,12 @@ public abstract class PropertySupply<O extends PropertyObject<T>, T> {
 	 */
 	public O getPropertyObject(O propertyObject, Field field) {
 		if (propertyResolvers != null) {
-			PropertyObject object = propertyObject;
+			PropertyObject propertyObj = propertyObject;
 			for (PropertyResolver propertyResolver : propertyResolvers) {
-				object = propertyResolver.getPropertyObject(object, field);
+				propertyObj = propertyResolver.getPropertyObject(propertyObj, field);
 			}
 
-			propertyObject = (O) object;
+			propertyObject = (O) propertyObj;
 		}
 
 		return propertyObject;
@@ -124,12 +135,18 @@ public abstract class PropertySupply<O extends PropertyObject<T>, T> {
 	 */
 	public O getPropertyObjectGetter(O propertyObject, Method method) {
 		if (propertyResolvers != null) {
-			PropertyObject object = propertyObject;
-			for (PropertyResolver propertyResolver : propertyResolvers) {
-				object = propertyResolver.getPropertyObjectGetter(object, method);
+			PropertyObject propertyObj = propertyObject;
+			if (propertyObj != null && ingoreAnnotationClass != null) {
+				if (method.getAnnotation(ingoreAnnotationClass) != null) {
+					propertyObj = null;
+				}
 			}
 
-			propertyObject = (O) object;
+			for (PropertyResolver propertyResolver : propertyResolvers) {
+				propertyObj = propertyResolver.getPropertyObjectGetter(propertyObj, method);
+			}
+
+			propertyObject = (O) propertyObj;
 		}
 
 		return propertyObject;
@@ -142,12 +159,18 @@ public abstract class PropertySupply<O extends PropertyObject<T>, T> {
 	 */
 	public O getPropertyObjectSetter(O propertyObject, Method method) {
 		if (propertyResolvers != null) {
-			PropertyObject object = propertyObject;
-			for (PropertyResolver propertyResolver : propertyResolvers) {
-				object = propertyResolver.getPropertyObjectSetter(object, method);
+			PropertyObject propertyObj = propertyObject;
+			if (propertyObj != null && ingoreAnnotationClass != null) {
+				if (method.getAnnotation(ingoreAnnotationClass) != null) {
+					propertyObj = null;
+				}
 			}
 
-			propertyObject = (O) object;
+			for (PropertyResolver propertyResolver : propertyResolvers) {
+				propertyObj = propertyResolver.getPropertyObjectSetter(propertyObj, method);
+			}
+
+			propertyObject = (O) propertyObj;
 		}
 
 		return propertyObject;
@@ -160,12 +183,21 @@ public abstract class PropertySupply<O extends PropertyObject<T>, T> {
 	 */
 	public O getPropertyObject(O propertyObject, PropertyInfo[] propertyInfos) {
 		if (propertyResolvers != null) {
-			PropertyObject object = propertyObject;
-			for (PropertyResolver propertyResolver : propertyResolvers) {
-				object = propertyResolver.getPropertyObject(object, propertyInfos);
+			PropertyObject propertyObj = propertyObject;
+			if (propertyObj != null && ingoreAnnotationClass != null) {
+				for (PropertyInfo propertyInfo : propertyInfos) {
+					if (propertyInfo.getClass() == ingoreAnnotationClass) {
+						propertyObj = null;
+						break;
+					}
+				}
 			}
 
-			propertyObject = (O) object;
+			for (PropertyResolver propertyResolver : propertyResolvers) {
+				propertyObj = propertyResolver.getPropertyObject(propertyObj, propertyInfos);
+			}
+
+			propertyObject = (O) propertyObj;
 		}
 
 		return propertyObject;

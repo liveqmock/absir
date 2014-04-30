@@ -7,11 +7,13 @@
  */
 package com.absir.validator;
 
+import java.lang.annotation.Annotation;
 import java.util.List;
 
 import com.absir.bean.basis.Base;
 import com.absir.bean.inject.value.Bean;
 import com.absir.property.PropertySupply;
+import com.absir.validator.value.ValidatorIngore;
 
 /**
  * @author absir
@@ -20,5 +22,16 @@ import com.absir.property.PropertySupply;
 @Base
 @Bean
 public class ValidatorSupply extends PropertySupply<ValidatorObject, List<Validator>> {
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.property.PropertySupply#getIngoreAnnotationClass()
+	 */
+	@Override
+	public Class<? extends Annotation> getIngoreAnnotationClass() {
+		// TODO Auto-generated method stub
+		return ValidatorIngore.class;
+	}
 
 }

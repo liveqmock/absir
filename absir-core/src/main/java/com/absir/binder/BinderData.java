@@ -20,6 +20,7 @@ import com.absir.core.kernel.KernelDyna;
 import com.absir.core.kernel.KernelLang.BreakException;
 import com.absir.property.Property;
 import com.absir.property.PropertyData;
+import com.absir.property.PropertyError;
 import com.absir.validator.Validator;
 import com.absir.validator.ValidatorSupply;
 
@@ -104,7 +105,7 @@ public class BinderData extends DynaBinder {
 	protected <T> T newInstance(Class<T> toClass) {
 		T toObj = super.newInstance(toClass);
 		if (toObj == null) {
-			binderResult.addPropertyError("Fail to instance", toClass);
+			addPropertyError("Fail to instance", toClass);
 		}
 
 		return toObj;
@@ -118,7 +119,7 @@ public class BinderData extends DynaBinder {
 	 */
 	@Override
 	protected <T> T nullTo(Class<T> toClass, Object obj) {
-		binderResult.addPropertyError("Fail to convert", obj);
+		addPropertyError("Fail to convert", obj);
 		return KernelDyna.nullTo(toClass);
 	}
 
@@ -248,7 +249,7 @@ public class BinderData extends DynaBinder {
 
 		} catch (Throwable e) {
 			// TODO: handle exception
-			binderResult.addPropertyError("Fail to convert", value);
+			addPropertyError("Fail to convert", value);
 			return;
 		}
 
@@ -265,7 +266,7 @@ public class BinderData extends DynaBinder {
 				for (Validator validator : validators) {
 					String errorMessage = validator.validateValue(value);
 					if (errorMessage != null) {
-						binderResult.addPropertyError(errorMessage, value);
+						addPropertyError(errorMessage, value);
 						break;
 					}
 				}
@@ -335,5 +336,17 @@ public class BinderData extends DynaBinder {
 	@Override
 	protected void bindMapTo(Object key) {
 		binderResult.setPropertyPath(binderResult.getPropertyPath() + "['" + key + "']");
+	}
+
+	/**
+	 * @param errorMessage
+	 * @param errorObject
+	 */
+	protected void addPropertyError(String errorMessage, Object errorObject) {
+		PropertyError propertyError = new PropertyError();
+		propertyError.setPropertyPath(binderResult.getPropertyPath());
+		propertyError.setErrorMessage(errorMessage);
+		propertyError.setErrorObject(errorObject);
+		binderResult.addPropertyError(propertyError);
 	}
 }

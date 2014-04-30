@@ -21,5 +21,5 @@ public @interface PropertyInfo {
 	/**
 	 * @return
 	 */
-	String valueInfo();
+	String valueInfo() default "";
 }

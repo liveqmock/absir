@@ -7,10 +7,57 @@
  */
 package com.absir.validator;
 
+import com.absir.bean.inject.value.Bean;
+import com.absir.property.PropertyResolverAbstract;
+import com.absir.validator.value.NotEmpty;
+
 /**
  * @author absir
  * 
  */
-public class ValidatorNotEmpty {
+@Bean
+public class ValidatorNotEmpty extends PropertyResolverAbstract<ValidatorObject, NotEmpty> {
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.property.PropertyResolverAbstract#getPropertyObjectAnnotation
+	 * (com.absir.property.PropertyObject, java.lang.annotation.Annotation)
+	 */
+	@Override
+	public ValidatorObject getPropertyObjectAnnotation(ValidatorObject propertyObject, NotEmpty annotation) {
+		// TODO Auto-generated method stub
+		if (propertyObject == null) {
+			propertyObject = new ValidatorObject();
+		}
+
+		propertyObject.addValidator(new Validator() {
+
+			@Override
+			public String validateValue(Object value) {
+				// TODO Auto-generated method stub
+				if (value == null || "".equals(value)) {
+					return "NotEmpty";
+				}
+
+				return null;
+			}
+		});
+
+		return propertyObject;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.property.PropertyResolverAbstract#getPropertyObjectAnnotationValue
+	 * (com.absir.property.PropertyObject, java.lang.String)
+	 */
+	@Override
+	public ValidatorObject getPropertyObjectAnnotationValue(ValidatorObject propertyObject, String annotationValue) {
+		// TODO Auto-generated method stub
+		return getPropertyObjectAnnotation(propertyObject, null);
+	}
 }

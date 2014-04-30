@@ -8,7 +8,6 @@
 package com.absir.binder;
 
 import com.absir.core.kernel.KernelLang.PropertyFilter;
-import com.absir.property.PropertyError;
 import com.absir.property.PropertyErrors;
 
 /**
@@ -109,15 +108,15 @@ public class BinderResult extends PropertyErrors {
 		return propertyFilter.isMatch();
 	}
 
-	/**
-	 * @param errorMessage
-	 * @param errorObject
-	 */
-	public void addPropertyError(String errorMessage, Object errorObject) {
-		PropertyError propertyError = new PropertyError();
-		propertyError.setPropertyPath(getPropertyPath());
-		propertyError.setErrorMessage(errorMessage);
-		propertyError.setErrorObject(errorObject);
-		addPropertyError(propertyError);
-	}
+	// /**
+	// * @param errorMessage
+	// * @param errorObject
+	// */
+	// public void addPropertyError(String errorMessage, Object errorObject) {
+	// PropertyError propertyError = new PropertyError();
+	// propertyError.setPropertyPath(getPropertyPath());
+	// propertyError.setErrorMessage(errorMessage);
+	// propertyError.setErrorObject(errorObject);
+	// addPropertyError(propertyError);
+	// }
 }

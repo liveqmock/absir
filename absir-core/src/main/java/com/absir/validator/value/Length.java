@@ -28,5 +28,5 @@ public @interface Length {
 	/**
 	 * @return
 	 */
-	int max() default 0;
+	int max() default 65535;
 }

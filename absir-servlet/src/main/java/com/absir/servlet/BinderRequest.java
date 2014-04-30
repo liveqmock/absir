@@ -28,6 +28,9 @@ import com.absir.property.PropertyError;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class BinderRequest extends BinderData {
 
+	/** parameterPath */
+	private String parameterPath;
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -125,7 +128,10 @@ public class BinderRequest extends BinderData {
 					propertyErrors.remove(size - 1);
 				}
 
-				return super.bindArray(StringUtils.split(params[0], ','), name, toClass, toType);
+				parameterPath = getBinderResult().getPropertyPath();
+				T returnValue = super.bindArray(StringUtils.split(params[0], ','), name, toClass, toType);
+				parameterPath = null;
+				return returnValue;
 			}
 		}
 
@@ -174,10 +180,29 @@ public class BinderRequest extends BinderData {
 					propertyErrors.remove(size - 1);
 				}
 
-				return super.bindCollection(StringUtils.split(params[0], ','), name, toClass, toType, toObject);
+				parameterPath = getBinderResult().getPropertyPath();
+				T returnValue = super.bindCollection(StringUtils.split(params[0], ','), name, toClass, toType, toObject);
+				parameterPath = null;
+				return returnValue;
 			}
 		}
 
 		return super.bindCollection(obj, name, toClass, toType, toObject);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.binder.BinderData#addPropertyError(java.lang.String,
+	 * java.lang.Object)
+	 */
+	@Override
+	protected void addPropertyError(String errorMessage, Object errorObject) {
+		if (parameterPath == null) {
+			super.addPropertyError(errorMessage, errorObject);
+
+		} else {
+			getBinderResult().rejectValue(parameterPath, errorMessage, errorObject);
+		}
 	}
 }

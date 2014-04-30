@@ -42,11 +42,7 @@ public class TransactionStatus {
 	 * @param transactionAttribute
 	 */
 	public void open(String transactionName, TransactionAttribute transactionAttribute) {
-		if (transactionName == null) {
-			return;
-		}
-
-		if ("".equals(transactionName)) {
+		if (transactionName == null || "".equals(transactionName)) {
 			if (!transactionOpened) {
 				this.transactionAttribute = transactionAttribute;
 				TransactionUtils.get().getTransactionContext().add(transactionAttribute);

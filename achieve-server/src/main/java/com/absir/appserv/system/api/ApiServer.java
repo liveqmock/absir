@@ -103,15 +103,17 @@ public abstract class ApiServer {
 	 * @author absir
 	 * 
 	 */
-	public static class Route extends TransactionIntercepter {
+	public static class Route implements Interceptor {
 
-		/**
-		 * @param iterator
-		 * @param input
-		 * @return
-		 * @throws Throwable
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see com.absir.server.in.Interceptor#intercept(java.util.Iterator,
+		 * com.absir.server.in.Input)
 		 */
-		public OnPut interceptImpl(Iterator<Interceptor> iterator, Input input) throws Throwable {
+		@Override
+		public OnPut intercept(Iterator<Interceptor> iterator, Input input) throws Throwable {
+			// TODO Auto-generated method stub
 			SecurityContext securityContext = SecurityService.ME.autoLogin("api", true, -1, input);
 			if (securityContext == null && input instanceof InputRequest) {
 				InputRequest inputRequest = (InputRequest) input;
@@ -137,5 +139,13 @@ public abstract class ApiServer {
 		protected JiUserBase getInputUserBase(InputRequest inputRequest) {
 			return IdentityServiceLocal.getUserBase(inputRequest.getRequest().getHeader("identity"));
 		}
+	}
+
+	/**
+	 * @author absir
+	 * 
+	 */
+	public static class TransactionRoute extends TransactionIntercepter {
+
 	}
 }

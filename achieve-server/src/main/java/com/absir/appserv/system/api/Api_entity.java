@@ -39,6 +39,7 @@ import com.absir.server.exception.ServerException;
 import com.absir.server.exception.ServerStatus;
 import com.absir.server.in.InMethod;
 import com.absir.server.in.Input;
+import com.absir.server.value.Interceptors;
 import com.absir.server.value.Mapping;
 import com.absir.server.value.Nullable;
 import com.absir.server.value.Param;
@@ -49,6 +50,7 @@ import com.absir.server.value.Server;
  * 
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
+@Interceptors(ApiServer.TransactionRoute.class)
 @Server
 public class Api_entity extends ApiServer {
 

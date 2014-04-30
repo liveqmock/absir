@@ -38,6 +38,10 @@ public class TransactionIntercepter implements Interceptor {
 	 * @param transactionAttribute
 	 */
 	public static void open(Input input, String transactionName, TransactionAttribute transactionAttribute) {
+		if (transactionName == null) {
+			return;
+		}
+
 		Object status = input.getAttribute(TRANSACTION_STATUS_NAME);
 		if (status != null) {
 			TransactionStatus transactionStatus = null;

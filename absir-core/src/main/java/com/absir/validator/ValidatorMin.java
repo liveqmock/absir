@@ -40,6 +40,12 @@ public class ValidatorMin extends PropertyResolverAbstract<ValidatorObject, Min>
 
 				return null;
 			}
+
+			@Override
+			public Object[] getValidateParameters() {
+				// TODO Auto-generated method stub
+				return new Object[] { min };
+			}
 		});
 
 		return propertyObject;

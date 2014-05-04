@@ -40,6 +40,12 @@ public class ValidatorMax extends PropertyResolverAbstract<ValidatorObject, Max>
 
 				return null;
 			}
+
+			@Override
+			public Object[] getValidateParameters() {
+				// TODO Auto-generated method stub
+				return new Object[] { max };
+			}
 		});
 
 		return propertyObject;

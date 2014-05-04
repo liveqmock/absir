@@ -61,11 +61,16 @@ public class HelperLang {
 	 */
 	public static String getFieldCaption(Field field, Class<?> cls) {
 		JaLang jaLang = field.getAnnotation(JaLang.class);
-		if (jaLang == null) {
-			return field.getName();
-		}
+		return getFieldCaption(jaLang == null ? field.getName() : jaLang.value(), cls);
+	}
 
-		return jaLang.value();
+	/**
+	 * @param lang
+	 * @param cls
+	 * @return
+	 */
+	public static String getFieldCaption(String lang, Class<?> cls) {
+		return lang;
 	}
 
 	/**

@@ -44,6 +44,13 @@ public class ValidatorDigits extends PropertyResolverAbstract<ValidatorObject, D
 
 				return null;
 			}
+
+			@Override
+			public Object[] getValidateParameters() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
 		});
 
 		return propertyObject;

@@ -19,4 +19,9 @@ public interface Validator {
 	 */
 	public String validateValue(Object value);
 
+	/**
+	 * @return
+	 */
+	public Object[] getValidateParameters();
+
 }

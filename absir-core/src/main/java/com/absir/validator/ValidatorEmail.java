@@ -48,6 +48,12 @@ public class ValidatorEmail extends PropertyResolverAbstract<ValidatorObject, Em
 
 				return null;
 			}
+
+			@Override
+			public Object[] getValidateParameters() {
+				// TODO Auto-generated method stub
+				return null;
+			}
 		});
 
 		return propertyObject;

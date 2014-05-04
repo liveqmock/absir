@@ -42,6 +42,12 @@ public class ValidatorLength extends PropertyResolverAbstract<ValidatorObject, L
 
 				return null;
 			}
+
+			@Override
+			public Object[] getValidateParameters() {
+				// TODO Auto-generated method stub
+				return new Object[] { min, max };
+			}
 		});
 
 		return propertyObject;

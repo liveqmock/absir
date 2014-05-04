@@ -39,12 +39,11 @@ public class CompareObject implements PropertyObject<CompareAbstract> {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * com.absir.property.PropertyObject#getPropertyData(com.absir.property.
-	 * Property)
+	 * @see com.absir.property.PropertyObject#getPropertyData(java.lang.String,
+	 * com.absir.property.Property)
 	 */
 	@Override
-	public CompareAbstract getPropertyData(Property property) {
+	public CompareAbstract getPropertyData(String name, Property property) {
 		// TODO Auto-generated method stub
 		if (property.getAllow() < 0) {
 			return null;

@@ -462,7 +462,7 @@ public class EntityField extends DBField {
 		} else {
 			EntityModel entityModel = ModelFactory.getModelEntity(new JoEntity(null, field.getType()));
 			for (IField iField : entityModel.getFields()) {
-				iFieldScope.add(new EmbeddField(iField, getName(), getOrder()));
+				iFieldScope.add(new EmbeddField(iField, getName()));
 			}
 		}
 	}

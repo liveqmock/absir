@@ -37,9 +37,6 @@ public class DBField implements IField {
 	/** caption */
 	protected String caption;
 
-	/** order */
-	protected int order;
-
 	/** groups */
 	protected String[] groups;
 
@@ -131,13 +128,6 @@ public class DBField implements IField {
 	 */
 	public String getCaption() {
 		return caption;
-	}
-
-	/**
-	 * @return the order
-	 */
-	public int getOrder() {
-		return order;
 	}
 
 	/**

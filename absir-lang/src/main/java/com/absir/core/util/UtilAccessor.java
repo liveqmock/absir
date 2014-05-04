@@ -7,6 +7,7 @@
  */
 package com.absir.core.util;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -26,42 +27,62 @@ public class UtilAccessor {
 	 * @author absir
 	 * 
 	 */
-	public static interface Accessor {
+	public static abstract class Accessor {
 
 		/**
 		 * @param obj
 		 * @return
 		 */
-		public Object get(Object obj);
+		public abstract Object get(Object obj);
 
 		/**
 		 * @param obj
 		 * @param value
 		 * @return
 		 */
-		public boolean set(Object obj, Object value);
+		public abstract boolean set(Object obj, Object value);
 
 		/**
 		 * @return
 		 */
-		public Field getField();
+		public abstract Field getField();
 
 		/**
 		 * @return
 		 */
-		public Method getGetter();
+		public abstract Method getGetter();
 
 		/**
 		 * @return
 		 */
-		public Method getSetter();
+		public abstract Method getSetter();
+
+		/**
+		 * @param annotationClass
+		 * @param getter
+		 * @return
+		 */
+		public <T extends Annotation> T getAnnotation(Class<T> annotationClass, boolean getter) {
+			Method method = getter ? getGetter() : getSetter();
+			T annotation = method == null ? null : method.getAnnotation(annotationClass);
+			if (annotation == null) {
+				Field field = getField();
+				annotation = field == null ? null : field.getAnnotation(annotationClass);
+				if (annotation == null) {
+					method = getter ? getSetter() : getGetter();
+					annotation = method == null ? null : method.getAnnotation(annotationClass);
+				}
+			}
+
+			return annotation;
+		}
 	}
 
 	/**
 	 * @author absir
 	 * 
 	 */
-	public static abstract class AccessorWrapper implements Accessor {
+	public static abstract class AccessorWrapper extends Accessor {
 
 		/** accessor */
 		private Accessor accessor;

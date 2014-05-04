@@ -88,11 +88,12 @@ public class PropertyContext implements Orderable {
 	}
 
 	/**
+	 * @param name
 	 * @param property
 	 * @return
 	 */
-	public Object getPropertyData(Property property) {
-		return propertyObject == null ? null : propertyObject.getPropertyData(property);
+	public Object getPropertyData(String name, Property property) {
+		return propertyObject == null ? null : propertyObject.getPropertyData(name, property);
 	}
 
 	/**

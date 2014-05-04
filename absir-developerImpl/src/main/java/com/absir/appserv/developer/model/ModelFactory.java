@@ -32,7 +32,6 @@ import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.core.kernel.KernelClass;
 import com.absir.core.kernel.KernelLang.BreakException;
 import com.absir.core.kernel.KernelLang.CallbackBreak;
-import com.absir.core.kernel.KernelList;
 import com.absir.core.kernel.KernelReflect;
 import com.absir.orm.hibernate.SessionFactoryUtils;
 import com.absir.orm.value.JoEntity;
@@ -206,7 +205,7 @@ public class ModelFactory {
 		});
 
 		entityModel.addGroupField(JaEdit.GROUP_LIST, entityModel.getPrimary());
-		KernelList.sortOrderable(iFieldList);
+		// KernelList.sortOrderable(iFieldList);
 		for (IField iField : iFieldList) {
 			entityModel.addField(iField);
 			if (iField.getGroups() == null) {

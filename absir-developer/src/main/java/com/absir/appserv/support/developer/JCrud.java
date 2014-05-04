@@ -10,9 +10,9 @@ package com.absir.appserv.support.developer;
 import java.io.Serializable;
 
 import com.absir.appserv.system.bean.value.JaCrud;
-import com.absir.core.kernel.KernelArray;
-import com.absir.core.kernel.KernelReflect;
-import com.absir.core.util.UtilAnnotation;
+import com.absir.core.dyna.DynaBinder;
+import com.absir.core.kernel.KernelClass;
+import com.absir.core.kernel.KernelString;
 
 /**
  * @author absir
@@ -33,24 +33,49 @@ public class JCrud implements Serializable {
 	/** cruds */
 	protected JaCrud.Crud[] cruds;
 
-	/** jaCrud */
-	@JaCrud
-	private static JaCrud jaCrud = KernelReflect.declaredField(JCrud.class, "jaCrud").getAnnotation(JaCrud.class);
-
-	/**
-	 * 
-	 */
-	public JCrud() {
-		this(jaCrud);
-	}
-
 	/**
 	 * @param crud
 	 */
-	public JCrud(JaCrud crud) {
-		UtilAnnotation.copy(crud, this);
-		parameters = new Object[crud.parameters().length];
-		KernelArray.copy(crud.parameters(), parameters);
+	public void setJaCrud(JaCrud crud) {
+		if (crud != null) {
+			value = crud.value();
+			factory = crud.factory();
+			parameters = DynaBinder.to(crud.parameters(), Object[].class);
+			cruds = crud.cruds();
+		}
+	}
+
+	/**
+	 * @param crudValue
+	 */
+	public void setJaCrudValue(String crudValue) {
+		if (!KernelString.isEmpty(crudValue)) {
+			String[] params = crudValue.split(",");
+			int length = params.length;
+			if (length == 1) {
+				value = params[0];
+
+			} else if (length == 2) {
+				value = params[0];
+				factory = KernelClass.forName(params[1]);
+
+			} else if (length > 2) {
+				value = params[0];
+				factory = KernelClass.forName(params[1]);
+				length -= 2;
+				parameters = new Object[length];
+				for (int i = 0; i < length; i++) {
+					parameters[i] = params[i + 2];
+				}
+			}
+		}
+	}
+
+	/**
+	 * @return the value
+	 */
+	public String getValue() {
+		return value;
 	}
 
 	/**
@@ -68,17 +93,9 @@ public class JCrud implements Serializable {
 	}
 
 	/**
-	 * @return the value
-	 */
-	public String getValue() {
-		return value;
-	}
-
-	/**
 	 * @return the cruds
 	 */
 	public JaCrud.Crud[] getCruds() {
 		return cruds;
 	}
-
 }

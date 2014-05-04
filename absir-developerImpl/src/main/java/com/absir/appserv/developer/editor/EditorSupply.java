@@ -10,7 +10,6 @@ package com.absir.appserv.developer.editor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
-import com.absir.appserv.support.developer.IField;
 import com.absir.appserv.system.bean.value.JaIngore;
 import com.absir.bean.inject.value.Bean;
 import com.absir.property.PropertySupply;
@@ -20,7 +19,7 @@ import com.absir.property.PropertySupply;
  * 
  */
 @Bean
-public class EditorSupply extends PropertySupply<EditorObject, IField> {
+class EditorSupply extends PropertySupply<EditorObject, EntityField> {
 
 	/*
 	 * (non-Javadoc)

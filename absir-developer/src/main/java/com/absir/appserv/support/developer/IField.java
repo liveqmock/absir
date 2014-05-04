@@ -11,13 +11,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.absir.appserv.system.bean.value.JeEditable;
-import com.absir.core.kernel.KernelList.Orderable;
 
 /**
  * @author absir
  * 
  */
-public interface IField extends Orderable {
+public interface IField {
 
 	/**
 	 * @return
@@ -53,11 +52,6 @@ public interface IField extends Orderable {
 	 * @return
 	 */
 	public String getCaption();
-
-	/**
-	 * @return
-	 */
-	public int getOrder();
 
 	/**
 	 * @return

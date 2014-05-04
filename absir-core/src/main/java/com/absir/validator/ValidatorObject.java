@@ -26,12 +26,11 @@ public class ValidatorObject implements PropertyObject<List<Validator>> {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * com.absir.property.PropertyObject#getPropertyData(com.absir.property.
-	 * Property)
+	 * @see com.absir.property.PropertyObject#getPropertyData(java.lang.String,
+	 * com.absir.property.Property)
 	 */
 	@Override
-	public List<Validator> getPropertyData(Property property) {
+	public List<Validator> getPropertyData(String name, Property property) {
 		// TODO Auto-generated method stub
 		if (validators != null) {
 			if (validators.isEmpty()) {

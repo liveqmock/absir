@@ -14,7 +14,9 @@ package com.absir.property;
 public interface PropertyObject<T> {
 
 	/**
+	 * @param name
+	 * @param property
 	 * @return
 	 */
-	public T getPropertyData(Property property);
+	public T getPropertyData(String name, Property property);
 }

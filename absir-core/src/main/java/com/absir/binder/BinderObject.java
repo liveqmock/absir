@@ -36,12 +36,11 @@ public class BinderObject implements PropertyObject<Binder> {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * com.absir.property.PropertyObject#getPropertyData(com.absir.property.
-	 * Property)
+	 * @see com.absir.property.PropertyObject#getPropertyData(java.lang.String,
+	 * com.absir.property.Property)
 	 */
 	@Override
-	public Binder getPropertyData(Property property) {
+	public Binder getPropertyData(String name, Property property) {
 		// TODO Auto-generated method stub
 		return binder;
 	}

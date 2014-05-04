@@ -36,13 +36,6 @@ public @interface JaEdit {
 	public static final String EDIT_SUBTABLE = "subtable";
 
 	/**
-	 * 字段默认排序
-	 * 
-	 * @return
-	 */
-	int order() default 0;
-
-	/**
 	 * 是否支持编辑
 	 * 
 	 * @return

@@ -26,18 +26,14 @@ public class EmbeddField implements IField {
 	/** name */
 	private String name;
 
-	/** order */
-	private int order;
-
 	/**
 	 * @param field
 	 * @param name
 	 * @param order
 	 */
-	public EmbeddField(IField field, String name, int order) {
+	public EmbeddField(IField field, String name) {
 		this.field = field;
 		this.name = name + "." + field.getName();
-		this.order = order + field.getOrder();
 	}
 
 	/*
@@ -115,17 +111,6 @@ public class EmbeddField implements IField {
 	public String getCaption() {
 		// TODO Auto-generated method stub
 		return field.getCaption();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.absir.appserv.support.developer.IField#getOrder()
-	 */
-	@Override
-	public int getOrder() {
-		// TODO Auto-generated method stub
-		return order;
 	}
 
 	/*

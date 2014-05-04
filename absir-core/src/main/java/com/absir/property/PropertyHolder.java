@@ -79,10 +79,10 @@ public class PropertyHolder {
 				if (propertyData != null) {
 					Property property = entry.getValue().getProperty();
 					if (propertyTree) {
-						propertyData = ((PropertyContext) propertyData).getPropertyData(property);
+						propertyData = ((PropertyContext) propertyData).getPropertyData(entry.getKey(), property);
 
 					} else {
-						propertyData = ((PropertyObject) propertyData).getPropertyData(property);
+						propertyData = ((PropertyObject) propertyData).getPropertyData(entry.getKey(), property);
 					}
 				}
 

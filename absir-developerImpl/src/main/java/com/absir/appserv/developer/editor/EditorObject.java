@@ -10,7 +10,6 @@ package com.absir.appserv.developer.editor;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.absir.appserv.support.developer.IField;
 import com.absir.appserv.system.bean.value.JaCrud;
 import com.absir.appserv.system.bean.value.JaEdit;
 import com.absir.property.Property;
@@ -20,10 +19,13 @@ import com.absir.property.PropertyObject;
  * @author absir
  * 
  */
-public class EditorObject implements PropertyObject<IField> {
+public class EditorObject implements PropertyObject<EntityField> {
 
 	/** generated */
 	private boolean generated;
+
+	/** embedd */
+	private boolean embedd;
 
 	/** lang */
 	private String lang;
@@ -65,6 +67,21 @@ public class EditorObject implements PropertyObject<IField> {
 	 */
 	public void setGenerated(boolean generated) {
 		this.generated = generated;
+	}
+
+	/**
+	 * @return the embedd
+	 */
+	public boolean isEmbedd() {
+		return embedd;
+	}
+
+	/**
+	 * @param embedd
+	 *            the embedd to set
+	 */
+	public void setEmbedd(boolean embedd) {
+		this.embedd = embedd;
 	}
 
 	/**
@@ -224,17 +241,16 @@ public class EditorObject implements PropertyObject<IField> {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * com.absir.property.PropertyObject#getPropertyData(com.absir.property.
-	 * Property)
+	 * @see com.absir.property.PropertyObject#getPropertyData(java.lang.String,
+	 * com.absir.property.Property)
 	 */
 	@Override
-	public IField getPropertyData(Property property) {
+	public EntityField getPropertyData(String name, Property property) {
 		// TODO Auto-generated method stub
 		if (property.getAllow() < 0) {
 			return null;
 		}
 
-		return null;
+		return new EntityField(name, property, this);
 	}
 }

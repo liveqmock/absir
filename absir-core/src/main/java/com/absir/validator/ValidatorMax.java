@@ -7,6 +7,8 @@
  */
 package com.absir.validator;
 
+import java.util.Map;
+
 import com.absir.bean.inject.value.Bean;
 import com.absir.core.dyna.DynaBinder;
 import com.absir.property.PropertyResolverAbstract;
@@ -42,9 +44,13 @@ public class ValidatorMax extends PropertyResolverAbstract<ValidatorObject, Max>
 			}
 
 			@Override
-			public Object[] getValidateParameters() {
+			public String getValidateClass(Map<String, Object> validatorMap) {
 				// TODO Auto-generated method stub
-				return new Object[] { max };
+				if (max < Integer.MAX_VALUE) {
+					validatorMap.put("max", max);
+				}
+
+				return null;
 			}
 		});
 

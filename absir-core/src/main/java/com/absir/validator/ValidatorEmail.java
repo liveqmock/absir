@@ -7,6 +7,7 @@
  */
 package com.absir.validator;
 
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import com.absir.bean.inject.value.Bean;
@@ -50,9 +51,9 @@ public class ValidatorEmail extends PropertyResolverAbstract<ValidatorObject, Em
 			}
 
 			@Override
-			public Object[] getValidateParameters() {
+			public String getValidateClass(Map<String, Object> validatorMap) {
 				// TODO Auto-generated method stub
-				return null;
+				return "email";
 			}
 		});
 

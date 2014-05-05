@@ -34,6 +34,20 @@ public class JCrud implements Serializable {
 	protected JaCrud.Crud[] cruds;
 
 	/**
+	 * 
+	 */
+	public JCrud() {
+
+	}
+
+	/**
+	 * @param crud
+	 */
+	public JCrud(JaCrud crud) {
+		setJaCrud(crud);
+	}
+
+	/**
 	 * @param crud
 	 */
 	public void setJaCrud(JaCrud crud) {

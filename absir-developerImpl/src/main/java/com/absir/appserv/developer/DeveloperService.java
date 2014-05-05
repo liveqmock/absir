@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
-import com.absir.appserv.developer.model.EmbeddField;
 import com.absir.appserv.developer.model.EntityModel;
 import com.absir.appserv.developer.model.ModelFactory;
 import com.absir.appserv.support.Developer;
@@ -115,7 +114,7 @@ public class DeveloperService implements IDeveloper {
 
 		List<JCrudField> crudFields = new ArrayList<JCrudField>();
 		for (IField field : entityModel.getFields()) {
-			if (!(field instanceof EmbeddField) && (field.getCrudField().getjCrud() != null || field.getCrudField().getCruds() != null)) {
+			if (field.getName().indexOf(".") < 0 && (field.getCrudField().getjCrud() != null || field.getCrudField().getCruds() != null)) {
 				crudFields.add(field.getCrudField());
 			}
 		}

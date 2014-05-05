@@ -34,7 +34,7 @@ public class JoEntity implements Serializable {
 	 */
 	public JoEntity(String entityName, Class<?> entityClass) {
 		if (entityName == null) {
-			entityName = SessionFactoryUtils.getJpaEntityName(entityClass);
+			entityName = SessionFactoryUtils.getEntityNameNull(entityClass);
 
 		} else if (entityClass == null) {
 			entityName = SessionFactoryUtils.getJpaEntityName(entityName);

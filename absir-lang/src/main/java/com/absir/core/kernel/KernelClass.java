@@ -879,14 +879,14 @@ public abstract class KernelClass {
 	public static Method declaredGetter(Class cls, String field, Class fieldType, boolean declared) {
 		field = KernelString.uncapitalize(field);
 		boolean is = fieldType != null && (fieldType == boolean.class || fieldType == Boolean.class);
-		Method method = KernelReflect.declaredMethod(cls, (is ? "is" : "get") + field, 0, declared);
+		Method method = KernelReflect.assignableMethod(cls, fieldType, (is ? "is" : "get") + field, 0, declared, true, true);
 		if (method == null || (fieldType != null && !fieldType.isAssignableFrom(method.getReturnType()))) {
 			if (fieldType == null) {
-				method = KernelReflect.method(cls, "is" + field);
+				method = KernelReflect.assignableMethod(cls, fieldType, "is" + field, 0, declared, true, true);
 
 			} else {
 				if (is) {
-					method = KernelReflect.method(cls, "get" + field);
+					method = KernelReflect.assignableMethod(cls, fieldType, "get" + field, 0, declared, true, true);
 				}
 			}
 

@@ -71,12 +71,18 @@ public class Property {
 		}
 
 		if (allow > -2) {
-			if (accessor.getSetter() != null) {
+			if (accessor.getSetter() == null) {
+				if (accessor.getGetter() != null) {
+					type = accessor.getGetter().getReturnType();
+				}
+
+			} else {
 				type = accessor.getSetter().getParameterTypes()[0];
-				if (field != null) {
-					if (type.isAssignableFrom(field.getType())) {
-						type = null;
-					}
+			}
+
+			if (field != null) {
+				if (type.isAssignableFrom(field.getType())) {
+					type = field.getType();
 				}
 			}
 

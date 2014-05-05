@@ -28,5 +28,5 @@ public @interface Length {
 	/**
 	 * @return
 	 */
-	int max() default 65535;
+	int max() default Integer.MAX_VALUE;
 }

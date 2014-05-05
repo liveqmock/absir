@@ -472,7 +472,21 @@ public abstract class KernelReflect {
 	 * @param parameterTypes
 	 * @return
 	 */
-	public static Method assignableMethod(Class cls, final String name, int ancest, boolean declared, boolean assignable, boolean cacheable, final Class... parameterTypes) {
+	public static Method assignableMethod(Class cls, String name, int ancest, boolean declared, boolean assignable, boolean cacheable, Class... parameterTypes) {
+		return assignableMethod(cls, null, name, ancest, declared, assignable, cacheable, parameterTypes);
+	}
+
+	/**
+	 * @param cls
+	 * @param name
+	 * @param ancest
+	 * @param declared
+	 * @param assignable
+	 * @param cacheable
+	 * @param parameterTypes
+	 * @return
+	 */
+	public static Method assignableMethod(Class cls, final Class returnType, final String name, int ancest, boolean declared, boolean assignable, boolean cacheable, final Class... parameterTypes) {
 		String class_method_key = null;
 		if (cacheable) {
 			class_method_key = cls.getName() + ":" + name + ":" + parameterTypes.length;
@@ -484,7 +498,7 @@ public abstract class KernelReflect {
 
 		Method method = null;
 		while (cls != null) {
-			if (assignable && parameterTypes.length > 0) {
+			if (assignable && (returnType != null || parameterTypes.length > 0)) {
 				final List<Method> matchMethods = new ArrayList<Method>();
 				CallbackBreak<Method> callback = new CallbackBreak<Method>() {
 
@@ -492,13 +506,15 @@ public abstract class KernelReflect {
 					public void doWith(Method template) throws BreakException {
 						// TODO Auto-generated method stub
 						if (template.getName().equals(name) && KernelClass.isMatchableFrom(template.getParameterTypes(), parameterTypes)) {
-							for (Method method : matchMethods) {
-								if (KernelArray.equal(method.getParameterTypes(), template.getParameterTypes())) {
-									return;
-								}
+							// for (Method method : matchMethods) {
+							// if (KernelArray.equal(method.getParameterTypes(),
+							// template.getParameterTypes())) {
+							// return;
+							// }
+							// }
+							if (returnType == null || returnType.isAssignableFrom(template.getReturnType())) {
+								matchMethods.add(template);
 							}
-
-							matchMethods.add(template);
 						}
 					}
 
@@ -520,6 +536,10 @@ public abstract class KernelReflect {
 						int similar = -2;
 						for (Method match : matchMethods) {
 							int sim = KernelClass.similar(match.getParameterTypes(), parameterTypes);
+							if (returnType != null) {
+								sim += KernelClass.similar(returnType, match.getReturnType());
+							}
+
 							if (similar < sim) {
 								similar = sim;
 								method = match;

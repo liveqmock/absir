@@ -7,6 +7,8 @@
  */
 package com.absir.validator;
 
+import java.util.Map;
+
 import com.absir.bean.inject.value.Bean;
 import com.absir.core.kernel.KernelDyna;
 import com.absir.property.PropertyResolverAbstract;
@@ -46,9 +48,9 @@ public class ValidatorDigits extends PropertyResolverAbstract<ValidatorObject, D
 			}
 
 			@Override
-			public Object[] getValidateParameters() {
+			public String getValidateClass(Map<String, Object> validatorMap) {
 				// TODO Auto-generated method stub
-				return null;
+				return "digits";
 			}
 
 		});

@@ -19,7 +19,7 @@ import com.absir.property.PropertySupply;
  * 
  */
 @Bean
-class EditorSupply extends PropertySupply<EditorObject, EntityField> {
+public class EditorSupply extends PropertySupply<EditorObject, EditorObject> {
 
 	/*
 	 * (non-Javadoc)

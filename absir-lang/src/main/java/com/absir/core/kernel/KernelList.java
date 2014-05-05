@@ -50,6 +50,20 @@ public abstract class KernelList {
 	}
 
 	/**
+	 * @param list
+	 * @param element
+	 */
+	public static <T> void addOnly(List<T> list, T element) {
+		for (T el : list) {
+			if (el == element) {
+				return;
+			}
+		}
+
+		list.add(element);
+	}
+
+	/**
 	 * @author absir
 	 * 
 	 */

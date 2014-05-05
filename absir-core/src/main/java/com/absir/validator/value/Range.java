@@ -23,11 +23,11 @@ public @interface Range {
 	/**
 	 * @return
 	 */
-	float min() default 0;
+	float min() default Integer.MIN_VALUE;
 
 	/**
 	 * @return
 	 */
-	float max() default 65535;
+	float max() default Integer.MAX_VALUE;
 
 }

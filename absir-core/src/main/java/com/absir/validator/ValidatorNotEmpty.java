@@ -7,6 +7,8 @@
  */
 package com.absir.validator;
 
+import java.util.Map;
+
 import com.absir.bean.inject.value.Bean;
 import com.absir.property.PropertyResolverAbstract;
 import com.absir.validator.value.NotEmpty;
@@ -38,17 +40,18 @@ public class ValidatorNotEmpty extends PropertyResolverAbstract<ValidatorObject,
 			public String validateValue(Object value) {
 				// TODO Auto-generated method stub
 				if (value == null || "".equals(value)) {
-					return "NotEmpty";
+					return "Required";
 				}
 
 				return null;
 			}
 
 			@Override
-			public Object[] getValidateParameters() {
+			public String getValidateClass(Map<String, Object> validatorMap) {
 				// TODO Auto-generated method stub
-				return null;
+				return "required";
 			}
+
 		});
 
 		return propertyObject;

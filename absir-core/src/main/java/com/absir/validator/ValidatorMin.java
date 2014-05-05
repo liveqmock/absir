@@ -7,6 +7,8 @@
  */
 package com.absir.validator;
 
+import java.util.Map;
+
 import com.absir.bean.inject.value.Bean;
 import com.absir.core.dyna.DynaBinder;
 import com.absir.property.PropertyResolverAbstract;
@@ -42,9 +44,13 @@ public class ValidatorMin extends PropertyResolverAbstract<ValidatorObject, Min>
 			}
 
 			@Override
-			public Object[] getValidateParameters() {
+			public String getValidateClass(Map<String, Object> validatorMap) {
 				// TODO Auto-generated method stub
-				return new Object[] { min };
+				if (min > Integer.MIN_VALUE) {
+					validatorMap.put("min", min);
+				}
+
+				return null;
 			}
 		});
 

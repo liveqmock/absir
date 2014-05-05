@@ -7,6 +7,8 @@
  */
 package com.absir.validator;
 
+import java.util.Map;
+
 /**
  * @author absir
  * 
@@ -20,8 +22,9 @@ public interface Validator {
 	public String validateValue(Object value);
 
 	/**
+	 * @param validatorMap
 	 * @return
 	 */
-	public Object[] getValidateParameters();
+	public String getValidateClass(Map<String, Object> validatorMap);
 
 }

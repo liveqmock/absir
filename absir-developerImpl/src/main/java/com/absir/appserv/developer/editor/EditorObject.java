@@ -19,7 +19,7 @@ import com.absir.property.PropertyObject;
  * @author absir
  * 
  */
-public class EditorObject implements PropertyObject<EntityField> {
+public class EditorObject implements PropertyObject<EditorObject> {
 
 	/** generated */
 	private boolean generated;
@@ -245,12 +245,12 @@ public class EditorObject implements PropertyObject<EntityField> {
 	 * com.absir.property.Property)
 	 */
 	@Override
-	public EntityField getPropertyData(String name, Property property) {
+	public EditorObject getPropertyData(String name, Property property) {
 		// TODO Auto-generated method stub
 		if (property.getAllow() < 0) {
 			return null;
 		}
 
-		return new EntityField(name, property, this);
+		return this;
 	}
 }

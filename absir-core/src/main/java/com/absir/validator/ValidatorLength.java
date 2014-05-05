@@ -7,6 +7,8 @@
  */
 package com.absir.validator;
 
+import java.util.Map;
+
 import com.absir.bean.inject.value.Bean;
 import com.absir.core.dyna.DynaBinder;
 import com.absir.property.PropertyResolverAbstract;
@@ -44,9 +46,17 @@ public class ValidatorLength extends PropertyResolverAbstract<ValidatorObject, L
 			}
 
 			@Override
-			public Object[] getValidateParameters() {
+			public String getValidateClass(Map<String, Object> validatorMap) {
 				// TODO Auto-generated method stub
-				return new Object[] { min, max };
+				if (min > 0) {
+					validatorMap.put("minlength", min);
+				}
+
+				if (max < Integer.MAX_VALUE) {
+					validatorMap.put("maxlength", max);
+				}
+
+				return null;
 			}
 		});
 

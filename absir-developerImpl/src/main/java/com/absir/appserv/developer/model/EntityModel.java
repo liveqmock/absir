@@ -19,6 +19,7 @@ import com.absir.appserv.support.developer.IModel;
 import com.absir.appserv.support.developer.JCrud;
 import com.absir.appserv.system.bean.value.JaCrud;
 import com.absir.appserv.system.bean.value.JaEdit;
+import com.absir.core.kernel.KernelList;
 import com.absir.orm.value.JoEntity;
 
 /**
@@ -264,7 +265,7 @@ public class EntityModel implements IModel {
 		}
 
 		if (field != null) {
-			// KernelList.addOrderOnly(fields, field);
+			KernelList.addOnly(fields, field);
 		}
 
 		if (reference) {

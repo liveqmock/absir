@@ -1,390 +1,238 @@
 /**
- * Copyright 2013 ABSir's Studio
+ * Copyright 2014 ABSir's Studio
  * 
  * All right reserved
  *
- * Create on 2013-4-3 下午5:18:30
+ * Create on 2014-5-4 上午10:20:38
  */
 package com.absir.appserv.developer.model;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Embeddable;
-import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.Transient;
 
+import com.absir.appserv.developer.editor.EditorObject;
+import com.absir.appserv.developer.editor.EditorSupply;
 import com.absir.appserv.support.developer.IField;
 import com.absir.appserv.support.developer.JCrud;
 import com.absir.appserv.system.bean.value.JaCrud;
 import com.absir.appserv.system.bean.value.JaCrud.Crud;
 import com.absir.appserv.system.bean.value.JaEdit;
-import com.absir.appserv.system.bean.value.JaSubField;
+import com.absir.appserv.system.bean.value.JeEditable;
 import com.absir.appserv.system.helper.HelperJson;
 import com.absir.appserv.system.helper.HelperLang;
+import com.absir.bean.core.BeanFactoryUtils;
+import com.absir.binder.BinderUtils;
 import com.absir.core.dyna.DynaBinder;
 import com.absir.core.kernel.KernelArray;
 import com.absir.core.kernel.KernelClass;
 import com.absir.core.kernel.KernelCollection;
-import com.absir.core.kernel.KernelLang.ObjectEntry;
 import com.absir.core.kernel.KernelObject;
 import com.absir.core.kernel.KernelString;
+import com.absir.core.util.UtilAccessor.Accessor;
 import com.absir.core.util.UtilAnnotation;
 import com.absir.orm.hibernate.SessionFactoryUtils;
 import com.absir.orm.hibernate.boost.EntityAssoc.EntityAssocEntity;
-import com.absir.orm.value.JaClasses;
-import com.absir.orm.value.JaNames;
 import com.absir.orm.value.JiAssoc;
 import com.absir.orm.value.JiRelation;
 import com.absir.orm.value.JoEntity;
-import com.absir.validator.value.Digits;
-import com.absir.validator.value.Email;
-import com.absir.validator.value.Length;
-import com.absir.validator.value.Max;
-import com.absir.validator.value.Min;
-import com.absir.validator.value.NotEmpty;
+import com.absir.property.Property;
+import com.absir.property.PropertyData;
+import com.absir.validator.Validator;
+import com.absir.validator.ValidatorSupply;
 
+/**
+ * @author absir
+ * 
+ */
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class EntityField extends DBField {
 
-	/** field */
-	protected Field field;
+	/** embedd */
+	protected boolean embedd;
 
 	/**
-	 * 
-	 */
-	public EntityField() {
-	}
-
-	/**
+	 * @param name
+	 * @param property
+	 * @param editorObject
 	 * @param joEntity
 	 */
-	public EntityField(JoEntity joEntity, Field field) {
-		this.field = field;
-		this.caption = HelperLang.getFieldCaption(field, joEntity.getEntityClass());
-
-		JaSubField jaSubField = field.getAnnotation(JaSubField.class);
-		if (jaSubField != null) {
-			metas.put("subField", jaSubField.value());
-		}
-
-		generated = field.getAnnotation(GeneratedValue.class) != null || metas.containsKey("generated");
-		crudField.setName(field.getName());
-		crudField.setType(field.getType());
-
-		ManyToMany manyToMany = field.getAnnotation(ManyToMany.class);
-		if (manyToMany != null) {
-			mappedBy = manyToMany.mappedBy();
-		}
-
-		OneToMany oneToMany = field.getAnnotation(OneToMany.class);
-		if (oneToMany != null) {
-			mappedBy = oneToMany.mappedBy();
-		}
-
-		/*
-		 * ManyToOne manyToOne = field.getAnnotation(ManyToOne.class); if
-		 * (manyToOne != null) { mappedBy = manyToOne.mappedBy(); }
-		 */
-
-		crudReference();
-		initJoEntity(joEntity);
-		initValidate();
-
-		setJaEdit(field.getAnnotation(JaEdit.class));
-		setJaCrud(field.getAnnotation(JaCrud.class));
-		setJaClasses(field.getAnnotation(JaClasses.class));
-		setJaNames(field.getAnnotation(JaNames.class));
-	}
-
-	/**
-	 * @param jaEdit
-	 */
-	public void setJaEdit(JaEdit jaEdit) {
-		if (jaEdit != null) {
-			UtilAnnotation.copy(jaEdit, this);
-			if (jaEdit.types().length > 0) {
-				types.addAll(0, KernelArray.toList(jaEdit.types()));
-			}
-
-			Object metasObject = HelperJson.decodeMap(jaEdit.metas());
-			if (metasObject != null) {
-				KernelObject.copy(metasObject, metas);
-			}
-		}
-	}
-
-	/**
-	 * @param jaCrud
-	 */
-	public void setJaCrud(JaCrud jaCrud) {
-		if (jaCrud != null) {
-			crudField.setjCrud(new JCrud(jaCrud));
-		}
-	}
-
-	/**
-	 * @param jaClasses
-	 */
-	public void setJaClasses(JaClasses jaClasses) {
-		if (jaClasses != null) {
-			if (Map.class.isAssignableFrom(field.getType())) {
-				if (jaClasses.key() != void.class) {
-					entityName = SessionFactoryUtils.getJpaEntityName(jaClasses.key());
-				}
-
-				if (jaClasses.value() != void.class) {
-					valueEntityName = SessionFactoryUtils.getJpaEntityName(jaClasses.value());
-				}
-
-			} else {
-				if (jaClasses.value() != void.class) {
-					entityName = SessionFactoryUtils.getJpaEntityName(jaClasses.value());
-				}
-			}
-		}
-	}
-
-	/**
-	 * @param jaNames
-	 */
-	public void setJaNames(JaNames jaNames) {
-		if (jaNames != null) {
-			if (Map.class.isAssignableFrom(field.getType())) {
-				if (!KernelString.isEmpty(jaNames.key())) {
-					entityName = jaNames.key();
-				}
-
-				if (!KernelString.isEmpty(jaNames.value())) {
-					valueEntityName = jaNames.value();
-				}
-
-			} else {
-				if (!KernelString.isEmpty(jaNames.value())) {
-					entityName = jaNames.value();
-				}
-			}
-		}
-	}
-
-	/**
-	 * 
-	 */
-	public void initEntiyName() {
-		if (crudField.getJoEntity() == null && !KernelString.isEmpty(entityName) && !Map.class.isAssignableFrom(field.getType())) {
-			if (field.getType().isArray()) {
-				types.add("pselects");
-
-			} else if (Collection.class.isAssignableFrom(field.getType())) {
-				canOrder = false;
-				types.add("iselects");
-
-			} else {
-				types.add("iselect");
-			}
-		}
-	}
-
-	/**
-	 * @return the field
-	 */
-	public Field getField() {
-		return field;
-	}
-
-	/**
-	 * 
-	 */
-	private void crudReference() {
-		if (field.getAnnotation(ElementCollection.class) != null) {
-			crudField.setCruds(JaCrud.ALL);
+	public EntityField(String name, Property property, EditorObject editorObject, JoEntity joEntity) {
+		// set properties
+		crudField.setName(name);
+		if (property == null || editorObject == null || joEntity == null) {
 			return;
 		}
 
-		for (Class<Annotation> annotationClass : CRUD_ANNOTATION_CLASSES) {
-			Object annotation = field.getAnnotation(annotationClass);
-			if (annotation != null) {
-				CascadeType[] cascadeTypes = (CascadeType[]) KernelObject.send(annotation, "cascade");
-				if (cascadeTypes.length > 0) {
-					Set<Crud> cruds = new HashSet<Crud>();
-					for (CascadeType cascadeType : cascadeTypes) {
-						if (cascadeType == CascadeType.ALL) {
-							crudField.setCruds(JaCrud.ALL);
-							return;
+		crudField.setType(property.getType());
+		generated = editorObject.isGenerated();
+		embedd = editorObject.isEmbedd();
+		caption = HelperLang.getFieldCaption(editorObject.getLang(), joEntity.getEntityClass());
 
-						} else if (cascadeType == CascadeType.PERSIST) {
-							cruds.add(Crud.CREATE);
-
-						} else if (cascadeType == CascadeType.MERGE) {
-							cruds.add(Crud.UPDATE);
-
-						} else if (cascadeType == CascadeType.REMOVE) {
-							cruds.add(Crud.DELETE);
-						}
-					}
-
-					if (cruds.size() > 0) {
-						crudField.setCruds(KernelCollection.toArray(cruds, Crud.class));
-					}
-				}
-
-				return;
-			}
-		}
-
-		crudField.setCruds(JaCrud.ALL);
-	}
-
-	/** CRUD_ANNOTATION_CLASSES */
-	private static final Class<Annotation>[] CRUD_ANNOTATION_CLASSES = new Class[] { ManyToMany.class, OneToMany.class, ManyToOne.class, OneToOne.class };
-
-	/**
-	 * @param cls
-	 * @return
-	 */
-	private boolean typeFieldType(Class cls) {
-		if (Boolean.class.isAssignableFrom(cls) || boolean.class.isAssignableFrom(cls)) {
-			types.add("option");
-
-		} else if (Enum.class.isAssignableFrom(cls)) {
-			Map<Object, Object> map = new HashMap<Object, Object>();
-			Enum[] enums = ((Class<? extends Enum>) cls).getEnumConstants();
-			for (Enum enumerate : enums) {
-				map.put(enumerate.name(), HelperLang.getEnumNameCaption(enumerate));
+		// set joEntity
+		Accessor accessor = null;
+		Class<?> targetEntity = null;
+		while (accessor == null) {
+			accessor = property.getAccessor();
+			ElementCollection elementCollection = accessor.getAnnotation(ElementCollection.class, true);
+			if (elementCollection != null) {
+				crudField.setCruds(JaCrud.ALL);
+				break;
 			}
 
-			types.add("enum");
-			metas.put("values", map);
+			ManyToMany manyToMany = accessor.getAnnotation(ManyToMany.class, true);
+			if (manyToMany != null) {
+				mappedBy = manyToMany.mappedBy();
+				targetEntity = manyToMany.targetEntity();
+				setCrudCascadeTypes(manyToMany.cascade());
+				break;
+			}
 
-		} else if (Date.class.isAssignableFrom(cls)) {
-			types.add("date");
+			OneToMany oneToMany = accessor.getAnnotation(OneToMany.class, true);
+			if (oneToMany != null) {
+				mappedBy = oneToMany.mappedBy();
+				targetEntity = oneToMany.targetEntity();
+				setCrudCascadeTypes(oneToMany.cascade());
+				break;
+			}
 
-		} else {
-			return KernelClass.isBasicClass(cls);
+			ManyToOne manyToOne = accessor.getAnnotation(ManyToOne.class, true);
+			if (manyToOne != null) {
+				targetEntity = manyToOne.targetEntity();
+				setCrudCascadeTypes(manyToOne.cascade());
+				break;
+			}
+
+			OneToOne oneToOne = accessor.getAnnotation(OneToOne.class, true);
+			if (oneToOne != null) {
+				targetEntity = oneToOne.targetEntity();
+				setCrudCascadeTypes(oneToOne.cascade());
+				break;
+			}
+
+			setCrudCascadeTypes(null);
 		}
 
-		return true;
-	}
-
-	/**
-	 * @param joEntity
-	 */
-	private void initJoEntity(JoEntity joEntity) {
-		Class cls = field.getType();
-		if (!typeFieldType(cls)) {
-			if (Map.class.isAssignableFrom(cls)) {
+		// set fieldType
+		Class<?> fieldType = property.getType();
+		Class[] componentClasses = property.getField() == null ? KernelClass.componentClasses(fieldType) : KernelClass.componentClasses(accessor.getField().getGenericType());
+		entityName = SessionFactoryUtils.getEntityNameNull(componentClasses[0]);
+		if (!typeFieldType(fieldType)) {
+			if (Map.class.isAssignableFrom(fieldType)) {
 				canOrder = false;
-				Class[] rawClasses = KernelClass.rawClasses(KernelClass.typeArguments(field.getGenericType()));
-				String[] entityNames = SessionFactoryUtils.getReferencedJpaEntityNames(joEntity, field);
-				entityName = entityNames[1];
-				valueEntityName = entityNames[0];
-				if (entityNames[0] != null) {
-					crudField.setJoEntity(new JoEntity(entityNames[0], null));
-
-				} else if (rawClasses.length > 1 && rawClasses[1] != null && KernelClass.isCustomClass(rawClasses[1])) {
-					crudField.setJoEntity(new JoEntity(null, rawClasses[1]));
+				if (targetEntity != null && targetEntity != void.class) {
+					componentClasses[1] = targetEntity;
 				}
 
-				if (entityNames[1] != null) {
-					crudField.setKeyJoEntity(new JoEntity(entityNames[1], null));
+				// 自动关联实体
+				valueEntityName = SessionFactoryUtils.getEntityNameNull(componentClasses[1]);
+				if (valueEntityName != null) {
+					crudField.setJoEntity(new JoEntity(valueEntityName, null));
 
-				} else if (rawClasses.length > 0 && rawClasses[0] != null && KernelClass.isCustomClass(rawClasses[0])) {
-					crudField.setKeyJoEntity(new JoEntity(null, rawClasses[0]));
+				} else if (componentClasses[1] != null && KernelClass.isCustomClass(componentClasses[1])) {
+					crudField.setJoEntity(new JoEntity(null, componentClasses[1]));
 				}
 
-				if (entityNames[0] == null || entityNames[1] == null) {
-					Type[] typeArgs = KernelClass.typeArguments(field.getGenericType());
-					if (typeArgs != null && typeArgs.length > 0) {
-						if (entityNames[1] == null) {
-							Class rawClass = KernelClass.rawClass(typeArgs[0]);
-							if (!typeFieldType(rawClass) && KernelClass.isCustomClass(rawClass)) {
-								crudField.setCruds(JaCrud.ALL);
-								crudField.setKeyJoEntity(new JoEntity(null, rawClass));
-							}
+				if (entityName != null) {
+					crudField.setKeyJoEntity(new JoEntity(entityName, null));
+
+				} else if (componentClasses[0] != null && KernelClass.isCustomClass(componentClasses[0])) {
+					crudField.setKeyJoEntity(new JoEntity(null, componentClasses[0]));
+				}
+
+				if (entityName == null) {
+					if (!(crudField.getKeyJoEntity() == null && typeFieldType(componentClasses[0]))) {
+						crudField.setCruds(JaCrud.ALL);
+					}
+				}
+
+				if (valueEntityName == null) {
+					if (crudField.getJoEntity() == null) {
+						EntityField valueField = new EntityField(crudField.getName(), null, null, null);
+						this.valueField = valueField;
+						valueField.typeFieldType(componentClasses.getClass());
+						Object valueFieldMap = metas.get("valueField");
+						if (valueFieldMap != null && valueFieldMap instanceof Map) {
+							DynaBinder.mapTo((Map) valueFieldMap, valueField);
 						}
 
-						if (entityNames[0] == null && typeArgs.length > 1) {
-							Class rawClass = KernelClass.rawClass(typeArgs[0]);
-							if (KernelClass.isCustomClass(rawClass)) {
-								crudField.setCruds(JaCrud.ALL);
-								crudField.setJoEntity(new JoEntity(null, rawClass));
-
-							} else {
-								valueField = new EntityField();
-								Object key = metas.get("valueField");
-								if (key != null && key instanceof Map) {
-									DynaBinder.mapTo((Map) key, valueField);
-								}
-
-								((EntityField) valueField).typeFieldType(rawClass);
-							}
-						}
+					} else {
+						crudField.setCruds(JaCrud.ALL);
 					}
 				}
 
 				types.add(0, JaEdit.EDIT_SUBTABLE);
 
 			} else {
-				String entityName = null;
-				// 自动关联实体名称
-				if (joEntity.getEntityName() != null) {
-					if (JiAssoc.class.isAssignableFrom(field.getDeclaringClass()) && "assocId".equals(field.getName())) {
-						EntityAssocEntity assocEntity = SessionFactoryUtils.getEntityAssocEntity(joEntity.getEntityName());
-						if (assocEntity != null) {
-							entityName = assocEntity.getAssocName();
-						}
+				// 自动关联实体
+				if (entityName != null) {
+					crudField.setJoEntity(new JoEntity(entityName, null));
 
-					} else if (JiRelation.class.isAssignableFrom(JiRelation.class) && "relateId".endsWith(field.getName())) {
-						EntityAssocEntity assocEntity = SessionFactoryUtils.getEntityAssocEntity(joEntity.getEntityName());
-						if (assocEntity != null) {
-							entityName = assocEntity.getAssocEntity().getReferenceEntityName();
+				} else if (componentClasses[0] != null && KernelClass.isCustomClass(componentClasses[0])) {
+					crudField.setJoEntity(new JoEntity(null, componentClasses[0]));
+				}
+
+				if (entityName == null) {
+					if (joEntity.getEntityName() != null) {
+						if (JiAssoc.class.isAssignableFrom(joEntity.getEntityClass()) && "assocId".equals(crudField.getName())) {
+							EntityAssocEntity assocEntity = SessionFactoryUtils.getEntityAssocEntity(joEntity.getEntityName());
+							if (assocEntity != null) {
+								entityName = assocEntity.getAssocName();
+							}
+
+						} else if (JiRelation.class.isAssignableFrom(JiRelation.class) && "relateId".endsWith(crudField.getName())) {
+							EntityAssocEntity assocEntity = SessionFactoryUtils.getEntityAssocEntity(joEntity.getEntityName());
+							if (assocEntity != null) {
+								entityName = assocEntity.getAssocEntity().getReferenceEntityName();
+							}
 						}
 					}
 				}
 
 				if (entityName == null) {
-					entityName = SessionFactoryUtils.getReferencedJpaEntityName(joEntity, field);
-				}
-
-				if (KernelString.isEmpty(entityName)) {
-					if (cls.isArray()) {
-						if (KernelClass.isBasicClass(cls.getComponentType())) {
+					Class<?> componentClass = componentClasses[0];
+					if (fieldType.isArray()) {
+						if (KernelClass.isBasicClass(fieldType.getComponentType())) {
 							types.add("params");
 
 						} else {
 							canOrder = false;
 						}
 
-					} else if (Collection.class.isAssignableFrom(cls)) {
+					} else if (Collection.class.isAssignableFrom(fieldType)) {
 						canOrder = false;
 						collection = true;
-						Class rawClass = KernelClass.componentClass(field.getGenericType());
-						if (!typeFieldType(rawClass) && KernelClass.isCustomClass(rawClass)) {
-							crudField.setCruds(JaCrud.ALL);
-							crudField.setJoEntity(new JoEntity(null, rawClass));
-						}
+						if (crudField.getJoEntity() != null) {
+							if (!typeFieldType(componentClass) && KernelClass.isCustomClass(componentClass)) {
+								crudField.setCruds(JaCrud.ALL);
+							}
 
-						types.add(0, JaEdit.EDIT_SUBTABLE);
+							types.add(0, JaEdit.EDIT_SUBTABLE);
+						}
 					}
 
 				} else {
-					this.entityName = entityName;
 					crudField.setJoEntity(new JoEntity(entityName, null));
-					if (Collection.class.isAssignableFrom(cls)) {
+					if (Collection.class.isAssignableFrom(fieldType)) {
 						canOrder = false;
 						types.add("selects");
 
@@ -400,103 +248,268 @@ public class EntityField extends DBField {
 				}
 			}
 		}
+
+		// set editorName
+		String editorName = editorObject.getValueName();
+		if (KernelString.isEmpty(editorName)) {
+			editorName = editorObject.getValueClass() == null ? null : SessionFactoryUtils.getEntityNameNull(editorObject.getValueClass());
+		}
+
+		valueEntityName = editorName == null ? entityName : editorName;
+		if (Map.class.isAssignableFrom(property.getType())) {
+			editorName = editorObject.getKeyName();
+			if (KernelString.isEmpty(editorName)) {
+				editorName = editorObject.getKeyClass() == null ? null : SessionFactoryUtils.getEntityNameNull(editorObject.getKeyClass());
+			}
+
+			if (editorName != null) {
+				entityName = editorName;
+			}
+
+		} else {
+			entityName = valueEntityName;
+		}
+
+		if (entityName != null || crudField.getJoEntity() == null || fieldType != componentClasses[0]) {
+			embedd = false;
+
+		} else if (!embedd) {
+			embedd = fieldType.getAnnotation(Embeddable.class) != null;
+		}
+
+		// set crud
+		if (editorObject.getCrud() != null || editorObject.getCrudValue() != null) {
+			JCrud jCrud = crudField.getjCrud();
+			if (jCrud == null) {
+				jCrud = new JCrud();
+				crudField.setjCrud(jCrud);
+			}
+
+			jCrud.setJaCrud(editorObject.getCrud());
+			jCrud.setJaCrudValue(editorObject.getCrudValue());
+			if ((KernelString.isEmpty(jCrud.getValue()) && (jCrud.getFactory() == null || jCrud.getFactory() == void.class)) || (jCrud.getCruds() == null || jCrud.getCruds().length == 0)) {
+				crudField.setjCrud(null);
+			}
+		}
+
+		// set edit
+		if (editorObject.getEdit() != null) {
+			UtilAnnotation.copy(editorObject.getEdit(), this);
+			if (editorObject.getEdit().types().length > 0) {
+				types.addAll(0, KernelArray.toList(editorObject.getEdit().types()));
+			}
+
+			Object metasObject = HelperJson.decodeMap(editorObject.getEdit().metas());
+			if (metasObject != null) {
+				KernelObject.copy(metasObject, metas);
+			}
+		}
+
+		// set metas
+		if (editorObject.getMetas() != null) {
+			for (Entry<Object, Object> entry : editorObject.getMetas().entrySet()) {
+				metas.put(entry.getKey().toString(), entry.getValue());
+			}
+		}
 	}
 
 	/**
-	 * 
+	 * @param cascadeTypes
 	 */
-	private void initValidate() {
-		if (field.getAnnotation(NotEmpty.class) != null) {
-			nullable = false;
+	protected void setCrudCascadeTypes(CascadeType[] cascadeTypes) {
+		if (cascadeTypes == null) {
+			crudField.setCruds(JaCrud.ALL);
+			return;
+		}
 
-		} else {
-			Column column = field.getAnnotation(Column.class);
-			if (column != null) {
-				nullable = column.nullable();
+		Set<Crud> cruds = new HashSet<Crud>();
+		for (CascadeType cascadeType : cascadeTypes) {
+			if (cascadeType == CascadeType.ALL) {
+				crudField.setCruds(JaCrud.ALL);
+				return;
+
+			} else if (cascadeType == CascadeType.PERSIST) {
+				cruds.add(Crud.CREATE);
+
+			} else if (cascadeType == CascadeType.MERGE) {
+				cruds.add(Crud.UPDATE);
+
+			} else if (cascadeType == CascadeType.REMOVE) {
+				cruds.add(Crud.DELETE);
 			}
 		}
 
-		Object validators = metas.get("validators");
-		Map<String, Object> validatorMap = validators == null || !(validators instanceof Map) ? null : (Map<String, Object>) validators;
-		if (validatorMap == null) {
-			validatorMap = new HashMap<String, Object>();
-			metas.put("validators", validatorMap);
-		}
-
-		if (field.getAnnotation(Email.class) != null) {
-			metas.put("validatorClass", "email");
-
-		} else if (field.getAnnotation(Digits.class) != null) {
-			metas.put("validatorClass", "digits");
-		}
-
-		Min min = field.getAnnotation(Min.class);
-		if (min != null) {
-			validatorMap.put("min", min.value());
-		}
-
-		Max max = field.getAnnotation(Max.class);
-		if (max != null) {
-			validatorMap.put("max", max.value());
-		}
-
-		Length length = field.getAnnotation(Length.class);
-		if (length != null) {
-			if (length.min() > 0) {
-				validatorMap.put("minlength", length.min());
-			}
-
-			if (length.max() > 0) {
-				validatorMap.put("maxlength", length.max());
-			}
+		if (cruds.size() > 0) {
+			crudField.setCruds(KernelCollection.toArray(cruds, Crud.class));
 		}
 	}
 
 	/**
-	 * @param iFieldScope
+	 * @param fieldType
+	 * @return
 	 */
-	protected void addEntityFieldScope(List<IField> iFieldScope) {
-		if (field.getType().getAnnotation(Embeddable.class) == null) {
-			iFieldScope.add(this);
+	protected boolean typeFieldType(Class<?> fieldType) {
+		if (Boolean.class.isAssignableFrom(fieldType) || boolean.class.isAssignableFrom(fieldType)) {
+			types.add("option");
+
+		} else if (Enum.class.isAssignableFrom(fieldType)) {
+			Map<Object, Object> map = new HashMap<Object, Object>();
+			Enum<?>[] enums = ((Class<? extends Enum>) fieldType).getEnumConstants();
+			for (Enum<?> enumerate : enums) {
+				map.put(enumerate.name(), HelperLang.getEnumNameCaption(enumerate));
+			}
+
+			types.add("enum");
+			metas.put("values", map);
+
+		} else if (Date.class.isAssignableFrom(fieldType)) {
+			types.add("date");
 
 		} else {
-			EntityModel entityModel = ModelFactory.getModelEntity(new JoEntity(null, field.getType()));
-			for (IField iField : entityModel.getFields()) {
-				iFieldScope.add(new EmbeddField(iField, getName()));
-			}
+			return KernelClass.isBasicClass(fieldType);
 		}
+
+		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.absir.appserv.developer.model.DBField#instanceDefaultEntity()
+	/**
+	 * @param joEntity
+	 * @param property
+	 * @param validators
+	 * @param fieldScope
 	 */
-	@Override
-	protected Object instanceDefaultEntity() {
-		if (getTypes().size() > 0 && JaEdit.EDIT_SUBTABLE.equals(getTypes().get(0)))
-			if (getMappedBy() == null) {
-				if (crudField.getKeyJoEntity() == null && getValueField() == null) {
-					if (crudField.getJoEntity() == null) {
+	public void addEntityFieldScope(List<Validator> validators, Collection<IField> fieldScope) {
+		// set validators
+		if (validators != null) {
+			Object validatorObject = metas.get("validators");
+			Map<String, Object> validatorMap = validatorObject == null || !(validatorObject instanceof Map) ? null : (Map<String, Object>) validatorObject;
+			if (validatorMap == null) {
+				validatorMap = new HashMap<String, Object>();
+				metas.put("validators", validatorMap);
+			}
+
+			List<String> validatorClasses = new ArrayList<String>();
+			for (Validator validator : validators) {
+				String validatorClass = validator.getValidateClass(validatorMap);
+				if (!KernelString.isEmpty(validatorClass)) {
+					if ("required".equals(validatorClass)) {
+						nullable = false;
 
 					} else {
-						return KernelClass.newInstance(crudField.getJoEntity().getEntityClass());
+						validatorClasses.add(validatorClass);
 					}
-
-				} else {
-					ObjectEntry<Object, Object> entry = new ObjectEntry<Object, Object>();
-					if (crudField.getKeyJoEntity() != null) {
-						entry.setKey(KernelClass.newInstance(crudField.getKeyJoEntity().getEntityClass()));
-					}
-
-					if (crudField.getJoEntity() != null) {
-						entry.setValue(KernelClass.newInstance(crudField.getJoEntity().getEntityClass()));
-					}
-
-					return entry;
 				}
 			}
 
-		return null;
+			if (validatorClasses.size() > 0) {
+				metas.put("validatorClass", KernelString.implode(validatorClasses, ' '));
+			}
+		}
+
+		if (embedd) {
+			addEntityFieldScope(crudField.getName(), crudField.getJoEntity(), fieldScope, null);
+
+		} else {
+			fieldScope.add(this);
+		}
+	}
+
+	/** EDITOR_SUPPLY */
+	private static final EditorSupply EDITOR_SUPPLY = BeanFactoryUtils.get(EditorSupply.class);
+
+	/**
+	 * @param name
+	 * @param joEntity
+	 * @param fieldScope
+	 * @param entityModel
+	 */
+	public static void addEntityFieldScope(String name, JoEntity joEntity, Collection<IField> fieldScope, EntityModel entityModel) {
+		String identifierName = entityModel == null ? null : SessionFactoryUtils.getIdentifierName(joEntity.getEntityName(), joEntity.getEntityClass());
+		ValidatorSupply validatorSupply = BinderUtils.getValidatorSupply();
+		validatorSupply.getPropertyMap(joEntity.getEntityClass());
+		Map<String, PropertyData> propertyMap = EDITOR_SUPPLY.getPropertyMap(joEntity.getEntityClass());
+		for (Entry<String, PropertyData> entry : propertyMap.entrySet()) {
+			PropertyData propertyData = entry.getValue();
+			Property property = propertyData.getProperty();
+			EditorObject editorObject = EDITOR_SUPPLY.getPropertyObject(entry.getValue());
+			if (editorObject == null || property.getAllow() < 0 || isTransientField(property, editorObject)) {
+				continue;
+			}
+
+			String fieldName = entry.getKey();
+			if (!KernelString.isEmpty(name)) {
+				fieldName = name + '.' + fieldName;
+			}
+
+			EntityField entityField = null;
+			if (entityModel != null && (property.getAccessor().getAnnotation(Id.class, true) != null || (identifierName != null && identifierName.equals(fieldName)))) {
+				entityField = new EntityField(fieldName, property, editorObject, joEntity);
+				entityModel.setPrimary(entityField);
+				entityField.addEntityFieldScope(validatorSupply.getPropertyObject(propertyData), entityModel.getPrimaries());
+
+			} else if (!isMappedByField(property, editorObject)) {
+				entityField = new EntityField(fieldName, property, editorObject, joEntity);
+				entityField.addEntityFieldScope(validatorSupply.getPropertyObject(propertyData), fieldScope);
+			}
+
+			if (entityModel != null) {
+				if (entityField == null || entityField.getEditable() != JeEditable.ENABLE) {
+					entityModel.setFilter(true);
+				}
+
+				if (entityField != null) {
+					if (entityField.getEditable() == JeEditable.ENABLE) {
+						entityModel.addGroupField("editable", entityField);
+
+					} else if (entityField.getEditable() == JeEditable.OPTIONAL) {
+						entityModel.addGroupField("optional", entityField);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param property
+	 * @param editorObject
+	 * @return
+	 */
+	private static boolean isTransientField(Property property, EditorObject editorObject) {
+		if (editorObject != null) {
+			if (editorObject.getEdit() != null) {
+				return editorObject.getEdit().editable() == JeEditable.DISABLE;
+			}
+
+			Field field = property.getField();
+			if (field == null) {
+				Method method = property.getAccessor().getGetter();
+				if (method != null) {
+					return Modifier.isTransient(method.getModifiers()) || method.getAnnotation(Transient.class) != null;
+				}
+
+			} else {
+				return Modifier.isTransient(field.getModifiers()) || field.getAnnotation(Transient.class) != null;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * @param field
+	 * @return
+	 */
+	private static boolean isMappedByField(Property property, EditorObject editorObject) {
+		OneToMany oneToMany = property.getAccessor().getAnnotation(OneToMany.class, true);
+		ManyToMany manyToMany = property.getAccessor().getAnnotation(ManyToMany.class, true);
+		if ((oneToMany == null || oneToMany.mappedBy().isEmpty()) && (manyToMany == null || manyToMany.mappedBy().isEmpty())) {
+			return false;
+		}
+
+		if (editorObject.getEdit() != null && editorObject.getEdit().types().length > 0) {
+			return false;
+		}
+
+		return true;
 	}
 }

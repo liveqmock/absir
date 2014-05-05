@@ -58,6 +58,13 @@ public class UtilAccessor {
 		public abstract Method getSetter();
 
 		/**
+		 * @return
+		 */
+		public Class<?> getDeclaringClass() {
+			return getField() == null ? getGetter() == null ? getSetter().getDeclaringClass() : getGetter().getDeclaringClass() : getField().getDeclaringClass();
+		}
+
+		/**
 		 * @param annotationClass
 		 * @param getter
 		 * @return

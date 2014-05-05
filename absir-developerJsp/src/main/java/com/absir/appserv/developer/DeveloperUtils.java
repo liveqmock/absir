@@ -42,9 +42,6 @@ import com.absir.orm.value.JoEntity;
  */
 public class DeveloperUtils {
 
-	/** Developer_Web */
-	// private static Boolean Developer_Web = null;
-
 	/** Generator_Tokens */
 	private static Set<Object> Generator_Tokens = new HashSet<Object>();
 

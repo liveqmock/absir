@@ -87,22 +87,15 @@ public class WebJstlView extends ReturnedResolverView {
 	 * @throws Exception
 	 */
 	public void renderView(String view, Input input, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		if (Server_Context_Path == null) {
-			Server_Context_Path = InDispathFilter.getServletContext().getRealPath("");
-		}
-
-		request.setAttribute(LAYOUT_NAME, true);
+		response.setCharacterEncoding(ContextUtils.getCharset().displayName());
+		// request.setAttribute(LAYOUT_NAME, true);
 		request.setAttribute(PRERPARE_NAME, view);
 		for (Entry<String, Object> entry : input.getModel().entrySet()) {
 			request.setAttribute(entry.getKey(), entry.getValue());
 		}
-		
+
 		request.setAttribute(WebJsplUtils.REQUEST_INPUT_NAME, input);
-		response.setCharacterEncoding(ContextUtils.getCharset().displayName());
-		RequestDispatcher rd = request.getRequestDispatcher(view);
-		WebResponseWrapper responseWrapper = new WebResponseWrapper(response);
-		rd.include(request, responseWrapper);
-		renderMergeOutputLayout(new WebRequestAttributes(request), response, responseWrapper, LAYOUT_ITERATE_DEPTH);
+		renderMergeOutputLayout(view, request, response, new WebResponseWrapper(response), LAYOUT_ITERATE_DEPTH);
 	}
 
 	/**
@@ -110,6 +103,10 @@ public class WebJstlView extends ReturnedResolverView {
 	 * @return
 	 */
 	private String getLayoutFilename(String filename) {
+		if (Server_Context_Path == null) {
+			Server_Context_Path = InDispathFilter.getServletContext().getRealPath("");
+		}
+
 		String layoutFilename = File_Name_Map_Layout_Name.get(filename);
 		if (layoutFilename == null) {
 			synchronized (this) {
@@ -136,18 +133,21 @@ public class WebJstlView extends ReturnedResolverView {
 	}
 
 	/**
+	 * @param view
 	 * @param request
 	 * @param response
 	 * @param wrapper
 	 * @param depth
 	 * @throws Exception
 	 */
-	protected void renderMergeOutputLayout(HttpServletRequest request, HttpServletResponse response, WebResponseWrapper wrapper, int depth) throws Exception {
+	protected void renderMergeOutputLayout(String view, HttpServletRequest request, HttpServletResponse response, WebResponseWrapper wrapper, int depth) throws Exception {
+		RequestDispatcher rd = request.getRequestDispatcher(view);
+		rd.include(request, wrapper);
 		String content = wrapper.getContent();
 		if (depth-- != 0) {
 			Object layout = request.getAttribute(LAYOUT_NAME);
 			if (layout != null) {
-				if (layout instanceof Boolean) {
+				if (layout.getClass() == Boolean.class) {
 					if ((Boolean) layout) {
 						Object filename = request.getAttribute(PRERPARE_NAME);
 						if (filename != null) {
@@ -164,10 +164,8 @@ public class WebJstlView extends ReturnedResolverView {
 					request.setAttribute(LAYOUT_BODY_NAME, content);
 					content = null;
 
-					RequestDispatcher rd = request.getRequestDispatcher((String) layout);
 					wrapper.resetBuffer();
-					rd.include(request, wrapper);
-					renderMergeOutputLayout(request, response, wrapper, depth);
+					renderMergeOutputLayout((String) layout, request, response, wrapper, depth);
 				}
 			}
 		}

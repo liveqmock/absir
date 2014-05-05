@@ -166,17 +166,15 @@ public class EntityField extends DBField {
 				}
 
 				if (valueEntityName == null) {
+					EntityField valueField = new EntityField(crudField.getName(), null, null, null);
+					this.valueField = valueField;
+					crudField.setCruds(JaCrud.ALL);
 					if (crudField.getJoEntity() == null) {
-						EntityField valueField = new EntityField(crudField.getName(), null, null, null);
-						this.valueField = valueField;
 						valueField.typeFieldType(componentClasses.getClass());
 						Object valueFieldMap = metas.get("valueField");
 						if (valueFieldMap != null && valueFieldMap instanceof Map) {
 							DynaBinder.mapTo((Map) valueFieldMap, valueField);
 						}
-
-					} else {
-						crudField.setCruds(JaCrud.ALL);
 					}
 				}
 

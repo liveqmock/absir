@@ -9,29 +9,24 @@ package com.absir.appserv.system.bean.type;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.Properties;
 
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.usertype.DynamicParameterizedType;
 import org.hibernate.usertype.UserType;
 
 import com.absir.appserv.system.helper.HelperJson;
-import com.absir.core.kernel.KernelClass;
 import com.absir.core.kernel.KernelObject;
-import com.absir.core.kernel.KernelReflect;
 
 /**
  * @author absir
  * 
  */
 @SuppressWarnings({ "rawtypes", "serial", "unchecked" })
-public class JtJsonValue implements UserType, DynamicParameterizedType, Serializable {
+public class JtJsonValue implements UserType, Serializable {
 
 	/** cls */
 	private Class valueType;
@@ -49,28 +44,6 @@ public class JtJsonValue implements UserType, DynamicParameterizedType, Serializ
 	public JtJsonValue(String classname) throws ClassNotFoundException {
 		this();
 		this.valueType = Class.forName(classname);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.hibernate.usertype.ParameterizedType#setParameterValues(java.util
-	 * .Properties)
-	 */
-	@Override
-	public void setParameterValues(Properties parameters) {
-		// TODO Auto-generated method stub
-		String entityName = parameters.getProperty(ENTITY);
-		Class<?> entityClass = KernelClass.forName(entityName);
-		if (entityClass != null) {
-			Field field = KernelReflect.declaredField(entityClass, parameters.getProperty(PROPERTY));
-			if (field != null) {
-
-			}
-		}
-
-		HelperJson.encodeNull(parameters);
 	}
 
 	/*

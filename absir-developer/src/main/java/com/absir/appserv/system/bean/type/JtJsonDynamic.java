@@ -47,16 +47,16 @@ public class JtJsonDynamic implements UserType, DynamicParameterizedType, Serial
 	@Override
 	public void setParameterValues(Properties parameters) {
 		// TODO Auto-generated method stub
-		String entityName = parameters.getProperty(ENTITY);
-		Class<?> entityClass = KernelClass.forName(entityName);
+		Class<?> entityClass = KernelClass.forName(parameters.getProperty(ENTITY));
 		if (entityClass != null) {
 			Field field = KernelReflect.declaredField(entityClass, parameters.getProperty(PROPERTY));
 			if (field != null) {
 				dynamicType = field.getGenericType();
+				return;
 			}
 		}
 
-		HelperJson.encodeNull(parameters);
+		dynamicType = KernelClass.forName(parameters.getProperty(RETURNED_CLASS));
 	}
 
 	/*

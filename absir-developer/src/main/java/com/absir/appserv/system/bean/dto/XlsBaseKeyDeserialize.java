@@ -24,15 +24,17 @@ public class XlsBaseKeyDeserialize extends StdKeyDeserializer {
 		// TODO Auto-generated constructor stub
 	}
 
-	/* (non-Javadoc)
-	 * @see org.codehaus.jackson.map.deser.std.StdKeyDeserializer#_parse(java.lang.String, org.codehaus.jackson.map.DeserializationContext)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.codehaus.jackson.map.deser.std.StdKeyDeserializer#_parse(java.lang
+	 * .String, org.codehaus.jackson.map.DeserializationContext)
 	 */
 	@Override
 	protected Object _parse(String key, DeserializationContext ctxt) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	
 
 }

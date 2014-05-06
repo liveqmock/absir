@@ -10,6 +10,7 @@ package com.absir.appserv.system.bean.type;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,26 +31,11 @@ import com.absir.core.kernel.KernelReflect;
  * @author absir
  * 
  */
-@SuppressWarnings({ "rawtypes", "serial", "unchecked" })
-public class JtJsonValue implements UserType, DynamicParameterizedType, Serializable {
+@SuppressWarnings({ "rawtypes", "serial" })
+public class JtJsonDynamic implements UserType, DynamicParameterizedType, Serializable {
 
-	/** cls */
-	private Class valueType;
-
-	/**
-	 * 
-	 */
-	public JtJsonValue() {
-	}
-
-	/**
-	 * @param classname
-	 * @throws ClassNotFoundException
-	 */
-	public JtJsonValue(String classname) throws ClassNotFoundException {
-		this();
-		this.valueType = Class.forName(classname);
-	}
+	/** dynamicType */
+	private Type dynamicType;
 
 	/*
 	 * (non-Javadoc)
@@ -66,7 +52,7 @@ public class JtJsonValue implements UserType, DynamicParameterizedType, Serializ
 		if (entityClass != null) {
 			Field field = KernelReflect.declaredField(entityClass, parameters.getProperty(PROPERTY));
 			if (field != null) {
-
+				dynamicType = field.getGenericType();
 			}
 		}
 
@@ -140,7 +126,7 @@ public class JtJsonValue implements UserType, DynamicParameterizedType, Serializ
 			return null;
 		}
 
-		return HelperJson.decodeNull(value, valueType);
+		return HelperJson.decodeNull(value, dynamicType);
 	}
 
 	/*

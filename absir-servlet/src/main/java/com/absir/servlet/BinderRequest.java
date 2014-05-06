@@ -48,6 +48,9 @@ public class BinderRequest extends BinderData {
 			if (params.length > 0) {
 				if (!(toClass.isArray() || Collection.class.isAssignableFrom(toClass))) {
 					obj = params[0];
+					if (String.class.isAssignableFrom(toClass)) {
+						return (T) obj;
+					}
 				}
 			}
 		}

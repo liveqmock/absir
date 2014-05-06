@@ -141,6 +141,11 @@ public class EntityBoost {
 								}
 
 								if (uniqueKey.getColumnSpan() > 0) {
+									if (KernelString.isEmpty(uniqueKey.getName())) {
+										uniqueKey.setName(property.getName());
+									}
+
+									uniqueKey.setTable(table);
 									table.addUniqueKey(uniqueKey);
 								}
 
@@ -155,11 +160,14 @@ public class EntityBoost {
 								}
 
 								if (mappingIndex.getColumnSpan() > 0) {
+									if (KernelString.isEmpty(mappingIndex.getName())) {
+										mappingIndex.setName(property.getName());
+									}
+
 									mappingIndex.setTable(table);
 									table.addIndex(mappingIndex);
 								}
 							}
-
 						}
 					}
 				}

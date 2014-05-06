@@ -11,20 +11,19 @@ import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
 
 import com.absir.appserv.system.bean.base.JbBean;
 import com.absir.appserv.system.bean.value.JaLang;
+import com.absir.appserv.system.bean.value.JiActive;
 import com.absir.core.kernel.KernelString;
 
 /**
  * @author absir
  * 
  */
-@EntityListeners(SocketServerContext.Listener.class)
 @MappedSuperclass
-public class JbServer extends JbBean {
+public class JbServer extends JbBean implements JiActive {
 
 	@JaLang("服务器名称")
 	private String name;
@@ -38,8 +37,11 @@ public class JbServer extends JbBean {
 	@JaLang("服务器ipV6")
 	private String ipV6;
 
-	@JaLang("开启时间")
-	private long startTime;
+	@JaLang("开始时间")
+	private long beginTime;
+
+	@JaLang("关闭时间")
+	private long passTime;
 
 	/**
 	 * @return the name
@@ -86,21 +88,6 @@ public class JbServer extends JbBean {
 	}
 
 	/**
-	 * @return the startTime
-	 */
-	public long getStartTime() {
-		return startTime;
-	}
-
-	/**
-	 * @param startTime
-	 *            the startTime to set
-	 */
-	public void setStartTime(long startTime) {
-		this.startTime = startTime;
-	}
-
-	/**
 	 * @return
 	 * @throws UnknownHostException
 	 */
@@ -114,5 +101,35 @@ public class JbServer extends JbBean {
 		}
 
 		return null;
+	}
+
+	/**
+	 * @return the beginTime
+	 */
+	public long getBeginTime() {
+		return beginTime;
+	}
+
+	/**
+	 * @param beginTime
+	 *            the beginTime to set
+	 */
+	public void setBeginTime(long beginTime) {
+		this.beginTime = beginTime;
+	}
+
+	/**
+	 * @return the passTime
+	 */
+	public long getPassTime() {
+		return passTime;
+	}
+
+	/**
+	 * @param passTime
+	 *            the passTime to set
+	 */
+	public void setPassTime(long passTime) {
+		this.passTime = passTime;
 	}
 }

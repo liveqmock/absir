@@ -7,20 +7,20 @@
  */
 package com.absir.server.socket;
 
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
-
-import javax.persistence.PostPersist;
-import javax.persistence.PostRemove;
-import javax.persistence.PostUpdate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.absir.appserv.system.service.BeanService;
+import com.absir.appserv.system.dao.BeanDao;
+import com.absir.appserv.system.dao.utils.QueryDaoUtils;
+import com.absir.appserv.system.domain.DActiver;
+import com.absir.appserv.system.domain.DActiverMap;
+import com.absir.appserv.system.service.ActiveService;
 import com.absir.bean.basis.Base;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
@@ -28,10 +28,9 @@ import com.absir.bean.inject.value.Inject;
 import com.absir.bean.inject.value.Started;
 import com.absir.bean.inject.value.Stopping;
 import com.absir.bean.inject.value.Value;
-import com.absir.context.core.ContextBase;
-import com.absir.context.core.ContextUtils;
 import com.absir.core.kernel.KernelClass;
 import com.absir.orm.hibernate.SessionFactoryUtils;
+import com.absir.orm.hibernate.boost.IEntityMerge;
 import com.absir.server.socket.resolver.SocketSessionResolver;
 
 /**
@@ -41,11 +40,11 @@ import com.absir.server.socket.resolver.SocketSessionResolver;
 @SuppressWarnings({ "unchecked" })
 @Base
 @Bean
-public class SocketServerContext extends ContextBase {
+public class SocketServerContext extends ActiveService<JbServer, SocketServer> implements IEntityMerge<JbServer> {
 
 	/** ME */
 	@Inject
-	private static SocketServerContext ME;
+	public static SocketServerContext ME = BeanFactoryUtils.get(SocketServerContext.class);
 
 	/** LOGGER */
 	private static final Logger LOGGER = LoggerFactory.getLogger(SocketServerContext.class);
@@ -105,20 +104,42 @@ public class SocketServerContext extends ContextBase {
 	/** serverClass */
 	private Class<? extends JbServer> serverClass = (Class<? extends JbServer>) SessionFactoryUtils.getEntityClass("JServer");
 
-	/** nextStartTime */
-	private long nextServerTime = 0;
-
-	/** socketServerMap */
-	private Map<Long, SocketServer> socketServerMap = new HashMap<Long, SocketServer>();
-
-	/** serverContextMap */
-	private Map<Long, ServerContext> serverContextMap = new TreeMap<Long, ServerContext>();
-
-	/** serverContexts */
-	private List<ServerContext> serverContexts = null;
-
 	/** sessionResolver */
 	private SocketSessionResolver sessionResolver = BeanFactoryUtils.get(SocketSessionResolver.class);
+
+	/** socketServerContextMap */
+	private DActiverMap<JbServer, ServerContext> serverContextMap = new DActiverMap<JbServer, ServerContext>() {
+
+		@Override
+		protected boolean isClosed(ServerContext activeContext) {
+			// TODO Auto-generated method stub
+			return activeContext.isClosed();
+		}
+
+		@Override
+		protected Map<Serializable, ServerContext> createActiveContexts() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		protected ServerContext createActiveContext(JbServer active) {
+			// TODO Auto-generated method stub
+			return createServerContext(active);
+		}
+
+		@Override
+		protected ServerContext updateActiveContext(JbServer active, ServerContext activeContext) {
+			// TODO Auto-generated method stub
+			activeContext.setServer(active);
+			return activeContext;
+		}
+
+		@Override
+		protected void closeActiveContext(Serializable id, ServerContext activeContext) {
+			// TODO Auto-generated method stub
+		}
+	};
 
 	/**
 	 * @return
@@ -170,66 +191,36 @@ public class SocketServerContext extends ContextBase {
 	}
 
 	/**
-	 * 服务分区实体监听
-	 * 
-	 * @author absir
-	 * 
-	 */
-	public static class Listener {
-
-		/**
-		 * 添加, 修改服务分区
-		 * 
-		 */
-		@PostPersist
-		@PostUpdate
-		public void merge(JbServer server) {
-			SocketServerContext.ME.merge(server, false);
-		}
-
-		/**
-		 * 删除服务分区
-		 * 
-		 * @param lotCard
-		 */
-		@PostRemove
-		public void remove(JbServer server) {
-			SocketServerContext.ME.merge(server, true);
-		}
-	}
-
-	/**
 	 * 开启服务
 	 */
 	@Started
 	protected synchronized void started() {
-		List<JbServer> servers = null;
-		if (serverClass != null) {
-			servers = BeanService.ME.findAll("JServer");
+		if (activer == null && serverClass != null) {
+			activer = new DActiver<JbServer>("JServer");
 		}
 
-		if (servers == null || servers.isEmpty()) {
-			if (!option) {
-				option = true;
-				if (servers == null) {
-					servers = new ArrayList<JbServer>();
-				}
-
-				JbServer server = serverClass == null ? new JbServer() : KernelClass.newInstance(serverClass);
-				if (server != null) {
-					server.setId(-1L);
-					server.setPort(port);
-					server.setName("default");
-					servers.add(server);
-				}
+		if (!option) {
+			super.started();
+			if (activer == null) {
+				startDefault();
 			}
 		}
+	}
 
-		if (servers != null) {
-			for (JbServer server : servers) {
-				merge(server, false);
-			}
+	/**
+	 * 
+	 */
+	protected void startDefault() {
+		List<JbServer> servers = new ArrayList<JbServer>();
+		JbServer server = serverClass == null ? new JbServer() : KernelClass.newInstance(serverClass);
+		if (server != null) {
+			server.setId(0L);
+			server.setPort(port);
+			servers.add(server);
 		}
+
+		serverContextMap.setActives(servers);
+		activerMap.setActives(servers);
 	}
 
 	/**
@@ -237,11 +228,12 @@ public class SocketServerContext extends ContextBase {
 	 */
 	@Stopping
 	protected synchronized void stopping() {
-		for (SocketServer server : socketServerMap.values()) {
+		for (SocketServer server : activerMap.getOnlineActiveContexts().values()) {
 			server.close();
 		}
 
-		socketServerMap = null;
+		activer = null;
+		activerMap = null;
 	}
 
 	/**
@@ -250,8 +242,8 @@ public class SocketServerContext extends ContextBase {
 	 * @param id
 	 * @return
 	 */
-	public ServerContext getServerContext(Long id) {
-		return serverContextMap.get(id);
+	public ServerContext getServerContext(Serializable id) {
+		return serverContextMap.getOnlineActiveContexts().get(id);
 	}
 
 	/**
@@ -259,121 +251,153 @@ public class SocketServerContext extends ContextBase {
 	 * 
 	 * @return the serverContexts
 	 */
-	public List<ServerContext> getServerContexts() {
-		if (serverContexts == null) {
-			synchronized (this) {
-				serverContexts = new ArrayList<ServerContext>(serverContextMap.values());
-			}
-		}
-
-		return serverContexts;
-	}
-
-	/*
-	 * 服务步进
-	 * 
-	 * (non-Javadoc)
-	 * 
-	 * @see com.absir.context.bean.IContext#stepDone(long)
-	 */
-	@Override
-	public boolean stepDone(long contextTime) {
-		// TODO Auto-generated method stub
-		for (ServerContext serverContext : getServerContexts()) {
-			serverContext.stepDone(contextTime);
-		}
-
-		return false;
+	public Collection<ServerContext> getServerContexts() {
+		return serverContextMap.getOnlineActiveContexts().values();
 	}
 
 	/**
-	 * 服务更改
 	 * 
-	 * @param server
-	 * @param remove
-	 */
-	protected synchronized void merge(JbServer server, boolean remove) {
-		if (socketServerMap == null) {
-			return;
-		}
-
-		Long id = server.getId();
-		if (remove) {
-			SocketServer socketServer = socketServerMap.remove(id);
-			if (socketServer != null) {
-				socketServer.close();
-			}
-
-			if (serverContextMap.remove(id) != null) {
-				serverContexts = null;
-			}
-
-		} else {
-			ServerContext serverContext = serverContextMap.get(id);
-			if (serverContext == null) {
-				serverContext = createServerContext(server);
-				serverContextMap.put(id, serverContext);
-				serverContexts = null;
-			}
-
-			serverContext.setServer(server);
-			long contextTime = ContextUtils.getContextTime();
-			if (server.getStartTime() <= contextTime) {
-				startSocketServer(serverContext);
-
-			} else {
-				SocketServer socketServer = socketServerMap.remove(id);
-				if (socketServer != null) {
-					socketServer.close();
-					serverContext = createServerContext(server);
-					serverContextMap.put(id, serverContext);
-					serverContexts = null;
-				}
-
-				if (nextServerTime <= 0 || nextServerTime > server.getStartTime()) {
-					nextServerTime = server.getStartTime();
-				}
-			}
-		}
-	}
-
-	/**
-	 * 开启一个服务
-	 * 
-	 * @param serverContext
-	 */
-	protected void startSocketServer(ServerContext serverContext) {
-		Long id = serverContext.getServer().getId();
-		SocketServer socketServer = socketServerMap.get(id);
-		if (socketServer == null) {
-			socketServer = new SocketServer();
-			try {
-				socketServer.start(serverContext.getServer().getPort(), backlog, serverContext.getServer().getInetAddress(), bufferSize, receiveBufferSize, sendBufferSize,
-						createSocketReceiverContext(serverContext));
-				socketServerMap.put(id, socketServer);
-
-			} catch (Throwable e) {
-				// TODO Auto-generated catch block
-				LOGGER.error("server [" + serverContext.getServer().getIp() + "] start error", e);
-				serverContext.setClosed(true);
-			}
-		}
-	}
-
-	/**
+	 * 创建服务对象
 	 * 
 	 * @param server
 	 * @param from
 	 */
 	protected ServerContext createServerContext(JbServer server) {
-		return new ServerContext();
+		ServerContext serverContext = new ServerContext();
+		serverContext.setServer(server);
+		return serverContext;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.context.core.ContextService#step(long)
+	 */
+	@Override
+	public void step(long contextTime) {
+		// TODO Auto-generated method stub
+		super.step(contextTime);
+		for (ServerContext serverContext : getServerContexts()) {
+			serverContext.stepDone(contextTime);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.appserv.system.service.ActiveService#getInstance()
+	 */
+	@Override
+	protected ActiveService<JbServer, SocketServer> getInstance() {
+		// TODO Auto-generated method stub
+		return ME;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.system.service.ActiveService#createActiveContexts()
+	 */
+	@Override
+	protected Map<Serializable, SocketServer> createActiveContexts() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.system.service.ActiveService#isClosed(com.absir.appserv
+	 * .system.bean.value.JiActive)
+	 */
+	@Override
+	protected boolean isClosed(SocketServer activeContext) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/*
+	 * 开启服务
+	 * 
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.system.service.ActiveService#createActiveContext(com
+	 * .absir.appserv.system.bean.value.JiActive)
+	 */
+	@Override
+	protected SocketServer createActiveContext(JbServer active) {
+		// TODO Auto-generated method stub
+		ServerContext serverContext = getServerContext(active.getId());
+		if (serverContext == null) {
+			return null;
+		}
+
+		serverContext.setClosed(false);
+		SocketServer socketServer = new SocketServer();
+		try {
+			socketServer.start(serverContext.getServer().getPort(), backlog, serverContext.getServer().getInetAddress(), bufferSize, receiveBufferSize, sendBufferSize,
+					createSocketReceiverContext(serverContext));
+
+		} catch (Throwable e) {
+			// TODO Auto-generated catch block
+			LOGGER.error("server [" + serverContext.getServer().getIp() + "] start error", e);
+			serverContext.setClosed(true);
+		}
+
+		return socketServer;
 	}
 
 	/**
+	 * 创建服务监听
+	 * 
 	 * @param serverContext
 	 * @return
 	 */
 	protected SocketReceiverContext createSocketReceiverContext(ServerContext serverContext) {
 		return new SocketReceiverContext(serverContext);
+	}
+
+	/*
+	 * 关闭服务
+	 * 
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.system.service.ActiveService#closeActiveContext(java
+	 * .lang.Object)
+	 */
+	@Override
+	protected void closeActiveContext(Serializable id, SocketServer activeContext) {
+		// TODO Auto-generated method stub
+		ServerContext serverContext = getServerContext(id);
+		if (serverContext != null) {
+			serverContext.setClosed(true);
+		}
+
+		activeContext.close();
+	}
+
+	/*
+	 * 重新载入服务
+	 * 
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.appserv.system.service.ActiveService#reloadActives(long)
+	 */
+	@Override
+	protected void reloadActives(long contextTime) {
+		// TODO Auto-generated method stub
+		List<JbServer> servers = QueryDaoUtils.createQueryArray(BeanDao.getSession(), "SELECT o FROM JServer o").list();
+		if (!option && servers.isEmpty()) {
+			option = true;
+			startDefault();
+
+		} else {
+			serverContextMap.setActives(servers);
+			super.reloadActives(contextTime);
+		}
 	}
 }

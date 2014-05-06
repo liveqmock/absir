@@ -7,13 +7,14 @@
  */
 package com.absir.appserv.system.bean.value;
 
+import com.absir.appserv.system.bean.proxy.JiBase;
 import com.absir.appserv.system.bean.proxy.JiPass;
 
 /**
  * @author absir
  * 
  */
-public interface JiActivity extends JiPass {
+public interface JiActive extends JiBase, JiPass {
 
 	/**
 	 * @return

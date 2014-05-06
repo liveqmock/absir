@@ -205,16 +205,16 @@ public class BinderData extends DynaBinder {
 					Property property = propertyData.getProperty();
 					if (property.getAllow() <= 0 && property.allow(binderResult.getGroup())) {
 						String name = entry.getKey();
-						binderResult.setPropertyPath(propertyPrefix + name);
-						if (!binderResult.allowPropertyPath()) {
-							continue;
-						}
-
 						Object value = map.get(name);
 						if (value == null) {
 							if (!map.containsKey(name)) {
 								continue;
 							}
+						}
+
+						binderResult.setPropertyPath(propertyPrefix + name);
+						if (!binderResult.allowPropertyPath()) {
+							continue;
 						}
 
 						bindValue(value, propertyData, property, toObject);
@@ -238,10 +238,10 @@ public class BinderData extends DynaBinder {
 			value = property.getPropertyValue(value, beanName);
 			Binder binder = binderSupply.getPropertyObject(propertyData);
 			if (binder != null) {
-				value = property.getType() == null ? binder.to(value, beanName, property.getField().getGenericType()) : binder.to(value, beanName, property.getType());
+				value = property.getField() == null ? binder.to(value, beanName, property.getType()) : binder.to(value, beanName, property.getField().getGenericType());
 			}
 
-			value = property.getType() == null ? bind(value, beanName, property.getField().getGenericType()) : bind(value, beanName, property.getType());
+			value = property.getField() == null ? bind(value, beanName, property.getType()) : bind(value, beanName, property.getField().getGenericType());
 		}
 
 		try {

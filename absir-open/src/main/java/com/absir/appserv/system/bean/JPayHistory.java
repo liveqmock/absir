@@ -23,11 +23,14 @@ import com.absir.context.core.ContextUtils;
 @Entity
 public class JPayHistory extends JbBase {
 
+	@JaLang("订单号")
+	@Id
+	private String id;
+
 	/** id */
 	@JaLang("支付订单号")
-	@Id
-	@Column(length = 1024)
-	private String id;
+	@Column(length = 1024, unique = true)
+	private String tradeNo;
 
 	/** createTime */
 	@JaLang("创建时间")
@@ -47,6 +50,21 @@ public class JPayHistory extends JbBase {
 	 */
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	/**
+	 * @return the tradeNo
+	 */
+	public String getTradeNo() {
+		return tradeNo;
+	}
+
+	/**
+	 * @param tradeNo
+	 *            the tradeNo to set
+	 */
+	public void setTradeNo(String tradeNo) {
+		this.tradeNo = tradeNo;
 	}
 
 	/**

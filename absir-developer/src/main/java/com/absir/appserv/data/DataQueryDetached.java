@@ -283,6 +283,14 @@ public class DataQueryDetached {
 	 * @param parameters
 	 * @return
 	 */
+	public Object run(Object... parameters) {
+		return invoke(parameters);
+	}
+
+	/**
+	 * @param parameters
+	 * @return
+	 */
 	public Object invoke(Object[] parameters) {
 		Session session = null;
 		JdbcPage jdbcPage = null;

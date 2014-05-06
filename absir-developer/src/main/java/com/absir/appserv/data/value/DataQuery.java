@@ -16,12 +16,27 @@ import java.lang.annotation.Target;
  * @author absir
  * 
  */
-@Target({ ElementType.TYPE })
+@Target({ ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Session {
+public @interface DataQuery {
 
 	/**
 	 * @return
 	 */
 	String value();
+
+	/**
+	 * @return
+	 */
+	boolean nativeQuery() default false;
+
+	/**
+	 * @return
+	 */
+	boolean cacheable() default false;
+
+	/**
+	 * @return
+	 */
+	Class<?> aliasType() default void.class;
 }

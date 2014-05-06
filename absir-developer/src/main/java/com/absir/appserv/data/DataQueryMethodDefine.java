@@ -18,8 +18,8 @@ import com.absir.aop.AopImplDefine;
 import com.absir.aop.AopMethodDefineAbstract;
 import com.absir.appserv.data.value.FirstResults;
 import com.absir.appserv.data.value.MaxResults;
-import com.absir.appserv.data.value.Query;
-import com.absir.appserv.data.value.Session;
+import com.absir.appserv.data.value.DataQuery;
+import com.absir.appserv.data.value.DataSession;
 import com.absir.bean.basis.Basis;
 import com.absir.bean.basis.BeanDefine;
 import com.absir.bean.core.BeanDefineDiscover;
@@ -58,7 +58,7 @@ public class DataQueryMethodDefine extends AopMethodDefineAbstract<DataQueryInte
 	 */
 	@Override
 	public String getVariable(DataQueryInterceptor aopInterceptor, BeanDefine beanDefine, Object beanObject) {
-		Session session = beanDefine.getBeanType().getAnnotation(Session.class);
+		DataSession session = beanDefine.getBeanType().getAnnotation(DataSession.class);
 		return session == null ? null : session.value();
 	}
 
@@ -83,7 +83,7 @@ public class DataQueryMethodDefine extends AopMethodDefineAbstract<DataQueryInte
 	@Override
 	public DataQueryDetached getAopInterceptor(DataQueryDetached interceptor, String variable, Class<?> beanType, Method method) {
 		// TODO Auto-generated method stub
-		Query query = method.getAnnotation(Query.class);
+		DataQuery query = method.getAnnotation(DataQuery.class);
 		if (query == null) {
 			return null;
 		}

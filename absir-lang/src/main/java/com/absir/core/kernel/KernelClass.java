@@ -821,7 +821,7 @@ public abstract class KernelClass {
 	 */
 	public static Method declaredSetter(Class cls, String field, Class fieldType, boolean declared) {
 		String name = "set" + KernelString.uncapitalize(field);
-		return KernelReflect.declaredMethod(cls, name, 0, declared, new Class[] { fieldType });
+		return KernelReflect.assignableMethod(cls, name, 0, declared, fieldType == null ? true : false, true, fieldType);
 	}
 
 	/**

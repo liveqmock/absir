@@ -8,10 +8,10 @@
 package com.absir.property;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 
 import com.absir.core.kernel.KernelList;
 
@@ -26,7 +26,7 @@ public class PropertyHolder {
 	private int propertyDatas;
 
 	/** nameMapPropertyData */
-	private Map<String, PropertyData> nameMapPropertyData = new TreeMap<String, PropertyData>();
+	private Map<String, PropertyData> nameMapPropertyData = new LinkedHashMap<String, PropertyData>();
 
 	/**
 	 * @return the propertyDatas

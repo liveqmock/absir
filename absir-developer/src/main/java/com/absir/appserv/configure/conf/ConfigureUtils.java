@@ -14,6 +14,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.absir.bean.basis.BeanConfig;
+import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.binder.BinderUtils;
 import com.absir.core.dyna.DynaBinder;
 import com.absir.core.helper.HelperFile;
@@ -39,6 +41,7 @@ public abstract class ConfigureUtils {
 	 * @return
 	 */
 	public static Map<String, Object> readPropertyMap(File file) {
+		final BeanConfig beanConfig = BeanFactoryUtils.getBeanConfig();
 		final Map<String, Object> propertyMap = new HashMap<String, Object>();
 		try {
 			HelperFile.doWithReadLine(file, new CallbackBreak<String>() {
@@ -60,6 +63,7 @@ public abstract class ConfigureUtils {
 						value = value.substring(1, value.length() - 1).replace("\\\"", "\"");
 					}
 
+					value = beanConfig.getExpression(value);
 					propertyMap.put(template.substring(0, split).trim(), value);
 				}
 			});

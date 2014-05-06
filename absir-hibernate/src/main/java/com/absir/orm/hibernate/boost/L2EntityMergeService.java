@@ -8,7 +8,6 @@
 package com.absir.orm.hibernate.boost;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +31,7 @@ import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.InjectOnce;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Started;
-import com.absir.core.kernel.KernelReflect;
+import com.absir.core.kernel.KernelClass;
 import com.absir.orm.hibernate.SessionFactoryUtils;
 import com.absir.orm.hibernate.boost.IEntityMerge.MergeType;
 
@@ -59,22 +58,20 @@ public class L2EntityMergeService implements IEventService, PostInsertEventListe
 		}
 
 		Map<String, IEntityMerge> entityMergeBases = new HashMap<String, IEntityMerge>();
-		Class<?>[] parameterTypes = new Class<?>[] { String.class, null, MergeType.class, Object.class };
+		// Class<?>[] parameterTypes = new Class<?>[] { String.class, null,
+		// MergeType.class, Object.class };
 		for (IEntityMerge entityMerge : entityMerges) {
-			Method method = KernelReflect.assignableMethod(entityMerge.getClass(), "merge", parameterTypes);
-			if (method != null) {
-				Class<?> entityClass = method.getParameterTypes()[1];
-				String entityName = SessionFactoryUtils.getEntityName(entityClass);
-				if (entityName == null) {
-					for (Entry<String, Entry<Class<?>, SessionFactory>> entry : SessionFactoryUtils.get().getJpaEntityNameMapEntityClassFactory().entrySet()) {
-						if (entityClass.isAssignableFrom(entry.getValue().getKey())) {
-							entityMergeBases.put(entry.getValue().getKey().getName(), entityMerge);
-						}
+			Class<?> entityClass = KernelClass.argumentClass(entityMerge.getClass());
+			String entityName = SessionFactoryUtils.getEntityName(entityClass);
+			if (entityName == null) {
+				for (Entry<String, Entry<Class<?>, SessionFactory>> entry : SessionFactoryUtils.get().getJpaEntityNameMapEntityClassFactory().entrySet()) {
+					if (entityClass.isAssignableFrom(entry.getValue().getKey())) {
+						entityMergeBases.put(entry.getValue().getKey().getName(), entityMerge);
 					}
-
-				} else {
-					nameMapEntityMerge.put(entityName, entityMerge);
 				}
+
+			} else {
+				nameMapEntityMerge.put(entityName, entityMerge);
 			}
 		}
 

@@ -7,16 +7,19 @@
  */
 package com.absir.appserv.system.domain;
 
+import java.util.Iterator;
 import java.util.List;
 
+import org.hibernate.Session;
 import org.hibernate.event.spi.PostUpdateEvent;
 
-import com.absir.appserv.system.bean.value.JiActivity;
+import com.absir.appserv.system.bean.value.JiActive;
 import com.absir.appserv.system.dao.BeanDao;
 import com.absir.appserv.system.dao.utils.QueryDaoUtils;
 import com.absir.context.core.ContextUtils;
 import com.absir.core.kernel.KernelClass;
 import com.absir.core.kernel.KernelDyna;
+import com.absir.core.kernel.KernelString;
 import com.absir.orm.hibernate.SessionFactoryUtils;
 import com.absir.orm.hibernate.boost.IEntityMerge.MergeType;
 
@@ -25,13 +28,16 @@ import com.absir.orm.hibernate.boost.IEntityMerge.MergeType;
  * 
  */
 @SuppressWarnings("unchecked")
-public class DActitity<T extends JiActivity> {
-
-	/** 实体名称 */
-	private String entityName;
+public class DActiver<T extends JiActive> {
 
 	/** 下次更新时间 */
 	private long nextTime;
+
+	/** 下次更新查询 */
+	private String nextQueryString;
+
+	/** 当前活动查询 */
+	private String onlineQueryString;
 
 	/** 延时更新时间 */
 	private static final int DELAY_NEXT_TIME = 60000;
@@ -42,12 +48,25 @@ public class DActitity<T extends JiActivity> {
 	/**
 	 * @param entityName
 	 */
-	public DActitity(String entityName) {
+	public DActiver(String entityName) {
 		if (entityName == null) {
 			entityName = SessionFactoryUtils.getJpaEntityName(KernelClass.argumentClass(getClass()));
 		}
 
-		this.entityName = entityName;
+		if (!KernelString.isEmpty(entityName)) {
+			nextQueryString = "SELECT o FROM " + entityName + " o WHERE o.beginTime > ? ORDER BY o.beginTime";
+			onlineQueryString = "SELECT o FROM " + entityName + " o WHERE o.beginTime <= ? AND o.passTime >= ?";
+
+		}
+	}
+
+	/**
+	 * @param nextQueryString
+	 * @param onlineQueryString
+	 */
+	public DActiver(String nextQueryString, String onlineQueryString) {
+		this.nextQueryString = nextQueryString;
+		this.onlineQueryString = onlineQueryString;
 	}
 
 	/**
@@ -63,6 +82,36 @@ public class DActitity<T extends JiActivity> {
 	 */
 	public void setNextTime(long nextTime) {
 		this.nextTime = nextTime;
+	}
+
+	/**
+	 * @return the nextQueryString
+	 */
+	public String getNextQueryString() {
+		return nextQueryString;
+	}
+
+	/**
+	 * @param nextQueryString
+	 *            the nextQueryString to set
+	 */
+	public void setNextQueryString(String nextQueryString) {
+		this.nextQueryString = nextQueryString;
+	}
+
+	/**
+	 * @return the onlineQueryString
+	 */
+	public String getOnlineQueryString() {
+		return onlineQueryString;
+	}
+
+	/**
+	 * @param onlineQueryString
+	 *            the onlineQueryString to set
+	 */
+	public void setOnlineQueryString(String onlineQueryString) {
+		this.onlineQueryString = onlineQueryString;
 	}
 
 	/**
@@ -136,16 +185,15 @@ public class DActitity<T extends JiActivity> {
 	}
 
 	/**
-	 * 
-	 * @param activities
+	 * @param contextTime
+	 * @param activity
 	 */
-	public void setLastedActivites(long contextTime, List<T> activities) {
+	public void setNextActive(long contextTime, T activity) {
 		// 最大延时1天更新
 		nextTime = contextTime + MAX_NEXT_TIME;
-		if (activities.size() > 0) {
-			T actitity = activities.get(0);
-			if (nextTime > actitity.getBeginTime()) {
-				nextTime = actitity.getBeginTime();
+		if (activity != null) {
+			if (nextTime > activity.getBeginTime()) {
+				nextTime = activity.getBeginTime();
 			}
 		}
 	}
@@ -153,22 +201,37 @@ public class DActitity<T extends JiActivity> {
 	/**
 	 * @param activities
 	 */
-	public void setCurrentActivites(List<T> activities) {
-		for (T actitity : activities) {
-			if (nextTime > actitity.getPassTime()) {
-				nextTime = actitity.getPassTime();
+	public void setOnlineActives(List<T> activities) {
+		for (T activity : activities) {
+			if (nextTime > activity.getPassTime()) {
+				nextTime = activity.getPassTime();
 			}
 		}
 	}
 
 	/**
-	 * @return the actitities
+	 * @param contextTime
+	 * @return
 	 */
-	public List<T> reloadActivities(long contextTime) {
-		List<T> activities = QueryDaoUtils.selectQuery(BeanDao.getSession(), entityName, "o", new Object[] { "o.beginTime >", contextTime }, "ORDER BY o.beginTime", 0, 1);
-		setLastedActivites(contextTime, activities);
-		activities = QueryDaoUtils.selectQuery(BeanDao.getSession(), entityName, new Object[] { "o.beginTime <=", contextTime, "o.passTime >=", contextTime }, 0, 0);
-		setCurrentActivites(activities);
-		return activities;
+	public boolean stepNext(long contextTime) {
+		if (nextTime < contextTime) {
+			nextTime = Long.MAX_VALUE;
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param contextTime
+	 * @return
+	 */
+	public List<T> reloadActives(long contextTime) {
+		Session session = BeanDao.getSession();
+		Iterator<T> iterator = QueryDaoUtils.createQueryArray(session, nextQueryString, contextTime).setMaxResults(1).iterate();
+		setNextActive(contextTime, iterator.hasNext() ? iterator.next() : null);
+		List<T> actives = QueryDaoUtils.createQueryArray(session, onlineQueryString, contextTime, contextTime).list();
+		setOnlineActives(actives);
+		return actives;
 	}
 }

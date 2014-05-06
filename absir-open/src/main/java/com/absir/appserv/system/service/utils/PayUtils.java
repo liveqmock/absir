@@ -18,6 +18,7 @@ import com.absir.appserv.system.service.IPayProccessor;
 import com.absir.bean.basis.Configure;
 import com.absir.bean.inject.value.Inject;
 import com.absir.bean.inject.value.InjectType;
+import com.absir.core.kernel.KernelString;
 
 /**
  * @author absir
@@ -62,13 +63,14 @@ public abstract class PayUtils {
 	public static Object proccess(JPayTrade payTrade) {
 		if (payService != null) {
 			try {
-				JPayHistory payHistory = new JPayHistory();
-				String id = payTrade.getTradeNo();
-				if (id == null) {
-					id = payTrade.getId();
+				String tradeNo = payTrade.getTradeNo();
+				if (KernelString.isEmpty(tradeNo)) {
+					tradeNo = payTrade.getId();
 				}
 
-				payHistory.setId(id);
+				JPayHistory payHistory = new JPayHistory();
+				payHistory.setId(payTrade.getId());
+				payHistory.setTradeNo(tradeNo);
 				BeanService.ME.persist(payHistory);
 				return payService.proccess(payTrade);
 

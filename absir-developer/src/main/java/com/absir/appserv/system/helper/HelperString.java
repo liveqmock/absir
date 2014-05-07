@@ -7,13 +7,17 @@
  */
 package com.absir.appserv.system.helper;
 
+import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.absir.core.base.IBase;
 import com.absir.core.dyna.DynaBinder;
+import com.absir.core.kernel.KernelLang.BreakException;
+import com.absir.core.kernel.KernelLang.FilterTemplate;
 import com.absir.core.kernel.KernelString;
 import com.absir.core.kernel.KernelString.ImplodeBuilder;
 
@@ -21,7 +25,7 @@ import com.absir.core.kernel.KernelString.ImplodeBuilder;
  * @author absir
  * 
  */
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class HelperString extends StringUtils {
 
 	/** PARAM_MAP_IMPLODE_BUILDER */
@@ -77,5 +81,58 @@ public class HelperString extends StringUtils {
 		}
 
 		return paramMap;
+	}
+
+	/**
+	 * @param str
+	 * @param keyClass
+	 * @param valueClass
+	 * @param paramIdMap
+	 * @param filterTemplate
+	 * @return
+	 */
+	public static <ID extends Serializable, K extends IBase<ID>, V> Map<ID, V> paramIdMap(String str, Class<K> keyClass, Class<V> valueClass, Map<ID, V> paramIdMap,
+			FilterTemplate<Entry<K, V>> filterTemplate) {
+		if (str == null) {
+			return null;
+		}
+
+		Map<K, V> paramMap = paramMap(str, keyClass, valueClass);
+		if (paramIdMap == null) {
+			paramIdMap = new LinkedHashMap<ID, V>();
+		}
+
+		try {
+			for (Entry<K, V> entry : paramMap.entrySet()) {
+				if (filterTemplate == null || !filterTemplate.doWith(entry)) {
+					paramIdMap.put(entry.getKey().getId(), entry.getValue());
+				}
+			}
+
+		} catch (BreakException e) {
+		}
+
+		return paramIdMap;
+	}
+
+	/** NUMBER_FILTER_TEMPLATE */
+	public static final FilterTemplate<Entry<Object, Integer>> NUMBER_FILTER_TEMPLATE = new FilterTemplate<Entry<Object, Integer>>() {
+
+		@Override
+		public boolean doWith(Entry<Object, Integer> template) throws BreakException {
+			// TODO Auto-generated method stub
+			return template.getValue() == null || template.getValue() <= 0;
+		}
+
+	};
+
+	/**
+	 * @param str
+	 * @param keyClass
+	 * @param paramIdMap
+	 * @return
+	 */
+	public static <K extends IBase, M extends Map<? extends Serializable, Integer>> M paramIdNumberMap(String str, Class<K> keyClass, M paramIdMap) {
+		return (M) paramIdMap(str, keyClass, Integer.class, (Map<Serializable, Integer>) paramIdMap, (FilterTemplate<Entry<K, Integer>>) (Object) NUMBER_FILTER_TEMPLATE);
 	}
 }

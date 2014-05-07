@@ -12,6 +12,7 @@ import java.util.Map;
 
 import com.absir.appserv.system.bean.value.JaCrud;
 import com.absir.appserv.system.bean.value.JaEdit;
+import com.absir.core.kernel.KernelString;
 import com.absir.property.Property;
 import com.absir.property.PropertyObject;
 
@@ -249,6 +250,10 @@ public class EditorObject implements PropertyObject<EditorObject> {
 		// TODO Auto-generated method stub
 		if (property.getAllow() < 0) {
 			return null;
+		}
+
+		if (KernelString.isEmpty(lang)) {
+			lang = name;
 		}
 
 		return this;

@@ -132,6 +132,8 @@ public class EntityField extends DBField {
 			setCrudCascadeTypes(null);
 		}
 
+		boolean referenceCrudKey = false;
+		boolean referenceCrud = false;
 		// set fieldType
 		Class<?> fieldType = property.getType();
 		Class[] componentClasses = property.getField() == null ? KernelClass.componentClasses(fieldType) : KernelClass.componentClasses(accessor.getField().getGenericType());
@@ -159,23 +161,16 @@ public class EntityField extends DBField {
 					crudField.setKeyJoEntity(new JoEntity(null, componentClasses[0]));
 				}
 
-				if (entityName == null) {
-					if (!(crudField.getKeyJoEntity() == null && typeFieldType(componentClasses[0]))) {
-						crudField.setCruds(JaCrud.ALL);
-					}
+				if (!typeFieldType(componentClasses[0]) && KernelClass.isCustomClass(componentClasses[0])) {
+					// crudField.setCruds(JaCrud.ALL);
+					referenceCrudKey = true;
 				}
 
-				if (valueEntityName == null) {
-					EntityField valueField = new EntityField(crudField.getName(), null, null, null);
-					this.valueField = valueField;
-					crudField.setCruds(JaCrud.ALL);
-					if (crudField.getJoEntity() == null) {
-						valueField.typeFieldType(componentClasses.getClass());
-						Object valueFieldMap = metas.get("valueField");
-						if (valueFieldMap != null && valueFieldMap instanceof Map) {
-							DynaBinder.mapTo((Map) valueFieldMap, valueField);
-						}
-					}
+				EntityField valueField = new EntityField(crudField.getName(), null, null, null);
+				this.valueField = valueField;
+				if (!valueField.typeFieldType(componentClasses[1]) && KernelClass.isCustomClass(componentClasses[1])) {
+					// crudField.setCruds(JaCrud.ALL);
+					referenceCrud = true;
 				}
 
 				types.add(0, JaEdit.EDIT_SUBTABLE);
@@ -219,23 +214,19 @@ public class EntityField extends DBField {
 					} else if (Collection.class.isAssignableFrom(fieldType)) {
 						canOrder = false;
 						collection = true;
-						if (crudField.getJoEntity() != null) {
-							if (!typeFieldType(componentClass) && KernelClass.isCustomClass(componentClass)) {
-								crudField.setCruds(JaCrud.ALL);
-							}
-
-							types.add(0, JaEdit.EDIT_SUBTABLE);
+						if (!typeFieldType(componentClass) && KernelClass.isCustomClass(componentClass)) {
+							// crudField.setCruds(JaCrud.ALL);
+							referenceCrud = true;
 						}
+
+						types.add(0, JaEdit.EDIT_SUBTABLE);
 					}
 
 				} else {
-					crudField.setJoEntity(new JoEntity(entityName, null));
+					// referenceCrud = true;
+					referenceCrud = true;
 					if (Collection.class.isAssignableFrom(fieldType)) {
 						canOrder = false;
-						types.add("selects");
-
-					} else {
-						types.add("select");
 					}
 				}
 
@@ -268,11 +259,71 @@ public class EntityField extends DBField {
 			entityName = valueEntityName;
 		}
 
-		if (entityName != null || crudField.getJoEntity() == null || fieldType != componentClasses[0]) {
+		if (crudField.getJoEntity() == null || fieldType != componentClasses[0]) {
 			embedd = false;
 
 		} else if (!embedd) {
 			embedd = fieldType.getAnnotation(Embeddable.class) != null;
+		}
+
+		// embedd referenceCrudKey
+		if (componentClasses.length == 2) {
+			if (entityName != null) {
+				if (componentClasses[0] == SessionFactoryUtils.getIdentifierType(entityName, null)) {
+					embedd = false;
+					referenceCrudKey = false;
+				}
+			}
+
+			if (valueEntityName != null) {
+				if (componentClasses[1] == SessionFactoryUtils.getIdentifierType(valueEntityName, null)) {
+					embedd = false;
+					referenceCrud = false;
+				}
+			}
+
+		} else {
+			if (entityName != null) {
+				if (componentClasses[0] == SessionFactoryUtils.getIdentifierType(entityName, null)) {
+					embedd = false;
+					referenceCrud = false;
+				}
+			}
+		}
+
+		// embedd curd select selects
+		if (embedd) {
+			crudField.setCruds(JaCrud.ALL);
+
+		} else {
+			if (Map.class.isAssignableFrom(fieldType)) {
+				if (entityName != null) {
+					types.add(referenceCrudKey ? "select" : "iselect");
+
+				} else if (referenceCrudKey) {
+					crudField.setCruds(JaCrud.ALL);
+				}
+
+				if (valueEntityName != null) {
+					valueField.getTypes().add(referenceCrud ? "select" : "iselect");
+
+				} else if (referenceCrud) {
+					crudField.setCruds(JaCrud.ALL);
+				}
+
+			} else if (Collection.class.isAssignableFrom(fieldType)) {
+				if (entityName != null) {
+					types.add(referenceCrud ? "selects" : "iselect");
+
+				} else if (referenceCrud) {
+					crudField.setCruds(JaCrud.ALL);
+				}
+
+			} else {
+				if (entityName != null) {
+					types.add(referenceCrud ? "select" : "iselect");
+				}
+			}
 		}
 
 		// set crud
@@ -307,6 +358,14 @@ public class EntityField extends DBField {
 		if (editorObject.getMetas() != null) {
 			for (Entry<Object, Object> entry : editorObject.getMetas().entrySet()) {
 				metas.put(entry.getKey().toString(), entry.getValue());
+			}
+		}
+
+		// set metas valueField
+		if (valueField != null) {
+			Object valueFieldMap = metas.get("valueField");
+			if (valueFieldMap != null && valueFieldMap instanceof Map) {
+				DynaBinder.mapTo((Map) valueFieldMap, valueField);
 			}
 		}
 	}

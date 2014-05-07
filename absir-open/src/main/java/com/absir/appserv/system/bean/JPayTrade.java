@@ -11,6 +11,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+import com.absir.appserv.feature.menu.value.MaEntity;
+import com.absir.appserv.feature.menu.value.MaMenu;
 import com.absir.appserv.system.bean.base.JbBase;
 import com.absir.appserv.system.bean.value.JaEdit;
 import com.absir.appserv.system.bean.value.JaLang;
@@ -21,6 +23,7 @@ import com.absir.context.core.ContextUtils;
  * @author absir
  * 
  */
+@MaEntity(parent = { @MaMenu("支付管理") }, name = "订单")
 @Entity
 public class JPayTrade extends JbBase {
 
@@ -65,6 +68,7 @@ public class JPayTrade extends JbBase {
 
 	/** platform */
 	@JaLang("平台名称")
+	@JaEdit(groups = JaEdit.GROUP_LIST)
 	private String platform;
 
 	/** platformData */

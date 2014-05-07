@@ -11,7 +11,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.absir</groupId>
-			<artifactId>absir-alipay</artifactId>
+			<artifactId>absir-open</artifactId>
 			<version>${com.absir.version}</version>
 		</dependency>
 	</dependencies>

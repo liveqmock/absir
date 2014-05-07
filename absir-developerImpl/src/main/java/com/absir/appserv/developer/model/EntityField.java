@@ -37,6 +37,7 @@ import com.absir.appserv.support.developer.JCrud;
 import com.absir.appserv.system.bean.value.JaCrud;
 import com.absir.appserv.system.bean.value.JaCrud.Crud;
 import com.absir.appserv.system.bean.value.JaEdit;
+import com.absir.appserv.system.bean.value.JaEmbedd;
 import com.absir.appserv.system.bean.value.JeEditable;
 import com.absir.appserv.system.helper.HelperJson;
 import com.absir.appserv.system.helper.HelperLang;
@@ -263,7 +264,7 @@ public class EntityField extends DBField {
 			embedd = false;
 
 		} else if (!embedd) {
-			embedd = fieldType.getAnnotation(Embeddable.class) != null;
+			embedd = fieldType.getAnnotation(JaEmbedd.class) != null || fieldType.getAnnotation(Embeddable.class) != null;
 		}
 
 		// embedd referenceCrudKey

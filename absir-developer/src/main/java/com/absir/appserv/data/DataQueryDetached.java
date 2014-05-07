@@ -142,6 +142,9 @@ public class DataQueryDetached {
 		public abstract Object invoke(Query query, Class<?> returnType);
 	}
 
+	/** COUNT_PATTERN */
+	public static final String COUNT_PATTERN = " [] ";
+
 	/**
 	 * @param sql
 	 * @param nativeSql
@@ -228,13 +231,19 @@ public class DataQueryDetached {
 		}
 
 		if (jdbcPagePos >= 0) {
-			int selectPos = HelperString.indexOfIgnoreCase(sql, "SELECT");
+			int selectPos = HelperString.indexOfIgnoreCase(sql, "SELECT ");
 			if (selectPos >= 0) {
-				int fromPos = HelperString.indexOfIgnoreCase(sql, "FROM", selectPos);
+				int fromPos = HelperString.indexOfIgnoreCase(sql, " FROM", selectPos);
 				if (fromPos > 0) {
 					int splitPos = HelperString.indexOf(sql, ',', selectPos);
 					// generate count sql
-					String countSql = "SELECT COUNT(" + sql.substring(selectPos + 7, splitPos > 0 ? splitPos : (fromPos - 1)) + ") " + sql.substring(fromPos);
+					String countSql = "SELECT COUNT(" + sql.substring(selectPos + 7, splitPos < 0 || splitPos > fromPos ? fromPos : splitPos) + ") " + sql.substring(fromPos);
+					splitPos = HelperString.lastIndexOf(countSql, COUNT_PATTERN);
+					if (splitPos > 0) {
+						countSql = countSql.substring(0, splitPos);
+						this.sql = this.sql.replace(COUNT_PATTERN, " ");
+					}
+
 					// ingore parameter jdbcPage
 					parameterTypes[jdbcPagePos] = void.class;
 					// ingore parameter firstResultsPos

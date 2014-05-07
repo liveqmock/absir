@@ -7,7 +7,8 @@
  */
 package com.absir.appserv.developer.editor;
 
-import com.absir.appserv.system.bean.value.JaEmbedd;
+import javax.persistence.Embedded;
+
 import com.absir.bean.inject.value.Bean;
 import com.absir.core.dyna.DynaBinder;
 import com.absir.property.PropertyResolverAbstract;
@@ -17,7 +18,7 @@ import com.absir.property.PropertyResolverAbstract;
  * 
  */
 @Bean
-public class EditorEmbedd extends PropertyResolverAbstract<EditorObject, JaEmbedd> {
+public class EditorEmbeddable extends PropertyResolverAbstract<EditorObject, Embedded> {
 
 	/*
 	 * (non-Javadoc)
@@ -27,7 +28,7 @@ public class EditorEmbedd extends PropertyResolverAbstract<EditorObject, JaEmbed
 	 * (com.absir.property.PropertyObject, java.lang.annotation.Annotation)
 	 */
 	@Override
-	public EditorObject getPropertyObjectAnnotation(EditorObject propertyObject, JaEmbedd annotation) {
+	public EditorObject getPropertyObjectAnnotation(EditorObject propertyObject, Embedded annotation) {
 		// TODO Auto-generated method stub
 		if (propertyObject == null) {
 			propertyObject = new EditorObject();

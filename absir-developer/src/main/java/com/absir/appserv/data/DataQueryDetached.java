@@ -9,6 +9,7 @@ package com.absir.appserv.data;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.hibernate.Query;
@@ -95,7 +96,15 @@ public class DataQueryDetached {
 			}
 		},
 
-		COLLECTION {
+		LIST {
+			@Override
+			public Object invoke(Query query, Class<?> returnType) {
+				// TODO Auto-generated method stub
+				return DynaBinder.to(query.list(), returnType);
+			}
+		},
+
+		LIST_ITERATE {
 			@Override
 			public Object invoke(Query query, Class<?> returnType) {
 				// TODO Auto-generated method stub
@@ -142,8 +151,8 @@ public class DataQueryDetached {
 		public abstract Object invoke(Query query, Class<?> returnType);
 	}
 
-	/** COUNT_PATTERN */
-	public static final String COUNT_PATTERN = " [] ";
+	/** SQL_QUEUE_PATTERN */
+	public static final String SQL_QUEUE_PATTERN = " @ ";
 
 	/**
 	 * @param sql
@@ -151,13 +160,14 @@ public class DataQueryDetached {
 	 * @param sessionName
 	 * @param returnType
 	 * @param cacheable
+	 * @param aliasType
 	 * @param parameterTypes
 	 * @param parameterNames
 	 * @param firstResultsPos
 	 * @param maxResultsPos
 	 */
-	public DataQueryDetached(String sql, boolean nativeSql, String sessionName, Class<?> returnType, boolean cacheable, Class<?>[] parameterTypes, String[] parameterNames, int firstResultsPos,
-			int maxResultsPos) {
+	public DataQueryDetached(String sql, boolean nativeSql, String sessionName, Class<?> returnType, boolean cacheable, Class<?> aliasType, Class<?>[] parameterTypes, String[] parameterNames,
+			int firstResultsPos, int maxResultsPos) {
 		this.sql = sql;
 		this.nativeSql = nativeSql;
 		sessionFactory = KernelString.isEmpty(sessionName) ? null : SessionFactoryUtils.get().getNameMapSessionFactory(sessionName);
@@ -171,7 +181,7 @@ public class DataQueryDetached {
 				queryReturnInvoker = QueryReturnInvoker.ITERATE;
 
 			} else if (Collection.class.isAssignableFrom(returnType)) {
-				queryReturnInvoker = QueryReturnInvoker.COLLECTION;
+				queryReturnInvoker = aliasType == Collection.class ? QueryReturnInvoker.LIST : QueryReturnInvoker.LIST_ITERATE;
 
 			} else if (Map.class.isAssignableFrom(returnType)) {
 				queryReturnInvoker = QueryReturnInvoker.MAP;
@@ -187,6 +197,19 @@ public class DataQueryDetached {
 			}
 
 			// NULL IS Query
+		}
+
+		// setResultTransformer
+		if (aliasType == null || aliasType == void.class) {
+
+		} else if (aliasType == Map.class) {
+			resultTransformer = Transformers.ALIAS_TO_ENTITY_MAP;
+
+		} else if (aliasType == List.class) {
+			resultTransformer = Transformers.TO_LIST;
+
+		} else if (!KernelClass.isCustomClass(aliasType)) {
+			resultTransformer = Transformers.aliasToBean(aliasType);
 		}
 
 		int jdbcPagePos = -1;
@@ -238,10 +261,10 @@ public class DataQueryDetached {
 					int splitPos = HelperString.indexOf(sql, ',', selectPos);
 					// generate count sql
 					String countSql = "SELECT COUNT(" + sql.substring(selectPos + 7, splitPos < 0 || splitPos > fromPos ? fromPos : splitPos) + ") " + sql.substring(fromPos);
-					splitPos = HelperString.lastIndexOf(countSql, COUNT_PATTERN);
+					splitPos = HelperString.lastIndexOf(countSql, SQL_QUEUE_PATTERN);
 					if (splitPos > 0) {
 						countSql = countSql.substring(0, splitPos);
-						this.sql = this.sql.replace(COUNT_PATTERN, " ");
+						this.sql = this.sql.replace(SQL_QUEUE_PATTERN, " ");
 					}
 
 					// ingore parameter jdbcPage
@@ -256,7 +279,7 @@ public class DataQueryDetached {
 						parameterTypes[maxResultsPos] = void.class;
 					}
 
-					countQueryDetached = new DataQueryDetached(countSql, nativeSql, sessionName, Integer.class, cacheable, parameterTypes, parameterNames, -1, -1);
+					countQueryDetached = new DataQueryDetached(countSql, nativeSql, sessionName, Long.class, cacheable, null, parameterTypes, parameterNames, -1, -1);
 				}
 			}
 		}
@@ -333,7 +356,7 @@ public class DataQueryDetached {
 
 		if (!(jdbcPage == null || countQueryDetached == null)) {
 			// jdbcPage countQueryDetached
-			jdbcPage.setTotalCount((Integer) countQueryDetached.invoke(parameters));
+			jdbcPage.setTotalCount(((Long) countQueryDetached.invoke(parameters)).intValue());
 			query.setFirstResult(jdbcPage.getFirstResult());
 			query.setMaxResults(jdbcPage.getPageSize());
 		}

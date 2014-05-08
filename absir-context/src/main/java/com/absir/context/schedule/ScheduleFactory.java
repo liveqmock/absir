@@ -60,7 +60,7 @@ public class ScheduleFactory implements IMethodInject<Schedule> {
 		public void run() {
 			// TODO Auto-generated method stub
 			while (true) {
-				long time = System.currentTimeMillis();
+				long time = ContextUtils.getContextTime();
 				Date date = new Date(time);
 				UtilNode<ScheduleRunable> scheduleRunableNode = scheduleRunableHeader.getNext();
 				UtilNode<ScheduleRunable> scheduleRunableNext = null;

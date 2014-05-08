@@ -20,6 +20,7 @@ import com.absir.appserv.jdbc.JdbcAlias;
 import com.absir.appserv.jdbc.JdbcCondition;
 import com.absir.appserv.jdbc.JdbcPage;
 import com.absir.appserv.jdbc.JdbcUtils;
+import com.absir.core.dyna.DynaBinder;
 import com.absir.core.kernel.KernelLang;
 
 /**
@@ -138,18 +139,6 @@ public abstract class QueryDaoUtils {
 	 * @param session
 	 * @param queryString
 	 * @param parameters
-	 * @return
-	 */
-	public static Query createQueryArray(Session session, String queryString, Object... parameters) {
-		Query query = session.createQuery(queryString);
-		setParameterArray(query, parameters);
-		return query;
-	}
-
-	/**
-	 * @param session
-	 * @param queryString
-	 * @param parameters
 	 * @param firstResult
 	 * @param maxResults
 	 * @param cacheable
@@ -159,6 +148,51 @@ public abstract class QueryDaoUtils {
 		Query query = createQuery(session, queryString, parameters);
 		setQueryResult(query, firstResult, maxResults, cacheable);
 		return query;
+	}
+
+	/**
+	 * @param session
+	 * @param queryString
+	 * @param parameters
+	 * @return
+	 */
+	public static Query createQueryArray(Session session, String queryString, Object... parameters) {
+		Query query = session.createQuery(queryString);
+		setParameterArray(query, parameters);
+		return query;
+	}
+
+	/**
+	 * @param query
+	 * @return
+	 */
+	public static Object first(Query query) {
+		query.setMaxResults(1);
+		Iterator iterator = query.iterate();
+		return iterator.hasNext() ? iterator.next() : null;
+	}
+
+	/**
+	 * @param query
+	 * @param toClass
+	 * @return
+	 */
+	public static <T> T firstTo(Query query, Class<T> toClass) {
+		return DynaBinder.to(first(query), toClass);
+	}
+
+	/**
+	 * @param query
+	 * @return
+	 */
+	public static List list(Query query) {
+		Iterator iterator = query.iterate();
+		List list = new ArrayList();
+		while (iterator.hasNext()) {
+			list.add(iterator.next());
+		}
+
+		return list;
 	}
 
 	/**

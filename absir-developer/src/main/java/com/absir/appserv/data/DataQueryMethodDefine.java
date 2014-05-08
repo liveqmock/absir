@@ -9,17 +9,13 @@ package com.absir.appserv.data;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-
-import org.hibernate.transform.Transformers;
 
 import com.absir.aop.AopImplDefine;
 import com.absir.aop.AopMethodDefineAbstract;
-import com.absir.appserv.data.value.FirstResults;
-import com.absir.appserv.data.value.MaxResults;
 import com.absir.appserv.data.value.DataQuery;
 import com.absir.appserv.data.value.DataSession;
+import com.absir.appserv.data.value.FirstResults;
+import com.absir.appserv.data.value.MaxResults;
 import com.absir.bean.basis.Basis;
 import com.absir.bean.basis.BeanDefine;
 import com.absir.bean.core.BeanDefineDiscover;
@@ -103,22 +99,8 @@ public class DataQueryMethodDefine extends AopMethodDefineAbstract<DataQueryInte
 			}
 		}
 
-		DataQueryDetached queryDetached = new DataQueryDetached(query.value(), query.nativeQuery(), variable, method.getReturnType(), query.cacheable(), parameterTypes,
+		DataQueryDetached queryDetached = new DataQueryDetached(query.value(), query.nativeQuery(), variable, method.getReturnType(), query.cacheable(), query.aliasType(), parameterTypes,
 				BeanDefineDiscover.paramterNames(method), firstResultsPos, maxResultsPos);
-		// setResultTransformer
-		Class<?> aliasType = query.aliasType();
-		if (aliasType == null || aliasType == void.class) {
-
-		} else if (aliasType == Map.class) {
-			queryDetached.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
-
-		} else if (aliasType == List.class) {
-			queryDetached.setResultTransformer(Transformers.TO_LIST);
-
-		} else {
-			queryDetached.setResultTransformer(Transformers.aliasToBean(aliasType));
-		}
-
 		return queryDetached;
 	}
 

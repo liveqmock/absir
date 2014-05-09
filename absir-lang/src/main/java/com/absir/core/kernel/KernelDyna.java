@@ -551,11 +551,11 @@ public abstract class KernelDyna {
 	 */
 	public static Boolean toBoolean(String str, Boolean defaultValue) {
 		try {
-			return Boolean.valueOf(str);
+			return Float.valueOf(str).floatValue() != 0;
 
 		} catch (Exception e) {
 			try {
-				return Float.valueOf(str).floatValue() != 0;
+				return Boolean.valueOf(str);
 
 			} catch (Exception ex) {
 				return defaultValue;

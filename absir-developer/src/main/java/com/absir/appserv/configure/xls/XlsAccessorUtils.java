@@ -12,6 +12,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -323,7 +324,7 @@ public class XlsAccessorUtils {
 	public static class XlsDaoBean extends XlsDao {
 
 		/** beans */
-		private Map<Serializable, Object> beans = new HashMap<Serializable, Object>();
+		private Map<Serializable, Object> beans = new LinkedHashMap<Serializable, Object>();
 
 		/**
 		 * @param idType

@@ -67,9 +67,11 @@ public class RouteAdapter {
 			int mMax = -1;
 			int mmMin = -1;
 			while (min < max) {
-				m = (min + max) / 2;
+				m = (min + max) >> 1;
 				if (m == min) {
-					break;
+					if (min == max || mMax != mmMin) {
+						break;
+					}
 				}
 
 				compare = compare(routeMatchers.get(m), uries, length);

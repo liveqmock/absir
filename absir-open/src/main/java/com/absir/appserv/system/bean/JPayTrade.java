@@ -10,6 +10,7 @@ package com.absir.appserv.system.bean;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Index;
 
 import com.absir.appserv.feature.menu.value.MaEntity;
 import com.absir.appserv.feature.menu.value.MaMenu;
@@ -18,6 +19,7 @@ import com.absir.appserv.system.bean.value.JaEdit;
 import com.absir.appserv.system.bean.value.JaLang;
 import com.absir.appserv.system.bean.value.JePayStatus;
 import com.absir.context.core.ContextUtils;
+import com.absir.orm.value.JaColum;
 
 /**
  * @author absir
@@ -59,6 +61,7 @@ public class JPayTrade extends JbBase {
 	/** status */
 	@JaLang("交易状态")
 	@JaEdit(groups = JaEdit.GROUP_LIST)
+	@JaColum(indexs = @Index(columnList = ""))
 	private JePayStatus status;
 
 	/** orderNo */

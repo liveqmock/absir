@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Inject;
 import com.absir.bean.inject.value.InjectType;
 import com.absir.core.kernel.KernelClass;
@@ -39,6 +40,15 @@ public abstract class PropertySupply<O extends PropertyObject<T>, T> {
 		return supplySize;
 	}
 
+	// 初始化属性参数空间
+	static {
+		List<PropertySupply> propertySupplies = BeanFactoryUtils.getOrderBeanObjects(PropertySupply.class);
+		supplySize = propertySupplies.size();
+		for (int i = 0; i < supplySize; i++) {
+			propertySupplies.get(i).supplyIndex = i;
+		}
+	}
+
 	/** supplyIndex */
 	private int supplyIndex;
 
@@ -47,16 +57,6 @@ public abstract class PropertySupply<O extends PropertyObject<T>, T> {
 
 	/** ingoreAnnotationClass */
 	protected Class<? extends Annotation> ingoreAnnotationClass;
-
-	/**
-	 * 
-	 */
-	public PropertySupply() {
-		synchronized (PropertySupply.class) {
-			supplyIndex = supplySize;
-			supplySize++;
-		}
-	}
 
 	/**
 	 * @param propertyResolvers

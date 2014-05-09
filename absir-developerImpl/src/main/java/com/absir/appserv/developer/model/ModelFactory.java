@@ -128,6 +128,10 @@ public class ModelFactory {
 		}
 
 		EntityField.addEntityFieldScope(null, joEntity, entityModel.getFields(), entityModel);
+		for (IField parmary : entityModel.getPrimaries()) {
+			entityModel.addGroupField(JaEdit.GROUP_SUGGEST, parmary);
+		}
+
 		entityModel.addGroupField(JaEdit.GROUP_LIST, entityModel.getPrimary());
 		for (IField field : entityModel.getFields()) {
 			// entityModel.addField(field);

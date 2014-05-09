@@ -11,6 +11,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import com.absir.bean.inject.value.Bean;
 import com.absir.context.core.compare.CompareAbstract;
 import com.absir.context.core.compare.CompareObject;
 import com.absir.context.core.compare.value.CaField;
@@ -24,6 +25,7 @@ import com.absir.property.value.PropertyInfo;
  * 
  */
 @SuppressWarnings("rawtypes")
+@Bean
 public class ContextMapSupply extends PropertySupply<CompareObject, CompareAbstract> {
 
 	/** compareObject */

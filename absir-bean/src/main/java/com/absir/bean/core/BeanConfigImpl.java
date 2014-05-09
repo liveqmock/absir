@@ -189,7 +189,7 @@ public class BeanConfigImpl implements BeanConfig {
 	 * @param loadedPropertyFilenames
 	 * @param beanConfigTemplates
 	 */
-	private void readProperties(String filename, final Set<String> propertyFilenames, final Set<String> loadedPropertyFilenames, final Map<String, CallbackTemplate<String>> beanConfigTemplates) {
+	private void readProperties(String filename, Set<String> propertyFilenames, Set<String> loadedPropertyFilenames, Map<String, CallbackTemplate<String>> beanConfigTemplates) {
 		if (!loadedPropertyFilenames.add(filename)) {
 			return;
 		}
@@ -219,107 +219,119 @@ public class BeanConfigImpl implements BeanConfig {
 				}
 
 			} else {
-				try {
-					HelperFile.doWithReadLine(propertyFile, new CallbackBreak<String>() {
+				readProperties(this, configMap, propertyFile, beanConfigTemplates);
+			}
+		}
+	}
 
-						@Override
-						public void doWith(String template) throws BreakException {
-							// TODO Auto-generated method stub
-							template = template.trim();
-							int length = template.length();
-							if (length <= 2 || template.charAt(0) == '#') {
+	/**
+	 * @param beanConfig
+	 * @param configMap
+	 * @param propertyFile
+	 * @param propertyFilenames
+	 * @param loadedPropertyFilenames
+	 * @param beanConfigTemplates
+	 */
+	private static void readProperties(final BeanConfigImpl beanConfig, final Map<String, Object> configMap, File propertyFile, final Map<String, CallbackTemplate<String>> beanConfigTemplates) {
+		try {
+			HelperFile.doWithReadLine(propertyFile, new CallbackBreak<String>() {
+
+				@Override
+				public void doWith(String template) throws BreakException {
+					// TODO Auto-generated method stub
+					template = template.trim();
+					int length = template.length();
+					if (length <= 2 || template.charAt(0) == '#') {
+						return;
+					}
+
+					int index = template.indexOf('=');
+					if (index > 0 && index < length - 1) {
+						char chr = template.charAt(index - 1);
+						String name;
+						if (chr == '.' || chr == '#' || chr == '+') {
+							if (index < 1) {
 								return;
 							}
 
-							int index = template.indexOf('=');
-							if (index > 0 && index < length - 1) {
-								char chr = template.charAt(index - 1);
-								String name;
-								if (chr == '.' || chr == '#' || chr == '+') {
-									if (index < 1) {
-										return;
-									}
+							name = template.substring(0, index - 1).trim();
 
-									name = template.substring(0, index - 1).trim();
+						} else {
+							chr = 0;
+							name = template.substring(0, index).trim();
+						}
 
-								} else {
-									chr = 0;
-									name = template.substring(0, index).trim();
-								}
+						length = name.length();
+						if (length == 0) {
+							return;
+						}
 
-								length = name.length();
-								if (length == 0) {
-									return;
-								}
+						template = template.substring(index + 1).trim();
+						String[] environments = null;
+						index = name.indexOf('|');
+						if (index > 0) {
+							if (length <= 1) {
+								return;
+							}
 
-								template = template.substring(index + 1).trim();
-								String[] environments = null;
-								index = name.indexOf('|');
-								if (index > 0) {
-									if (length <= 1) {
-										return;
-									}
+							String environmentParams = name.substring(index + 1);
+							name = name.substring(0, index).trim();
+							length = name.length();
+							if (length == 0) {
+								return;
+							}
 
-									String environmentParams = name.substring(index + 1);
-									name = name.substring(0, index).trim();
-									length = name.length();
-									if (length == 0) {
-										return;
-									}
+							environments = environmentParams.trim().split("\\|");
+						}
 
-									environments = environmentParams.trim().split("\\|");
-								}
-
-								if (environments == null || KernelArray.contain(environments, environment.name())) {
-									template = getExpression(template);
-									CallbackTemplate<String> callbackTemplate = chr == 0 ? beanConfigTemplates.get(name) : null;
-									if (callbackTemplate == null) {
-										Object value = template;
-										if (chr != 0) {
-											Object old;
-											switch (chr) {
-											case '.':
-												old = DynaBinder.to(configMap.get(name), String.class);
-												if (old != null) {
-													value = old + template;
-												}
-
-												break;
-											case '#':
-												old = DynaBinder.to(configMap.get(name), String.class);
-												if (old != null) {
-													value = old + "\r\n" + template;
-												}
-
-												break;
-											case '+':
-												old = DynaBinder.to(configMap.get(name), List.class);
-												if (old != null) {
-													((List) old).add(template);
-													value = old;
-												}
-
-												break;
-											default:
-												break;
-											}
+						if (environments == null || KernelArray.contain(environments, beanConfig.environment.name())) {
+							template = beanConfig.getExpression(template);
+							CallbackTemplate<String> callbackTemplate = chr == 0 ? beanConfigTemplates == null ? null : beanConfigTemplates.get(name) : null;
+							if (callbackTemplate == null) {
+								Object value = template;
+								if (chr != 0) {
+									Object old;
+									switch (chr) {
+									case '.':
+										old = DynaBinder.to(configMap.get(name), String.class);
+										if (old != null) {
+											value = old + template;
 										}
 
-										setValue(name, value);
+										break;
+									case '#':
+										old = DynaBinder.to(configMap.get(name), String.class);
+										if (old != null) {
+											value = old + "\r\n" + template;
+										}
 
-									} else {
-										callbackTemplate.doWith(template);
+										break;
+									case '+':
+										old = DynaBinder.to(configMap.get(name), List.class);
+										if (old != null) {
+											((List) old).add(template);
+											value = old;
+										}
+
+										break;
+									default:
+										break;
 									}
 								}
+
+								configMap.put(name, value);
+
+							} else {
+								callbackTemplate.doWith(template);
 							}
 						}
-					});
-
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					}
 				}
-			}
+			});
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
@@ -380,6 +392,15 @@ public class BeanConfigImpl implements BeanConfig {
 	 * @return
 	 */
 	public String getExpression(String expression) {
+		return getExpression(expression, false);
+	}
+
+	/**
+	 * @param expression
+	 * @param strict
+	 * @return
+	 */
+	public String getExpression(String expression, boolean strict) {
 		int fromIndex = expression.indexOf("${");
 		if (fromIndex >= 0 && fromIndex < expression.length() - 2) {
 			StringBuilder stringBuilder = new StringBuilder();
@@ -407,9 +428,11 @@ public class BeanConfigImpl implements BeanConfig {
 				fromIndex += 2;
 				if (fromIndex < endIndex) {
 					Object value = getValue(expression.substring(fromIndex, endIndex));
-					if (value != null) {
-						stringBuilder.append(value);
+					if (strict && value == null) {
+						return null;
 					}
+
+					stringBuilder.append(value);
 				}
 
 				fromIndex = expression.indexOf("${", endIndex);

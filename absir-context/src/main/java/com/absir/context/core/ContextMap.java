@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.context.core.compare.CompareAbstract;
 import com.absir.property.Property;
 import com.absir.property.PropertyData;
@@ -25,7 +26,7 @@ import com.absir.property.PropertyData;
 public class ContextMap {
 
 	/** CONTEXT_MAP_SUPPLY */
-	protected static final ContextMapSupply CONTEXT_MAP_SUPPLY = new ContextMapSupply();
+	public static final ContextMapSupply CONTEXT_MAP_SUPPLY = BeanFactoryUtils.get(ContextMapSupply.class);
 
 	/** obj */
 	private transient Object obj;

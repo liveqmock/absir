@@ -8,6 +8,7 @@
 package com.absir.appserv.crud;
 
 import com.absir.appserv.support.developer.JCrud;
+import com.absir.core.util.UtilAccessor.Accessor;
 
 /**
  * @author absir
@@ -69,6 +70,13 @@ public abstract class CrudProperty {
 	 */
 	public int getExclude() {
 		return exclude;
+	}
+	
+	/**
+	 * @return
+	 */
+	public Accessor getAccessor() {
+		return null;
 	}
 
 	/**

@@ -319,6 +319,17 @@ public abstract class CrudUtils {
 			// TODO Auto-generated method stub
 			accessor.set(entity, propertyValue);
 		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see com.absir.appserv.crud.CrudProperty#getAccessor()
+		 */
+		@Override
+		public Accessor getAccessor() {
+			// TODO Auto-generated method stub
+			return accessor;
+		}
 	}
 
 	/**

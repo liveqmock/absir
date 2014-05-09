@@ -232,7 +232,7 @@ public class BeanConfigImpl implements BeanConfig {
 	 * @param loadedPropertyFilenames
 	 * @param beanConfigTemplates
 	 */
-	private static void readProperties(final BeanConfigImpl beanConfig, final Map<String, Object> configMap, File propertyFile, final Map<String, CallbackTemplate<String>> beanConfigTemplates) {
+	public static void readProperties(final BeanConfig beanConfig, final Map<String, Object> configMap, File propertyFile, final Map<String, CallbackTemplate<String>> beanConfigTemplates) {
 		try {
 			HelperFile.doWithReadLine(propertyFile, new CallbackBreak<String>() {
 
@@ -284,7 +284,7 @@ public class BeanConfigImpl implements BeanConfig {
 							environments = environmentParams.trim().split("\\|");
 						}
 
-						if (environments == null || KernelArray.contain(environments, beanConfig.environment.name())) {
+						if (environments == null || KernelArray.contain(environments, beanConfig.getEnvironment().name())) {
 							template = beanConfig.getExpression(template);
 							CallbackTemplate<String> callbackTemplate = chr == 0 ? beanConfigTemplates == null ? null : beanConfigTemplates.get(name) : null;
 							if (callbackTemplate == null) {

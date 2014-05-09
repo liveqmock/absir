@@ -14,14 +14,11 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.absir.bean.basis.BeanConfig;
+import com.absir.bean.core.BeanConfigImpl;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.binder.BinderUtils;
 import com.absir.core.dyna.DynaBinder;
-import com.absir.core.helper.HelperFile;
 import com.absir.core.kernel.KernelClass;
-import com.absir.core.kernel.KernelLang.BreakException;
-import com.absir.core.kernel.KernelLang.CallbackBreak;
 
 /**
  * @author absir
@@ -41,37 +38,8 @@ public abstract class ConfigureUtils {
 	 * @return
 	 */
 	public static Map<String, Object> readPropertyMap(File file) {
-		final BeanConfig beanConfig = BeanFactoryUtils.getBeanConfig();
-		final Map<String, Object> propertyMap = new HashMap<String, Object>();
-		try {
-			HelperFile.doWithReadLine(file, new CallbackBreak<String>() {
-
-				@Override
-				public void doWith(String template) throws BreakException {
-					// TODO Auto-generated method stub
-					if (template.startsWith("#")) {
-						return;
-					}
-
-					int split = template.indexOf('=');
-					if (split <= 0) {
-						return;
-					}
-
-					String value = template.substring(split + 1).trim();
-					if (value.length() > 1 && value.startsWith("\"") && value.endsWith("\"")) {
-						value = value.substring(1, value.length() - 1).replace("\\\"", "\"");
-					}
-
-					value = beanConfig.getExpression(value);
-					propertyMap.put(template.substring(0, split).trim(), value);
-				}
-			});
-
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
-
+		Map<String, Object> propertyMap = new HashMap<String, Object>();
+		BeanConfigImpl.readProperties(BeanFactoryUtils.getBeanConfig(), propertyMap, file, null);
 		return BinderUtils.getDataMap(propertyMap);
 	}
 

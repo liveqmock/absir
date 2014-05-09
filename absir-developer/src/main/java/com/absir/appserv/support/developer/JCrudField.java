@@ -25,6 +25,12 @@ public class JCrudField implements Serializable {
 	/** type */
 	private Class<?> type;
 
+	/** include */
+	private int include;
+
+	/** exclude */
+	private int exclude;
+
 	/** jCrud */
 	private JCrud jCrud;
 
@@ -65,6 +71,36 @@ public class JCrudField implements Serializable {
 	 */
 	public void setType(Class<?> type) {
 		this.type = type;
+	}
+
+	/**
+	 * @return the include
+	 */
+	public int getInclude() {
+		return include;
+	}
+
+	/**
+	 * @param include
+	 *            the include to set
+	 */
+	public void setInclude(int include) {
+		this.include = include;
+	}
+
+	/**
+	 * @return the exclude
+	 */
+	public int getExclude() {
+		return exclude;
+	}
+
+	/**
+	 * @param exclude
+	 *            the exclude to set
+	 */
+	public void setExclude(int exclude) {
+		this.exclude = exclude;
 	}
 
 	/**

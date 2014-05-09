@@ -18,6 +18,12 @@ public abstract class CrudProperty {
 	/** type */
 	protected Class<?> type;
 
+	/** group */
+	protected int include;
+
+	/** exclude */
+	protected int exclude;
+
 	/** jCrud */
 	protected JCrud jCrud;
 
@@ -49,6 +55,20 @@ public abstract class CrudProperty {
 	 */
 	public Class<?> getType() {
 		return type;
+	}
+
+	/**
+	 * @return the include
+	 */
+	public int getInclude() {
+		return include;
+	}
+
+	/**
+	 * @return the exclude
+	 */
+	public int getExclude() {
+		return exclude;
 	}
 
 	/**

@@ -179,10 +179,19 @@ public class UtilAccessor {
 
 	/**
 	 * @param cls
-	 * @param propertyName
+	 * @param property
 	 * @return
 	 */
-	public static Accessor getAccessor(Class<?> cls, final Field field) {
+	public static Accessor getAccessorProperty(Class<?> cls, String property) {
+		return getAccessor(cls, property, KernelReflect.declaredField(cls, property));
+	}
+
+	/**
+	 * @param cls
+	 * @param field
+	 * @return
+	 */
+	public static Accessor getAccessor(Class<?> cls, Field field) {
 		return getAccessor(cls, field.getName(), field);
 	}
 

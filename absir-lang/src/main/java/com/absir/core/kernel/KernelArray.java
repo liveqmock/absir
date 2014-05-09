@@ -198,6 +198,23 @@ public abstract class KernelArray {
 	 * @param array
 	 * @return
 	 */
+	public static Object[] toArray(Object array) {
+		int length = Array.getLength(array);
+		Object[] objects = new Object[length];
+		if (length > 0) {
+			ArrayAccessor accessor = forClass(array.getClass());
+			for (int i = 0; i < length; i++) {
+				objects[i] = accessor.get(array, i);
+			}
+		}
+
+		return objects;
+	}
+
+	/**
+	 * @param array
+	 * @return
+	 */
 	public static <T> List<T> toList(T[] array) {
 		List<T> list = new ArrayList<T>(array.length);
 		copy(array, list);

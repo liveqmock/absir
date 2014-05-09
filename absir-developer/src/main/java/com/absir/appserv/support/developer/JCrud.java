@@ -10,7 +10,7 @@ package com.absir.appserv.support.developer;
 import java.io.Serializable;
 
 import com.absir.appserv.system.bean.value.JaCrud;
-import com.absir.core.dyna.DynaBinder;
+import com.absir.core.kernel.KernelArray;
 import com.absir.core.kernel.KernelClass;
 import com.absir.core.kernel.KernelString;
 
@@ -54,7 +54,7 @@ public class JCrud implements Serializable {
 		if (crud != null) {
 			value = crud.value();
 			factory = crud.factory();
-			parameters = DynaBinder.to(crud.parameters(), Object[].class);
+			parameters = KernelArray.toArray(crud.parameters());
 			cruds = crud.cruds();
 		}
 	}

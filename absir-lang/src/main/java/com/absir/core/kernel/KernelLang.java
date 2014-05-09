@@ -448,6 +448,9 @@ public class KernelLang {
 	 */
 	public static class PropertyFilter {
 
+		/** group */
+		private int group;
+
 		/** includes */
 		private Map<String, Entry<String, MatcherType>> includes;
 
@@ -462,6 +465,7 @@ public class KernelLang {
 		 */
 		public PropertyFilter newly() {
 			PropertyFilter filter = new PropertyFilter();
+			filter.group = group;
 			filter.includes = includes;
 			filter.excludes = excludes;
 			return filter;
@@ -472,6 +476,30 @@ public class KernelLang {
 		 */
 		public void begin() {
 			propertyPath = "";
+		}
+
+		/**
+		 * @param include
+		 * @param exclude
+		 * @return
+		 */
+		public boolean allow(int include, int exclude) {
+			return group == 0 || ((exclude & group) == 0 && (include == 0 || (include & group) != 0));
+		}
+
+		/**
+		 * @return the group
+		 */
+		public int getGroup() {
+			return group;
+		}
+
+		/**
+		 * @param group
+		 *            the group to set
+		 */
+		public void setGroup(int group) {
+			this.group = group;
 		}
 
 		/**

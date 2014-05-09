@@ -11,7 +11,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 import com.absir.bean.core.BeanFactoryUtils;
-import com.absir.core.kernel.KernelReflect;
 import com.absir.core.util.UtilAccessor;
 import com.absir.core.util.UtilAccessor.Accessor;
 
@@ -20,9 +19,6 @@ import com.absir.core.util.UtilAccessor.Accessor;
  * 
  */
 public class Property {
-
-	/** field */
-	private Field field;
 
 	/** accessor */
 	private Accessor accessor;
@@ -54,8 +50,8 @@ public class Property {
 	 * @param factoryClass
 	 */
 	public Property(Class<?> beanClass, String name, int include, int exclude, String beanName, Class<? extends PropertyFactory> factoryClass) {
-		field = KernelReflect.declaredField(beanClass, name);
-		accessor = UtilAccessor.getAccessor(beanClass, name, field);
+		accessor = UtilAccessor.getAccessorProperty(beanClass, name);
+		Field field = accessor.getField();
 		if (field == null || !Modifier.isPublic(field.getModifiers())) {
 			if (accessor == null) {
 				allow = -2;
@@ -104,7 +100,7 @@ public class Property {
 	 * @return the field
 	 */
 	public Field getField() {
-		return field;
+		return accessor.getField();
 	}
 
 	/**

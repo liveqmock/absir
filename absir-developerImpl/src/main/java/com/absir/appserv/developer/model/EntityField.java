@@ -80,11 +80,20 @@ public class EntityField extends DBField {
 	public EntityField(String name, Property property, EditorObject editorObject, JoEntity joEntity) {
 		// set properties
 		crudField.setName(name);
-		if (property == null || editorObject == null || joEntity == null) {
+		if (property == null) {
 			return;
 		}
 
+		// setPropertyField
 		crudField.setType(property.getType());
+		crudField.setInclude(property.getInclude());
+		crudField.setExclude(property.getExclude());
+
+		// is valueField
+		if (editorObject == null || joEntity == null) {
+			return;
+		}
+
 		generated = editorObject.isGenerated();
 		embedd = editorObject.isEmbedd();
 		caption = HelperLang.getFieldCaption(editorObject.getLang(), joEntity.getEntityClass());
@@ -167,7 +176,8 @@ public class EntityField extends DBField {
 					referenceCrudKey = true;
 				}
 
-				EntityField valueField = new EntityField(crudField.getName(), null, null, null);
+				EntityField valueField = new EntityField(crudField.getName(), property, null, null);
+				valueField.crudField.setType(componentClasses[1]);
 				this.valueField = valueField;
 				if (!valueField.typeFieldType(componentClasses[1]) && KernelClass.isCustomClass(componentClasses[1])) {
 					// crudField.setCruds(JaCrud.ALL);

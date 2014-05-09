@@ -25,8 +25,7 @@ import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.bean.value.JaCrud.Crud;
 import com.absir.appserv.system.helper.HelperRandom;
 import com.absir.bean.core.BeanFactoryUtils;
-import com.absir.bean.inject.value.Inject;
-import com.absir.bean.inject.value.InjectType;
+import com.absir.bean.inject.value.Started;
 import com.absir.bean.inject.value.Value;
 import com.absir.core.helper.HelperFile;
 import com.absir.core.helper.HelperFileName;
@@ -44,11 +43,11 @@ import com.absir.servlet.InputRequest;
  */
 public class UploadCrudFactory implements ICrudFactory {
 
-	/** uploadPath */
-	private static String uploadPath;
-
 	/** uploadUrl */
 	private static String uploadUrl;
+
+	/** uploadPath */
+	private static String uploadPath;
 
 	/** LOGGER */
 	private static final Logger LOGGER = LoggerFactory.getLogger(UploadCrudFactory.class);
@@ -56,15 +55,15 @@ public class UploadCrudFactory implements ICrudFactory {
 	/**
 	 * @return
 	 */
-	public static String getUploadPath() {
-		return uploadPath;
+	public static String getUploadUrl() {
+		return uploadUrl;
 	}
 
 	/**
 	 * @return
 	 */
-	public static String getUploadUrl() {
-		return uploadUrl;
+	public static String getUploadPath() {
+		return uploadPath;
 	}
 
 	/**
@@ -78,16 +77,17 @@ public class UploadCrudFactory implements ICrudFactory {
 	}
 
 	/**
+	 * @param uploadUrl
 	 * @param uploadPath
 	 */
-	@Inject(type = InjectType.Selectable)
-	protected void setUploadDir(@Value(value = "resource.upload.path", defaultValue = "upload") String uploadPath, @Value(value = "resource.upload.url", defaultValue = "upload") String uploadUrl) {
+	@Started
+	protected void setUploadUrl(@Value(value = "resource.upload.url", defaultValue = "upload") String uploadUrl, @Value(value = "resource.upload.path", defaultValue = "upload") String uploadPath) {
 		if (KernelString.isEmpty(uploadPath)) {
 			return;
 		}
 
+		UploadCrudFactory.uploadUrl = uploadUrl;
 		UploadCrudFactory.uploadPath = HelperFileName.normalizeNoEndSeparator(BeanFactoryUtils.getBeanConfig().getResourcePath() + uploadPath) + "/";
-		UploadCrudFactory.uploadUrl = HelperFileName.normalizeNoEndSeparator(uploadUrl);
 	}
 
 	/**
@@ -241,7 +241,7 @@ public class UploadCrudFactory implements ICrudFactory {
 					HelperFile.deleteQuietly(new File(uploadPath + uploadFile));
 				}
 
-				uploadFile = "upload/" + HelperRandom.randSecendId() + "." + HelperFileName.getExtension(requestBody.getName());
+				uploadFile = HelperRandom.randSecendId() + "." + HelperFileName.getExtension(requestBody.getName());
 				try {
 					HelperFile.write(new File(uploadPath + uploadFile), requestBody.getInputStream());
 

@@ -7,7 +7,6 @@
  */
 package com.absir.appserv.crud;
 
-import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -29,7 +28,6 @@ import com.absir.bean.inject.value.InjectType;
 import com.absir.core.kernel.KernelArray;
 import com.absir.core.kernel.KernelLang;
 import com.absir.core.kernel.KernelLang.PropertyFilter;
-import com.absir.core.kernel.KernelReflect;
 import com.absir.core.util.UtilAccessor;
 import com.absir.core.util.UtilAccessor.Accessor;
 import com.absir.core.util.UtilRuntime;
@@ -61,6 +59,7 @@ public abstract class CrudUtils {
 	 * @param joEntity
 	 * @param entity
 	 * @param filter
+	 * @param group
 	 * @param user
 	 */
 	public static void crud(JaCrud.Crud crud, JoEntity joEntity, Object entity, PropertyFilter filter, final JiUserBase user) {
@@ -81,7 +80,7 @@ public abstract class CrudUtils {
 			@Override
 			public boolean isSupport(CrudProperty crudProperty) {
 				// TODO Auto-generated method stub
-				return true;
+				return filter.allow(crudProperty.getInclude(), crudProperty.getExclude());
 			}
 
 			@Override
@@ -279,10 +278,10 @@ public abstract class CrudUtils {
 	 * @author absir
 	 * 
 	 */
-	private static class CrudPropertyField extends CrudProperty {
+	private static class CrudPropertyAccessor extends CrudProperty {
 
-		/** field */
-		private Field field;
+		/** name */
+		private String name;
 
 		/** accessor */
 		private Accessor accessor;
@@ -295,7 +294,7 @@ public abstract class CrudUtils {
 		@Override
 		public String getName() {
 			// TODO Auto-generated method stub
-			return field.getName();
+			return name;
 		}
 
 		/*
@@ -495,19 +494,21 @@ public abstract class CrudUtils {
 			crudProperty = crudPropertyName;
 
 		} else {
-			Field field = KernelReflect.declaredField(entityClass, crudField.getName());
-			if (field == null) {
+			Accessor accessor = UtilAccessor.getAccessorProperty(entityClass, crudField.getName());
+			if (accessor == null) {
 				return;
 			}
 
-			CrudPropertyField crudPropertyField = new CrudPropertyField();
-			crudPropertyField.field = field;
-			crudPropertyField.accessor = UtilAccessor.getAccessor(entityClass, field);
-			crudProperty = crudPropertyField;
+			CrudPropertyAccessor crudPropertyAccessor = new CrudPropertyAccessor();
+			crudPropertyAccessor.name = crudField.getName();
+			crudPropertyAccessor.accessor = accessor;
+			crudProperty = crudPropertyAccessor;
 		}
 
 		crudProperty.crudProcessor = crudProcessor;
 		crudProperty.type = crudField.getType();
+		crudProperty.include = crudField.getInclude();
+		crudProperty.exclude = crudField.getExclude();
 		crudProperty.jCrud = crudField.getjCrud();
 		if (crudProperty.jCrud != null) {
 			crudEntity.addCrudProperty(crudProperty);

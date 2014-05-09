@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite failures="0" time="0.069" errors="0" skipped="0" tests="1" name="com.absir.test.ReflectTest">
+<testsuite failures="0" time="0.083" errors="0" skipped="0" tests="1" name="com.absir.test.ReflectTest">
   <properties>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
     <property name="sun.boot.library.path" value="/Library/Java/JavaVirtualMachines/jdk1.7.0_12.jdk/Contents/Home/jre/lib"/>
@@ -20,7 +20,7 @@
     <property name="basedir" value="/Users/absir/Documents/workspace-sts/absir/absir-server"/>
     <property name="java.endorsed.dirs" value="/Library/Java/JavaVirtualMachines/jdk1.7.0_12.jdk/Contents/Home/jre/lib/endorsed"/>
     <property name="os.arch" value="x86_64"/>
-    <property name="surefire.real.class.path" value="/Users/absir/Documents/workspace-sts/absir/absir-server/target/surefire/surefirebooter5129621576332007253.jar"/>
+    <property name="surefire.real.class.path" value="/Users/absir/Documents/workspace-sts/absir/absir-server/target/surefire/surefirebooter1219239481931790670.jar"/>
     <property name="java.io.tmpdir" value="/var/folders/cn/z6slxy1x405g15s8bgprsy800000gn/T/"/>
     <property name="line.separator" value="
 "/>
@@ -46,7 +46,7 @@
     <property name="java.vm.specification.version" value="1.7"/>
     <property name="sun.arch.data.model" value="64"/>
     <property name="java.home" value="/Library/Java/JavaVirtualMachines/jdk1.7.0_12.jdk/Contents/Home/jre"/>
-    <property name="sun.java.command" value="/Users/absir/Documents/workspace-sts/absir/absir-server/target/surefire/surefirebooter5129621576332007253.jar /Users/absir/Documents/workspace-sts/absir/absir-server/target/surefire/surefire437743451080210955tmp /Users/absir/Documents/workspace-sts/absir/absir-server/target/surefire/surefire3917978486877663284tmp"/>
+    <property name="sun.java.command" value="/Users/absir/Documents/workspace-sts/absir/absir-server/target/surefire/surefirebooter1219239481931790670.jar /Users/absir/Documents/workspace-sts/absir/absir-server/target/surefire/surefire8610678422327032148tmp /Users/absir/Documents/workspace-sts/absir/absir-server/target/surefire/surefire5802200021598176638tmp"/>
     <property name="java.specification.vendor" value="Oracle Corporation"/>
     <property name="user.language" value="zh"/>
     <property name="awt.toolkit" value="sun.lwawt.macosx.LWCToolkit"/>
@@ -64,5 +64,5 @@
     <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
-  <testcase time="0.004" classname="com.absir.test.ReflectTest" name="test"/>
+  <testcase time="0.005" classname="com.absir.test.ReflectTest" name="test"/>
 </testsuite>

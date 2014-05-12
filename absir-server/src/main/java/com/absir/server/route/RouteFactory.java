@@ -32,6 +32,7 @@ import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Inject;
 import com.absir.bean.inject.value.InjectType;
 import com.absir.bean.inject.value.Orders;
+import com.absir.core.kernel.KernelArray;
 import com.absir.core.kernel.KernelCollection;
 import com.absir.core.kernel.KernelLang.ObjectEntry;
 import com.absir.core.kernel.KernelString;
@@ -50,6 +51,7 @@ import com.absir.server.value.Before;
 import com.absir.server.value.Close;
 import com.absir.server.value.Interceptors;
 import com.absir.server.value.Mapping;
+import com.absir.server.value.Nullable;
 import com.absir.server.value.OnException;
 import com.absir.server.value.Server;
 import com.absir.server.value.UrlBase;
@@ -252,6 +254,10 @@ public class RouteFactory implements IBeanDefineSupply, IBeanFactoryAware, IMeth
 						break;
 					}
 				}
+			}
+
+			if (parameterPathAnnotations != null && KernelArray.getAssignable(parameterAnnotations[i], Nullable.class) != null) {
+				routeMethod.nullables[i] = true;
 			}
 
 			if (parameter == null) {

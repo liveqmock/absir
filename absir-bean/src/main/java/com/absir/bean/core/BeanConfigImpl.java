@@ -223,6 +223,8 @@ public class BeanConfigImpl implements BeanConfig {
 			}
 		}
 	}
+	
+	
 
 	/**
 	 * @param beanConfig

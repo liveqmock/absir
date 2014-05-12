@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite failures="0" time="0.084" errors="0" skipped="0" tests="1" name="com.absir.test.StringTest">
+<testsuite failures="0" time="0.075" errors="0" skipped="0" tests="1" name="com.absir.test.StringTest">
   <properties>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
     <property name="sun.boot.library.path" value="/Library/Java/JavaVirtualMachines/jdk1.7.0_12.jdk/Contents/Home/jre/lib"/>
@@ -20,11 +20,10 @@
     <property name="basedir" value="/Users/absir/Documents/workspace-sts/absir/absir-lang"/>
     <property name="java.endorsed.dirs" value="/Library/Java/JavaVirtualMachines/jdk1.7.0_12.jdk/Contents/Home/jre/lib/endorsed"/>
     <property name="os.arch" value="x86_64"/>
-    <property name="surefire.real.class.path" value="/Users/absir/Documents/workspace-sts/absir/absir-lang/target/surefire/surefirebooter2341841871683775583.jar"/>
+    <property name="surefire.real.class.path" value="/Users/absir/Documents/workspace-sts/absir/absir-lang/target/surefire/surefirebooter175541199855738419.jar"/>
     <property name="java.io.tmpdir" value="/var/folders/cn/z6slxy1x405g15s8bgprsy800000gn/T/"/>
     <property name="line.separator" value="
 "/>
-    <property name="socksProxyPort" value="9742"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="os.name" value="Mac OS X"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
@@ -42,11 +41,10 @@
     <property name="file.encoding" value="UTF-8"/>
     <property name="user.name" value="absir"/>
     <property name="java.class.path" value="/Users/absir/Documents/workspace-sts/absir/absir-lang/target/test-classes:/Users/absir/Documents/workspace-sts/absir/absir-lang/target/classes:/Users/absir/.m2/repository/junit/junit/4.8.2/junit-4.8.2.jar:"/>
-    <property name="socksProxyHost" value="127.0.0.1"/>
     <property name="java.vm.specification.version" value="1.7"/>
     <property name="sun.arch.data.model" value="64"/>
     <property name="java.home" value="/Library/Java/JavaVirtualMachines/jdk1.7.0_12.jdk/Contents/Home/jre"/>
-    <property name="sun.java.command" value="/Users/absir/Documents/workspace-sts/absir/absir-lang/target/surefire/surefirebooter2341841871683775583.jar /Users/absir/Documents/workspace-sts/absir/absir-lang/target/surefire/surefire5523193120906997661tmp /Users/absir/Documents/workspace-sts/absir/absir-lang/target/surefire/surefire5827244326266494026tmp"/>
+    <property name="sun.java.command" value="/Users/absir/Documents/workspace-sts/absir/absir-lang/target/surefire/surefirebooter175541199855738419.jar /Users/absir/Documents/workspace-sts/absir/absir-lang/target/surefire/surefire2429211003364219580tmp /Users/absir/Documents/workspace-sts/absir/absir-lang/target/surefire/surefire5281253283006861130tmp"/>
     <property name="java.specification.vendor" value="Oracle Corporation"/>
     <property name="user.language" value="zh"/>
     <property name="awt.toolkit" value="sun.lwawt.macosx.LWCToolkit"/>

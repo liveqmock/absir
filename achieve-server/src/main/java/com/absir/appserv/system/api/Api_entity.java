@@ -293,6 +293,28 @@ public class Api_entity extends ApiServer {
 	/**
 	 * @param entityName
 	 * @param updateTime
+	 * @param input
+	 * @return
+	 */
+	public Map<String, Object> changedId(String entityName, long updateTime, Input input) {
+		Map<String, Object> modelMap = changed(entityName, updateTime, input);
+		List<IBase> entities = (List<IBase>) modelMap.get("entities");
+		int size = entities.size();
+		if (size > 0 && entities.get(0) instanceof IBase) {
+			List<Object> changeIds = new ArrayList<Object>(size);
+			for (IBase base : entities) {
+				changeIds.add(base.getId());
+			}
+
+			modelMap.put("entities", changeIds);
+		}
+
+		return modelMap;
+	}
+
+	/**
+	 * @param entityName
+	 * @param updateTime
 	 * @param pageIndex
 	 * @param input
 	 * @return

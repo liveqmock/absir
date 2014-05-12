@@ -38,6 +38,7 @@
 		<module>absir-open</module>
 		<module>absir-iap</module>
 		<module>absir-developerWeb</module>
+		<module>absir-source</module>
 	</modules>
 	<dependencies>
 		<dependency>

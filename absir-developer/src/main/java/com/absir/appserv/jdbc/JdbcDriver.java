@@ -305,11 +305,11 @@ public class JdbcDriver {
 	protected void updateGlue(StringBuilder builder, Object glue, int index, Object value, Collection target) {
 		if (index == 1) {
 			target.add(value);
-			value = '?';
+			value = "?";
 		}
 
 		if (glue != null) {
-			builder.append(builder);
+			builder.append(glue);
 		}
 
 		builder.append(value);

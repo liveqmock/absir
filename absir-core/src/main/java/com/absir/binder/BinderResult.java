@@ -16,9 +16,6 @@ import com.absir.property.PropertyErrors;
  */
 public class BinderResult extends PropertyErrors {
 
-	/** group */
-	private int group;
-
 	/** propertyFilter */
 	private PropertyFilter propertyFilter;
 
@@ -29,7 +26,7 @@ public class BinderResult extends PropertyErrors {
 	 * @return the group
 	 */
 	public int getGroup() {
-		return group;
+		return getPropertyFilter().getGroup();
 	}
 
 	/**
@@ -37,18 +34,14 @@ public class BinderResult extends PropertyErrors {
 	 *            the group to set
 	 */
 	public void setGroup(int group) {
-		this.group = group;
+		getPropertyFilter().setGroup(group);
 	}
 
 	/**
 	 * @return the propertyPath
 	 */
 	public String getPropertyPath() {
-		if (propertyFilter == null) {
-			propertyFilter = new PropertyFilter();
-		}
-
-		return propertyFilter.getPropertyPath();
+		return getPropertyFilter().getPropertyPath();
 	}
 
 	/**
@@ -56,13 +49,17 @@ public class BinderResult extends PropertyErrors {
 	 *            the propertyPath to set
 	 */
 	public void setPropertyPath(String propertyPath) {
-		this.propertyFilter.setPropertyPath(propertyPath);
+		getPropertyFilter().setPropertyPath(propertyPath);
 	}
 
 	/**
 	 * @return the propertyFilter
 	 */
 	public PropertyFilter getPropertyFilter() {
+		if (propertyFilter == null) {
+			propertyFilter = new PropertyFilter();
+		}
+
 		return propertyFilter;
 	}
 
@@ -107,16 +104,4 @@ public class BinderResult extends PropertyErrors {
 	public boolean allowPropertyPath() {
 		return propertyFilter.isMatch();
 	}
-
-	// /**
-	// * @param errorMessage
-	// * @param errorObject
-	// */
-	// public void addPropertyError(String errorMessage, Object errorObject) {
-	// PropertyError propertyError = new PropertyError();
-	// propertyError.setPropertyPath(getPropertyPath());
-	// propertyError.setErrorMessage(errorMessage);
-	// propertyError.setErrorObject(errorObject);
-	// addPropertyError(propertyError);
-	// }
 }

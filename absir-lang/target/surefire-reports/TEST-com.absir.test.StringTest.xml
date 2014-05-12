@@ -20,7 +20,7 @@
     <property name="basedir" value="/Users/absir/Documents/workspace-sts/absir/absir-lang"/>
     <property name="java.endorsed.dirs" value="/Library/Java/JavaVirtualMachines/jdk1.7.0_12.jdk/Contents/Home/jre/lib/endorsed"/>
     <property name="os.arch" value="x86_64"/>
-    <property name="surefire.real.class.path" value="/Users/absir/Documents/workspace-sts/absir/absir-lang/target/surefire/surefirebooter5263619284388967156.jar"/>
+    <property name="surefire.real.class.path" value="/Users/absir/Documents/workspace-sts/absir/absir-lang/target/surefire/surefirebooter2341841871683775583.jar"/>
     <property name="java.io.tmpdir" value="/var/folders/cn/z6slxy1x405g15s8bgprsy800000gn/T/"/>
     <property name="line.separator" value="
 "/>
@@ -46,7 +46,7 @@
     <property name="java.vm.specification.version" value="1.7"/>
     <property name="sun.arch.data.model" value="64"/>
     <property name="java.home" value="/Library/Java/JavaVirtualMachines/jdk1.7.0_12.jdk/Contents/Home/jre"/>
-    <property name="sun.java.command" value="/Users/absir/Documents/workspace-sts/absir/absir-lang/target/surefire/surefirebooter5263619284388967156.jar /Users/absir/Documents/workspace-sts/absir/absir-lang/target/surefire/surefire2244593689465710037tmp /Users/absir/Documents/workspace-sts/absir/absir-lang/target/surefire/surefire5831922577124779131tmp"/>
+    <property name="sun.java.command" value="/Users/absir/Documents/workspace-sts/absir/absir-lang/target/surefire/surefirebooter2341841871683775583.jar /Users/absir/Documents/workspace-sts/absir/absir-lang/target/surefire/surefire5523193120906997661tmp /Users/absir/Documents/workspace-sts/absir/absir-lang/target/surefire/surefire5827244326266494026tmp"/>
     <property name="java.specification.vendor" value="Oracle Corporation"/>
     <property name="user.language" value="zh"/>
     <property name="awt.toolkit" value="sun.lwawt.macosx.LWCToolkit"/>
@@ -64,5 +64,5 @@
     <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
-  <testcase time="0.009" classname="com.absir.test.StringTest" name="test"/>
+  <testcase time="0.01" classname="com.absir.test.StringTest" name="test"/>
 </testsuite>

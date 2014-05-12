@@ -226,6 +226,89 @@ public abstract class KernelString {
 	}
 
 	/**
+	 * @param value
+	 * @return
+	 */
+	public static String unTransferred(String value) {
+		value = value.trim();
+		int length = value.length();
+		if (length < 1) {
+			return value;
+		}
+
+		StringBuilder stringBuilder = new StringBuilder();
+		int quotation = 0;
+		char chr = value.charAt(0);
+		if (chr == '"') {
+			quotation = 1;
+
+		} else {
+			stringBuilder.append(chr);
+		}
+
+		length--;
+		boolean transferred = false;
+		for (int i = 1; i < length; i++) {
+			chr = value.charAt(i);
+			if (transferred) {
+				transferred = false;
+				appendTransferred(stringBuilder, chr);
+
+			} else if (chr == '\\') {
+				transferred = true;
+
+			} else {
+				stringBuilder.append(chr);
+			}
+		}
+
+		chr = value.charAt(length);
+		if (transferred) {
+			appendTransferred(stringBuilder, chr);
+
+		} else {
+			// "" quotation
+			if (quotation == 1 && chr == '"') {
+				quotation = 2;
+
+			} else {
+				stringBuilder.append(chr);
+			}
+		}
+
+		return quotation == 1 ? '"' + stringBuilder.toString() : stringBuilder.toString();
+	}
+
+	/**
+	 * @param stringBuilder
+	 * @param chr
+	 */
+	public static void appendTransferred(StringBuilder stringBuilder, char chr) {
+		switch (chr) {
+		case 't':
+			stringBuilder.append("\t");
+			break;
+		case 'r':
+			stringBuilder.append("\r");
+			break;
+		case 'n':
+			stringBuilder.append("\n");
+			break;
+		case '"':
+			stringBuilder.append('"');
+			break;
+		case '\'':
+			stringBuilder.append('\'');
+			break;
+
+		default:
+			stringBuilder.append('\\');
+			stringBuilder.append(chr);
+			break;
+		}
+	}
+
+	/**
 	 * @param string
 	 * @param index
 	 * @return

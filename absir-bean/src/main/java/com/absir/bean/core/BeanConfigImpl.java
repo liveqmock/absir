@@ -223,8 +223,6 @@ public class BeanConfigImpl implements BeanConfig {
 			}
 		}
 	}
-	
-	
 
 	/**
 	 * @param beanConfig
@@ -287,7 +285,7 @@ public class BeanConfigImpl implements BeanConfig {
 						}
 
 						if (environments == null || KernelArray.contain(environments, beanConfig.getEnvironment().name())) {
-							template = beanConfig.getExpression(template);
+							template = beanConfig.getExpression(KernelString.unTransferred(template));
 							CallbackTemplate<String> callbackTemplate = chr == 0 ? beanConfigTemplates == null ? null : beanConfigTemplates.get(name) : null;
 							if (callbackTemplate == null) {
 								Object value = template;

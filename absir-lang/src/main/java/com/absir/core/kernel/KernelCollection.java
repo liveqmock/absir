@@ -11,6 +11,7 @@ import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,6 +20,22 @@ import java.util.Map;
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class KernelCollection {
+
+	/**
+	 * @param lootCards
+	 * @param card
+	 * @return
+	 */
+	public static <T> boolean contain(List<T> collection, T element) {
+		// TODO Auto-generated method stub
+		for (T ele : collection) {
+			if (ele == element) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	/**
 	 * @param collection

@@ -181,7 +181,7 @@ public class DataQueryDetached {
 				queryReturnInvoker = QueryReturnInvoker.ITERATE;
 
 			} else if (Collection.class.isAssignableFrom(returnType)) {
-				queryReturnInvoker = aliasType == Collection.class ? QueryReturnInvoker.LIST : QueryReturnInvoker.LIST_ITERATE;
+				queryReturnInvoker = nativeSql || aliasType == Collection.class ? QueryReturnInvoker.LIST : QueryReturnInvoker.LIST_ITERATE;
 
 			} else if (Map.class.isAssignableFrom(returnType)) {
 				queryReturnInvoker = QueryReturnInvoker.MAP;

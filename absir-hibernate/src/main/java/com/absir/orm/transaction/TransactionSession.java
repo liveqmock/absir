@@ -62,6 +62,7 @@ public class TransactionSession {
 	 */
 	public void open(ISessionContext sessionContext) {
 		if (transactionAttribute != null) {
+			addition = false;
 			if (!(transactionAttributes == null || transactionAttributes.isEmpty())) {
 				for (TransactionAttribute transactionAttribute : transactionAttributes) {
 					holder(sessionContext.open(sessionHolder, transactionAttribute, this));
@@ -123,13 +124,13 @@ public class TransactionSession {
 			transactionAttribute = null;
 		}
 
-		return false;
+		return isCloseAll();
 	}
 
 	/**
 	 * @return
 	 */
 	public boolean isCloseAll() {
-		return transactionAttribute == null && (sessionHolders == null || sessionHolders.isEmpty());
+		return transactionAttribute == null && sessionHolders == null;
 	}
 }

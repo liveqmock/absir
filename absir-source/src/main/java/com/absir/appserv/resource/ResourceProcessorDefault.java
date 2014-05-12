@@ -69,9 +69,10 @@ public class ResourceProcessorDefault implements ResourceProcessor {
 		directory.setScanned(true);
 		directory.setUpdateTime(directoryFile.lastModified());
 		session.merge(directory);
+		session.flush();
 		if (!modified) {
 			// (未更改)跳过目录文件扫瞄
-			QueryDaoUtils.createQueryArray(session, "UPDATE JResource o SET o.scanned = TRUE WHERE o.id like ?%", directoryId).executeUpdate();
+			QueryDaoUtils.createQueryArray(session, "UPDATE JResource o SET o.scanned = TRUE WHERE o.id LIKE ?", directoryId + '%').executeUpdate();
 		}
 
 		return modified;
@@ -109,5 +110,6 @@ public class ResourceProcessorDefault implements ResourceProcessor {
 		}
 
 		session.merge(resource);
+		session.flush();
 	}
 }

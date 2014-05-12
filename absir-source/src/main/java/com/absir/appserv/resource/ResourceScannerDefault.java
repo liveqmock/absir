@@ -34,7 +34,7 @@ import com.absir.orm.transaction.value.Transaction;
 public class ResourceScannerDefault extends ResourceScanner {
 
 	/** ME */
-	public static final ResourceProcessorDefault ME = BeanFactoryUtils.get(ResourceProcessorDefault.class);
+	public static final ResourceScannerDefault ME = BeanFactoryUtils.get(ResourceScannerDefault.class);
 
 	/** scanPath */
 	@Value("resource.scan.path")

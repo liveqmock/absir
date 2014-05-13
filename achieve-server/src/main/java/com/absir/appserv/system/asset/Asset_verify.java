@@ -19,10 +19,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.absir.appserv.system.helper.HelperRandom;
 import com.absir.bean.inject.value.Value;
+import com.absir.server.in.Input;
 import com.absir.server.value.Body;
 import com.absir.server.value.Nullable;
 import com.absir.server.value.Param;
 import com.absir.server.value.Server;
+import com.absir.servlet.InputRequest;
 
 /**
  * @author absir
@@ -61,7 +63,7 @@ public class Asset_verify extends AssetServer {
 	@Body
 	public void route(@Param @Nullable Integer width, @Param @Nullable Integer height, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		verifyCode(width == null ? 64 : width, height == null ? 18 : height, 0, request, response);
-	} 
+	}
 
 	/**
 	 * @param width
@@ -126,5 +128,25 @@ public class Asset_verify extends AssetServer {
 		ImageIO.write(image, "JPEG", out);
 		out.flush();
 		out.close();
+	}
+
+	/**
+	 * @param input
+	 */
+	public static boolean verifyInput(Input input) {
+		if (input instanceof InputRequest) {
+			String verifycode = ((InputRequest) input).getSession("verifycode");
+			if (verifycode != null) {
+				String paramVerify = input.getParam("verifycode");
+				if (paramVerify != null) {
+					if (verifycode.equals(paramVerify)) {
+						((InputRequest) input).removeSession("verifycode");
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
 	}
 }

@@ -21,6 +21,9 @@ import com.absir.context.core.ContextUtils;
  */
 public class SecurityContext extends ContextBean<String> {
 
+	/** securitySupply */
+	private ISecuritySupply securitySupply;
+
 	/** user */
 	private JiUserBase user;
 
@@ -32,6 +35,24 @@ public class SecurityContext extends ContextBean<String> {
 
 	/** maxExpirationTime */
 	private long maxExpirationTime = 0;
+
+	/** metaObjects */
+	private Map<String, Object> metaObjects;
+
+	/**
+	 * @return the securitySupply
+	 */
+	public ISecuritySupply getSecuritySupply() {
+		return securitySupply;
+	}
+
+	/**
+	 * @param securitySupply
+	 *            the securitySupply to set
+	 */
+	public void setSecuritySupply(ISecuritySupply securitySupply) {
+		this.securitySupply = securitySupply;
+	}
 
 	/**
 	 * @return the user
@@ -46,6 +67,21 @@ public class SecurityContext extends ContextBean<String> {
 	 */
 	public void setUser(JiUserBase user) {
 		this.user = user;
+	}
+
+	/**
+	 * @return the metas
+	 */
+	public Map<String, Serializable> getMetas() {
+		return metas;
+	}
+
+	/**
+	 * @param metas
+	 *            the metas to set
+	 */
+	public void setMetas(Map<String, Serializable> metas) {
+		this.metas = metas;
 	}
 
 	/**
@@ -71,7 +107,9 @@ public class SecurityContext extends ContextBean<String> {
 	public void setMeta(String name, Serializable value) {
 		if (metas == null) {
 			synchronized (this) {
-				metas = new HashMap<String, Serializable>();
+				if (metas == null) {
+					metas = new HashMap<String, Serializable>();
+				}
 			}
 		}
 
@@ -112,21 +150,39 @@ public class SecurityContext extends ContextBean<String> {
 			maxExpirationTime = -1;
 		}
 
-		this.maxExpirationTime = maxExpirationTime + ContextUtils.getContextTime();
+		this.maxExpirationTime = ContextUtils.getContextTime() + maxExpirationTime;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.absir.appserv.system.context.IContext#retainAt(long)
+	/**
+	 * @param name
+	 * @return
 	 */
-	@Override
-	public void retainAt(long contextTime) {
-		// TODO Auto-generated method stub
-		super.retainAt(contextTime);
-		if (maxExpirationTime > 0) {
-			maxExpirationTime += contextTime;
+	public Object getMetaObject(String name) {
+		return metaObjects == null ? null : metaObjects.get(name);
+	}
+
+	/**
+	 * @param name
+	 */
+	public void removeMetaObjects(String name) {
+		if (metaObjects != null) {
+			metaObjects.remove(name);
 		}
+	}
+
+	/**
+	 * @return the meta
+	 */
+	public void setMetaObjects(String name, Object value) {
+		if (metaObjects == null) {
+			synchronized (this) {
+				if (metaObjects == null) {
+					metaObjects = new HashMap<String, Object>();
+				}
+			}
+		}
+
+		metaObjects.put(name, value);
 	}
 
 	/*
@@ -137,7 +193,7 @@ public class SecurityContext extends ContextBean<String> {
 	@Override
 	public boolean stepDone(long contextTime) {
 		// TODO Auto-generated method stub
-		return maxExpirationTime != 0 && (super.stepDone(contextTime) || (maxExpirationTime > 0 && maxExpirationTime < contextTime));
+		return maxExpirationTime != 0 && (maxExpirationTime < contextTime || super.stepDone(contextTime));
 	}
 
 	/*
@@ -148,5 +204,20 @@ public class SecurityContext extends ContextBean<String> {
 	@Override
 	protected void initialize() {
 		// TODO Auto-generated method stub
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.context.core.ContextBean#uninitialize()
+	 */
+	@Override
+	public void uninitialize() {
+		// TODO Auto-generated method stub
+		if (securitySupply != null && user != null) {
+			if (maxExpirationTime > ContextUtils.getContextTime()) {
+				securitySupply.saveSession(this);
+			}
+		}
 	}
 }

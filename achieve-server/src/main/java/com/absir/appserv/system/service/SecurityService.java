@@ -106,6 +106,12 @@ public abstract class SecurityService implements ISecurityService {
 	}
 
 	/**
+	 * @param securityContext
+	 * @param userBase
+	 */
+	protected abstract void setSecurityContext(SecurityContext securityContext, JiUserBase userBase);
+
+	/**
 	 * @param securityManager
 	 * @param userBase
 	 * @param remember
@@ -124,6 +130,7 @@ public abstract class SecurityService implements ISecurityService {
 			sessionExpiration = remember;
 		}
 
+		setSecurityContext(securityContext, userBase);
 		securityContext.setMaxExpirationTime(sessionExpiration);
 		setSecurityContext(securityContext, inputRequest);
 		if (remember > 0) {
@@ -133,6 +140,13 @@ public abstract class SecurityService implements ISecurityService {
 		setUserBase(userBase, inputRequest);
 		return securityContext;
 	}
+
+	/**
+	 * @param sessionId
+	 * @param securityManager
+	 * @return
+	 */
+	protected abstract SecurityContext findSecurityContext(String sessionId, SecurityManager securityManager);
 
 	/*
 	 * (non-Javadoc)
@@ -154,11 +168,17 @@ public abstract class SecurityService implements ISecurityService {
 
 			if (sessionId != null) {
 				SecurityContext securityContext = ContextUtils.findContext(SecurityContext.class, sessionId);
-				if (securityContext != null) {
-					setSecurityContext(securityContext, input);
-					setUserBase(securityContext.getUser(), input);
-					return securityContext;
+				if (securityContext == null) {
+					securityContext = findSecurityContext(sessionId, securityManager);
+					if (securityContext == null) {
+						return null;
+					}
 				}
+
+				securityContext.retainAt();
+				setSecurityContext(securityContext, input);
+				setUserBase(securityContext.getUser(), input);
+				return securityContext;
 			}
 		}
 
@@ -211,13 +231,20 @@ public abstract class SecurityService implements ISecurityService {
 	@Override
 	public void logout(String name, Input input) {
 		// TODO Auto-generated method stub
+		SecurityContext securityContext = getSecurityContext(input);
+		if (securityContext != null) {
+			// 销毁之前的登录
+			securityContext.setSecuritySupply(null);
+			securityContext.setExpiration();
+			if (input instanceof InputRequest) {
+				InputRequest inputRequest = (InputRequest) input;
+				SecurityManager securityManager = getSecurityManager(name);
+				inputRequest.removeSession(securityManager.getSessionKey());
+				inputRequest.removeCookie(securityManager.getSessionKey(), securityManager.getCookiePath());
+			}
+		}
+
 		setUserBase(null, input);
 		setSecurityContext(null, input);
-		if (input instanceof InputRequest) {
-			InputRequest inputRequest = (InputRequest) input;
-			SecurityManager securityManager = getSecurityManager(name);
-			inputRequest.removeSession(securityManager.getSessionKey());
-			inputRequest.removeCookie(securityManager.getSessionKey(), securityManager.getCookiePath());
-		}
 	}
 }

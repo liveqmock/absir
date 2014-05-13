@@ -8,12 +8,14 @@
 package com.absir.appserv.system.admin;
 
 import com.absir.appserv.feature.menu.MenuContextUtils;
+import com.absir.appserv.system.asset.Asset_verify;
 import com.absir.appserv.system.bean.value.JeRoleLevel;
 import com.absir.appserv.system.helper.HelperInput;
 import com.absir.appserv.system.security.SecurityContext;
 import com.absir.appserv.system.server.ServerResolverRedirect;
 import com.absir.appserv.system.service.SecurityService;
 import com.absir.server.exception.ServerException;
+import com.absir.server.exception.ServerStatus;
 import com.absir.server.in.InMethod;
 import com.absir.server.in.Input;
 import com.absir.server.value.Mapping;
@@ -89,6 +91,10 @@ public class Admin_login extends AdminServer {
 	public String route(@Param String username, @Param String password, @Param @Nullable long remember, Input input) throws Exception {
 		try {
 			SecurityService.ME.logout("admin", input);
+			if (!HelperInput.isAjax(input) && !Asset_verify.verifyInput(input)) {
+				throw new ServerException(ServerStatus.NO_VERIFY);
+			}
+
 			SecurityService.ME.login(username, password, remember, JeRoleLevel.ROLE_ADMIN.ordinal(), "admin", input);
 
 		} catch (ServerException e) {

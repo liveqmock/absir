@@ -7,16 +7,10 @@
  */
 package com.absir.appserv.system.bean;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-
+import javax.persistence.Lob;
 import javax.persistence.MappedSuperclass;
 
-import org.hibernate.annotations.Type;
-
 import com.absir.appserv.system.bean.base.JbVerifier;
-import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.bean.value.JaEdit;
 import com.absir.appserv.system.bean.value.JaLang;
 
@@ -28,6 +22,10 @@ import com.absir.appserv.system.bean.value.JaLang;
 public abstract class JbSession extends JbVerifier {
 
 	@JaEdit(groups = JaEdit.GROUP_LIST)
+	@JaLang("用户Id")
+	private Long userId;
+
+	@JaEdit(groups = JaEdit.GROUP_LIST)
 	@JaLang("用户名")
 	private String username;
 
@@ -35,25 +33,24 @@ public abstract class JbSession extends JbVerifier {
 	@JaLang("最后登录")
 	private long lastTime;
 
-	@JaEdit(groups = JaEdit.GROUP_LIST)
-	@JaLang("请求地址")
-	private Long addrest;
-
-	@JaEdit(groups = JaEdit.GROUP_LIST)
-	@JaLang("请求路径")
-	private String url;
-
-	@JaLang("请求来源")
-	private String agent;
-
 	@JaLang("附加信息")
-	@Type(type = "com.absir.appserv.system.bean.type.JtJsonMap")
-	private Map<String, Serializable> metas;
+	@Lob
+	private byte[] metas;
 
 	/**
-	 * @return
+	 * @return the userId
 	 */
-	public abstract JiUserBase getUser();
+	public Long getUserId() {
+		return userId;
+	}
+
+	/**
+	 * @param userId
+	 *            the userId to set
+	 */
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
 
 	/**
 	 * @return the username
@@ -86,77 +83,17 @@ public abstract class JbSession extends JbVerifier {
 	}
 
 	/**
-	 * @return the addrest
+	 * @return the metas
 	 */
-	public Long getAddrest() {
-		return addrest;
+	public byte[] getMetas() {
+		return metas;
 	}
 
 	/**
-	 * @param addrest
-	 *            the addrest to set
+	 * @param metas
+	 *            the metas to set
 	 */
-	public void setAddrest(Long addrest) {
-		this.addrest = addrest;
-	}
-
-	/**
-	 * @return the url
-	 */
-	public String getUrl() {
-		return url;
-	}
-
-	/**
-	 * @param url
-	 *            the url to set
-	 */
-	public void setUrl(String url) {
-		this.url = url;
-	}
-
-	/**
-	 * @return the agent
-	 */
-	public String getAgent() {
-		return agent;
-	}
-
-	/**
-	 * @param agent
-	 *            the agent to set
-	 */
-	public void setAgent(String agent) {
-		this.agent = agent;
-	}
-
-	/**
-	 * @param name
-	 * @return
-	 */
-	public Serializable getMeta(String name) {
-		return metas == null ? null : metas.get(name);
-	}
-
-	/**
-	 * @param name
-	 */
-	public void removeMeta(String name) {
-		if (metas != null) {
-			metas.remove(name);
-		}
-	}
-
-	/**
-	 * @return the meta
-	 */
-	public void setMeta(String name, Serializable value) {
-		if (metas == null) {
-			synchronized (this) {
-				metas = new HashMap<String, Serializable>();
-			}
-		}
-
-		metas.put(name, value);
+	public void setMetas(byte[] metas) {
+		this.metas = metas;
 	}
 }

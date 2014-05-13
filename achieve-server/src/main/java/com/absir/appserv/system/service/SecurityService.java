@@ -169,7 +169,7 @@ public abstract class SecurityService implements ISecurityService {
 			if (sessionId != null) {
 				SecurityContext securityContext = ContextUtils.findContext(SecurityContext.class, sessionId);
 				if (securityContext == null) {
-					securityContext = findSecurityContext(sessionId, securityManager);
+					securityContext = ME.findSecurityContext(sessionId, securityManager);
 					if (securityContext == null) {
 						return null;
 					}

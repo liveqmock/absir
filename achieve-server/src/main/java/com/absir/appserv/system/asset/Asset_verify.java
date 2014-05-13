@@ -33,7 +33,7 @@ public class Asset_verify extends AssetServer {
 
 	/** fontSize */
 	@Value(value = "asset.verify.fontSize")
-	private static float fontSize = 20.0f;
+	private static float fontSize = 18.0f;
 
 	/** fontName */
 	@Value(value = "asset.verify.fontName")
@@ -61,16 +61,7 @@ public class Asset_verify extends AssetServer {
 	@Body
 	public void route(@Param @Nullable Integer width, @Param @Nullable Integer height, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		verifyCode(width == null ? 64 : width, height == null ? 18 : height, 0, request, response);
-	}
-
-	/**
-	 * @throws Exception
-	 * 
-	 */
-	@Body
-	public void test(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		verifyCode(64, 18, 0, request, response);
-	}
+	} 
 
 	/**
 	 * @param width

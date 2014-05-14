@@ -70,6 +70,20 @@ public abstract class ContextBean<ID extends Serializable> extends Context<ID> i
 		return expirationTime < contextTime;
 	}
 
+	/**
+	 * @return
+	 */
+	public Class<?> getKeyClass() {
+		return getClass();
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean uninitializeDone() {
+		return false;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 

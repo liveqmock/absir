@@ -117,34 +117,48 @@ public class ContextFactory {
 				if (contextBean.isExpiration() || contextBean.stepDone(contextTime)) {
 					contextBeanIterator.remove();
 					contextBean.setExpiration();
-					utilAtom.increment();
-					threadPoolExecutor.execute(new Runnable() {
-
-						@Override
-						public void run() {
-							// TODO Auto-generated method stub
-							try {
-								Map<Serializable, Context> contextMap = classMapIdMapContext.get(contextBean.getClass());
-								if (contextMap != null) {
-									contextBean.uninitialize();
-									synchronized (contextMap) {
-										if (contextBean.isExpiration()) {
-											contextMap.remove(contextBean.getId());
-											return;
-										}
-									}
-
-									contextBeans.add(contextBean);
+					final Map<Serializable, Context> contextMap = classMapIdMapContext.get(contextBean.getKeyClass());
+					if (contextBean.uninitializeDone()) {
+						if (contextMap != null) {
+							synchronized (contextMap) {
+								if (contextBean.isExpiration()) {
+									contextMap.remove(contextBean.getId());
+									continue;
 								}
 
-							} catch (Throwable e) {
-								logger.error("failed!", e);
-
-							} finally {
-								utilAtom.decrement();
+								contextBeans.add(contextBean);
 							}
 						}
-					});
+
+					} else {
+						utilAtom.increment();
+						threadPoolExecutor.execute(new Runnable() {
+
+							@Override
+							public void run() {
+								// TODO Auto-generated method stub
+								try {
+									contextBean.uninitialize();
+									if (contextMap != null) {
+										synchronized (contextMap) {
+											if (contextBean.isExpiration()) {
+												contextMap.remove(contextBean.getId());
+												return;
+											}
+										}
+
+										contextBeans.add(contextBean);
+									}
+
+								} catch (Throwable e) {
+									logger.error("failed!", e);
+
+								} finally {
+									utilAtom.decrement();
+								}
+							}
+						});
+					}
 				}
 			}
 
@@ -303,6 +317,10 @@ public class ContextFactory {
 
 						if (context instanceof ContextBean) {
 							((ContextBean) context).retainAt(contextTime);
+							if (ctxClass != cls && context instanceof ContextBeano) {
+								((ContextBeano) context).keyClass = cls;
+							}
+
 							contextBeans.add((ContextBean) context);
 							return (T) context;
 						}

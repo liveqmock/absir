@@ -20,8 +20,8 @@ public class HelperLong {
 	 * @param iPcount
 	 * @return
 	 */
-	private static long longIP(String iPaddress, int iPcount) {
-		return longString(iPaddress, ".", iPcount);
+	public static long longIP(String iPaddress, int iPcount) {
+		return longString(iPaddress, '.', iPcount);
 	}
 
 	/**
@@ -32,7 +32,7 @@ public class HelperLong {
 	 * @param count
 	 * @return
 	 */
-	private static long longString(String string, String glues, int count) {
+	public static long longString(String string, char glues, int count) {
 		count -= 1;
 		int to = 0;
 		long lg = 0;

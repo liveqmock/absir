@@ -29,6 +29,14 @@ public abstract class JbSession extends JbVerifier {
 	@JaLang("用户名")
 	private String username;
 
+	@JaEdit(types = "ip", groups = JaEdit.GROUP_LIST)
+	@JaLang("地址")
+	private long address;
+
+	@JaEdit(groups = JaEdit.GROUP_LIST)
+	@JaLang("设备")
+	private String agent;
+
 	@JaEdit(types = "dateTime", groups = JaEdit.GROUP_LIST)
 	@JaLang("最后登录")
 	private long lastTime;
@@ -65,6 +73,36 @@ public abstract class JbSession extends JbVerifier {
 	 */
 	public void setUsername(String username) {
 		this.username = username;
+	}
+
+	/**
+	 * @return the address
+	 */
+	public long getAddress() {
+		return address;
+	}
+
+	/**
+	 * @param address
+	 *            the address to set
+	 */
+	public void setAddress(long address) {
+		this.address = address;
+	}
+
+	/**
+	 * @return the agent
+	 */
+	public String getAgent() {
+		return agent;
+	}
+
+	/**
+	 * @param agent
+	 *            the agent to set
+	 */
+	public void setAgent(String agent) {
+		this.agent = agent;
 	}
 
 	/**

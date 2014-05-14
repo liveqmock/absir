@@ -10,6 +10,7 @@ package com.absir.appserv.system.service;
 import java.util.Map;
 
 import com.absir.appserv.system.bean.proxy.JiUserBase;
+import com.absir.appserv.system.helper.HelperLong;
 import com.absir.appserv.system.helper.HelperRandom;
 import com.absir.appserv.system.security.ISecurityService;
 import com.absir.appserv.system.security.SecurityContext;
@@ -123,6 +124,8 @@ public abstract class SecurityService implements ISecurityService {
 		String sessionId = HelperRandom.randSecendId(contextTime, 8, inputRequest.getRequest().hashCode());
 		SecurityContext securityContext = ContextUtils.getContext(SecurityContext.class, sessionId);
 		securityContext.setUser(userBase);
+		securityContext.setAddress(HelperLong.longIP(inputRequest.getRequest().getRemoteAddr(), 0));
+		securityContext.setAgent(inputRequest.getRequest().getHeader("user-agent"));
 		securityContext.setLifeTime(securityManager.getSessionLife());
 		securityContext.retainAt(contextTime);
 		long sessionExpiration = securityManager.getSessionExpiration();

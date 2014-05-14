@@ -27,6 +27,12 @@ public class SecurityContext extends ContextBean<String> {
 	/** user */
 	private JiUserBase user;
 
+	/** address */
+	private long address;
+
+	/** agent */
+	private String agent;
+
 	/** metas */
 	private Map<String, Serializable> metas;
 
@@ -34,7 +40,7 @@ public class SecurityContext extends ContextBean<String> {
 	private long lifeTime;
 
 	/** maxExpirationTime */
-	private long maxExpirationTime = 0;
+	private long maxExpirationTime;
 
 	/** metaObjects */
 	private Map<String, Object> metaObjects;
@@ -67,6 +73,36 @@ public class SecurityContext extends ContextBean<String> {
 	 */
 	public void setUser(JiUserBase user) {
 		this.user = user;
+	}
+
+	/**
+	 * @return the address
+	 */
+	public long getAddress() {
+		return address;
+	}
+
+	/**
+	 * @param address
+	 *            the address to set
+	 */
+	public void setAddress(long address) {
+		this.address = address;
+	}
+
+	/**
+	 * @return the agent
+	 */
+	public String getAgent() {
+		return agent;
+	}
+
+	/**
+	 * @param agent
+	 *            the agent to set
+	 */
+	public void setAgent(String agent) {
+		this.agent = agent;
 	}
 
 	/**

@@ -71,7 +71,7 @@ public abstract class CrudProperty {
 	public int getExclude() {
 		return exclude;
 	}
-	
+
 	/**
 	 * @return
 	 */

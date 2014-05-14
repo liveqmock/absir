@@ -124,7 +124,7 @@ public abstract class SecurityService implements ISecurityService {
 		String sessionId = HelperRandom.randSecendId(contextTime, 8, inputRequest.getRequest().hashCode());
 		SecurityContext securityContext = ContextUtils.getContext(SecurityContext.class, sessionId);
 		securityContext.setUser(userBase);
-		securityContext.setAddress(HelperLong.longIP(inputRequest.getRequest().getRemoteAddr(), 0));
+		securityContext.setAddress(HelperLong.longIP(inputRequest.getRequest().getRemoteAddr(), -1));
 		securityContext.setAgent(inputRequest.getRequest().getHeader("user-agent"));
 		securityContext.setLifeTime(securityManager.getSessionLife());
 		securityContext.retainAt(contextTime);

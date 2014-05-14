@@ -7,6 +7,8 @@
  */
 package com.absir.appserv.system.helper;
 
+import com.absir.core.kernel.KernelDyna;
+
 /**
  * @author absir
  * 
@@ -33,18 +35,17 @@ public class HelperLong {
 	 * @return
 	 */
 	public static long longString(String string, char glues, int count) {
-		count -= 1;
-		int to = 0;
 		long lg = 0;
-		for (int from = 0; count >= 0; count--) {
-			to = string.indexOf(glues, from);
-			if (to < 0) {
-				lg += HelperNumber.toLong(string.substring(from)) << (2 << count);
-				break;
+		int from;
+		int last = string.length();
+		for (int i = 0; count < 0 || (count != 0 && --count >= 0); i += 8) {
+			from = HelperString.lastIndexOf(string, glues, last - 1);
+			if (from <= 0) {
+				count = 0;
 			}
 
-			lg += HelperNumber.toLong(string.substring(from, to)) << (2 << count);
-			from = to + 1;
+			lg += ((long) KernelDyna.toLong(string.substring(from + 1, last), 0L)) << i;
+			last = from;
 		}
 
 		return lg;
@@ -61,21 +62,33 @@ public class HelperLong {
 	}
 
 	/**
+	 * @param lg
+	 * @param glues
+	 * @return
+	 */
+	public static String stringLong(long lg, char glues, int count) {
+		int i = count * 8;
+		StringBuffer sb = new StringBuffer();
+		sb.append((int) ((lg >> (i -= 8)) & 0XFF));
+		while (true) {
+			if (i <= 0) {
+				break;
+			}
+
+			sb.append(glues);
+			sb.append((int) ((lg >> (i -= 8)) & 0XFF));
+		}
+
+		return sb.toString();
+	}
+
+	/**
 	 * 数字转换IPV4
 	 * 
 	 * @param longIP
 	 * @return
 	 */
 	public static String longIPV4(long longIP) {
-		StringBuffer sb = new StringBuffer();
-		sb.append(String.valueOf(longIP >>> 24));
-		sb.append('.');
-		sb.append(String.valueOf((longIP & 0x00FFFFFF) >>> 16));
-		sb.append('.');
-		sb.append(String.valueOf((longIP & 0x0000FFFF) >>> 8));
-		sb.append('.');
-		sb.append(String.valueOf(longIP & 0x000000FF));
-		sb.append('.');
-		return sb.toString();
+		return stringLong(longIP, '.', 4);
 	}
 }

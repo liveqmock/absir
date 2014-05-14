@@ -209,15 +209,21 @@ public class SecurityContext extends ContextBean<String> {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see com.absir.context.core.ContextBean#uninitializeDone()
+	 */
+	public boolean uninitializeDone() {
+		// TODO Auto-generated method stub
+		return securitySupply == null || user == null || maxExpirationTime <= ContextUtils.getContextTime();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.absir.context.core.ContextBean#uninitialize()
 	 */
 	@Override
 	public void uninitialize() {
 		// TODO Auto-generated method stub
-		if (securitySupply != null && user != null) {
-			if (maxExpirationTime > ContextUtils.getContextTime()) {
-				securitySupply.saveSession(this);
-			}
-		}
+		securitySupply.saveSession(this);
 	}
 }

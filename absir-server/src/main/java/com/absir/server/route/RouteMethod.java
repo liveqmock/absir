@@ -66,6 +66,20 @@ public class RouteMethod {
 	}
 
 	/**
+	 * @return the parameterTypes
+	 */
+	public Class<?>[] getParameterTypes() {
+		return parameterTypes;
+	}
+
+	/**
+	 * @return the parameterResolvers
+	 */
+	public ParameterResolver[] getParameterResolvers() {
+		return parameterResolvers;
+	}
+
+	/**
 	 * @param inMethods
 	 * @return
 	 */

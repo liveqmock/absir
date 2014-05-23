@@ -8,6 +8,7 @@
 package com.absir.aop;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -29,6 +30,18 @@ public class AopInterceptorAbstract<T> implements AopInterceptor<T> {
 	 */
 	public Map<Method, T> getMethodMapInterceptor() {
 		return methodMapInterceptor;
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean setunmodifiableMethodMapInterceptor() {
+		if (methodMapInterceptor == null || methodMapInterceptor.isEmpty()) {
+			return false;
+		}
+
+		methodMapInterceptor = Collections.unmodifiableMap(methodMapInterceptor);
+		return true;
 	}
 
 	/*

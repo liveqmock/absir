@@ -29,6 +29,7 @@ import com.absir.appserv.system.service.utils.AuthServiceUtils;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Inject;
 import com.absir.bean.inject.value.InjectType;
+import com.absir.core.kernel.KernelObject;
 import com.absir.core.kernel.KernelString;
 import com.absir.orm.transaction.value.Transaction;
 
@@ -56,7 +57,12 @@ public class MenuBeanService {
 			@Override
 			public boolean isPermission(IMenuBean menuBean, JiUserBase user) {
 				// TODO Auto-generated method stub
-				return AuthService.ME.menuPermission(menuBean.getUrl(), user);
+				String ref = menuBean.getRef();
+				if (ref == null) {
+					return true;
+				}
+
+				return AuthService.ME.menuPermission(ref, user);
 			}
 
 			@Override
@@ -174,12 +180,13 @@ public class MenuBeanService {
 		}
 
 		for (MenuBeanRoot beanRoot : menuBeanRoot.getChildren().values()) {
-			String url = beanRoot.getMenuBean().getUrl();
-			if (!KernelString.isEmpty(url)) {
+			String url = beanRoot.getMenuBean().getRef();
+			if (KernelObject.equals("MENU", beanRoot.getMenuBean().getUrlType()) && !KernelString.isEmpty(url)) {
 				JMenuPermission menuPermission = (JMenuPermission) QueryDaoUtils.selectQuery(session, "JMenuPermission", new Object[] { "o.id", url });
 				if (menuPermission == null) {
 					menuPermission = new JMenuPermission();
-					menuPermission.setAllowUserIds(new long[] { 1L });
+					menuPermission.setId(url);
+					menuPermission.setAllowIds(new long[] { 1L });
 					session.persist(menuPermission);
 				}
 

@@ -31,4 +31,19 @@ public @interface MaFactory {
 	 * @return
 	 */
 	Class<? extends IMenuFactory> factory() default IMenuFactory.class;
+
+	/**
+	 * @return
+	 */
+	String ref() default "";
+
+	/**
+	 * @return
+	 */
+	String[] parameters() default {};
+
+	/**
+	 * @return
+	 */
+	int[] parameterOrders() default {};
 }

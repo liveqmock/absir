@@ -22,6 +22,21 @@ import java.util.Map;
 public class KernelCollection {
 
 	/**
+	 * @param collection
+	 * @param cls
+	 * @return
+	 */
+	public static <T> T getAssignable(Collection<?> collection, Class<T> cls) {
+		for (Object ele : collection) {
+			if (cls.isAssignableFrom(ele.getClass())) {
+				return (T) ele;
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * @param lootCards
 	 * @param card
 	 * @return

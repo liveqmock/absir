@@ -13,13 +13,17 @@ import javax.persistence.Id;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import com.absir.appserv.feature.menu.value.MaEntity;
+import com.absir.appserv.feature.menu.value.MaMenu;
 import com.absir.appserv.system.bean.base.JbBase;
 import com.absir.appserv.system.bean.value.JaLang;
+import com.absir.appserv.system.bean.value.JaName;
 
 /**
  * @author absir
  * 
  */
+@MaEntity(parent = { @MaMenu("菜单管理") }, name = "权限")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Entity
 public class JMenuPermission extends JbBase {
@@ -28,11 +32,13 @@ public class JMenuPermission extends JbBase {
 	@Id
 	private String id;
 
-	@JaLang("授权用户")
-	private long allowUserIds[];
+	@JaLang("授权角色")
+	@JaName("JUserRole")
+	private long allowIds[];
 
-	@JaLang("禁用用户")
-	private long forbidUserIds[];
+	@JaLang("禁用角色")
+	@JaName("JUserRole")
+	private long forbidIds[];
 
 	/**
 	 * @return the id
@@ -50,32 +56,32 @@ public class JMenuPermission extends JbBase {
 	}
 
 	/**
-	 * @return the allowUserIds
+	 * @return the allowIds
 	 */
-	public long[] getAllowUserIds() {
-		return allowUserIds;
+	public long[] getAllowIds() {
+		return allowIds;
 	}
 
 	/**
-	 * @param allowUserIds
-	 *            the allowUserIds to set
+	 * @param allowIds
+	 *            the allowIds to set
 	 */
-	public void setAllowUserIds(long[] allowUserIds) {
-		this.allowUserIds = allowUserIds;
+	public void setAllowIds(long[] allowIds) {
+		this.allowIds = allowIds;
 	}
 
 	/**
-	 * @return the forbidUserIds
+	 * @return the forbidIds
 	 */
-	public long[] getForbidUserIds() {
-		return forbidUserIds;
+	public long[] getForbidIds() {
+		return forbidIds;
 	}
 
 	/**
-	 * @param forbidUserIds
-	 *            the forbidUserIds to set
+	 * @param forbidIds
+	 *            the forbidIds to set
 	 */
-	public void setForbidUserIds(long[] forbidUserIds) {
-		this.forbidUserIds = forbidUserIds;
+	public void setForbidIds(long[] forbidIds) {
+		this.forbidIds = forbidIds;
 	}
 }

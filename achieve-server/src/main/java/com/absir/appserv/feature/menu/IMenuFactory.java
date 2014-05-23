@@ -7,6 +7,7 @@
  */
 package com.absir.appserv.feature.menu;
 
+import com.absir.appserv.feature.menu.value.MaFactory;
 import com.absir.server.route.RouteMatcher;
 
 /**
@@ -18,7 +19,8 @@ public interface IMenuFactory {
 	/**
 	 * @param menuBeanRoot
 	 * @param routeMatcher
+	 * @param maFactory
 	 */
-	public void proccess(MenuBeanRoot menuBeanRoot, RouteMatcher routeMatcher);
+	public void proccess(MenuBeanRoot menuBeanRoot, RouteMatcher routeMatcher, MaFactory maFactory);
 
 }

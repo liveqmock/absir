@@ -55,14 +55,14 @@ public class AuthService {
 
 		if (user == null) {
 			// 匿名用户
-			if (menuPermission.getForbidUserIds() != null) {
-				if (HelperArray.contains(menuPermission.getForbidUserIds(), -1L)) {
+			if (menuPermission.getForbidIds() != null) {
+				if (HelperArray.contains(menuPermission.getForbidIds(), -1L)) {
 					return false;
 				}
 			}
 
-			if (menuPermission.getAllowUserIds() != null) {
-				if (HelperArray.contains(menuPermission.getAllowUserIds(), -1L)) {
+			if (menuPermission.getAllowIds() != null) {
+				if (HelperArray.contains(menuPermission.getAllowIds(), -1L)) {
 					return true;
 				}
 			}
@@ -73,29 +73,29 @@ public class AuthService {
 			return true;
 		}
 
-		if (menuPermission.getForbidUserIds() != null) {
+		if (menuPermission.getForbidIds() != null) {
 			// 所有用户
-			if (HelperArray.contains(menuPermission.getForbidUserIds(), 0L)) {
+			if (HelperArray.contains(menuPermission.getForbidIds(), 0L)) {
 				return false;
 			}
 
 			// 用户角色
 			for (JiUserRole userRole : user.userRoles()) {
-				if (HelperArray.contains(menuPermission.getForbidUserIds(), userRole.getId())) {
+				if (HelperArray.contains(menuPermission.getAllowIds(), userRole.getId())) {
 					return false;
 				}
 			}
 		}
 
-		if (menuPermission.getAllowUserIds() != null) {
+		if (menuPermission.getAllowIds() != null) {
 			// 所有用户
-			if (HelperArray.contains(menuPermission.getAllowUserIds(), 0L)) {
+			if (HelperArray.contains(menuPermission.getAllowIds(), 0L)) {
 				return true;
 			}
 
 			// 用户角色
 			for (JiUserRole userRole : user.userRoles()) {
-				if (HelperArray.contains(menuPermission.getAllowUserIds(), userRole.getId())) {
+				if (HelperArray.contains(menuPermission.getAllowIds(), userRole.getId())) {
 					return true;
 				}
 			}

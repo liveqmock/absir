@@ -8,6 +8,7 @@
 package com.absir.appserv.system.helper;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 import com.absir.appserv.system.bean.value.JaLang;
 import com.absir.core.kernel.KernelReflect;
@@ -71,6 +72,24 @@ public class HelperLang {
 	 */
 	public static String getFieldCaption(String lang, Class<?> cls) {
 		return lang;
+	}
+
+	/**
+	 * @param method
+	 * @return
+	 */
+	public static String getMethodCaption(Method method) {
+		return getMethodCaption(method, method.getDeclaringClass());
+	}
+
+	/**
+	 * @param method
+	 * @param cls
+	 * @return
+	 */
+	public static String getMethodCaption(Method method, Class<?> cls) {
+		JaLang jaLang = method.getAnnotation(JaLang.class);
+		return getFieldCaption(jaLang == null ? method.getName() : jaLang.value(), cls);
 	}
 
 	/**

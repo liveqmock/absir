@@ -7,6 +7,7 @@
  */
 package com.absir.appserv.feature.menu;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -21,6 +22,8 @@ import com.absir.appserv.configure.JConfigureBase;
 import com.absir.appserv.configure.JConfigureSupply;
 import com.absir.appserv.configure.xls.XlsBase;
 import com.absir.appserv.configure.xls.XlsCrudSupply;
+import com.absir.appserv.crud.bean.CrudBean;
+import com.absir.appserv.crud.bean.CrudBeanSupply;
 import com.absir.appserv.feature.menu.value.MaEntity;
 import com.absir.appserv.feature.menu.value.MaFactory;
 import com.absir.appserv.feature.menu.value.MeUrlType;
@@ -182,12 +185,43 @@ public abstract class MenuContextUtils {
 				addMenuBeanRoot(menuBeanRoot, entry.getKey(), entry.getValue(), "系统配置", "配置", "edit", entityNames);
 			}
 
+			// 配置CRUD菜单
+			for (Entry<String, Class<? extends CrudBean>> entry : CrudBeanSupply.getCrudMapClass().entrySet()) {
+				addMenuBeanRoot(menuBeanRoot, entry.getKey(), entry.getValue(), "功能管理", "添加", "edit", entityNames);
+			}
+
 			// 添加实体权限
 			menuBeanService.addEntityPermission(entityNames);
 
 			// 添加后台菜单
 			menuBeanService.addMenuBeanRoot(menuBeanRoot, "admin", "后台菜单", MeUrlType.ADMIN);
 		}
+	}
+
+	/**
+	 * 添加权限菜单
+	 * 
+	 * @param menuBeanRoot
+	 * @param rootName
+	 * @param ref
+	 * @param url
+	 * @param method
+	 * @param routeType
+	 * @param parameters
+	 * @param parameterOrders
+	 */
+	public static void addMenuBeanRoot(MenuBeanRoot menuBeanRoot, String rootName, String ref, String url, Method method, Class<?> routeType, String[] parameters, int[] parameterOrders) {
+		int length = parameters == null ? 0 : parameters.length;
+		int orderLength = parameterOrders == null ? 0 : parameterOrders.length;
+		String name = length > 2 ? parameters[--length] : HelperLang.getMethodCaption(method, routeType);
+		int order = orderLength > 2 ? parameterOrders[--orderLength] : 0;
+		String folderName = length > 1 ? parameters[--length] : HelperLang.getTypeCaption(routeType);
+		int folderOrder = orderLength > 1 ? parameterOrders[--orderLength] : 0;
+		rootName = length > 0 ? parameters[--length] : rootName;
+		int rootOrder = orderLength > 0 ? parameterOrders[--orderLength] : 0;
+		menuBeanRoot = menuBeanRoot.getChildrenRoot(rootName, rootOrder, null, null, null);
+		menuBeanRoot = menuBeanRoot.getChildrenRoot(folderName, folderOrder, null, null, null);
+		menuBeanRoot = menuBeanRoot.getChildrenRoot(name, order, ref, url, KernelString.isEmpty(ref) ? null : "MENU");
 	}
 
 	/**
@@ -201,7 +235,7 @@ public abstract class MenuContextUtils {
 	 * @param option
 	 * @param entityNames
 	 */
-	private static void addMenuBeanRoot(MenuBeanRoot menuBeanRoot, final String entityName, Class<?> entityClass, String menuName, String suffix, String option, List<String> entityNames) {
+	public static void addMenuBeanRoot(MenuBeanRoot menuBeanRoot, final String entityName, Class<?> entityClass, String menuName, String suffix, String option, List<String> entityNames) {
 		String entityCaption = null;
 		MaEntity maEntity = entityClass.getAnnotation(MaEntity.class);
 		if (maEntity != null) {
@@ -242,7 +276,7 @@ public abstract class MenuContextUtils {
 					if (maFactory != null) {
 						IMenuFactory menuFactory = BeanFactoryUtils.getRegisterBeanObject(maFactory.value(), IMenuFactory.class, maFactory.factory());
 						if (menuFactory != null) {
-							menuFactory.proccess(menuBeanRoot, routeMatcher);
+							menuFactory.proccess(menuBeanRoot, routeMatcher, maFactory);
 						}
 					}
 				}

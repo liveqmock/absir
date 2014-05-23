@@ -77,7 +77,7 @@ public class Property {
 			}
 
 			if (field != null) {
-				if (type.isAssignableFrom(field.getType())) {
+				if (type == null || type.isAssignableFrom(field.getType())) {
 					type = field.getType();
 				}
 			}

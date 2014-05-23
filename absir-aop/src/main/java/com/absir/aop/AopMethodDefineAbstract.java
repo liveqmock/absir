@@ -39,7 +39,7 @@ public abstract class AopMethodDefineAbstract<T extends AopInterceptorAbstract, 
 	@Override
 	public boolean isEmpty(T aopInterceptor) {
 		// TODO Auto-generated method stub
-		return aopInterceptor.setunmodifiableMethodMapInterceptor();
+		return !aopInterceptor.setunmodifiableMethodMapInterceptor();
 	}
 
 	/*

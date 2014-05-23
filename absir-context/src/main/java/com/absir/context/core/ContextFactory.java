@@ -419,7 +419,9 @@ public class ContextFactory {
 					public void run() {
 						// TODO Auto-generated method stub
 						try {
-							context.uninitialize();
+							if (!(context instanceof ContextBean && ((ContextBean) context).uninitializeDone())) {
+								context.uninitialize();
+							}
 
 						} finally {
 							utilAtom.decrement();

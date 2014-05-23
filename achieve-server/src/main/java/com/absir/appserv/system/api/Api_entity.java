@@ -119,19 +119,19 @@ public class Api_entity extends ApiServer {
 	 * @return
 	 */
 	public List<Object> list(String entityName, Integer pageIndex, Input input) {
-		return list(entityName, pageIndex, JdbcPage.PAGE_SIZE, input);
+		return list(entityName, JdbcPage.PAGE_SIZE, pageIndex, input);
 	}
 
 	/**
 	 * 获取数据列表
 	 * 
 	 * @param entityName
-	 * @param pageIndex
 	 * @param pageSize
+	 * @param pageIndex
 	 * @param input
 	 * @return
 	 */
-	public List<Object> list(String entityName, Integer pageIndex, Integer pageSize, Input input) {
+	public List<Object> list(String entityName, Integer pageSize, Integer pageIndex, Input input) {
 		JiUserBase user = SecurityService.ME.getUserBase(input);
 		if (!(SessionFactoryUtils.entityPermission(entityName, JePermission.SELECT) || AuthServiceUtils.selectPermission(entityName, user))) {
 			throw new ServerException(ServerStatus.ON_DENIED);
@@ -170,11 +170,14 @@ public class Api_entity extends ApiServer {
 	 * 高级搜索列表
 	 * 
 	 * @param entityName
-	 * @param jdbcPage
+	 * @param condition
+	 * @param queue
+	 * @param pageSize
+	 * @param pageIndex
 	 * @param input
 	 * @return
 	 */
-	public List<Object> search(String entityName, @Param @Nullable String condition, @Param @Nullable String queue, Integer pageIndex, Integer pageSize, Input input) {
+	public List<Object> search(String entityName, @Param @Nullable String condition, @Param @Nullable String queue, Integer pageSize, Integer pageIndex, Input input) {
 		ICrudSupply crudSupply = EntityService.ME.getCrudSupply(entityName);
 		JiUserBase user = SecurityService.ME.getUserBase(input);
 		if (!SessionFactoryUtils.entityPermission(entityName, JePermission.SELECT)) {
@@ -252,7 +255,7 @@ public class Api_entity extends ApiServer {
 	 * @return
 	 */
 	public Map<String, Object> changed(String entityName, long updateTime, int pageIndex, Input input) {
-		return changed(entityName, updateTime, pageIndex, JdbcPage.PAGE_SIZE, input);
+		return changed(entityName, updateTime, JdbcPage.PAGE_SIZE, pageIndex, input);
 	}
 
 	/**
@@ -260,11 +263,12 @@ public class Api_entity extends ApiServer {
 	 * 
 	 * @param entityName
 	 * @param updateTime
-	 * @param size
+	 * @param pageSize
+	 * @param pageIndex
 	 * @param input
 	 * @return
 	 */
-	public Map<String, Object> changed(String entityName, long updateTime, int pageIndex, int pageSize, Input input) {
+	public Map<String, Object> changed(String entityName, long updateTime, int pageSize, int pageIndex, Input input) {
 		ICrudSupply crudSupply = EntityService.ME.getCrudSupply(entityName);
 		JiUserBase user = SecurityService.ME.getUserBase(input);
 		if (!(SessionFactoryUtils.entityPermission(entityName, JePermission.SELECT) || AuthServiceUtils.selectPermission(entityName, user))) {
@@ -320,7 +324,7 @@ public class Api_entity extends ApiServer {
 	 * @return
 	 */
 	public Map<String, Object> changedId(String entityName, long updateTime, int pageIndex, Input input) {
-		return changedId(entityName, updateTime, pageIndex, JdbcPage.PAGE_SIZE, input);
+		return changedId(entityName, updateTime, JdbcPage.PAGE_SIZE, pageIndex, input);
 	}
 
 	/**
@@ -328,12 +332,12 @@ public class Api_entity extends ApiServer {
 	 * 
 	 * @param entityName
 	 * @param updateTime
-	 * @param pageIndex
 	 * @param pageSize
+	 * @param pageIndex
 	 * @param input
 	 * @return
 	 */
-	public Map<String, Object> changedId(String entityName, long updateTime, int pageIndex, int pageSize, Input input) {
+	public Map<String, Object> changedId(String entityName, long updateTime, int pageSize, int pageIndex, Input input) {
 		Map<String, Object> modelMap = changed(entityName, updateTime, pageIndex, pageSize, input);
 		List<IBase> entities = (List<IBase>) modelMap.get("entities");
 		int size = entities.size();

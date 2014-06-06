@@ -1,0 +1,12 @@
+<%@page import="java.io.PrintWriter"%>
+<%@page isErrorPage="true"%>
+<%@ include file="/WEB-INF/jsp/common.jsp"%>
+<c:set var="layout_body" scope="request">
+	<h1>uncaughtException</h1>
+	<p>
+		<%
+			exception.printStackTrace(new PrintWriter(out));
+		%>
+	</p>
+</c:set>
+<jsp:include page="layout.jsp"></jsp:include>

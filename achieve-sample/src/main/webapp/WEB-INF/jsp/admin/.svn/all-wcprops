@@ -1,0 +1,71 @@
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/absir/!svn/ver/4597/appserv/archetypes/appserv-framework/src/main/webapp/WEB-INF/jsp/admin
+END
+notication.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/svn/absir/!svn/ver/2060/appserv/archetypes/appserv-framework/src/main/webapp/WEB-INF/jsp/admin/notication.jsp
+END
+main.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/absir/!svn/ver/2060/appserv/archetypes/appserv-framework/src/main/webapp/WEB-INF/jsp/admin/main.jsp
+END
+login.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/svn/absir/!svn/ver/4559/appserv/archetypes/appserv-framework/src/main/webapp/WEB-INF/jsp/admin/login.jsp
+END
+layout.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/absir/!svn/ver/2060/appserv/archetypes/appserv-framework/src/main/webapp/WEB-INF/jsp/admin/layout.jsp
+END
+login.timeout.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/svn/absir/!svn/ver/2060/appserv/archetypes/appserv-framework/src/main/webapp/WEB-INF/jsp/admin/login.timeout.jsp
+END
+successed.ajax.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/svn/absir/!svn/ver/4526/appserv/archetypes/appserv-framework/src/main/webapp/WEB-INF/jsp/admin/successed.ajax.jsp
+END
+login.success.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/svn/absir/!svn/ver/3576/appserv/archetypes/appserv-framework/src/main/webapp/WEB-INF/jsp/admin/login.success.jsp
+END
+main.layout.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svn/absir/!svn/ver/4507/appserv/archetypes/appserv-framework/src/main/webapp/WEB-INF/jsp/admin/main.layout.jsp
+END
+failed.ajax.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svn/absir/!svn/ver/4526/appserv/archetypes/appserv-framework/src/main/webapp/WEB-INF/jsp/admin/failed.ajax.jsp
+END
+login.failed.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/svn/absir/!svn/ver/3574/appserv/archetypes/appserv-framework/src/main/webapp/WEB-INF/jsp/admin/login.failed.jsp
+END
+login.ajax.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/svn/absir/!svn/ver/3574/appserv/archetypes/appserv-framework/src/main/webapp/WEB-INF/jsp/admin/login.ajax.jsp
+END

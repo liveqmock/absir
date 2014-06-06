@@ -1,0 +1,59 @@
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/absir/!svn/ver/4597/appserv/archetypes/appserv-framework/src/main/webapp/WEB-INF/jsp/admin/entity
+END
+save.error.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 117
+/svn/absir/!svn/ver/2060/appserv/archetypes/appserv-framework/src/main/webapp/WEB-INF/jsp/admin/entity/save.error.jsp
+END
+error.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/svn/absir/!svn/ver/2060/appserv/archetypes/appserv-framework/src/main/webapp/WEB-INF/jsp/admin/entity/error.jsp
+END
+edit.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svn/absir/!svn/ver/4209/appserv/archetypes/appserv-framework/src/main/webapp/WEB-INF/jsp/admin/entity/edit.jsp
+END
+lookup.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/svn/absir/!svn/ver/4597/appserv/archetypes/appserv-framework/src/main/webapp/WEB-INF/jsp/admin/entity/lookup.jsp
+END
+delete.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/svn/absir/!svn/ver/2060/appserv/archetypes/appserv-framework/src/main/webapp/WEB-INF/jsp/admin/entity/delete.jsp
+END
+save.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svn/absir/!svn/ver/3883/appserv/archetypes/appserv-framework/src/main/webapp/WEB-INF/jsp/admin/entity/save.jsp
+END
+list.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svn/absir/!svn/ver/4597/appserv/archetypes/appserv-framework/src/main/webapp/WEB-INF/jsp/admin/entity/list.jsp
+END
+suggest.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/svn/absir/!svn/ver/2060/appserv/archetypes/appserv-framework/src/main/webapp/WEB-INF/jsp/admin/entity/suggest.jsp
+END
+delete.error.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 119
+/svn/absir/!svn/ver/2060/appserv/archetypes/appserv-framework/src/main/webapp/WEB-INF/jsp/admin/entity/delete.error.jsp
+END

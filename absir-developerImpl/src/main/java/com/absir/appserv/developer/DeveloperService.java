@@ -48,6 +48,9 @@ public class DeveloperService implements IDeveloper {
 	 */
 	@Started
 	protected static void postConstruct() {
+		//DeveloperService.class.getResource(arg0)
+		//HelperFile.copyDirectoryToDirectory(srcDir, destDir)
+		//new File(arg0)
 		if (developerWeb != null) {
 			String contextPath = HelperFileName.normalizeNoEndSeparator(developerWeb + "/../../../");
 			if ((HelperFileName.getName(contextPath)).equals(HelperFileName.getName(HelperFileName.normalizeNoEndSeparator(BeanFactoryUtils.getBeanConfig().getClassPath() + "/../../")))) {

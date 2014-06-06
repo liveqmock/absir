@@ -395,16 +395,25 @@ public abstract class KernelClass {
 			Type[] types = typeArguments(type);
 			if (types == null || types.length <= 0) {
 				Class cls = rawClass(type);
-				if (!(force || isArgumentClass(cls))) {
-					break;
+				for (Type interfaceType : cls.getGenericInterfaces()) {
+					types = typeArguments(interfaceType);
+					if (types != null && types.length > 0) {
+						break;
+					}
 				}
 
-				if (cls.isArray()) {
-					return cls.getComponentType();
+				if (types == null || types.length <= 0) {
+					if (!(force || isArgumentClass(cls))) {
+						break;
+					}
 
-				} else {
-					type = cls.getGenericSuperclass();
-					continue;
+					if (cls.isArray()) {
+						return cls.getComponentType();
+
+					} else {
+						type = cls.getGenericSuperclass();
+						continue;
+					}
 				}
 			}
 
@@ -425,16 +434,25 @@ public abstract class KernelClass {
 			Type[] types = typeArguments(type);
 			if (types == null || types.length <= 0) {
 				Class cls = rawClass(type);
-				if (!(force || isArgumentClass(cls))) {
-					break;
+				for (Type interfaceType : cls.getGenericInterfaces()) {
+					types = typeArguments(interfaceType);
+					if (types != null && types.length > 0) {
+						break;
+					}
 				}
 
-				if (cls.isArray()) {
-					return new Class[] { cls.getComponentType() };
+				if (types == null || types.length <= 0) {
+					if (!(force || isArgumentClass(cls))) {
+						break;
+					}
 
-				} else {
-					type = cls.getGenericSuperclass();
-					continue;
+					if (cls.isArray()) {
+						return new Class[] { cls.getComponentType() };
+
+					} else {
+						type = cls.getGenericSuperclass();
+						continue;
+					}
 				}
 			}
 

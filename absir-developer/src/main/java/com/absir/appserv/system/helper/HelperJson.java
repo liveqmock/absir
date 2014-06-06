@@ -7,10 +7,15 @@
  */
 package com.absir.appserv.system.helper;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.DeserializationConfig;
@@ -22,14 +27,20 @@ import org.codehaus.jackson.map.introspect.AnnotatedClass;
 import org.codehaus.jackson.map.introspect.JacksonAnnotationIntrospector;
 import org.codehaus.jackson.map.ser.impl.SimpleBeanPropertyFilter;
 import org.codehaus.jackson.map.ser.impl.SimpleFilterProvider;
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
+import org.dom4j.io.XMLWriter;
 
+import com.absir.context.core.ContextUtils;
 import com.absir.core.kernel.KernelCharset;
 
 /**
  * @author absir
  * 
  */
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class HelperJson {
 
 	/** OBJECT_MAPPER */
@@ -304,6 +315,124 @@ public class HelperJson {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			return null;
+		}
+	}
+
+	/**
+	 * @param xml
+	 * @return
+	 */
+	public static Map<String, Object> xmlToMap(String xml) {
+		InputStream inputStream = null;
+		try {
+			inputStream = new ByteArrayInputStream(xml.getBytes(ContextUtils.getCharset()));
+			SAXReader saxReader = new SAXReader();
+			return xmlToMap(saxReader.read(inputStream).getRootElement());
+
+		} catch (Exception e) {
+			return null;
+
+		} finally {
+			if (inputStream != null) {
+				try {
+					inputStream.close();
+
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param element
+	 * @return
+	 */
+	private static Map<String, Object> xmlToMap(Element element) {
+		Iterator<Element> iterator = element.elementIterator();
+		if (iterator.hasNext()) {
+			Map<String, Object> map = new LinkedHashMap<String, Object>();
+			while (true) {
+				Element ele = iterator.next();
+				Map<String, Object> eleMap = xmlToMap(ele);
+				map.put(ele.getName(), eleMap == null ? ele.getText() : eleMap);
+				if (!iterator.hasNext()) {
+					break;
+				}
+			}
+
+			return map;
+		}
+
+		return null;
+	}
+
+	/**
+	 * @param map
+	 * @param rootName
+	 * @return
+	 */
+	public static String mapToXml(Map<String, Object> map, String rootName) {
+		return mapToXml(map, rootName, null);
+	}
+
+	/**
+	 * @param map
+	 * @param rootName
+	 * @param data
+	 * @return
+	 */
+	public static String mapToXml(Map<String, Object> map, String rootName, String data) {
+		try {
+			XMLWriter xmlWriter = mapToXmlWriter(map, rootName);
+			if (data != null) {
+				
+			}
+
+			return xmlWriter.toString();
+
+		} catch (Exception e) {
+
+		}
+
+		return null;
+	}
+
+	/**
+	 * @param map
+	 * @param rootName
+	 * @return
+	 * @throws IOException
+	 */
+	public static XMLWriter mapToXmlWriter(Map<String, Object> map, String rootName) throws IOException {
+		XMLWriter xmlWriter = new XMLWriter();
+		Document document = DocumentHelper.createDocument();
+		if (rootName == null) {
+			rootName = "xml";
+		}
+
+		Element element = document.addElement(rootName);
+		mapToXmlWriter(map, element);
+		xmlWriter.write(document);
+		return xmlWriter;
+	}
+
+	/**
+	 * @param map
+	 * @param element
+	 * @return
+	 */
+	protected static void mapToXmlWriter(Map<String, Object> map, Element element) {
+		for (Entry<String, Object> entry : map.entrySet()) {
+			Object value = entry.getValue();
+			if (value != null) {
+				if (value instanceof Map) {
+					mapToXmlWriter((Map<String, Object>) value, element.addElement(entry.getKey()));
+
+				} else {
+					element.addAttribute(entry.getKey(), value.toString());
+				}
+			}
 		}
 	}
 }

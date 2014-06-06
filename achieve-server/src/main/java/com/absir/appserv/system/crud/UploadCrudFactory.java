@@ -24,7 +24,9 @@ import com.absir.appserv.support.developer.JCrudField;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.bean.value.JaCrud.Crud;
 import com.absir.appserv.system.helper.HelperRandom;
+import com.absir.bean.basis.Base;
 import com.absir.bean.core.BeanFactoryUtils;
+import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Started;
 import com.absir.bean.inject.value.Value;
 import com.absir.core.helper.HelperFile;
@@ -41,6 +43,8 @@ import com.absir.servlet.InputRequest;
  * @author absir
  * 
  */
+@Base
+@Bean
 public class UploadCrudFactory implements ICrudFactory {
 
 	/** uploadUrl */

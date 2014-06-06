@@ -459,9 +459,9 @@ public class BeanConfigImpl implements BeanConfig {
 				if (beanConfig != null) {
 					return beanConfig.getExpressionObject(expression, beanName, toClass);
 				}
-			}
 
-			return null;
+				return null;
+			}
 		}
 
 		return DynaBinder.to(obj, beanName, toClass);

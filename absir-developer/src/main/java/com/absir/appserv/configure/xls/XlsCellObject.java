@@ -9,6 +9,8 @@ package com.absir.appserv.configure.xls;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
 
+import com.absir.core.base.IBase;
+
 /**
  * @author absir
  * 
@@ -41,7 +43,13 @@ public class XlsCellObject extends XlsCellBase {
 	public void wirteHssfCell(HSSFCell hssfCell) {
 		// TODO Auto-generated method stub
 		if (obj != null) {
-			xlsBase.write(hssfCell, obj.toString());
+			if (obj instanceof IBase) {
+				obj = ((IBase<?>) obj).getId();
+			}
+
+			if (obj != null) {
+				xlsBase.write(hssfCell, obj.toString());
+			}
 		}
 	}
 }

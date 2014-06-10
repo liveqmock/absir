@@ -97,7 +97,7 @@ public abstract class XlsUtils {
 	}
 
 	/** XLS_BASE */
-	private static final XlsBase XLS_BASE = new XlsBase();
+	public static final XlsBase XLS_BASE = new XlsBase();
 
 	/**
 	 * @param workbook
@@ -230,6 +230,10 @@ public abstract class XlsUtils {
 	 * @return
 	 */
 	public static <T> HSSFWorkbook getWorkbook(String beanName, Class<T> beanClass, Collection<T> beans, XlsBase xlsBase) {
+		if (xlsBase == null) {
+			xlsBase = XLS_BASE;
+		}
+
 		HSSFWorkbook hssfWorkbook = new HSSFWorkbook();
 		XlsAccessorUtils.writeHssfWorkbook(hssfWorkbook, beanClass, beans, xlsBase);
 		return hssfWorkbook;

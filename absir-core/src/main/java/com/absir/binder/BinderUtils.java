@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.absir.core.kernel.KernelDyna;
+import com.absir.property.PropertyData;
 import com.absir.validator.ValidatorSupply;
 
 /**
@@ -35,6 +36,26 @@ public class BinderUtils {
 	 */
 	public static ValidatorSupply getValidatorSupply() {
 		return BinderData.validatorSupply;
+	}
+
+	/**
+	 * @param entity
+	 * @return
+	 */
+	public static Map<String, Object> getEntityMap(Object entity) {
+		if (entity == null) {
+			return null;
+		}
+
+		Map<String, Object> entityMap = new HashMap<String, Object>();
+		for (Entry<String, PropertyData> entry : BinderData.binderSupply.getPropertyMap(entity.getClass()).entrySet()) {
+			PropertyData propertyData = entry.getValue();
+			if (propertyData.getProperty().getAllow() >= 0) {
+				entityMap.put(entry.getKey(), propertyData.getProperty().getAccessor().get(entity));
+			}
+		}
+
+		return entityMap;
 	}
 
 	/**

@@ -28,9 +28,9 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import com.absir.binder.BinderData;
 import com.absir.context.core.ContextUtils;
+import com.absir.core.dyna.DynaBinder;
 import com.absir.core.helper.HelperIO;
 import com.absir.core.kernel.KernelCharset;
-import com.absir.core.kernel.KernelCollection;
 import com.absir.core.kernel.KernelLang;
 import com.absir.server.in.InMethod;
 import com.absir.server.in.InModel;
@@ -241,19 +241,24 @@ public class InputRequest extends Input {
 					if (!fileItems.isEmpty()) {
 						parameterMap = new HashMap<String, Object>();
 						for (Entry<String, List<FileItem>> entry : fileItems.entrySet()) {
-							List<String> parameters = null;
+							List<Object> parameters = null;
+							boolean fileItem = false;
 							for (FileItem item : entry.getValue()) {
-								if (item.isFormField()) {
-									if (parameters == null) {
-										parameters = new ArrayList<String>();
-									}
+								if (parameters == null) {
+									parameters = new ArrayList<Object>();
+								}
 
+								if (item.isFormField()) {
 									parameters.add(new String(item.get(), ContextUtils.getCharset()));
+
+								} else {
+									fileItem = true;
+									parameters.add(item);
 								}
 							}
 
 							if (parameters != null) {
-								parameterMap.put(entry.getKey(), KernelCollection.toArray(parameters, String.class));
+								parameterMap.put(entry.getKey(), DynaBinder.to(parameters, fileItem ? Object[].class : String[].class));
 							}
 						}
 

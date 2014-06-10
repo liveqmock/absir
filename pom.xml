@@ -42,6 +42,7 @@
 		<module>absir-yidong</module>
 		<module>absir-js</module>
 		<module>achieve-sample</module>
+		<module>absir-test</module>
 	</modules>
 	<dependencies>
 		<dependency>

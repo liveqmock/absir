@@ -51,7 +51,12 @@ public class ParameterResolverParam implements ParameterResolver<String> {
 	public Object getParameterValue(OnPut onPut, String parameter, Class<?> parameterType, String beanName, RouteMethod routeMethod) {
 		// TODO Auto-generated method stub
 		Input input = onPut.getInput();
-		return onPut.getBinderData().bind(parameterType.isArray() ? input.getParams(parameter) : input.getParam(parameter), beanName, parameterType);
+		Object parameterValue = input.getParamMap().get(parameter);
+		if (!(parameterValue == null || parameterType.isArray() || !parameterValue.getClass().isArray())) {
+			parameterValue = ((Object[]) parameterValue)[0];
+		}
+
+		return onPut.getBinderData().bind(parameterValue, beanName, parameterType);
 	}
 
 }

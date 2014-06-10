@@ -7,8 +7,16 @@
  */
 package com.absir.appserv.system.admin;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.fileupload.FileItem;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+
+import com.absir.appserv.configure.xls.XlsUtils;
 import com.absir.appserv.crud.CrudContextUtils;
 import com.absir.appserv.crud.CrudSupply;
 import com.absir.appserv.crud.ICrudSupply;
@@ -40,10 +48,12 @@ import com.absir.server.in.Input;
 import com.absir.server.value.Binder;
 import com.absir.server.value.Body;
 import com.absir.server.value.Mapping;
+import com.absir.server.value.Nullable;
 import com.absir.server.value.Param;
 import com.absir.server.value.Server;
 import com.absir.servlet.InputRequest;
 
+@SuppressWarnings("unchecked")
 @Server
 public class Admin_entity extends AdminServer {
 
@@ -311,6 +321,69 @@ public class Admin_entity extends AdminServer {
 		}
 
 		return "admin/entity/delete";
+	}
+
+	/**
+	 * 导出Excel
+	 * 
+	 * @param entityName
+	 * @param ids
+	 * @param input
+	 * @param response
+	 * @throws IOException
+	 */
+	@Body
+	public void export(String entityName, @Nullable @Param String[] ids, Input input, HttpServletResponse response) throws IOException {
+		ICrudSupply crudSupply = getCrudSupply(entityName, input);
+		if (crudSupply instanceof CrudSupply) {
+			throw new ServerException(ServerStatus.IN_404);
+		}
+
+		JiUserBase user = SecurityService.ME.getUserBase(input);
+		PropertyFilter filter = AuthServiceUtils.selectPropertyFilter(entityName, crudSupply, user);
+		TransactionIntercepter.open(input, crudSupply.getTransactionName(), BeanService.TRANSACTION_READ_ONLY);
+		List<Object> entities = ids == null ? EntityService.ME.list(entityName, crudSupply, user, null, InputServiceUtils.getSearchCondition(entityName, filter, null, input),
+				InputServiceUtils.getOrderQueue(input), null) : EntityService.ME.list(entityName, crudSupply, user, null, ids);
+		HSSFWorkbook workbook = XlsUtils.getWorkbook(entities, XlsUtils.XLS_BASE);
+		response.addHeader("Content-Disposition", "attachment;filename=" + entityName + ".xls");
+		workbook.write(response.getOutputStream());
+	}
+
+	/**
+	 * 导入Excel(上传)
+	 * 
+	 * @param entityName
+	 * @param input
+	 * @return
+	 * @throws IOException
+	 */
+	public void upload(String entityName, Input input) throws IOException {
+		ICrudSupply crudSupply = getCrudSupply(entityName, input);
+		if (crudSupply instanceof CrudSupply) {
+			throw new ServerException(ServerStatus.IN_404);
+		}
+	}
+
+	/**
+	 * 导入Excel
+	 * 
+	 * @param entityName
+	 * @param xls
+	 * @param input
+	 * @return
+	 * @throws IOException
+	 */
+	public String importXls(String entityName, @Param FileItem xls, Input input) throws IOException {
+		ICrudSupply crudSupply = getCrudSupply(entityName, input);
+		if (crudSupply instanceof CrudSupply) {
+			throw new ServerException(ServerStatus.IN_404);
+		}
+
+		JiUserBase user = SecurityService.ME.getUserBase(input);
+		PropertyFilter filter = AuthServiceUtils.insertPropertyFilter(entityName, crudSupply, user);
+		List<?> entities = XlsUtils.getXlsList(new HSSFWorkbook(xls.getInputStream()), null, crudSupply.getEntityClass(entityName), XlsUtils.XLS_BASE, false);
+		EntityService.ME.merge(entityName, crudSupply, user, entities, filter);
+		return "admin/entity/importXls";
 	}
 
 	/**

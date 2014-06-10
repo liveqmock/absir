@@ -28,6 +28,7 @@ import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
 import com.absir.binder.BinderData;
 import com.absir.binder.BinderResult;
+import com.absir.binder.BinderUtils;
 import com.absir.core.dyna.DynaBinder;
 import com.absir.core.kernel.KernelClass;
 import com.absir.core.kernel.KernelLang.PropertyFilter;
@@ -134,7 +135,11 @@ public class EntityService {
 	 */
 	public Object merge(String entityName, Object entity, Object entityObject, ICrudSupply crudSupply, boolean create, JiUserBase user, PropertyFilter filter) {
 		if (entityObject == null || !(entityObject instanceof Map)) {
-			return null;
+			if (entityObject.getClass() != crudSupply.getEntityClass(entityName)) {
+				return null;
+			}
+
+			entityObject = BinderUtils.getEntityMap(entityObject);
 		}
 
 		BinderData binderData = new BinderData();
@@ -266,7 +271,11 @@ public class EntityService {
 	 */
 	public Object update(String entityName, ICrudSupply crudSupply, JiUserBase user, Object entityObject, PropertyFilter filter) {
 		if (entityObject == null || !(entityObject instanceof Map)) {
-			return null;
+			if (entityObject.getClass() != crudSupply.getEntityClass(entityName)) {
+				return null;
+			}
+
+			entityObject = BinderUtils.getEntityMap(entityObject);
 		}
 
 		return update(entityName, crudSupply.getIdentifierName(entityName), crudSupply.getIdentifierType(entityName), (Map) entityObject, crudSupply, user, filter,
@@ -282,6 +291,7 @@ public class EntityService {
 	 * @return
 	 */
 	public List update(String entityName, ICrudSupply crudSupply, JiUserBase user, List<?> entityList, PropertyFilter filter) {
+		Class entityClass = null;
 		String identifierName = crudSupply.getIdentifierName(entityName);
 		Class identifierType = crudSupply.getIdentifierType(entityName);
 		JdbcCondition jdbcCondition = AccessServiceUtils.updateCondition(entityName, user, null);
@@ -289,7 +299,15 @@ public class EntityService {
 		List<Object> entities = new ArrayList<Object>();
 		for (Object entityObject : entityList) {
 			if (entityObject == null || !(entityObject instanceof Map)) {
-				continue;
+				if (entityClass == null) {
+					entityClass = crudSupply.getEntityClass(entityName);
+				}
+
+				if (entityObject.getClass() != entityClass) {
+					continue;
+				}
+
+				entityObject = BinderUtils.getEntityMap(entityObject);
 			}
 
 			entities.add(update(entityName, identifierName, identifierType, (Map) entityObject, crudSupply, user, filter, jdbcCondition));
@@ -312,7 +330,11 @@ public class EntityService {
 	public Object merge(String entityName, ICrudSupply crudSupply, JiUserBase user, Object entityObject, PropertyFilter filter) {
 		// TODO Auto-generated method stub
 		if (entityObject == null || !(entityObject instanceof Map)) {
-			return null;
+			if (entityObject.getClass() != crudSupply.getEntityClass(entityName)) {
+				return null;
+			}
+
+			entityObject = BinderUtils.getEntityMap(entityObject);
 		}
 
 		return merge(entityName, crudSupply.getIdentifierName(entityName), crudSupply.getIdentifierType(entityName), (Map) entityObject, crudSupply, user, filter,
@@ -328,6 +350,7 @@ public class EntityService {
 	 * @return
 	 */
 	public List merge(String entityName, ICrudSupply crudSupply, JiUserBase user, List<?> entityList, PropertyFilter filter) {
+		Class entityClass = null;
 		String identifierName = crudSupply.getIdentifierName(entityName);
 		Class identifierType = crudSupply.getIdentifierType(entityName);
 		JdbcCondition jdbcCondition = AccessServiceUtils.updateCondition(entityName, user, null);
@@ -335,7 +358,15 @@ public class EntityService {
 		List<Object> entities = new ArrayList<Object>();
 		for (Object entityObject : entityList) {
 			if (entityObject == null || !(entityObject instanceof Map)) {
-				continue;
+				if (entityClass == null) {
+					entityClass = crudSupply.getEntityClass(entityName);
+				}
+
+				if (entityObject.getClass() != entityClass) {
+					continue;
+				}
+
+				entityObject = BinderUtils.getEntityMap(entityObject);
 			}
 
 			entities.add(merge(entityName, identifierName, identifierType, (Map) entityObject, crudSupply, user, filter, jdbcCondition));

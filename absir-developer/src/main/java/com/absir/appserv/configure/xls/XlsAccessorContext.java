@@ -37,12 +37,14 @@ public class XlsAccessorContext extends XlsAccessorBean {
 		// TODO Auto-generated constructor stub
 		this.beanClass = beanClass;
 		accessors = getXlsAccessors(beanClass, xlsBase);
-		if (XlsBean.class.isAssignableFrom(beanClass)) {
-			isXlsBean = true;
-			idType = KernelClass.argumentClass(beanClass);
+		if (XlsBase.class.isAssignableFrom(beanClass)) {
+			if (XlsBase.class.isAssignableFrom(beanClass)) {
+				isXlsBean = true;
+				idType = KernelClass.argumentClass(beanClass);
 
-		} else {
-			accessors.remove(0);
+			} else {
+				accessors.remove(0);
+			}
 		}
 	}
 

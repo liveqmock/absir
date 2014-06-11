@@ -17,6 +17,9 @@
         <dependent-module archiveName="absir-core-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-core/absir-core">
             <dependency-type>uses</dependency-type>
         </dependent-module>
+        <dependent-module archiveName="absir-hibernate-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-hibernate/absir-hibernate">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <dependent-module archiveName="absir-servlet-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-servlet/absir-servlet">
             <dependency-type>uses</dependency-type>
         </dependent-module>

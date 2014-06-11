@@ -231,10 +231,12 @@ public class EntityService {
 				if (entity != null) {
 					id = crudSupply.getIdentifier(entityName, entity);
 					entity = CrudServiceUtils.find(crudSupply, entityName, id, jdbcCondition);
-					if (entity == null) {
+					if (entity != null) {
 						return merge(entityName, entity, propertyMap, crudSupply, false, user, filter);
 					}
 				}
+
+				return merge(entityName, crudSupply.create(entityName), propertyMap, crudSupply, false, user, filter);
 			}
 
 		} catch (ServerException e) {

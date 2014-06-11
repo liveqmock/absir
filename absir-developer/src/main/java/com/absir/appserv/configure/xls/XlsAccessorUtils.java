@@ -82,7 +82,7 @@ public class XlsAccessorUtils {
 		accessors[0] = 0;
 		accessors[1] = 0;
 		accessors[2] = hssfSheet.getLastRowNum() + 1;
-		accessors[3] = hssfSheet.getRow(0).getPhysicalNumberOfCells();
+		accessors[3] = accessors[2] <= 1 ? 0 : hssfSheet.getRow(0).getPhysicalNumberOfCells();
 		return accessors;
 	}
 

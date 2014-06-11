@@ -114,9 +114,12 @@ public class DynaBinderUtils extends DynaBinder {
 			}
 
 		} else {
-			if (obj instanceof String && !is(toClass)) {
+			T to = DynaBinder.to(obj, toClass);
+			if (to == null && obj instanceof String && !is(toClass)) {
 				return HelperJson.decodeNull((String) obj, toClass);
 			}
+
+			return to;
 		}
 
 		return DynaBinder.to(obj, toClass);

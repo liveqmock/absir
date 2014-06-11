@@ -81,8 +81,8 @@ public class XlsAccessorUtils {
 		int[] accessors = new int[4];
 		accessors[0] = 0;
 		accessors[1] = 0;
-		accessors[2] = hssfSheet.getLastRowNum() + 1;
-		accessors[3] = accessors[2] <= 1 ? 0 : hssfSheet.getRow(0).getPhysicalNumberOfCells();
+		accessors[2] = hssfSheet.getPhysicalNumberOfRows();
+		accessors[3] = accessors[2] <= 0 ? 0 : hssfSheet.getRow(0).getPhysicalNumberOfCells();
 		return accessors;
 	}
 

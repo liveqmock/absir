@@ -523,7 +523,7 @@ public class BeanServiceBase implements BeanService, ICrudSupply {
 	public void mergeEntity(String entityName, Object entity, boolean create) {
 		// TODO Auto-generated method stub
 		if (create) {
-			persist(entityName == null ? null : SessionFactoryUtils.getEntityName(entityName), entity);
+			persist(entityName, entity);
 
 		} else {
 			merge(entityName, entity);

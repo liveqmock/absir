@@ -38,7 +38,7 @@ public class XlsAccessorContext extends XlsAccessorBean {
 		this.beanClass = beanClass;
 		accessors = getXlsAccessors(beanClass, xlsBase);
 		if (XlsBase.class.isAssignableFrom(beanClass)) {
-			if (XlsBase.class.isAssignableFrom(beanClass)) {
+			if (XlsBean.class.isAssignableFrom(beanClass)) {
 				isXlsBean = true;
 				idType = KernelClass.argumentClass(beanClass);
 

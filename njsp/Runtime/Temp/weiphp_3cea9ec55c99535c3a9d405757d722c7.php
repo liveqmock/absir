@@ -1,0 +1,3 @@
+<?php
+//000000000000a:2:{i:14024783086301;a:10:{s:8:"template";s:6:"simple";s:5:"title";a:1:{i:0;s:12:"园区新闻";}s:3:"url";a:1:{i:0;s:0:"";}s:13:"widget_height";s:0:"";s:12:"widget_title";s:0:"";s:17:"widget_more_title";a:1:{i:0;s:0:"";}s:15:"widget_more_url";a:1:{i:0;s:0:"";}s:7:"page_id";s:2:"44";s:9:"widget_id";s:14:"14024783086301";s:11:"widget_name";s:8:"Category";}i:14024784452841;a:9:{s:14:"custom_content";s:0:"";s:5:"parse";s:1:"0";s:13:"widget_height";s:0:"";s:12:"widget_title";s:0:"";s:17:"widget_more_title";a:1:{i:0;s:0:"";}s:15:"widget_more_url";a:1:{i:0;s:0:"";}s:7:"page_id";s:2:"44";s:9:"widget_id";s:14:"14024784452841";s:11:"widget_name";s:6:"Custom";}}
+?>

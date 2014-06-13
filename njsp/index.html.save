@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="/njsp/Public/Home/css/font-awesome.css?v=1397806729" media="all">
+	<link rel="stylesheet" type="text/css" href="/njsp/Public/Home/css/mobile_module.css?v=1397806729" media="all">
+    <script type="text/javascript" src="/njsp/Public/static/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="/njsp/Public/Home/js/prefixfree.min.js"></script>
+    <script type="text/javascript" src="/njsp/Public/Home/js/m/dialog.js?v=1397806729"></script>
+    <script type="text/javascript" src="/njsp/Public/Home/js/m/flipsnap.min.js"></script>
+    <script type="text/javascript" src="/njsp/Public/Home/js/m/mobile_module.js?v=1397806729"></script>
+    <script type="text/javascript" src="/njsp/Public/Home/js/admin_common.js?v=1397806729"></script>
+	<title>南京高新区微信平台</title>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+	<meta content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <meta name="Keywords" content="weiphp 微信公众平台开发框架">
+    <meta name="Description" content="weiphp 微信公众平台开发框架">
+    <meta content="application/xhtml+xml;charset=UTF-8" http-equiv="Content-Type">
+    <meta content="no-cache,must-revalidate" http-equiv="Cache-Control">
+    <meta content="no-cache" http-equiv="pragma">
+    <meta content="0" http-equiv="expires">
+    <meta content="telephone=no, address=no" name="format-detection">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="shortcut icon" href="http://42.62.40.112/njsp/favicon.ico">
+</head>	
+<link href="./Addons/Leaflets/View/default/Public/leaflets.css?v=1397806729" rel="stylesheet" type="text/css">
+<body id="leaflets">
+	<div class="container body">
+    	<h1>南京软件园官方微信公众号</h1>
+        <div class="qrcode">
+        	<img src="http://42.62.40.112/njsp/Uploads/Picture/2014-04-18/5350d62596aff.jpg"/>
+        </div>
+        <div class="qr_tips">请使用微信扫描二维码关注此公众号</div>
+        <div class="desc">
+        	地址：南京高新技术产业开发区高新路16号(210061) 
+		电话：(8625) 5864 1100 值班：(8625) 5884 3667 传真：(8625) 5884 3843
+招商热线：(8625) 5805 0030 招商传真：(8625) 5805 0004 招商邮件：	提交
+	</div>
+        <p class="copyright">版权所有：南京高新技术产业开发区管理委员会</p>
+    </div>
+	
+</body>
+<script type="text/javascript">
+$('#shape').click(function(event){
+	if(event.target.tagName == "SPAN"){
+		$(event.target).addClass('on');
+		$(this).unbind("click");
+		var audio = new Audio();
+		//audio.src = "./Addons/Leaflets/View/default/Public/hit.mp3";
+		//audio.play();
+		setTimeout(function(){openSuccessDialog();},2000);//测试代码
+		$.ajax({
+			url:"url",
+			data:{},
+			dataType:"json",
+			success:function(data){
+				if(data.result=="sucess"){
+						$(event.target).addClass('luck');
+						setTimeout(function(){
+							openSuccessDialog();
+						},2000)
+					
+					}else{
+						setTimeout(function(){
+							openErrorDialog();
+						},2000)
+					}
+				}
+			});
+	}
+})
+function openSuccessDialog(){
+	var successHtml = "<div class='common_dialog lqcg'>"
+		+"<h6>你的运气太好了！</h6><p class='p_10'>你获得了精美礼物一份，请联系客服领取。</p>"
+		+"<div class='tb'><a class='btn m_15 flex_1' href='#'>去领取</a></div>"
+		+"</div>"
+		$.Dialog.open(successHtml);
+	}
+function openErrorDialog(){
+	var successHtml = "<div class='common_dialog lqcg'>"
+		+"<h6>很抱歉！没有砸中，还需继续努力</h6><p class='p_10'>你还有10次机会。</p>"
+		+"<div class='tb'><a class='btn m_15 flex_1' href='#'>在砸一次</a></div>"
+		+"</div>"
+		$.Dialog.open(successHtml);
+	}
+</script>
+</html>

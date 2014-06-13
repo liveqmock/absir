@@ -1,0 +1,1 @@
+<?php if (!defined('THINK_PATH')) exit();?><!-- 底部导航最多能添加4个选项 -->

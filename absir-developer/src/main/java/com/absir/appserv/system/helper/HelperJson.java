@@ -386,7 +386,7 @@ public class HelperJson {
 		try {
 			XMLWriter xmlWriter = mapToXmlWriter(map, rootName);
 			if (data != null) {
-				
+
 			}
 
 			return xmlWriter.toString();

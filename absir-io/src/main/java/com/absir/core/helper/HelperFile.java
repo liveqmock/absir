@@ -8,13 +8,17 @@
 package com.absir.core.helper;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.FileUtils;
@@ -161,5 +165,112 @@ public class HelperFile extends FileUtils {
 		}
 
 		return null;
+	}
+
+	/**
+	 * @param srcFile
+	 * @param destFile
+	 * @param overWrite
+	 * @param preserveFileDate
+	 * @return
+	 * @throws IOException
+	 */
+	public static boolean copyFileOverWrite(File srcFile, File destFile, boolean overWrite, boolean preserveFileDate) throws IOException {
+		if (destFile.exists() && !overWrite) {
+			return false;
+		}
+
+		copyFile(srcFile, destFile, preserveFileDate);
+		return true;
+	}
+
+	/**
+	 * @param srcDir
+	 * @param destDir
+	 * @param overWrite
+	 * @param preserveFileDate
+	 * @throws IOException
+	 */
+	public static void copyDirectoryOverWrite(File srcDir, File destDir, boolean overWrite, FileFilter filter, boolean preserveFileDate) throws IOException {
+		if (srcDir == null) {
+			throw new NullPointerException("Source must not be null");
+		}
+		if (destDir == null) {
+			throw new NullPointerException("Destination must not be null");
+		}
+		if (srcDir.exists() == false) {
+			throw new FileNotFoundException("Source '" + srcDir + "' does not exist");
+		}
+		if (srcDir.isDirectory() == false) {
+			throw new IOException("Source '" + srcDir + "' exists but is not a directory");
+		}
+		if (srcDir.getCanonicalPath().equals(destDir.getCanonicalPath())) {
+			throw new IOException("Source '" + srcDir + "' and destination '" + destDir + "' are the same");
+		}
+
+		// Cater for destination being directory within the source directory
+		// (see IO-141)
+		List<String> exclusionList = null;
+		if (destDir.getCanonicalPath().startsWith(srcDir.getCanonicalPath())) {
+			File[] srcFiles = filter == null ? srcDir.listFiles() : srcDir.listFiles(filter);
+			if (srcFiles != null && srcFiles.length > 0) {
+				exclusionList = new ArrayList<String>(srcFiles.length);
+				for (File srcFile : srcFiles) {
+					File copiedFile = new File(destDir, srcFile.getName());
+					exclusionList.add(copiedFile.getCanonicalPath());
+				}
+			}
+		}
+
+		doCopyDirectoryOverWrite(srcDir, destDir, overWrite, filter, preserveFileDate, exclusionList);
+	}
+
+	/**
+	 * @param srcDir
+	 * @param destDir
+	 * @param overWrite
+	 * @param filter
+	 * @param preserveFileDate
+	 * @param exclusionList
+	 * @throws IOException
+	 */
+	private static void doCopyDirectoryOverWrite(File srcDir, File destDir, boolean overWrite, FileFilter filter, boolean preserveFileDate, List<String> exclusionList) throws IOException {
+		File[] srcFiles = filter == null ? srcDir.listFiles() : srcDir.listFiles(filter);
+		if (srcFiles == null) { // null if abstract pathname does not denote a
+								// directory, or if an I/O error occurs
+			throw new IOException("Failed to list contents of " + srcDir);
+		}
+
+		if (destDir.exists()) {
+			if (destDir.isDirectory() == false) {
+				throw new IOException("Destination '" + destDir + "' exists but is not a directory");
+			}
+
+		} else {
+			if (!destDir.mkdirs() && !destDir.isDirectory()) {
+				throw new IOException("Destination '" + destDir + "' directory cannot be created");
+			}
+		}
+
+		if (destDir.canWrite() == false) {
+			throw new IOException("Destination '" + destDir + "' cannot be written to");
+		}
+
+		for (File srcFile : srcFiles) {
+			File dstFile = new File(destDir, srcFile.getName());
+			if (exclusionList == null || !exclusionList.contains(srcFile.getCanonicalPath())) {
+				if (srcFile.isDirectory()) {
+					doCopyDirectoryOverWrite(srcFile, dstFile, overWrite, filter, preserveFileDate, exclusionList);
+
+				} else {
+					copyFileOverWrite(srcFile, dstFile, overWrite, preserveFileDate);
+				}
+			}
+		}
+
+		// Do this last, as the above has probably affected directory metadata
+		if (preserveFileDate) {
+			destDir.setLastModified(srcDir.lastModified());
+		}
 	}
 }

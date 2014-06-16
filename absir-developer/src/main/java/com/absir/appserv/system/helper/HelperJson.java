@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.codec.binary.Base64;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -231,7 +232,7 @@ public class HelperJson {
 	 * @return
 	 */
 	public static byte[] encodeBase64(byte[] bytes) {
-		return null;
+		return Base64.encodeBase64(bytes);
 	}
 
 	/**
@@ -239,7 +240,7 @@ public class HelperJson {
 	 * @return
 	 */
 	public static byte[] decodeBase64(byte[] bytes) {
-		return null;
+		return Base64.decodeBase64(bytes);
 	}
 
 	/**

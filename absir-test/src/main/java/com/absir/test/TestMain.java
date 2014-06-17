@@ -41,6 +41,6 @@ public class TestMain {
 		client.put(KernelCollection.toArray(xlsFile, String.class), "/server/tomcat7/webapps/appserv-static/WEB-INF/classes/xls/");
 		conn.close();
 
-		System.out.println(HelperClient.openConnection("http://42.62.40.112:8080/achieve-dtyx/asset/modifier／1", null, String.class));
+		System.out.println(HelperClient.openConnection("http://42.62.40.112:8080/achieve-dtyx/asset/modifier/1", null, null));
 	}
 }

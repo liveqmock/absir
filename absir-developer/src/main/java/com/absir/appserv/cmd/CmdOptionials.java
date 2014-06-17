@@ -71,7 +71,7 @@ public class CmdOptionials {
 			Opitional<?> opitional;
 			for (Entry<String, Object> entry : optionalMap.entrySet()) {
 				opitional = keyMapOpitional.get(entry.getKey());
-				if (opitional != null && !opitional.isModified()) {
+				if (opitional != null && !opitional.isModified() && opitional.isStored()) {
 					opitional.setOpitionalValue(entry.getValue());
 				}
 			}

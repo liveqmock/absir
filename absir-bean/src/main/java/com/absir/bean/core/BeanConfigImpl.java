@@ -68,21 +68,7 @@ public class BeanConfigImpl implements BeanConfig {
 	 */
 	public BeanConfigImpl(IBeanConfigProvider beanConfigProvider, String classPath) {
 		if (classPath == null) {
-			URL resourceURL = Thread.currentThread().getContextClassLoader().getResource("");
-			if (resourceURL == null) {
-				try {
-					classPath = BeanConfigImpl.class.getResource("").getPath();
-					int length = classPath.length();
-					classPath = classPath.substring((length > 4 && "file:".equals(classPath.substring(0, 5).toLowerCase())) ? 5 : 0, length - BeanConfigImpl.class.getPackage().getName().length() - 3);
-					classPath = HelperFileName.getFullPath(classPath);
-
-				} catch (Throwable e) {
-					classPath = "file:///";
-				}
-
-			} else {
-				classPath = resourceURL.getPath();
-			}
+			classPath = getResourceClassPath();
 		}
 
 		BeanFactory beanFactory = BeanFactoryUtils.get();
@@ -222,6 +208,30 @@ public class BeanConfigImpl implements BeanConfig {
 				readProperties(this, configMap, propertyFile, beanConfigTemplates);
 			}
 		}
+	}
+
+	/**
+	 * @return
+	 */
+	public static String getResourceClassPath() {
+		String classPath = null;
+		URL resourceURL = Thread.currentThread().getContextClassLoader().getResource("");
+		if (resourceURL == null) {
+			try {
+				classPath = BeanConfigImpl.class.getResource("").getPath();
+				int length = classPath.length();
+				classPath = classPath.substring((length > 4 && "file:".equals(classPath.substring(0, 5).toLowerCase())) ? 5 : 0, length - BeanConfigImpl.class.getPackage().getName().length() - 3);
+				classPath = HelperFileName.getFullPath(classPath);
+
+			} catch (Throwable e) {
+				classPath = "file:///";
+			}
+
+		} else {
+			classPath = resourceURL.getPath();
+		}
+
+		return classPath;
 	}
 
 	/**

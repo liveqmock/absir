@@ -44,7 +44,6 @@ public abstract class OBuffRound<T extends OObject> extends OBuffReverse<T> {
 		if (round > 0) {
 			if (--round == 0) {
 				result.setDone(true);
-				return;
 			}
 		}
 

@@ -531,13 +531,11 @@ public abstract class OObject<T extends OObject> implements JiBase {
 		hp += this.hp;
 		if (hp > maxHp) {
 			treat = maxHp - this.hp;
-			setHp(maxHp);
-
-		} else {
-			setHp(hp);
+			hp = maxHp;
 		}
 
 		// 治疗战报
+		setHp(hp);
 		addReportDetail(null, TREAT, hp);
 		return treat;
 	}

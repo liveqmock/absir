@@ -7,9 +7,13 @@
  */
 package com.absir.test;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.absir.appserv.system.helper.HelperClient;
+import com.absir.core.kernel.KernelCollection;
 import com.trilead.ssh2.Connection;
 import com.trilead.ssh2.SCPClient;
 
@@ -27,10 +31,16 @@ public class TestMain {
 			throw new IOException("Authentication failed.");
 		}
 
+		File file = new File("d:\\fight\\xls\\");
+		List<String> xlsFile = new ArrayList<String>();
+		for (File xls : file.listFiles()) {
+			xlsFile.add(xls.toString());
+		}
+
 		SCPClient client = new SCPClient(conn);
-		client.put("d:/fight/xls/*", "/server/tomcat7/webapps/appserv-static/WEB-INF/classes/xls/");
+		client.put(KernelCollection.toArray(xlsFile, String.class), "/server/tomcat7/webapps/appserv-static/WEB-INF/classes/xls/");
 		conn.close();
 
-		System.out.println(HelperClient.openConnection("http://42.62.40.112:8080/achieve-dtyx/asset/modifier", null, String.class));
+		System.out.println(HelperClient.openConnection("http://42.62.40.112:8080/achieve-dtyx/asset/modifier／1", null, String.class));
 	}
 }

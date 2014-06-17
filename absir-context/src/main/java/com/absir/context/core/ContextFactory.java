@@ -73,7 +73,7 @@ public class ContextFactory {
 
 	/** maxThread */
 	@Value("context.maxThread")
-	private int maxThread = 1024;
+	private int maxThread = 128;
 
 	/** stopDelay */
 	@Value("context.stopDelay")

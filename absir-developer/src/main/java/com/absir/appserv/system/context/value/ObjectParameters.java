@@ -11,7 +11,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 import com.absir.appserv.system.helper.HelperAccessor;
-import com.absir.core.kernel.KernelDyna;
+import com.absir.core.dyna.DynaBinder;
 import com.absir.core.kernel.KernelReflect;
 
 /**
@@ -33,7 +33,7 @@ public class ObjectParameters {
 
 		for (int i = 0; i < size; i++) {
 			Field field = fields.get(i);
-			KernelReflect.set(this, field, KernelDyna.to(parameters[i], field.getType()));
+			KernelReflect.set(this, field, DynaBinder.to(parameters[i], field.getType()));
 		}
 	}
 }

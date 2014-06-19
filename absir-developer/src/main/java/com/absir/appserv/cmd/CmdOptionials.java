@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 import com.absir.bean.core.BeanConfigImpl;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.core.dyna.DynaBinder;
+import com.absir.core.helper.HelperFile;
 
 /**
  * @author absir
@@ -52,6 +53,7 @@ public class CmdOptionials {
 
 		} else {
 			opitional.setOpitionalValue(argCmd);
+			opitional = null;
 		}
 
 		return true;
@@ -61,7 +63,7 @@ public class CmdOptionials {
 	 * @param storedFile
 	 */
 	public void loadOptionialStoredFile(File storedFile) {
-		if (optionialStoredFile != null) {
+		if (optionialStoredFile == null) {
 			optionialStoredFile = storedFile;
 		}
 
@@ -80,8 +82,10 @@ public class CmdOptionials {
 
 	/**
 	 * 保存设置参数
+	 * 
+	 * @throws Throwable
 	 */
-	public void saveOptionialStoredFile() {
+	public void saveOptionialStoredFile() throws Throwable {
 		if (optionialStoredFile != null) {
 			Opitional<?> opitional;
 			StringBuilder stringBuilder = new StringBuilder();
@@ -94,6 +98,8 @@ public class CmdOptionials {
 					stringBuilder.append("\r\n");
 				}
 			}
+
+			HelperFile.writeStringToFile(optionialStoredFile, stringBuilder.toString());
 		}
 	}
 

@@ -244,6 +244,7 @@ public class Api_entity extends ApiServer {
 		condition.setUpdateTime(updateTime);
 		Map<String, Object> modelMap = new HashMap<String, Object>();
 		changed(entityName, SecurityService.ME.getUserBase(input), condition, modelMap, input);
+		modelMap.put("entities", modelMap.remove(entityName));
 		return modelMap;
 	}
 

@@ -60,7 +60,7 @@ public class OBuff_ATK_R extends OBuffRound<OCard> implements IBuffReBound<Objec
 			if (++round == 0) {
 				result.setDone(true);
 			}
-			
+
 			setRound(round);
 		}
 

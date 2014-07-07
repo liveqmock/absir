@@ -180,6 +180,9 @@ public class DataQueryDetached {
 			if (Iterator.class.isAssignableFrom(returnType)) {
 				queryReturnInvoker = QueryReturnInvoker.ITERATE;
 
+			} else if (returnType.isArray()) {
+				queryReturnInvoker = QueryReturnInvoker.LIST;
+				
 			} else if (Collection.class.isAssignableFrom(returnType)) {
 				queryReturnInvoker = nativeSql || aliasType == Collection.class ? QueryReturnInvoker.LIST : QueryReturnInvoker.LIST_ITERATE;
 
@@ -246,7 +249,11 @@ public class DataQueryDetached {
 			for (int i = 0; i < length; i++) {
 				if (parameterMetas[i] == null) {
 					String parameterName = parameterNames[i];
-					if (!KernelString.isEmpty(parameterName) && sql.indexOf(':' + parameterName) > 0) {
+					if (KernelString.isEmpty(parameterName)) {
+						parameterName = "p" + i;
+					}
+
+					if (sql.indexOf(':' + parameterName) > 0) {
 						parameterMetas[i] = parameterName;
 					}
 				}
@@ -388,7 +395,7 @@ public class DataQueryDetached {
 
 					} else if (parameter.getClass().isArray()) {
 						// set Parameter Array
-						query.setParameterList((String) parameterMeta, (Object[]) parameter);
+						query.setParameterList((String) parameterMeta, DynaBinder.to(parameter, Object[].class));
 
 					} else if (Collection.class.isAssignableFrom(parameter.getClass())) {
 						// set Parameter Collection

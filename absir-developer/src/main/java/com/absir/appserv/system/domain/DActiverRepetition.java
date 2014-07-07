@@ -49,12 +49,9 @@ public class DActiverRepetition<T extends JiActiveRepetition> extends DActiver<T
 			for (JiActiveRepetition active : actives) {
 				long nextPassTime = active.getNextPassTime(contextTime);
 				if (nextPassTime > contextTime) {
-					long nextBeginTime = active.getBeginTime() + nextPassTime - active.getPassTime();
-					if (nextBeginTime <= contextTime) {
-						active.setBeginTime(nextBeginTime);
-						active.setPassTime(nextPassTime);
-						session.merge(active);
-					}
+					active.setBeginTime(active.getBeginTime() + nextPassTime - active.getPassTime());
+					active.setPassTime(nextPassTime);
+					session.merge(active);
 				}
 			}
 		}

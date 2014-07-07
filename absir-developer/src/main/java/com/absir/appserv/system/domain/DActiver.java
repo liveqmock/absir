@@ -56,7 +56,6 @@ public class DActiver<T extends JiActive> {
 		if (!KernelString.isEmpty(entityName)) {
 			nextQueryString = "SELECT o FROM " + entityName + " o WHERE o.beginTime > ? ORDER BY o.beginTime";
 			onlineQueryString = "SELECT o FROM " + entityName + " o WHERE o.beginTime <= ? AND o.passTime >= ?";
-
 		}
 	}
 

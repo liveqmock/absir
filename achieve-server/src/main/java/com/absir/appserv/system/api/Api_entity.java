@@ -68,11 +68,11 @@ public class Api_entity extends ApiServer {
 	@Bean
 	protected static class Version {
 
-		@Value("api.min")
+		@Value("api.version.min")
 		public String min = "0.0.0";
 
-		@Value("api.version")
-		public String version = "1.0.0";
+		@Value("api.version.version")
+		public String max = "1.0.0";
 
 		/** timeZone */
 		public int timeZone = Calendar.getInstance().getTimeZone().getRawOffset();

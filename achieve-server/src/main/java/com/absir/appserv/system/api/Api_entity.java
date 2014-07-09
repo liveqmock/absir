@@ -8,6 +8,7 @@
 package com.absir.appserv.system.api;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,9 @@ import com.absir.appserv.system.service.utils.AuthServiceUtils;
 import com.absir.appserv.system.service.utils.CrudServiceUtils;
 import com.absir.appserv.system.service.utils.EntityServiceUtils;
 import com.absir.appserv.system.service.utils.SearchServiceUtils;
+import com.absir.bean.inject.value.Bean;
+import com.absir.bean.inject.value.Inject;
+import com.absir.bean.inject.value.Value;
 import com.absir.core.base.IBase;
 import com.absir.core.kernel.KernelLang.PropertyFilter;
 import com.absir.orm.hibernate.SessionFactoryUtils;
@@ -53,6 +57,35 @@ import com.absir.server.value.Server;
 @Interceptors(ApiServer.TransactionRoute.class)
 @Server
 public class Api_entity extends ApiServer {
+
+	@Inject
+	protected Version version;
+
+	/**
+	 * @author absir
+	 *
+	 */
+	@Bean
+	protected static class Version {
+
+		@Value("api.min")
+		public String min = "0.0.0";
+
+		@Value("api.version")
+		public String version = "1.0.0";
+
+		/** timeZone */
+		public int timeZone = Calendar.getInstance().getTimeZone().getRawOffset();
+	}
+
+	/**
+	 * 返回版本信息
+	 * 
+	 * @return
+	 */
+	public Object version() {
+		return version;
+	}
 
 	/**
 	 * 获取单个数据

@@ -124,7 +124,7 @@ public class BeanDefineType extends BeanDefineAbstractor {
 	 * @return
 	 */
 	public static <T> Constructor<T> getBeanConstructor(Class<T> beanType, int parameterLength) {
-		Constructor<T>[] constructors = (Constructor<T>[]) beanType.getConstructors();
+		Constructor<T>[] constructors = (Constructor<T>[]) beanType.getDeclaredConstructors();
 		if (constructors.length == 0) {
 			throw new RuntimeException("can not find constructor of beanType = " + beanType);
 		}
@@ -132,6 +132,7 @@ public class BeanDefineType extends BeanDefineAbstractor {
 		for (Constructor<T> constructor : constructors) {
 			int length = constructor.getParameterTypes().length;
 			if ((parameterLength <= 0 ? length == 0 || constructor.getAnnotation(Basis.class) != null : length == parameterLength)) {
+				constructor.setAccessible(true);
 				return constructor;
 			}
 		}
@@ -140,7 +141,9 @@ public class BeanDefineType extends BeanDefineAbstractor {
 			throw new RuntimeException("can not find constructor of beanType = " + beanType + " parameter length = " + parameterLength);
 		}
 
-		return constructors[0];
+		Constructor<T> constructor = constructors[0];
+		constructor.setAccessible(true);
+		return constructor;
 	}
 
 	/**

@@ -95,7 +95,7 @@ public class Admin_entity extends AdminServer {
 	@Mapping(method = InMethod.POST)
 	public void list(String entityName, @Binder JdbcPage jdbcPage, Input input) {
 		ICrudSupply crudSupply = getCrudSupply(entityName, input);
-		if (crudSupply instanceof CrudSupply) {
+		if (!crudSupply.support(Crud.COMPLETE)) {
 			throw new ServerException(ServerStatus.IN_404);
 		}
 
@@ -116,8 +116,8 @@ public class Admin_entity extends AdminServer {
 		jdbcPage = InputServiceUtils.getJdbcPage(entityName, jdbcPage, input);
 		model.put("page", jdbcPage);
 		TransactionIntercepter.open(input, crudSupply.getTransactionName(), BeanService.TRANSACTION_READ_ONLY);
-		model.put("entities",
-				EntityService.ME.list(entityName, crudSupply, user, null, InputServiceUtils.getSearchCondition(entityName, filter, null, input), InputServiceUtils.getOrderQueue(input), jdbcPage));
+		model.put("entities", EntityService.ME.list(entityName, crudSupply, user, null, InputServiceUtils.getSearchCondition(entityName, crudSupply.getEntityClass(entityName), filter, null, input),
+				InputServiceUtils.getOrderQueue(input), jdbcPage));
 	}
 
 	/**
@@ -138,6 +138,10 @@ public class Admin_entity extends AdminServer {
 	 */
 	public void edit(String entityName, Object id, Input input) {
 		ICrudSupply crudSupply = getCrudSupply(entityName, input);
+		if (id == null && !crudSupply.support(Crud.CREATE)) {
+			throw new ServerException(ServerStatus.IN_404);
+		}
+
 		JiUserBase user = SecurityService.ME.getUserBase(input);
 		PropertyFilter filter = null;
 		InModel model = input.getModel();
@@ -230,6 +234,10 @@ public class Admin_entity extends AdminServer {
 	 */
 	public String save(String entityName, Object id, Input input) {
 		ICrudSupply crudSupply = getCrudSupply(entityName, input);
+		if (!crudSupply.support(id == null ? Crud.CREATE : Crud.UPDATE)) {
+			throw new ServerException(ServerStatus.IN_404);
+		}
+
 		JiUserBase user = SecurityService.ME.getUserBase(input);
 		PropertyFilter filter = null;
 		try {
@@ -286,6 +294,10 @@ public class Admin_entity extends AdminServer {
 	 */
 	public String delete(String entityName, @Param Object id, Input input) {
 		ICrudSupply crudSupply = getCrudSupply(entityName, null);
+		if (!crudSupply.support(Crud.DELETE)) {
+			throw new ServerException(ServerStatus.IN_404);
+		}
+
 		JiUserBase user = SecurityService.ME.getUserBase(input);
 		AuthServiceUtils.deletePropertyFilter(entityName, crudSupply, user);
 		try {
@@ -342,8 +354,9 @@ public class Admin_entity extends AdminServer {
 		JiUserBase user = SecurityService.ME.getUserBase(input);
 		PropertyFilter filter = AuthServiceUtils.selectPropertyFilter(entityName, crudSupply, user);
 		TransactionIntercepter.open(input, crudSupply.getTransactionName(), BeanService.TRANSACTION_READ_ONLY);
-		List<Object> entities = ids == null ? EntityService.ME.list(entityName, crudSupply, user, null, InputServiceUtils.getSearchCondition(entityName, filter, null, input),
-				InputServiceUtils.getOrderQueue(input), null) : EntityService.ME.list(entityName, crudSupply, user, null, ids);
+		List<Object> entities = ids == null ? EntityService.ME.list(entityName, crudSupply, user, null,
+				InputServiceUtils.getSearchCondition(entityName, crudSupply.getEntityClass(entityName), filter, null, input), InputServiceUtils.getOrderQueue(input), null) : EntityService.ME.list(
+				entityName, crudSupply, user, null, ids);
 		HSSFWorkbook workbook = XlsUtils.getWorkbook(entities, XlsUtils.XLS_BASE);
 		response.addHeader("Content-Disposition", "attachment;filename=" + entityName + ".xls");
 		workbook.write(response.getOutputStream());

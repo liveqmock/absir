@@ -233,17 +233,7 @@ public class BinderData extends DynaBinder {
 	 * @param toObject
 	 */
 	protected void bindValue(Object value, PropertyData propertyData, Property property, Object toObject) {
-		if (value != null) {
-			String beanName = property.getBeanName();
-			value = property.getPropertyValue(value, beanName);
-			Binder binder = binderSupply.getPropertyObject(propertyData);
-			if (binder != null) {
-				value = property.getField() == null ? binder.to(value, beanName, property.getType()) : binder.to(value, beanName, property.getField().getGenericType());
-			}
-
-			value = property.getField() == null ? bind(value, beanName, property.getType()) : bind(value, beanName, property.getField().getGenericType());
-		}
-
+		value = binderSupply.bindValue(propertyData, value, null, this);
 		try {
 			property.getAccessor().set(toObject, value);
 

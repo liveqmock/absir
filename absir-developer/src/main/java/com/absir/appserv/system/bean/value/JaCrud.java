@@ -35,7 +35,7 @@ public @interface JaCrud {
 		/** 删除处理 DELETE */
 		DELETE,
 
-		/** 全部处理 COMPLETE */
+		/** 全部处理|LIST COMPLETE */
 		COMPLETE;
 	}
 

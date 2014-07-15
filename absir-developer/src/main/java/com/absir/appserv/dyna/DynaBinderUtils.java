@@ -8,8 +8,11 @@
 package com.absir.appserv.dyna;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.absir.appserv.configure.xls.XlsBase;
 import com.absir.appserv.configure.xls.XlsUtils;
@@ -17,11 +20,17 @@ import com.absir.appserv.system.helper.HelperJson;
 import com.absir.appserv.system.service.utils.CrudServiceUtils;
 import com.absir.bean.basis.Configure;
 import com.absir.bean.inject.value.Started;
+import com.absir.binder.BinderSupply;
+import com.absir.binder.BinderUtils;
 import com.absir.core.dyna.DynaBinder;
 import com.absir.core.dyna.DynaConvert;
 import com.absir.core.kernel.KernelClass;
 import com.absir.core.kernel.KernelLang.BreakException;
+import com.absir.core.kernel.KernelString;
 import com.absir.orm.hibernate.SessionFactoryUtils;
+import com.absir.property.PropertyData;
+import com.absir.property.PropertyHolder;
+import com.absir.property.PropertyUtils;
 
 /**
  * @author absir
@@ -30,6 +39,54 @@ import com.absir.orm.hibernate.SessionFactoryUtils;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 @Configure
 public class DynaBinderUtils extends DynaBinder {
+
+	/**
+	 * @param param
+	 * @param paramType
+	 * @return
+	 */
+	public static <T> T getParamValue(String param, Class<T> paramType) {
+		if (param != null && KernelClass.isCustomClass(paramType)) {
+			T paramValue = KernelClass.newInstance(paramType);
+			if (paramValue != null) {
+				String[] params = param.split("_");
+				BinderSupply binderSupply = BinderUtils.getBinderSupply();
+				PropertyHolder propertyHolder = PropertyUtils.getPropertyMap(paramType, binderSupply);
+				int index = 0;
+				for (Entry<String, PropertyData> entry : propertyHolder.getNameMapPropertyData().entrySet()) {
+					PropertyData propertyData = entry.getValue();
+					if (propertyData.getProperty().getAllow() == 0) {
+						propertyData.getProperty().getAccessor().set(paramValue, binderSupply.bindValue(propertyData, params[index++], null, DynaBinder.INSTANCE));
+					}
+				}
+			}
+		}
+
+		return DynaBinder.to(param, paramType);
+	}
+
+	/**
+	 * @param paramValue
+	 * @return
+	 */
+	public static String getParamFromValue(Object paramValue) {
+		if (paramValue != null && KernelClass.isCustomClass(paramValue.getClass())) {
+			BinderSupply binderSupply = BinderUtils.getBinderSupply();
+			PropertyHolder propertyHolder = PropertyUtils.getPropertyMap(paramValue.getClass(), binderSupply);
+			List<Object> params = new ArrayList<Object>();
+			for (Entry<String, PropertyData> entry : propertyHolder.getNameMapPropertyData().entrySet()) {
+				PropertyData propertyData = entry.getValue();
+				if (propertyData.getProperty().getAllow() == 0) {
+					Object param = binderSupply.bindValue(propertyData, propertyData.getProperty().getAccessor().get(paramValue), String.class, null);
+					params.add(param == null ? "" : params);
+				}
+			}
+
+			return KernelString.implode(params, '_');
+		}
+
+		return DynaBinder.to(paramValue, String.class);
+	}
 
 	@Started
 	private static void started() {

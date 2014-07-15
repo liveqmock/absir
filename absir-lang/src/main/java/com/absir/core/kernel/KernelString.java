@@ -68,20 +68,6 @@ public abstract class KernelString {
 	 * @return
 	 */
 	public static String capitalize(String string) {
-		if (capitalize(string.charAt(0))) {
-			return string;
-		}
-
-		char[] data = string.toCharArray();
-		data[0] = Character.toLowerCase(data[0]);
-		return new String(data);
-	}
-
-	/**
-	 * @param string
-	 * @return
-	 */
-	public static String uncapitalize(String string) {
 		if (unCapitalize(string.charAt(0))) {
 			return string;
 
@@ -93,6 +79,20 @@ public abstract class KernelString {
 
 		char[] data = string.toCharArray();
 		data[0] = Character.toUpperCase(data[0]);
+		return new String(data);
+	}
+
+	/**
+	 * @param string
+	 * @return
+	 */
+	public static String unCapitalize(String string) {
+		if (capitalize(string.charAt(0))) {
+			return string;
+		}
+
+		char[] data = string.toCharArray();
+		data[0] = Character.toLowerCase(data[0]);
 		return new String(data);
 	}
 
@@ -222,7 +222,7 @@ public abstract class KernelString {
 	 */
 	public static String camelInvertUnderline(String string) {
 		int index = lastIndexUncapitalizeOf(string);
-		return camelUnderline(index > 0 ? KernelString.capitalize(rightString(string, string.length() - index)) + leftString(string, index) : string);
+		return camelUnderline(index > 0 ? KernelString.unCapitalize(rightString(string, string.length() - index)) + leftString(string, index) : string);
 	}
 
 	/**

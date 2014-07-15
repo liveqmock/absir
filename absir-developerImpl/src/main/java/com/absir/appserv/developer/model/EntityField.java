@@ -7,6 +7,7 @@
  */
 package com.absir.appserv.developer.model;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -30,6 +31,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
+import com.absir.appserv.crud.ICrudSupply;
 import com.absir.appserv.developer.editor.EditorObject;
 import com.absir.appserv.developer.editor.EditorSupply;
 import com.absir.appserv.support.developer.IField;
@@ -41,8 +43,10 @@ import com.absir.appserv.system.bean.value.JaEmbedd;
 import com.absir.appserv.system.bean.value.JeEditable;
 import com.absir.appserv.system.helper.HelperJson;
 import com.absir.appserv.system.helper.HelperLang;
+import com.absir.appserv.system.service.CrudService;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.binder.BinderUtils;
+import com.absir.core.base.IBase;
 import com.absir.core.dyna.DynaBinder;
 import com.absir.core.kernel.KernelArray;
 import com.absir.core.kernel.KernelClass;
@@ -492,7 +496,17 @@ public class EntityField extends DBField {
 	 * @param entityModel
 	 */
 	public static void addEntityFieldScope(String name, JoEntity joEntity, Collection<IField> fieldScope, EntityModel entityModel) {
-		String identifierName = entityModel == null ? null : SessionFactoryUtils.getIdentifierName(joEntity.getEntityName(), joEntity.getEntityClass());
+		String identifierName = null;
+		String entityName = joEntity.getEntityName();
+		if (entityName == null) {
+			entityName = joEntity.getEntityClass().getSimpleName();
+		}
+
+		ICrudSupply crudSupply = CrudService.ME.getCrudSupply(entityName);
+		if (crudSupply != null) {
+			identifierName = crudSupply.getIdentifierName(entityName);
+		}
+
 		ValidatorSupply validatorSupply = BinderUtils.getValidatorSupply();
 		validatorSupply.getPropertyMap(joEntity.getEntityClass());
 		Map<String, PropertyData> propertyMap = EDITOR_SUPPLY.getPropertyMap(joEntity.getEntityClass());
@@ -512,6 +526,10 @@ public class EntityField extends DBField {
 			EntityField entityField = null;
 			if (entityModel != null && (property.getAccessor().getAnnotation(Id.class, true) != null || (identifierName != null && identifierName.equals(fieldName)))) {
 				entityField = new EntityField(fieldName, property, editorObject, joEntity);
+				if ((entityField.getType() == Object.class || entityField.getType() == Serializable.class) && IBase.class.isAssignableFrom(joEntity.getEntityClass()) && fieldName.equals("id")) {
+					entityField.getCrudField().setType(KernelClass.argumentClass(joEntity.getEntityClass()));
+				}
+
 				entityModel.setPrimary(entityField);
 				entityField.addEntityFieldScope(validatorSupply.getPropertyObject(propertyData), entityModel.getPrimaries());
 

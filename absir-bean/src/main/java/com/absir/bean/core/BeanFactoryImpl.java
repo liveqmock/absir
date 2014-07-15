@@ -287,7 +287,7 @@ public final class BeanFactoryImpl implements BeanFactory {
 							beanNamePrefixLength = 0;
 
 						} else {
-							beanNamePrefix = KernelString.capitalize(beanNamePrefix);
+							beanNamePrefix = KernelString.unCapitalize(beanNamePrefix);
 						}
 
 						Map<String, Object> beanDefines = new HashMap<String, Object>();
@@ -296,7 +296,7 @@ public final class BeanFactoryImpl implements BeanFactory {
 								beanName = entry.getKey();
 								int length = beanName.length();
 								if (length > 7 && beanName.endsWith("Service")) {
-									beanName = KernelString.uncapitalize(beanName.substring(0, length - 7));
+									beanName = KernelString.capitalize(beanName.substring(0, length - 7));
 
 								} else if (beanNamePrefixLength > 0 && beanNamePrefixLength < beanName.length() && beanName.startsWith(beanNamePrefix)) {
 									beanName = beanName.substring(beanNamePrefixLength);

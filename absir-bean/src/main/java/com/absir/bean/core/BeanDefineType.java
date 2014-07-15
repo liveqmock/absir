@@ -107,7 +107,7 @@ public class BeanDefineType extends BeanDefineAbstractor {
 	 * @return
 	 */
 	public static String getBeanName(String beanName, Class<?> beanType) {
-		return KernelString.isEmpty(beanName) ? KernelString.capitalize(beanType.getSimpleName()) : beanName;
+		return KernelString.isEmpty(beanName) ? KernelString.unCapitalize(beanType.getSimpleName()) : beanName;
 	}
 
 	/**

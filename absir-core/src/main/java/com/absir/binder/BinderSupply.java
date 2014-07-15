@@ -12,6 +12,9 @@ import java.lang.annotation.Annotation;
 import com.absir.bean.basis.Base;
 import com.absir.bean.inject.value.Bean;
 import com.absir.binder.value.BinderIngore;
+import com.absir.core.dyna.DynaBinder;
+import com.absir.property.Property;
+import com.absir.property.PropertyData;
 import com.absir.property.PropertySupply;
 
 /**
@@ -33,4 +36,40 @@ public class BinderSupply extends PropertySupply<BinderObject, Binder> {
 		return BinderIngore.class;
 	}
 
+	/**
+	 * @param propertyData
+	 * @param value
+	 * @param toType
+	 * @return
+	 */
+	public Object bindValue(PropertyData propertyData, Object value, Class<?> toType, DynaBinder dynaBinder) {
+		if (value != null) {
+			Property property = propertyData.getProperty();
+			String beanName = property.getBeanName();
+			if (toType == null) {
+				value = property.getPropertyValue(value, beanName);
+			}
+
+			Binder binder = getPropertyObject(propertyData);
+			if (binder != null) {
+				if (toType == null) {
+					value = property.getField() == null ? binder.to(value, beanName, property.getType()) : binder.to(value, beanName, property.getField().getGenericType());
+
+				} else {
+					value = binder.to(value, beanName, toType);
+				}
+			}
+
+			if (dynaBinder != null) {
+				if (toType == null) {
+					value = property.getField() == null ? dynaBinder.bind(value, beanName, property.getType()) : dynaBinder.bind(value, beanName, property.getField().getGenericType());
+
+				} else {
+					value = dynaBinder.bind(value, beanName, toType);
+				}
+			}
+		}
+
+		return value;
+	}
 }

@@ -10,6 +10,7 @@ package com.absir.appserv.system.service.impl;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.hibernate.Session;
@@ -374,6 +375,17 @@ public class BeanServiceBase implements BeanService, ICrudSupply {
 				}
 			}
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.appserv.crud.ICrudSupply#getEntityNameMapClass()
+	 */
+	@Override
+	public Set<Entry<String, Class<?>>> getEntityNameMapClass() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/*

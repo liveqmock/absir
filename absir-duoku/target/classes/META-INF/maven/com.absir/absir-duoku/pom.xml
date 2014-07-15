@@ -6,12 +6,12 @@
 		<artifactId>parent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>absir-bean</artifactId>
+	<artifactId>absir-duoku</artifactId>
 	<version>${com.absir.version}</version>
 	<dependencies>
 		<dependency>
 			<groupId>com.absir</groupId>
-			<artifactId>absir-io</artifactId>
+			<artifactId>absir-open</artifactId>
 			<version>${com.absir.version}</version>
 		</dependency>
 	</dependencies>

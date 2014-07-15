@@ -48,7 +48,7 @@ public class JdbcUtils {
 	 */
 	public static JdbcDriver forProduct(Connection connection) throws SQLException {
 		DatabaseMetaData metaData = connection.getMetaData();
-		return JdbcUtils.forProduct(KernelString.uncapitalize(metaData.getDatabaseProductName().toLowerCase()), metaData.getDatabaseProductVersion().toLowerCase());
+		return JdbcUtils.forProduct(KernelString.capitalize(metaData.getDatabaseProductName().toLowerCase()), metaData.getDatabaseProductVersion().toLowerCase());
 	}
 
 	/**

@@ -15,12 +15,12 @@ import java.util.List;
 import com.absir.appserv.dyna.DynaBinderUtils;
 import com.absir.appserv.support.Developer;
 import com.absir.appserv.system.crud.UploadCrudFactory;
-import com.absir.appserv.system.dao.BeanDao;
 import com.absir.appserv.system.service.utils.AccessServiceUtils;
 import com.absir.appserv.system.service.utils.CrudServiceUtils;
 import com.absir.core.dyna.DynaBinder;
 import com.absir.core.kernel.KernelCharset;
 import com.absir.core.kernel.KernelCollection;
+import com.absir.core.util.UtilAccessor;
 import com.absir.core.util.UtilRuntime;
 import com.absir.server.in.IAttributes;
 
@@ -37,7 +37,7 @@ public class EntityStatics {
 	 * @return
 	 */
 	public static String getPrimary(Object entity, String primary) {
-		return DynaBinderUtils.to(BeanDao.getIdentifier(entity), String.class);
+		return DynaBinderUtils.getParamFromValue(UtilAccessor.get(entity, primary));
 	}
 
 	/**

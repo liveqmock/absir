@@ -37,6 +37,7 @@ import com.absir.orm.hibernate.boost.EntityAssoc.AssocField;
 import com.absir.orm.hibernate.boost.EntityAssoc.EntityAssocEntity;
 import com.absir.orm.value.JePermission;
 import com.absir.orm.value.JoEntity;
+import com.absir.property.PropertyUtils;
 
 /**
  * @author absir
@@ -451,6 +452,10 @@ public abstract class SessionFactoryUtils {
 	 * @param jpaEntityNames
 	 */
 	public static String[] getEntityNames(String[] jpaEntityNames) {
+		if (jpaEntityNames == null) {
+			return null;
+		}
+
 		int length = jpaEntityNames.length;
 		for (int i = 0; i < length; i++) {
 			jpaEntityNames[i] = getEntityName(jpaEntityNames[i]);
@@ -464,6 +469,10 @@ public abstract class SessionFactoryUtils {
 	 * @return
 	 */
 	public static String[] getJpaEntityNames(String[] entityNames) {
+		if (entityNames == null) {
+			return null;
+		}
+
 		int length = entityNames.length;
 		for (int i = 0; i < length; i++) {
 			entityNames[i] = getJpaEntityName(entityNames[i]);
@@ -514,34 +523,38 @@ public abstract class SessionFactoryUtils {
 						@Override
 						public void doWith(Field template) throws BreakException {
 							// TODO Auto-generated method stub
-							Object[] ms = null;
-							Class<?> type = template.getType();
-							if (KernelClass.isBasicClass(type)) {
-								ms = new Object[1];
-								ms[0] = type;
-
-							} else {
-								if (Map.class.isAssignableFrom(type)) {
-									String[] referencedEntityNames = getJpaEntityNames(getReferencedEntityNames(jpaEntityName, template));
-									if (referencedEntityNames[0] != null || referencedEntityNames[1] != null) {
-										ms = new Object[3];
-										ms[0] = type;
-										ms[1] = referencedEntityNames[0];
-										ms[2] = referencedEntityNames[1];
-									}
+							if ((PropertyUtils.TRANSIENT_MODIFIER & template.getModifiers()) == 0) {
+								Object[] ms = null;
+								Class<?> type = template.getType();
+								if (KernelClass.isBasicClass(type) || type == Serializable.class) {
+									ms = new Object[1];
+									ms[0] = type;
 
 								} else {
-									String referencedEntityName = getJpaEntityName(getReferencedEntityName(jpaEntityName, template));
-									if (referencedEntityName != null) {
-										ms = new Object[2];
-										ms[0] = type;
-										ms[1] = referencedEntityName;
+									if (Map.class.isAssignableFrom(type)) {
+										String[] referencedEntityNames = getJpaEntityNames(getReferencedEntityNames(jpaEntityName, template));
+										if (referencedEntityNames != null) {
+											if (referencedEntityNames[0] != null || referencedEntityNames[1] != null) {
+												ms = new Object[3];
+												ms[0] = type;
+												ms[1] = referencedEntityNames[0];
+												ms[2] = referencedEntityNames[1];
+											}
+										}
+
+									} else {
+										String referencedEntityName = getJpaEntityName(getReferencedEntityName(jpaEntityName, template));
+										if (referencedEntityName != null) {
+											ms = new Object[2];
+											ms[0] = type;
+											ms[1] = referencedEntityName;
+										}
 									}
 								}
-							}
 
-							if (ms != null) {
-								metaDefines.put(template.getName(), ms);
+								if (ms != null) {
+									metaDefines.put(template.getName(), ms);
+								}
 							}
 						}
 					});

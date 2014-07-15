@@ -12,6 +12,7 @@ import java.lang.reflect.Method;
 
 import com.absir.appserv.system.bean.value.JaLang;
 import com.absir.core.kernel.KernelReflect;
+import com.absir.core.kernel.KernelString;
 
 /**
  * @author absir
@@ -62,7 +63,7 @@ public class HelperLang {
 	 */
 	public static String getFieldCaption(Field field, Class<?> cls) {
 		JaLang jaLang = field.getAnnotation(JaLang.class);
-		return getFieldCaption(jaLang == null ? field.getName() : jaLang.value(), cls);
+		return getFieldCaption(jaLang == null ? KernelString.capitalize(field.getName()) : jaLang.value(), cls);
 	}
 
 	/**
@@ -71,7 +72,7 @@ public class HelperLang {
 	 * @return
 	 */
 	public static String getFieldCaption(String lang, Class<?> cls) {
-		return lang;
+		return KernelString.capitalize(lang);
 	}
 
 	/**
@@ -89,7 +90,7 @@ public class HelperLang {
 	 */
 	public static String getMethodCaption(Method method, Class<?> cls) {
 		JaLang jaLang = method.getAnnotation(JaLang.class);
-		return getFieldCaption(jaLang == null ? method.getName() : jaLang.value(), cls);
+		return getFieldCaption(jaLang == null ? KernelString.capitalize(method.getName()) : jaLang.value(), cls);
 	}
 
 	/**

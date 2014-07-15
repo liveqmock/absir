@@ -18,14 +18,10 @@ import javax.servlet.ServletContext;
 
 import org.hibernate.SessionFactory;
 
-import com.absir.appserv.configure.JConfigureBase;
-import com.absir.appserv.configure.JConfigureSupply;
-import com.absir.appserv.configure.xls.XlsBase;
-import com.absir.appserv.configure.xls.XlsCrudSupply;
-import com.absir.appserv.crud.bean.CrudBean;
-import com.absir.appserv.crud.bean.CrudBeanSupply;
+import com.absir.appserv.crud.ICrudSupply;
 import com.absir.appserv.feature.menu.value.MaEntity;
 import com.absir.appserv.feature.menu.value.MaFactory;
+import com.absir.appserv.feature.menu.value.MaSupply;
 import com.absir.appserv.feature.menu.value.MeUrlType;
 import com.absir.appserv.support.Developer;
 import com.absir.appserv.system.admin.AdminServer;
@@ -175,19 +171,17 @@ public abstract class MenuContextUtils {
 				}
 			}
 
-			// XLSCRUD权限
-			for (Entry<String, Class<? extends XlsBase>> entry : XlsCrudSupply.getNameMapXlsClass().entrySet()) {
-				addMenuBeanRoot(menuBeanRoot, entry.getKey(), entry.getValue(), "内容配置", "列表", "list", entityNames);
-			}
-
 			// 配置CRUD菜单
-			for (Entry<String, Class<? extends JConfigureBase>> entry : JConfigureSupply.getConfigureMapClass().entrySet()) {
-				addMenuBeanRoot(menuBeanRoot, entry.getKey(), entry.getValue(), "系统配置", "配置", "edit", entityNames);
-			}
-
-			// 配置CRUD菜单
-			for (Entry<String, Class<? extends CrudBean>> entry : CrudBeanSupply.getCrudMapClass().entrySet()) {
-				addMenuBeanRoot(menuBeanRoot, entry.getKey(), entry.getValue(), "功能管理", "添加", "edit", entityNames);
+			for (ICrudSupply crudSupply : BeanFactoryUtils.get().getBeanObjects(ICrudSupply.class)) {
+				Set<Entry<String, Class<?>>> entityNameMapClass = crudSupply.getEntityNameMapClass();
+				if (entityNameMapClass != null) {
+					MaSupply maSupply = KernelClass.fetchAnnotation(crudSupply.getClass(), MaSupply.class);
+					if (maSupply != null) {
+						for (Entry<String, Class<?>> entry : entityNameMapClass) {
+							addMenuBeanRoot(menuBeanRoot, entry.getKey(), entry.getValue(), maSupply.folder(), maSupply.name(), maSupply.method(), entityNames);
+						}
+					}
+				}
 			}
 
 			// 添加实体权限

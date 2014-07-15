@@ -21,6 +21,7 @@ import com.absir.appserv.support.developer.IModel;
 import com.absir.appserv.support.developer.JCrudField;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.bean.value.JaCrud;
+import com.absir.appserv.system.crud.value.ICrudBean;
 import com.absir.bean.basis.Configure;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Inject;
@@ -90,6 +91,10 @@ public abstract class CrudUtils {
 			}
 
 		});
+
+		if (entity instanceof ICrudBean) {
+			((ICrudBean) entity).proccessCrud(crud);
+		}
 	}
 
 	/**

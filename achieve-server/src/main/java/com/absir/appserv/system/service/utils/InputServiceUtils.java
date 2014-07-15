@@ -107,12 +107,7 @@ public class InputServiceUtils {
 	 */
 	public static JdbcCondition getSearchCondition(String entityName, PropertyFilter filter, JdbcCondition jdbcCondition, Input input) {
 		// TODO Auto-generated method stub
-		Class<?> entityClass = SessionFactoryUtils.getEntityClass(entityName);
-		if (entityClass == null) {
-			return jdbcCondition;
-		}
-
-		return getSearchCondition(entityName, entityClass, filter, jdbcCondition, input);
+		return getSearchCondition(entityName, SessionFactoryUtils.getEntityClass(entityName), filter, jdbcCondition, input);
 	}
 
 	/**
@@ -126,6 +121,10 @@ public class InputServiceUtils {
 	 * @return
 	 */
 	public static JdbcCondition getSearchCondition(String entityName, Class<?> entityClass, PropertyFilter filter, JdbcCondition jdbcCondition, Input input) {
+		if (entityClass == null) {
+			return jdbcCondition;
+		}
+
 		if (jdbcCondition == null) {
 			jdbcCondition = new JdbcCondition();
 		}

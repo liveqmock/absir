@@ -7,6 +7,7 @@
  */
 package com.absir.appserv.system.helper;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.absir.core.base.IBase;
 import com.absir.core.kernel.KernelClass;
 import com.absir.core.kernel.KernelDyna;
 import com.absir.core.kernel.KernelLang;
@@ -32,6 +34,20 @@ public class HelperQuery {
 
 	/** NAME_PATTERN */
 	private static final Pattern NAME_PATTERN = Pattern.compile("o\\.(.*?)([\\s|=|>|<]+)", Pattern.CASE_INSENSITIVE);
+
+	/**
+	 * @param entityClass
+	 * @param field
+	 * @return
+	 */
+	public static Class<?> getFieldType(Class<?> entityClass, Field field) {
+		Class<?> fieldType = field.getType();
+		if (fieldType == Serializable.class && "id".equals(field.getName()) && IBase.class.isAssignableFrom(entityClass)) {
+			fieldType = KernelClass.argumentClass(entityClass);
+		}
+
+		return fieldType;
+	}
 
 	/**
 	 * @param entityClass
@@ -55,7 +71,7 @@ public class HelperQuery {
 				}
 
 				Object value = conditions.get(i + 1);
-				FilterTemplate<Object> filterTemplate = getConditionFilter(field, matcher, value);
+				FilterTemplate<Object> filterTemplate = getConditionFilter(field, getFieldType(entityClass, field), matcher, value);
 				if (filterTemplate != null) {
 					filterTemplates.add(filterTemplate);
 				}
@@ -105,9 +121,9 @@ public class HelperQuery {
 	 * @param value
 	 * @return
 	 */
-	private static FilterTemplate<Object> getConditionFilter(final Field field, Matcher matcher, final Object value) {
+	private static FilterTemplate<Object> getConditionFilter(final Field field, Class<?> fieldType, Matcher matcher, final Object value) {
 		if (value == null) {
-			if (!Object.class.isAssignableFrom(field.getType())) {
+			if (!Object.class.isAssignableFrom(fieldType)) {
 				return null;
 			}
 
@@ -121,7 +137,7 @@ public class HelperQuery {
 			};
 		}
 
-		if (String.class.isAssignableFrom(field.getType())) {
+		if (String.class.isAssignableFrom(fieldType)) {
 			if (value instanceof String) {
 				String str = ((String) value).toLowerCase();
 				if (str.length() > 1) {
@@ -182,7 +198,7 @@ public class HelperQuery {
 			};
 		}
 
-		Class<?> numberClass = getNumberClass(field.getType());
+		Class<?> numberClass = getNumberClass(fieldType);
 		if (numberClass != null) {
 			byte option = 0;
 			if (matcher.group(2).indexOf('>') >= 0) {
@@ -381,7 +397,7 @@ public class HelperQuery {
 					continue;
 				}
 
-				Comparator<Object> comparator = getComparator(field, matcher, orderStr);
+				Comparator<Object> comparator = getComparator(field, getFieldType(entityClass, field), matcher, orderStr);
 				if (comparator != null) {
 					comparators.add(comparator);
 				}
@@ -415,13 +431,14 @@ public class HelperQuery {
 
 	/**
 	 * @param field
+	 * @param fieldType
 	 * @param matcher
 	 * @param orderStr
 	 * @return
 	 */
-	private static Comparator<Object> getComparator(final Field field, Matcher matcher, String orderStr) {
-		final boolean opt = matcher.end() < orderStr.length() - 4 && orderStr.substring(matcher.end()).toUpperCase().indexOf(" DESC") >= 0;
-		if (String.class.isAssignableFrom(field.getType())) {
+	private static Comparator<Object> getComparator(final Field field, Class<?> fieldType, Matcher matcher, String orderStr) {
+		final boolean opt = matcher.end() < orderStr.length() - 3 && orderStr.substring(matcher.end()).toUpperCase().indexOf("DESC") >= 0;
+		if (String.class.isAssignableFrom(fieldType)) {
 			return new Comparator<Object>() {
 
 				@Override
@@ -443,7 +460,7 @@ public class HelperQuery {
 			};
 		}
 
-		Class<?> numberClass = getNumberClass(field.getType());
+		Class<?> numberClass = getNumberClass(fieldType);
 		if (numberClass != null) {
 			if (numberClass == int.class) {
 				return new Comparator<Object>() {

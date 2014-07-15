@@ -9,6 +9,8 @@ package com.absir.appserv.crud;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import com.absir.appserv.jdbc.JdbcCondition;
 import com.absir.appserv.jdbc.JdbcPage;
@@ -20,6 +22,11 @@ import com.absir.appserv.system.bean.value.JaCrud.Crud;
  */
 @SuppressWarnings("rawtypes")
 public interface ICrudSupply {
+
+	/**
+	 * @return
+	 */
+	public Set<Entry<String, Class<?>>> getEntityNameMapClass();
 
 	/**
 	 * @return

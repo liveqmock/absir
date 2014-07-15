@@ -838,7 +838,7 @@ public abstract class KernelClass {
 	 * @return
 	 */
 	public static Method declaredSetter(Class cls, String field, Class fieldType, boolean declared) {
-		String name = "set" + KernelString.uncapitalize(field);
+		String name = "set" + KernelString.capitalize(field);
 		return KernelReflect.assignableMethod(cls, name, 0, declared, fieldType == null ? true : false, true, fieldType);
 	}
 
@@ -895,7 +895,7 @@ public abstract class KernelClass {
 	 * @return
 	 */
 	public static Method declaredGetter(Class cls, String field, Class fieldType, boolean declared) {
-		field = KernelString.uncapitalize(field);
+		field = KernelString.capitalize(field);
 		boolean is = fieldType != null && (fieldType == boolean.class || fieldType == Boolean.class);
 		Method method = KernelReflect.assignableMethod(cls, fieldType, (is ? "is" : "get") + field, 0, declared, true, true);
 		if (method == null || (fieldType != null && !fieldType.isAssignableFrom(method.getReturnType()))) {

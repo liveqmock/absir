@@ -688,9 +688,22 @@ public abstract class KernelReflect {
 	 * @param callback
 	 */
 	public static void doWithDeclaredFields(Class cls, CallbackBreak<Field> callback) {
+		doWithDeclaredFields(cls, callback, null);
+	}
+
+	/**
+	 * @param cls
+	 * @param callback
+	 * @param superClass
+	 */
+	public static void doWithDeclaredFields(Class cls, CallbackBreak<Field> callback, Class superClass) {
 		try {
-			for (Field field : cls.getDeclaredFields()) {
-				callback.doWith(field);
+			while (cls != null && cls != Object.class && cls != superClass) {
+				for (Field field : cls.getDeclaredFields()) {
+					callback.doWith(field);
+				}
+
+				cls = cls.getSuperclass();
 			}
 
 		} catch (BreakException e) {

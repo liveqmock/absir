@@ -153,10 +153,10 @@ public class PropertyUtils {
 			Class<?>[] parameterTypes = method.getParameterTypes();
 			if (parameterTypes.length == 0 && Modifier.isPublic(method.getModifiers()) && name.length() > 2) {
 				if (name.startsWith("is")) {
-					name = KernelString.capitalize(name.substring(2));
+					name = KernelString.unCapitalize(name.substring(2));
 
 				} else if (name.length() > 3 && method.getName().startsWith("get")) {
-					name = KernelString.capitalize(name.substring(3));
+					name = KernelString.unCapitalize(name.substring(3));
 				}
 
 				if (name != method.getName()) {
@@ -177,7 +177,7 @@ public class PropertyUtils {
 
 			} else if (parameterTypes.length == 1 && name.length() > 3) {
 				if (method.getName().startsWith("set")) {
-					name = KernelString.capitalize(name.substring(3));
+					name = KernelString.unCapitalize(name.substring(3));
 					if (propertyTree) {
 						PropertyContext propertyContext = getPropertyContext(propertyMap, name);
 						String beanName = paramterBeanNames(method.getParameterAnnotations())[0];

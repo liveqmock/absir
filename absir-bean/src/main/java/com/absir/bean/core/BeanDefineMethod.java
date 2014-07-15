@@ -135,7 +135,7 @@ public class BeanDefineMethod extends BeanDefineAbstractor {
 		if (KernelString.isEmpty(beanName)) {
 			beanName = method.getName();
 			if (beanName.length() > 3 && beanName.startsWith("get")) {
-				beanName = KernelString.capitalize(beanName.substring(3));
+				beanName = KernelString.unCapitalize(beanName.substring(3));
 			}
 		}
 

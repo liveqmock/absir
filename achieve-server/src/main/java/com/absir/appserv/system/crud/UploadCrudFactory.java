@@ -9,6 +9,8 @@ package com.absir.appserv.system.crud;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
 import java.util.List;
 
 import org.apache.commons.fileupload.FileItem;
@@ -23,17 +25,23 @@ import com.absir.appserv.crud.ICrudProcessorInput;
 import com.absir.appserv.support.developer.JCrudField;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.bean.value.JaCrud.Crud;
+import com.absir.appserv.system.crud.value.IUploadRule;
+import com.absir.appserv.system.crud.value.UploadRule;
 import com.absir.appserv.system.helper.HelperRandom;
+import com.absir.appserv.system.helper.HelperString;
+import com.absir.appserv.system.service.utils.CrudServiceUtils;
 import com.absir.bean.basis.Base;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Started;
 import com.absir.bean.inject.value.Value;
+import com.absir.core.base.IBase;
 import com.absir.core.helper.HelperFile;
 import com.absir.core.helper.HelperFileName;
 import com.absir.core.kernel.KernelArray;
 import com.absir.core.kernel.KernelDyna;
 import com.absir.core.kernel.KernelString;
+import com.absir.core.util.UtilAccessor.Accessor;
 import com.absir.orm.value.JoEntity;
 import com.absir.property.PropertyErrors;
 import com.absir.server.in.Input;
@@ -108,6 +116,9 @@ public class UploadCrudFactory implements ICrudFactory {
 
 		/** extensions */
 		private String[] extensions;
+
+		/** ruleName */
+		private String ruleName;
 
 		/**
 		 * @param parameters
@@ -245,9 +256,68 @@ public class UploadCrudFactory implements ICrudFactory {
 					HelperFile.deleteQuietly(new File(uploadPath + uploadFile));
 				}
 
-				uploadFile = HelperRandom.randSecendId() + "." + HelperFileName.getExtension(requestBody.getName());
+				InputStream uploadStream = null;
+				String extensionName = HelperFileName.getExtension(requestBody.getName());
 				try {
-					HelperFile.write(new File(uploadPath + uploadFile), requestBody.getInputStream());
+					Object[] parameters = crudProperty.getjCrud().getParameters();
+					MultipartUploader multipartUploader = parameters.length == 0 ? null : (MultipartUploader) parameters[0];
+					if (multipartUploader != null) {
+						if (multipartUploader.ruleName == null) {
+							Accessor accessor = crudProperty.getAccessor();
+							if (accessor != null) {
+								UploadRule uploadRule = accessor.getAnnotation(UploadRule.class, false);
+								if (uploadRule != null) {
+									multipartUploader.ruleName = uploadRule.value();
+								}
+							}
+
+							if (multipartUploader.ruleName == null) {
+								multipartUploader.ruleName = "";
+							}
+						}
+
+						if ("".equals(multipartUploader.ruleName)) {
+							multipartUploader = null;
+
+						} else {
+							String identity = "";
+							if (entity instanceof IBase) {
+								Serializable id = ((IBase<?>) entity).getId();
+								if (id == null) {
+									JoEntity joEntity = handler.getCrudEntity().getJoEntity();
+									if (joEntity != null && joEntity.getEntityName() != null) {
+										CrudServiceUtils.merge(joEntity.getEntityName(), handler.getRoot(), handler.getCrud() == Crud.CREATE, user, null);
+									}
+								}
+
+								id = ((IBase<?>) entity).getId();
+								if (id != null) {
+									identity = id.toString();
+								}
+							}
+
+							uploadFile = HelperString
+									.replaceEach(multipartUploader.ruleName, new String[] { ":name", ":id", ":ext" }, new String[] { crudProperty.getName(), identity, extensionName });
+						}
+					}
+
+					if (multipartUploader == null && entity instanceof IUploadRule) {
+						IUploadRule uploadRule = (IUploadRule) entity;
+						uploadFile = uploadRule.getUploadRuleName(crudProperty.getName(), extensionName);
+						if (uploadFile != null) {
+							uploadStream = uploadRule.proccessInputStream(crudProperty.getName(), requestBody.getInputStream(), extensionName);
+						}
+					}
+
+					if (uploadFile == null) {
+						uploadFile = HelperRandom.randSecendId() + "." + HelperFileName.getExtension(requestBody.getName());
+					}
+
+					if (uploadStream == null) {
+						uploadStream = requestBody.getInputStream();
+					}
+
+					HelperFile.write(new File(uploadPath + uploadFile), uploadStream);
 
 				} catch (IOException e) {
 					// TODO Auto-generated catch block

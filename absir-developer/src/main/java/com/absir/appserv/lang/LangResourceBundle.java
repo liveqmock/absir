@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 import com.absir.bean.basis.Base;
+import com.absir.bean.core.BeanConfigImpl;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Inject;
@@ -24,10 +25,10 @@ import com.absir.bean.inject.value.Value;
  */
 @Base
 @Bean
-public class LangBundle {
+public class LangResourceBundle {
 
-	@Value("lang.main")
-	protected String main;
+	@Value("lang.baseName")
+	protected String baseName = "message";
 
 	/** local */
 	private Locale locale;
@@ -43,10 +44,13 @@ public class LangBundle {
 	 */
 	@Inject
 	protected void initBundle() {
+		BeanConfigImpl
 		String language = BeanFactoryUtils.getBeanConfigValue("local.language", String.class);
 		String country = BeanFactoryUtils.getBeanConfigValue("local.country", String.class);
 		String variant = BeanFactoryUtils.getBeanConfigValue("local.variant", String.class);
 		locale = language == null || country == null ? Locale.getDefault() : new Locale(language, country, variant);
+		defaultResourceBundle = ResourceBundle.getBundle(baseName, locale);
+		defaultResourceBundle.getBundle(baseName);
 	}
 
 	/**

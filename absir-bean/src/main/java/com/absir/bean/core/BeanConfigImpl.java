@@ -278,62 +278,67 @@ public class BeanConfigImpl implements BeanConfig {
 							}
 
 							template = template.substring(index + 1).trim();
-							String[] environments = null;
-							index = name.indexOf('|');
-							if (index > 0) {
-								if (length <= 1) {
-									return;
-								}
+							if (beanConfig == null) {
+								configMap.put(name, template);
 
-								String environmentParams = name.substring(index + 1);
-								name = name.substring(0, index).trim();
-								length = name.length();
-								if (length == 0) {
-									return;
-								}
-
-								environments = environmentParams.trim().split("\\|");
-							}
-
-							if (environments == null || KernelArray.contain(environments, beanConfig.getEnvironment().name())) {
-								template = beanConfig.getExpression(KernelString.unTransferred(template));
-								CallbackTemplate<String> callbackTemplate = chr == 0 ? beanConfigTemplates == null ? null : beanConfigTemplates.get(name) : null;
-								if (callbackTemplate == null) {
-									Object value = template;
-									if (chr != 0) {
-										Object old;
-										switch (chr) {
-										case '.':
-											old = DynaBinder.to(configMap.get(name), String.class);
-											if (old != null) {
-												value = old + template;
-											}
-
-											break;
-										case '#':
-											old = DynaBinder.to(configMap.get(name), String.class);
-											if (old != null) {
-												value = old + "\r\n" + template;
-											}
-
-											break;
-										case '+':
-											old = DynaBinder.to(configMap.get(name), List.class);
-											if (old != null) {
-												((List) old).add(template);
-												value = old;
-											}
-
-											break;
-										default:
-											break;
-										}
+							} else {
+								String[] environments = null;
+								index = name.indexOf('|');
+								if (index > 0) {
+									if (length <= 1) {
+										return;
 									}
 
-									configMap.put(name, value);
+									String environmentParams = name.substring(index + 1);
+									name = name.substring(0, index).trim();
+									length = name.length();
+									if (length == 0) {
+										return;
+									}
 
-								} else {
-									callbackTemplate.doWith(template);
+									environments = environmentParams.trim().split("\\|");
+								}
+
+								if (environments == null || KernelArray.contain(environments, beanConfig.getEnvironment().name())) {
+									template = beanConfig.getExpression(KernelString.unTransferred(template));
+									CallbackTemplate<String> callbackTemplate = chr == 0 ? beanConfigTemplates == null ? null : beanConfigTemplates.get(name) : null;
+									if (callbackTemplate == null) {
+										Object value = template;
+										if (chr != 0) {
+											Object old;
+											switch (chr) {
+											case '.':
+												old = DynaBinder.to(configMap.get(name), String.class);
+												if (old != null) {
+													value = old + template;
+												}
+
+												break;
+											case '#':
+												old = DynaBinder.to(configMap.get(name), String.class);
+												if (old != null) {
+													value = old + "\r\n" + template;
+												}
+
+												break;
+											case '+':
+												old = DynaBinder.to(configMap.get(name), List.class);
+												if (old != null) {
+													((List) old).add(template);
+													value = old;
+												}
+
+												break;
+											default:
+												break;
+											}
+										}
+
+										configMap.put(name, value);
+
+									} else {
+										callbackTemplate.doWith(template);
+									}
 								}
 							}
 						}

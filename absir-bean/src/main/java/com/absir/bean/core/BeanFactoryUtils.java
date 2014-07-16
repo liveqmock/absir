@@ -43,6 +43,16 @@ public class BeanFactoryUtils {
 	}
 
 	/**
+	 * @param expression
+	 * @param toClass
+	 * @return
+	 */
+	public static <T> T getBeanConfigValue(String expression, Class<T> toClass) {
+		BeanConfig beanConfig = getBeanConfig();
+		return beanConfig == null ? null : beanConfig.getExpressionObject(expression, null, toClass);
+	}
+
+	/**
 	 * @return
 	 */
 	public static BeanFactory get() {

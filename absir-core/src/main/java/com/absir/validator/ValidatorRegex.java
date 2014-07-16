@@ -32,7 +32,7 @@ public class ValidatorRegex extends PropertyResolverAbstract<ValidatorObject, Re
 		}
 
 		final Pattern pattern = java.util.regex.Pattern.compile(regex);
-		propertyObject.addValidator(new Validator() {
+		propertyObject.addValidator(new ValidatorValue() {
 
 			@Override
 			public String validateValue(Object value) {

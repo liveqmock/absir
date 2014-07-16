@@ -254,7 +254,7 @@ public class BinderData extends DynaBinder {
 				}
 
 				for (Validator validator : validators) {
-					String errorMessage = validator.validateValue(value);
+					String errorMessage = validator.validate(value);
 					if (errorMessage != null) {
 						addPropertyError(errorMessage, value);
 						break;

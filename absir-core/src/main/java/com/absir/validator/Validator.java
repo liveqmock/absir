@@ -19,7 +19,7 @@ public interface Validator {
 	 * @param value
 	 * @return
 	 */
-	public String validateValue(Object value);
+	public String validate(Object value);
 
 	/**
 	 * @param validatorMap

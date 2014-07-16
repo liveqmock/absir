@@ -37,7 +37,7 @@ public class ValidatorNotEmpty extends PropertyResolverAbstract<ValidatorObject,
 		propertyObject.addValidator(new Validator() {
 
 			@Override
-			public String validateValue(Object value) {
+			public String validate(Object value) {
 				// TODO Auto-generated method stub
 				if (value == null || "".equals(value)) {
 					return "Required";

@@ -38,7 +38,7 @@ public class ValidatorEmail extends PropertyResolverAbstract<ValidatorObject, Em
 			propertyObject = new ValidatorObject();
 		}
 
-		propertyObject.addValidator(new Validator() {
+		propertyObject.addValidator(new ValidatorValue() {
 
 			@Override
 			public String validateValue(Object value) {

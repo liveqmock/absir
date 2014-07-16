@@ -31,7 +31,7 @@ public class ValidatorMin extends PropertyResolverAbstract<ValidatorObject, Min>
 			propertyObject = new ValidatorObject();
 		}
 
-		propertyObject.addValidator(new Validator() {
+		propertyObject.addValidator(new ValidatorValue() {
 
 			@Override
 			public String validateValue(Object value) {

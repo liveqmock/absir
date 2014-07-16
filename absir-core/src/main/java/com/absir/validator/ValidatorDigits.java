@@ -35,12 +35,12 @@ public class ValidatorDigits extends PropertyResolverAbstract<ValidatorObject, D
 			propertyObject = new ValidatorObject();
 		}
 
-		propertyObject.addValidator(new Validator() {
+		propertyObject.addValidator(new ValidatorValue() {
 
 			@Override
 			public String validateValue(Object value) {
 				// TODO Auto-generated method stub
-				if (value != null && KernelDyna.to(value, Integer.class) == null) {
+				if (KernelDyna.to(value, Integer.class) == null) {
 					return "Digits";
 				}
 

@@ -35,7 +35,7 @@ public class ValidatorLength extends PropertyResolverAbstract<ValidatorObject, L
 		propertyObject.addValidator(new Validator() {
 
 			@Override
-			public String validateValue(Object value) {
+			public String validate(Object value) {
 				// TODO Auto-generated method stub
 				int length = value == null ? 0 : value instanceof String ? ((String) value).length() : -1;
 				if (length >= 0 && (length >= min || length <= max)) {

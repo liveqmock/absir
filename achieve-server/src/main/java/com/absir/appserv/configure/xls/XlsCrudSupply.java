@@ -22,11 +22,11 @@ import com.absir.core.kernel.KernelClass;
  * @author absir
  * 
  */
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings({ "rawtypes" })
 @Bean
 @Basis
 @MaSupply
-public class XlsCrudSupply extends CrudSupply {
+public class XlsCrudSupply extends CrudSupply<XlsBase> {
 
 	/*
 	 * (non-Javadoc)

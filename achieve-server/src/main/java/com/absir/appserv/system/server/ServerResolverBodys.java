@@ -39,7 +39,7 @@ import com.absir.server.value.Body;
  */
 @Base
 @Bean
-public class ServerResolverBodys implements ParameterResolver<Class<?>>, ParameterResolverMethod, ReturnedResolver<Class<?>> {
+public class ServerResolverBodys implements ParameterResolver<Object>, ParameterResolverMethod, ReturnedResolver<Class<?>>, IServerResolverBody {
 
 	/** ME */
 	public static final ServerResolverBodys ME = BeanFactoryUtils.get(ServerResolverBodys.class);
@@ -52,7 +52,21 @@ public class ServerResolverBodys implements ParameterResolver<Class<?>>, Paramet
 	 * java.lang.annotation.Annotation[][], java.lang.reflect.Method)
 	 */
 	@Override
-	public Class<?> getParameter(int i, String[] parameterNames, Class<?>[] parameterTypes, Annotation[][] annotations, Method method) {
+	public Object getParameter(int i, String[] parameterNames, Class<?>[] parameterTypes, Annotation[][] annotations, Method method) {
+		// TODO Auto-generated method stub
+		return ServerResolverBody.ME.getParameter(this, i, parameterNames, parameterTypes, annotations, method);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.system.server.IServerResolverBody#getBodyParameter(int,
+	 * java.lang.String[], java.lang.Class[],
+	 * java.lang.annotation.Annotation[][], java.lang.reflect.Method)
+	 */
+	@Override
+	public Class<?> getBodyParameter(int i, String[] parameterNames, Class<?>[] parameterTypes, Annotation[][] annotations, Method method) {
 		// TODO Auto-generated method stub
 		return KernelArray.getAssignable(annotations[i], Bodys.class) == null ? null : Body.class;
 	}
@@ -66,25 +80,22 @@ public class ServerResolverBodys implements ParameterResolver<Class<?>>, Paramet
 	 * java.lang.String, com.absir.server.route.RouteMethod)
 	 */
 	@Override
-	public Object getParameterValue(OnPut onPut, Class<?> parameter, Class<?> parameterType, String beanName, RouteMethod routeMethod) throws Exception {
+	public Object getParameterValue(OnPut onPut, Object parameter, Class<?> parameterType, String beanName, RouteMethod routeMethod) throws Exception {
 		// TODO Auto-generated method stub
-		if (onPut.getInput().isDebug()) {
-			return ServerResolverBody.ME.getParameterValue(onPut, parameter, parameterType, beanName, routeMethod);
-		}
-
-		return sParameterValue(onPut, parameter, parameterType, beanName, routeMethod);
+		return ServerResolverBody.ME.getParameterValue(onPut.getInput().isDebug() ? ServerResolverBody.ME : this, onPut, parameter, parameterType, beanName, routeMethod);
 	}
 
-	/**
-	 * @param onPut
-	 * @param parameter
-	 * @param parameterType
-	 * @param beanName
-	 * @param routeMethod
-	 * @return
-	 * @throws Exception
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.system.server.IServerResolverBody#getBodyParameterValue
+	 * (com.absir.server.on.OnPut, java.lang.Object, java.lang.Class,
+	 * java.lang.String, com.absir.server.route.RouteMethod)
 	 */
-	public Object sParameterValue(OnPut onPut, Class<?> parameter, Class<?> parameterType, String beanName, RouteMethod routeMethod) throws Exception {
+	@Override
+	public Object getBodyParameterValue(OnPut onPut, Object parameter, Class<?> parameterType, String beanName, RouteMethod routeMethod) throws Exception {
+		// TODO Auto-generated method stub
 		Input input = onPut.getInput();
 		InputStream inputStream = input.getInputStream();
 		if (inputStream == null) {

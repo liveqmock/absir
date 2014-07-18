@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import com.absir.bean.basis.BeanConfig;
@@ -101,6 +102,7 @@ public class BeanConfigImpl implements BeanConfig {
 	 */
 	private void setClassPath(String classPath) {
 		this.classPath = classPath;
+		configMap.put("classPath", classPath);
 		System.setProperty("classPath", classPath);
 	}
 
@@ -109,6 +111,7 @@ public class BeanConfigImpl implements BeanConfig {
 	 */
 	private void setResourcePath(String resourcePath) {
 		this.resourcePath = resourcePath;
+		configMap.put("resourcePath", resourcePath);
 		System.setProperty("resourcePath", resourcePath);
 	}
 
@@ -250,7 +253,6 @@ public class BeanConfigImpl implements BeanConfig {
 					@Override
 					public void doWith(String template) throws BreakException {
 						// TODO Auto-generated method stub
-						template = template.trim();
 						int length = template.length();
 						if (length <= 2 || template.charAt(0) == '#') {
 							return;
@@ -265,11 +267,11 @@ public class BeanConfigImpl implements BeanConfig {
 									return;
 								}
 
-								name = template.substring(0, index - 1).trim();
+								name = template.substring(0, index - 1);
 
 							} else {
 								chr = 0;
-								name = template.substring(0, index).trim();
+								name = template.substring(0, index);
 							}
 
 							length = name.length();
@@ -277,11 +279,18 @@ public class BeanConfigImpl implements BeanConfig {
 								return;
 							}
 
-							template = template.substring(index + 1).trim();
+							template = template.substring(index + 1);
 							if (beanConfig == null) {
 								configMap.put(name, template);
 
 							} else {
+								name = name.trim();
+								if (length == 0) {
+									return;
+								}
+
+								length = name.length();
+								template = template.trim();
 								String[] environments = null;
 								index = name.indexOf('|');
 								if (index > 0) {
@@ -372,6 +381,28 @@ public class BeanConfigImpl implements BeanConfig {
 			for (File file : files) {
 				readProperties(beanConfig, configMap, file, beanConfigTemplates);
 			}
+		}
+	}
+
+	/**
+	 * @param configMap
+	 * @param propertyFile
+	 */
+	public static void writeProperties(Map<String, ?> configMap, File propertyFile) {
+		StringBuilder stringBuilder = new StringBuilder();
+		for (Entry<String, ?> entry : configMap.entrySet()) {
+			stringBuilder.append(entry.getKey());
+			stringBuilder.append('=');
+			stringBuilder.append(entry.getValue());
+			stringBuilder.append("\r\n");
+		}
+
+		try {
+			HelperFile.write(propertyFile, stringBuilder.toString());
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
@@ -540,6 +571,42 @@ public class BeanConfigImpl implements BeanConfig {
 	public <T> T getExpressionValue(String expression, String beanName, Class<T> toClass) {
 		// TODO Auto-generated method stub
 		return DynaBinder.to(getExpressionObject(expression, beanName, toClass), null, toClass);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.bean.basis.BeanConfig#getExpressionDefaultValue(java.lang.String
+	 * , java.lang.String, java.lang.Class)
+	 */
+	@Override
+	public <T> T getExpressionDefaultValue(String expression, String beanName, Class<T> toClass) {
+		// TODO Auto-generated method stub
+		T value = getExpressionObject(expression, beanName, toClass);
+		if (value == null) {
+			value = DynaBinder.to(expression, beanName, toClass);
+		}
+
+		return value;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.bean.basis.BeanConfig#getExpressionDefaultValue(java.lang.String
+	 * , java.lang.String, java.lang.reflect.Type)
+	 */
+	@Override
+	public Object getExpressionDefaultValue(String expression, String beanName, Type toType) {
+		// TODO Auto-generated method stub
+		Object value = getExpressionObject(expression, beanName, toType);
+		if (value == null) {
+			value = DynaBinder.INSTANCE.bind(expression, beanName, toType);
+		}
+
+		return value;
 	}
 
 	/*

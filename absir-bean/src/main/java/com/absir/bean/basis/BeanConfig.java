@@ -78,6 +78,22 @@ public interface BeanConfig {
 	public <T> T getExpressionValue(String expression, String beanName, Class<T> toClass);
 
 	/**
+	 * @param expression
+	 * @param beanName
+	 * @param toClass
+	 * @return
+	 */
+	public <T> T getExpressionDefaultValue(String expression, String beanName, Class<T> toClass);
+
+	/**
+	 * @param expression
+	 * @param beanName
+	 * @param toType
+	 * @return
+	 */
+	public Object getExpressionDefaultValue(String expression, String beanName, Type toType);
+
+	/**
 	 * @param filename
 	 * @return
 	 */

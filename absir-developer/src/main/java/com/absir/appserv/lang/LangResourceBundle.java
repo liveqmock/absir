@@ -18,9 +18,11 @@ import com.absir.bean.core.BeanConfigImpl;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Inject;
+import com.absir.bean.inject.value.Stopping;
 import com.absir.bean.inject.value.Value;
 import com.absir.context.core.ContextUtils;
 import com.absir.context.schedule.cron.CronFixDelayRunable;
+import com.absir.core.kernel.KernelString;
 
 /**
  * @author absir
@@ -30,6 +32,9 @@ import com.absir.context.schedule.cron.CronFixDelayRunable;
 @Base
 @Bean
 public class LangResourceBundle {
+
+	/** ME */
+	public static final LangResourceBundle ME = BeanFactoryUtils.get(LangResourceBundle.class);
 
 	/** langResource */
 	@Value(value = "lang.resouce", defaultValue = "${classPath}lang/")
@@ -46,6 +51,9 @@ public class LangResourceBundle {
 
 	/** resourceBundle */
 	protected Map<String, String> resourceBundle;
+
+	/** resourceLangs */
+	protected Map<String, String> resourceLangs = new HashMap<String, String>();
 
 	/** localeMapResourceBunlde */
 	protected Map<Locale, Map<String, String>> localeMapResourceBunlde = new HashMap<Locale, Map<String, String>>();
@@ -80,7 +88,7 @@ public class LangResourceBundle {
 	}
 
 	/**
-	 * 
+	 * 初始化国际化资源
 	 */
 	@Inject
 	protected void initBundle() {
@@ -90,6 +98,29 @@ public class LangResourceBundle {
 		String country = BeanFactoryUtils.getBeanConfigValue("local.country", String.class);
 		String variant = BeanFactoryUtils.getBeanConfigValue("local.variant", String.class);
 		locale = language == null || country == null ? Locale.getDefault() : new Locale(language, country, variant);
+	}
+
+	/**
+	 * 内置国际化资源写入
+	 */
+	@Stopping
+	public void stopping() {
+		if (!resourceLangs.isEmpty()) {
+			String var = locale.getLanguage();
+			if (!KernelString.isEmpty(var)) {
+				String resource = langResource + var;
+				var = locale.getCountry();
+				if (!KernelString.isEmpty(var)) {
+					resource += '_' + var;
+					var = locale.getVariant();
+					if (!KernelString.isEmpty(var)) {
+						resource += '_' + var;
+					}
+				}
+
+				BeanConfigImpl.writeProperties(resourceLangs, new File(resource + "/general.properties"));
+			}
+		}
 	}
 
 	/**
@@ -108,6 +139,18 @@ public class LangResourceBundle {
 	}
 
 	/**
+	 * @param name
+	 * @param lang
+	 */
+	public void setResourceLang(String name, String lang) {
+		Map<String, String> resourceBundle = getResourceBundle();
+		if (!resourceBundle.containsKey(name)) {
+			resourceBundle.put(name, lang);
+			resourceLangs.put(name, lang);
+		}
+	}
+
+	/**
 	 * @param locale
 	 * @return
 	 */
@@ -118,7 +161,7 @@ public class LangResourceBundle {
 		}
 
 		String var = locale.getLanguage();
-		if (var != null) {
+		if (!KernelString.isEmpty(var)) {
 			String resource = langResource + var;
 			File resourceFile = new File(resource);
 			if (resourceFile.exists()) {
@@ -129,14 +172,14 @@ public class LangResourceBundle {
 				}
 
 				var = locale.getCountry();
-				if (var != null) {
-					resource = langResource + var;
+				if (!KernelString.isEmpty(var)) {
+					resource += '_' + var;
 					resourceFile = new File(resource);
 					if (resourceFile.exists()) {
 						BeanConfigImpl.readDirProperties(null, (Map<String, Object>) (Object) resourceBundle, resourceFile, null);
 						var = locale.getVariant();
-						if (var != null) {
-							resource = langResource + var;
+						if (!KernelString.isEmpty(var)) {
+							resource += '_' + var;
 							resourceFile = new File(resource);
 							if (resourceFile.exists()) {
 								BeanConfigImpl.readDirProperties(null, (Map<String, Object>) (Object) resourceBundle, resourceFile, null);
@@ -149,7 +192,7 @@ public class LangResourceBundle {
 			}
 		}
 
-		return getResourceBundle();
+		return locale == this.locale ? new HashMap<String, String>() : getResourceBundle();
 	}
 
 	/**

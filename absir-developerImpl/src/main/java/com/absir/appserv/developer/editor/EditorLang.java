@@ -33,6 +33,7 @@ public class EditorLang extends PropertyResolverAbstract<EditorObject, JaLang> {
 		}
 
 		propertyObject.setLang(annotation.value());
+		propertyObject.setTag(annotation.tag());
 		return propertyObject;
 	}
 
@@ -50,7 +51,15 @@ public class EditorLang extends PropertyResolverAbstract<EditorObject, JaLang> {
 			propertyObject = new EditorObject();
 		}
 
-		propertyObject.setLang(annotationValue);
+		String[] anntations = annotationValue.split(",");
+		if (anntations.length == 2) {
+			propertyObject.setLang(anntations[0]);
+			propertyObject.setTag(anntations[1]);
+
+		} else {
+			propertyObject.setLang(annotationValue);
+		}
+
 		return propertyObject;
 	}
 

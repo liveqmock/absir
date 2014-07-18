@@ -100,7 +100,7 @@ public class EntityField extends DBField {
 
 		generated = editorObject.isGenerated();
 		embedd = editorObject.isEmbedd();
-		caption = HelperLang.getFieldCaption(editorObject.getLang(), joEntity.getEntityClass());
+		caption = HelperLang.getFieldCaption(editorObject.getLang(), editorObject.getTag(), name, joEntity.getEntityClass());
 
 		// set joEntity
 		Accessor accessor = null;

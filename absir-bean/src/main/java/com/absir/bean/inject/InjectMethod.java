@@ -16,7 +16,6 @@ import com.absir.bean.core.BeanDefineMethod;
 import com.absir.bean.core.BeanFactoryParameters;
 import com.absir.bean.inject.value.InjectType;
 import com.absir.bean.inject.value.Value;
-import com.absir.core.dyna.DynaBinder;
 import com.absir.core.kernel.KernelArray;
 import com.absir.core.kernel.KernelLang;
 import com.absir.core.kernel.KernelString;
@@ -37,7 +36,7 @@ public class InjectMethod extends InjectInvokerObserver {
 	String[] valueNames;
 
 	/** defaultValues */
-	Object[] defaultValues;
+	String[] defaultValues;
 
 	/**
 	 * @param method
@@ -59,7 +58,7 @@ public class InjectMethod extends InjectInvokerObserver {
 			if (value != null) {
 				if (valueNames == null) {
 					valueNames = new String[paramNames.length];
-					defaultValues = new Object[paramNames.length];
+					defaultValues = new String[paramNames.length];
 				}
 
 				valueNames[i] = KernelString.isEmpty(value.value()) ? paramNames[i] : value.value();
@@ -119,11 +118,7 @@ public class InjectMethod extends InjectInvokerObserver {
 					Class<?> parameterType = parameterTypes[i];
 					parameter = beanFactory.getBeanConfig().getExpressionObject(valueName, paramName, parameterType);
 					if (parameter == null) {
-						Object defaultValue = defaultValues[i];
-						parameter = DynaBinder.to(defaultValue, paramName, parameterType);
-						if (defaultValue != parameter) {
-							defaultValues[i] = parameter;
-						}
+						parameter = beanFactory.getBeanConfig().getExpressionDefaultValue(defaultValues[i], paramName, parameterType);
 					}
 				}
 

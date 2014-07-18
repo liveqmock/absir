@@ -12,7 +12,6 @@ import java.lang.reflect.Field;
 import com.absir.bean.basis.BeanFactory;
 import com.absir.bean.basis.ParamName;
 import com.absir.bean.inject.value.Value;
-import com.absir.core.dyna.DynaBinder;
 import com.absir.core.kernel.KernelReflect;
 import com.absir.core.kernel.KernelString;
 
@@ -32,7 +31,7 @@ public class InjectValue extends InjectInvoker {
 	String beanName;
 
 	/** defaultValue */
-	Object defaultValue;
+	String defaultValue;
 
 	/**
 	 * @param field
@@ -73,11 +72,7 @@ public class InjectValue extends InjectInvoker {
 				return;
 
 			} else {
-				value = DynaBinder.INSTANCE.bind(defaultValue, beanName, field.getGenericType());
-				if (defaultValue != value) {
-					defaultValue = value;
-				}
-
+				value = beanFactory.getBeanConfig().getExpressionDefaultValue(defaultValue, beanName, field.getGenericType());
 				if (value == null) {
 					return;
 				}

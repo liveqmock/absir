@@ -21,9 +21,16 @@ import java.lang.annotation.Target;
 public @interface JaLang {
 
 	/**
-	 * 国际化名称
+	 * 国际化值
 	 * 
 	 * @return
 	 */
 	String value();
+
+	/**
+	 * 同名识别字符
+	 * 
+	 * @return
+	 */
+	String tag() default "";
 }

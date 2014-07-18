@@ -31,6 +31,9 @@ public class EditorObject implements PropertyObject<EditorObject> {
 	/** lang */
 	private String lang;
 
+	/** tag */
+	private String tag;
+
 	/** metas */
 	private Map<Object, Object> metas;
 
@@ -98,6 +101,21 @@ public class EditorObject implements PropertyObject<EditorObject> {
 	 */
 	public void setLang(String lang) {
 		this.lang = lang;
+	}
+
+	/**
+	 * @return the tag
+	 */
+	public String getTag() {
+		return tag;
+	}
+
+	/**
+	 * @param tag
+	 *            the tag to set
+	 */
+	public void setTag(String tag) {
+		this.tag = tag;
 	}
 
 	/**

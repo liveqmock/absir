@@ -10,6 +10,7 @@ package com.absir.appserv.system.helper;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import com.absir.appserv.lang.LangResourceBundle;
 import com.absir.appserv.system.bean.value.JaLang;
 import com.absir.core.kernel.KernelReflect;
 import com.absir.core.kernel.KernelString;
@@ -22,16 +23,38 @@ import com.absir.core.kernel.KernelString;
 public class HelperLang {
 
 	/**
+	 * @param lang
+	 * @param name
+	 * @return
+	 */
+	public static String getLangName(JaLang lang, String name) {
+		return getLangName(lang == null ? null : lang.value(), lang == null ? null : lang.tag(), name);
+	}
+
+	/**
+	 * @param lang
+	 * @param tag
+	 * @param name
+	 * @return
+	 */
+	public static String getLangName(String lang, String tag, String name) {
+		if (!KernelString.isEmpty(tag)) {
+			name += '.' + tag;
+		}
+
+		if (lang != null) {
+			LangResourceBundle.ME.setResourceLang(name, lang);
+		}
+
+		return name;
+	}
+
+	/**
 	 * @param type
 	 * @return
 	 */
 	public static String getTypeCaption(Class<?> type) {
-		JaLang jaLang = type.getAnnotation(JaLang.class);
-		if (jaLang == null) {
-			return type.getSimpleName();
-		}
-
-		return jaLang.value();
+		return getTypeCaption(type, null);
 	}
 
 	/**
@@ -40,12 +63,7 @@ public class HelperLang {
 	 * @return
 	 */
 	public static String getTypeCaption(Class<?> type, String typeName) {
-		JaLang jaLang = type.getAnnotation(JaLang.class);
-		if (jaLang == null) {
-			return typeName == null ? type.getSimpleName() : typeName;
-		}
-
-		return jaLang.value();
+		return getLangName(type.getAnnotation(JaLang.class), typeName == null ? type.getSimpleName() : typeName);
 	}
 
 	/**
@@ -62,8 +80,7 @@ public class HelperLang {
 	 * @return
 	 */
 	public static String getFieldCaption(Field field, Class<?> cls) {
-		JaLang jaLang = field.getAnnotation(JaLang.class);
-		return getFieldCaption(jaLang == null ? KernelString.capitalize(field.getName()) : jaLang.value(), cls);
+		return getLangName(field.getAnnotation(JaLang.class), KernelString.capitalize(field.getName()));
 	}
 
 	/**
@@ -71,8 +88,8 @@ public class HelperLang {
 	 * @param cls
 	 * @return
 	 */
-	public static String getFieldCaption(String lang, Class<?> cls) {
-		return KernelString.capitalize(lang);
+	public static String getFieldCaption(String lang, String tag, String field, Class<?> cls) {
+		return getLangName(lang, tag, KernelString.capitalize(field));
 	}
 
 	/**
@@ -89,8 +106,7 @@ public class HelperLang {
 	 * @return
 	 */
 	public static String getMethodCaption(Method method, Class<?> cls) {
-		JaLang jaLang = method.getAnnotation(JaLang.class);
-		return getFieldCaption(jaLang == null ? KernelString.capitalize(method.getName()) : jaLang.value(), cls);
+		return getLangName(method.getAnnotation(JaLang.class), KernelString.capitalize(method.getName()));
 	}
 
 	/**
@@ -98,11 +114,6 @@ public class HelperLang {
 	 * @return
 	 */
 	public static String getEnumNameCaption(Enum enumerate) {
-		JaLang jaLang = KernelReflect.declaredField(enumerate.getClass(), enumerate.name()).getAnnotation(JaLang.class);
-		if (jaLang == null) {
-			return enumerate.name();
-		}
-
-		return jaLang.value();
+		return getLangName(KernelReflect.declaredField(enumerate.getClass(), enumerate.name()).getAnnotation(JaLang.class), enumerate.name());
 	}
 }

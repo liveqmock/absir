@@ -36,6 +36,14 @@ public class CronFixDelayRunable extends ScheduleRunableAbstract {
 		return fixDelay;
 	}
 
+	/**
+	 * @param fixDelay
+	 *            the fixDelay to set
+	 */
+	public void setFixDelay(long fixDelay) {
+		this.fixDelay = fixDelay;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -67,5 +75,14 @@ public class CronFixDelayRunable extends ScheduleRunableAbstract {
 		}
 
 		return scheduleTime;
+	}
+
+	/**
+	 * @param fixDelay
+	 * @return
+	 */
+	public CronFixDelayRunable transformCronFixDelayRunable(long fixDelay) {
+		this.fixDelay = 0;
+		return new CronFixDelayRunable(runnable, fixDelay);
 	}
 }

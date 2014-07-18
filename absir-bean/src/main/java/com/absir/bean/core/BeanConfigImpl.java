@@ -353,6 +353,29 @@ public class BeanConfigImpl implements BeanConfig {
 	}
 
 	/**
+	 * @param beanConfig
+	 * @param configMap
+	 * @param propertyDir
+	 * @param beanConfigTemplates
+	 */
+	public static void readDirProperties(final BeanConfig beanConfig, final Map<String, Object> configMap, File propertyDir, final Map<String, CallbackTemplate<String>> beanConfigTemplates) {
+		if (propertyDir.exists()) {
+			File[] files = propertyDir.listFiles(new FilenameFilter() {
+
+				@Override
+				public boolean accept(File dir, String name) {
+					// TODO Auto-generated method stub
+					return name.endsWith(".properties");
+				}
+			});
+
+			for (File file : files) {
+				readProperties(beanConfig, configMap, file, beanConfigTemplates);
+			}
+		}
+	}
+
+	/**
 	 * @return the classPath
 	 */
 	public String getClassPath() {

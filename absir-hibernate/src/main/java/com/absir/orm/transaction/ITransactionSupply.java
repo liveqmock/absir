@@ -9,14 +9,12 @@ package com.absir.orm.transaction;
 
 import java.util.Map;
 
-import com.absir.bean.inject.InjectOnce;
-
 /**
  * @author absir
  * 
  */
 @SuppressWarnings("rawtypes")
-public interface ITransactionSupply extends InjectOnce {
+public interface ITransactionSupply {
 
 	/**
 	 * @return

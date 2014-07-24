@@ -960,6 +960,28 @@ public final class BeanFactoryImpl implements BeanFactory {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.bean.basis.BeanFactory#unRegisterWithoutBeanType(java.lang.
+	 * Class[])
+	 */
+	@Override
+	public void unRegisterWithoutBeanType(Class<?>... beanTypes) {
+		// TODO Auto-generated method stub
+		if (beanTypes.length == 0) {
+			return;
+		}
+
+		Iterator<Entry<String, BeanDefine>> iterator = beanNameDefineMap.entrySet().iterator();
+		while (iterator.hasNext()) {
+			if (!KernelClass.isAssignableFrom(beanTypes, iterator.next().getValue().getBeanType())) {
+				iterator.remove();
+			}
+		}
+	}
+
 	/**
 	 * 注销对象定义
 	 * 

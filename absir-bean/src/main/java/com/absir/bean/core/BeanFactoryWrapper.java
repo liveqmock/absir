@@ -320,6 +320,19 @@ public class BeanFactoryWrapper implements BeanFactory {
 	 * (non-Javadoc)
 	 * 
 	 * @see
+	 * com.absir.bean.basis.BeanFactory#unRegisterWithoutBeanType(java.lang.
+	 * Class[])
+	 */
+	@Override
+	public void unRegisterWithoutBeanType(Class<?>... beanTypes) {
+		// TODO Auto-generated method stub
+		beanFactory.unRegisterWithoutBeanType(beanTypes);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
 	 * com.absir.bean.basis.BeanFactory#registerBeanSoftObject(java.lang.Object)
 	 */
 	@Override

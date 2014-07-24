@@ -10,8 +10,8 @@ package com.absir.appserv.system.helper;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import com.absir.appserv.lang.LangResourceBundle;
 import com.absir.appserv.system.bean.value.JaLang;
+import com.absir.context.lang.LangBundle;
 import com.absir.core.kernel.KernelReflect;
 import com.absir.core.kernel.KernelString;
 
@@ -43,7 +43,7 @@ public class HelperLang {
 		}
 
 		if (lang != null) {
-			LangResourceBundle.ME.setResourceLang(name, lang);
+			LangBundle.ME.setResourceLang(name, lang);
 		}
 
 		return name;

@@ -139,7 +139,7 @@ public class Asset_verify extends AssetServer {
 			if (verifycode != null) {
 				String paramVerify = input.getParam("verifycode");
 				if (paramVerify != null) {
-					if (verifycode.toLowerCase().equals(paramVerify)) {
+					if (verifycode.equals(paramVerify.toLowerCase())) {
 						((InputRequest) input).removeSession("verifycode");
 						return true;
 					}

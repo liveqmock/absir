@@ -13,6 +13,7 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 
 import com.absir.bean.basis.Environment;
@@ -37,6 +38,9 @@ public abstract class Input extends Bean<Serializable> implements IAttributes {
 	/** model */
 	private InModel model;
 
+	/** locale */
+	private Locale locale;
+
 	/** dispatcher */
 	private IDispatcher dispatcher;
 
@@ -58,6 +62,25 @@ public abstract class Input extends Bean<Serializable> implements IAttributes {
 	 */
 	public InModel getModel() {
 		return model;
+	}
+
+	/**
+	 * @return the locale
+	 */
+	public Locale getLocale() {
+		if(locale == null) {
+			//get
+		}
+		
+		return locale;
+	}
+
+	/**
+	 * @param locale
+	 *            the locale to set
+	 */
+	public void setLocale(Locale locale) {
+		this.locale = locale;
 	}
 
 	/**

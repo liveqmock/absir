@@ -29,6 +29,7 @@ import com.absir.bean.basis.BeanFactory;
 import com.absir.bean.basis.BeanScope;
 import com.absir.bean.basis.Configure;
 import com.absir.bean.config.IBeanDefineAware;
+import com.absir.bean.config.IBeanDefineProcessor;
 import com.absir.bean.config.IBeanDefineSupply;
 import com.absir.bean.config.IBeanFactoryAware;
 import com.absir.bean.config.IBeanFactoryStarted;
@@ -40,7 +41,6 @@ import com.absir.bean.core.BeanDefineMethod;
 import com.absir.bean.core.BeanDefineOriginal;
 import com.absir.bean.core.BeanDefineType;
 import com.absir.bean.core.BeanFactoryImpl;
-import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Inject;
 import com.absir.bean.inject.value.InjectOrder;
@@ -345,13 +345,19 @@ public class InjectBeanFactory implements IBeanFactorySupport, IBeanDefineSupply
 	public List<BeanDefine> getBeanDefines(BeanFactoryImpl beanFactory, Class<?> beanType) {
 		// TODO Auto-generated method stub
 		Bean bean = beanType.getAnnotation(Bean.class);
-		Configure configure = bean == null ? beanType.getAnnotation(Configure.class) : null;
-		if (bean == null && configure == null) {
-			return null;
+		List<BeanDefine> beanDefines = null;
+		if (bean != null || beanType.getAnnotation(Configure.class) != null) {
+			BeanDefine beanDefine = bean == null || BeanDefineOriginal.isAbstractBeanType(beanType) ? null : new InjectBeanDefine(new BeanDefineType(bean.value(), beanType), bean.scope());
+			beanDefines = getBeanDefines(beanFactory, beanType, beanDefine);
 		}
 
-		BeanDefine beanDefine = bean == null || BeanDefineOriginal.isAbstractBeanType(beanType) ? null : new InjectBeanDefine(new BeanDefineType(bean.value(), beanType), bean.scope());
-		return getBeanDefines(beanFactory, beanType, beanDefine);
+		if (beanDefines == null || beanDefines.isEmpty()) {
+			if (beanType.getAnnotation(Inject.class) != null) {
+				startedInjectInvokers.add(new ObjectEntry<Object, InjectInvoker>(null, new InjectBeanType(beanType)));
+			}
+		}
+
+		return beanDefines;
 	}
 
 	/**
@@ -879,7 +885,8 @@ public class InjectBeanFactory implements IBeanFactorySupport, IBeanDefineSupply
 		beanMethods.clear();
 		beanDefining = false;
 		BeanDefineDiscover.clear();
-		BeanFactoryUtils.get().unRegisterBeanType(IMethodDefine.class, ITypeSupport.class, IFieldSupport.class, IMethodSupport.class, IMethodInject.class, InjectOnce.class);
+		beanFactory.unRegisterBeanType(InjectOnce.class);
+		beanFactory.unRegisterWithoutBeanType(InjectRetain.class, IBeanDefineSupply.class, IBeanDefineAware.class, IBeanDefineProcessor.class, IBeanObjectProcessor.class);
 	}
 
 	/*

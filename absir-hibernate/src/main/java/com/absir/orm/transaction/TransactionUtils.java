@@ -11,12 +11,14 @@ import java.util.Collection;
 import java.util.Map.Entry;
 
 import com.absir.bean.core.BeanFactoryUtils;
+import com.absir.bean.inject.value.Inject;
 
 /**
  * @author absir
  * 
  */
 @SuppressWarnings("rawtypes")
+@Inject
 public abstract class TransactionUtils {
 
 	/** transactionService */

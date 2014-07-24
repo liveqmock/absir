@@ -28,7 +28,6 @@ import org.hibernate.persister.entity.EntityPersister;
 
 import com.absir.bean.basis.Base;
 import com.absir.bean.core.BeanFactoryUtils;
-import com.absir.bean.inject.InjectOnce;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Started;
 import com.absir.core.kernel.KernelClass;
@@ -42,7 +41,7 @@ import com.absir.orm.hibernate.boost.IEntityMerge.MergeType;
 @SuppressWarnings({ "rawtypes", "serial", "unchecked" })
 @Bean
 @Base
-public class L2EntityMergeService implements IEventService, PostInsertEventListener, PostUpdateEventListener, PostDeleteEventListener, InjectOnce {
+public class L2EntityMergeService implements IEventService, PostInsertEventListener, PostUpdateEventListener, PostDeleteEventListener {
 
 	/** nameMapEntityMerge */
 	private Map<String, IEntityMerge> nameMapEntityMerge = new HashMap<String, IEntityMerge>();

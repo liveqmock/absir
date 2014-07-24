@@ -169,6 +169,11 @@ public interface BeanFactory {
 	public void unRegisterBeanType(Class<?>... beanTypes);
 
 	/**
+	 * @param beanTypes
+	 */
+	public void unRegisterWithoutBeanType(Class<?>... beanTypes);
+
+	/**
 	 * @param beanObject
 	 */
 	public void registerBeanSoftObject(Object beanObject);

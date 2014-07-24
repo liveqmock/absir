@@ -14,6 +14,7 @@ import com.absir.appserv.crud.ICrudSupply;
 import com.absir.appserv.jdbc.JdbcCondition;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.bean.core.BeanFactoryUtils;
+import com.absir.bean.inject.value.Inject;
 import com.absir.core.kernel.KernelLang.PropertyFilter;
 
 /**
@@ -21,6 +22,7 @@ import com.absir.core.kernel.KernelLang.PropertyFilter;
  * 
  */
 @SuppressWarnings("rawtypes")
+@Inject
 public interface CrudService {
 
 	/** ME */

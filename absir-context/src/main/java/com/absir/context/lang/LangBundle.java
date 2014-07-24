@@ -5,7 +5,7 @@
  *
  * Create on 2014年7月16日 上午10:38:20
  */
-package com.absir.appserv.lang;
+package com.absir.context.lang;
 
 import java.io.File;
 import java.util.HashMap;
@@ -31,10 +31,10 @@ import com.absir.core.kernel.KernelString;
 @SuppressWarnings("unchecked")
 @Base
 @Bean
-public class LangResourceBundle {
+public class LangBundle {
 
 	/** ME */
-	public static final LangResourceBundle ME = BeanFactoryUtils.get(LangResourceBundle.class);
+	public static final LangBundle ME = BeanFactoryUtils.get(LangBundle.class);
 
 	/** langResource */
 	@Value(value = "lang.resouce", defaultValue = "${classPath}lang/")

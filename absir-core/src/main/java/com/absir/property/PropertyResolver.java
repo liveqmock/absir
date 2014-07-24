@@ -10,7 +10,6 @@ package com.absir.property;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import com.absir.bean.inject.InjectOnce;
 import com.absir.property.value.PropertyInfo;
 
 /**
@@ -18,7 +17,7 @@ import com.absir.property.value.PropertyInfo;
  * 
  */
 @SuppressWarnings({ "rawtypes" })
-public interface PropertyResolver<O extends PropertyObject> extends InjectOnce {
+public interface PropertyResolver<O extends PropertyObject> {
 
 	/**
 	 * @param property

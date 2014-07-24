@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
  * @author absir
  * 
  */
-@Target({ ElementType.FIELD, ElementType.METHOD })
+@Target({ ElementType.TYPE, ElementType.FIELD, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Inject {
 

@@ -15,6 +15,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import com.absir.bean.basis.Configure;
 import com.absir.bean.config.IBeanDefineEager;
 import com.absir.bean.core.BeanFactoryUtils;
+import com.absir.bean.inject.value.Inject;
 import com.absir.context.schedule.ScheduleFactory;
 import com.absir.core.dyna.DynaBinder;
 import com.absir.core.dyna.DynaConvert;
@@ -26,6 +27,7 @@ import com.absir.core.kernel.KernelLang.BreakException;
  * 
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
+@Inject
 @Configure
 public abstract class ContextUtils implements IBeanDefineEager {
 

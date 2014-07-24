@@ -14,6 +14,7 @@ import java.util.Set;
 import com.absir.appserv.system.service.impl.BeanServiceBase;
 import com.absir.appserv.system.service.impl.BeanServiceImpl;
 import com.absir.bean.core.BeanFactoryUtils;
+import com.absir.bean.inject.value.Inject;
 import com.absir.orm.transaction.TransactionAttribute;
 import com.absir.orm.transaction.value.Transaction;
 
@@ -22,6 +23,7 @@ import com.absir.orm.transaction.value.Transaction;
  * 
  */
 @SuppressWarnings("rawtypes")
+@Inject
 public interface BeanService {
 
 	/** ME */

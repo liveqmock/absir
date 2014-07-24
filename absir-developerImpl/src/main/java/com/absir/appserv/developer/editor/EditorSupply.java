@@ -11,6 +11,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
 import com.absir.appserv.system.bean.value.JaIngore;
+import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
 import com.absir.property.PropertySupply;
 
@@ -20,6 +21,9 @@ import com.absir.property.PropertySupply;
  */
 @Bean
 public class EditorSupply extends PropertySupply<EditorObject, EditorObject> {
+
+	/** EDITOR_SUPPLY */
+	public static final EditorSupply ME = BeanFactoryUtils.get(EditorSupply.class);
 
 	/*
 	 * (non-Javadoc)

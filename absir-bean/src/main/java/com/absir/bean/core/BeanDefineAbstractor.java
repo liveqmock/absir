@@ -10,6 +10,7 @@ package com.absir.bean.core;
 import com.absir.bean.basis.BeanDefine;
 import com.absir.bean.basis.BeanFactory;
 import com.absir.bean.basis.BeanScope;
+import com.absir.core.kernel.KernelClass;
 
 /**
  * @author absir
@@ -40,6 +41,19 @@ public abstract class BeanDefineAbstractor extends BeanDefineAbstract {
 		}
 
 		return getBeanObject(beanFactory, this, beanDefineRoot, beanDefineWrapper);
+	}
+
+	/**
+	 * @param type
+	 */
+	public static void loadInterfaces(Class<?> type) {
+		while (type != null && type != Object.class) {
+			for (Class<?> iCls : type.getInterfaces()) {
+				KernelClass.forName(iCls.getName());
+			}
+
+			type = type.getSuperclass();
+		}
 	}
 
 	/**

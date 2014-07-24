@@ -26,6 +26,7 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.metadata.ClassMetadata;
 
 import com.absir.bean.core.BeanFactoryUtils;
+import com.absir.bean.inject.value.Inject;
 import com.absir.core.kernel.KernelArray;
 import com.absir.core.kernel.KernelClass;
 import com.absir.core.kernel.KernelLang.BreakException;
@@ -44,6 +45,7 @@ import com.absir.property.PropertyUtils;
  * 
  */
 @SuppressWarnings("unchecked")
+@Inject
 public abstract class SessionFactoryUtils {
 
 	/** sessionFactoryBean */

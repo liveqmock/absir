@@ -43,6 +43,7 @@
 		<module>absir-js</module>
 		<module>achieve-sample</module>
 		<module>absir-test</module>
+		<module>absir-beetl</module>
 	</modules>
 	<dependencies>
 		<dependency>

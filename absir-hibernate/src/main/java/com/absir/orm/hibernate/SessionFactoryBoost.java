@@ -24,7 +24,6 @@ import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.type.BasicType;
 
 import com.absir.bean.basis.Base;
-import com.absir.bean.inject.InjectOnce;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Inject;
 import com.absir.bean.inject.value.InjectType;
@@ -43,7 +42,7 @@ import com.absir.orm.value.JiRelation;
 @SuppressWarnings("unchecked")
 @Base
 @Bean
-public class SessionFactoryBoost implements InjectOnce {
+public class SessionFactoryBoost  {
 
 	@Inject(type = InjectType.Selectable)
 	private BasicType[] basicTypes;

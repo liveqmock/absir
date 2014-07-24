@@ -44,7 +44,6 @@ import com.absir.appserv.system.bean.value.JeEditable;
 import com.absir.appserv.system.helper.HelperJson;
 import com.absir.appserv.system.helper.HelperLang;
 import com.absir.appserv.system.service.CrudService;
-import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.binder.BinderUtils;
 import com.absir.core.base.IBase;
 import com.absir.core.dyna.DynaBinder;
@@ -486,9 +485,6 @@ public class EntityField extends DBField {
 		}
 	}
 
-	/** EDITOR_SUPPLY */
-	private static final EditorSupply EDITOR_SUPPLY = BeanFactoryUtils.get(EditorSupply.class);
-
 	/**
 	 * @param name
 	 * @param joEntity
@@ -509,11 +505,11 @@ public class EntityField extends DBField {
 
 		ValidatorSupply validatorSupply = BinderUtils.getValidatorSupply();
 		validatorSupply.getPropertyMap(joEntity.getEntityClass());
-		Map<String, PropertyData> propertyMap = EDITOR_SUPPLY.getPropertyMap(joEntity.getEntityClass());
+		Map<String, PropertyData> propertyMap = EditorSupply.ME.getPropertyMap(joEntity.getEntityClass());
 		for (Entry<String, PropertyData> entry : propertyMap.entrySet()) {
 			PropertyData propertyData = entry.getValue();
 			Property property = propertyData.getProperty();
-			EditorObject editorObject = EDITOR_SUPPLY.getPropertyObject(entry.getValue());
+			EditorObject editorObject = EditorSupply.ME.getPropertyObject(entry.getValue());
 			if (editorObject == null || property.getAllow() < 0 || isTransientField(property, editorObject)) {
 				continue;
 			}

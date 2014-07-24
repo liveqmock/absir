@@ -64,6 +64,17 @@ public class DynaBinder {
 	}
 
 	/**
+	 * @param parameters
+	 * @param parameterTypes
+	 */
+	public static void to(Object[] parameters, Class<?>[] parameterTypes) {
+		int length = parameters.length;
+		for (int i = 0; i < length; i++) {
+			parameters[i] = to(parameters[i], parameterTypes[i]);
+		}
+	}
+
+	/**
 	 * @param map
 	 * @param toClass
 	 * @return

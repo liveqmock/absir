@@ -15,9 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.beetl.core.Configuration;
 import org.beetl.core.GroupTemplate;
-import org.beetl.core.ResourceLoader;
 import org.beetl.core.Template;
-import org.beetl.core.resource.FileResourceLoader;
 import org.beetl.core.resource.WebAppResourceLoader;
 import org.beetl.ext.web.WebRender;
 
@@ -38,7 +36,7 @@ import com.absir.servlet.InputRequest;
  */
 @Base(order = -1)
 @Bean
-public class WebBeetlView extends ReturnedResolverView implements IWebBeetl {
+public class WebBeetlView extends ReturnedResolverView {
 
 	/** ME */
 	public static final WebBeetlView ME = BeanFactoryUtils.get(WebBeetlView.class);
@@ -75,25 +73,6 @@ public class WebBeetlView extends ReturnedResolverView implements IWebBeetl {
 
 		for (IWebBeetl webBeetl : BeanFactoryUtils.getOrderBeanObjects(IWebBeetl.class)) {
 			webBeetl.process(groupTemplate);
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.absir.appserv.support.web.IBeetlProcessor#process(org.beetl.core.
-	 * GroupTemplate)
-	 */
-	@Override
-	public void process(GroupTemplate groupTemplate) {
-		// TODO Auto-generated method stub
-		ResourceLoader resourceLoader = groupTemplate.getResourceLoader();
-		if (resourceLoader instanceof FileResourceLoader) {
-			Boolean autoCheck = BeanFactoryUtils.getBeanConfig().getExpressionValue("web.beetl.autoCheck", null, Boolean.class);
-			if (autoCheck != null) {
-				((FileResourceLoader) resourceLoader).setAutoCheck(autoCheck);
-			}
 		}
 	}
 

@@ -19,14 +19,12 @@ import javax.persistence.Entity;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.internal.SessionFactoryImpl;
-import org.hibernate.type.BasicType;
 
 import com.absir.bean.basis.Basis;
 import com.absir.bean.basis.BeanDefine;
 import com.absir.bean.config.IBeanDefineSupply;
 import com.absir.bean.config.IBeanFactoryAware;
 import com.absir.bean.core.BeanFactoryImpl;
-import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.InjectOnce;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Inject;

@@ -14,13 +14,13 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import com.absir.appserv.support.developer.IDeveloper;
+import com.absir.appserv.system.helper.HelperString;
 import com.absir.bean.basis.Configure;
 import com.absir.bean.core.BeanFactoryUtils;
-import com.absir.bean.inject.value.Inject;
-import com.absir.bean.inject.value.InjectType;
 import com.absir.core.kernel.KernelLang.CallbackTemplate;
 import com.absir.core.kernel.KernelLang.ObjectEntry;
 import com.absir.core.kernel.KernelObject;
+import com.absir.core.kernel.KernelString;
 import com.absir.core.util.UtilFile;
 import com.absir.orm.value.JoEntity;
 
@@ -32,15 +32,11 @@ import com.absir.orm.value.JoEntity;
 @Configure
 public abstract class Developer {
 
-	/** developer */
-	@Inject(type = InjectType.Selectable)
-	private static IDeveloper developer;
-
 	/**
 	 * @return
 	 */
 	public static boolean isDeveloper() {
-		return developer != null;
+		return IDeveloper.ME != null;
 	}
 
 	/** CLASS_FILE_EXTENSION */
@@ -68,7 +64,7 @@ public abstract class Developer {
 	}
 
 	/** RUNTIME_PATH */
-	public static final String RUNTIME_PATH = "/META-RUNTIME/";
+	public static final String RUNTIME_PATH = "META-RUNTIME/";
 
 	/** RUMTIME_LISTENERS */
 	private static final List<CallbackTemplate<Entry<String, File>>> RUMTIME_LISTENERS = new ArrayList<CallbackTemplate<Entry<String, File>>>();
@@ -85,6 +81,26 @@ public abstract class Developer {
 	 */
 	public synchronized static void removeListener(CallbackTemplate<Entry<String, File>> listener) {
 		RUMTIME_LISTENERS.remove(listener);
+	}
+
+	/**
+	 * @param entry
+	 */
+	public static void doEntry(Entry<String, File> entry) {
+		for (CallbackTemplate<Entry<String, File>> listener : RUMTIME_LISTENERS) {
+			listener.doWith(entry);
+		}
+	}
+
+	/**
+	 * @param file
+	 */
+	public static void doEntry(File file) {
+		String path = file.getPath();
+		path = HelperString.substringAfter(path, BeanFactoryUtils.getBeanConfig().getClassPath());
+		if (!KernelString.isEmpty(path)) {
+			doEntry(new ObjectEntry<String, File>(path, file));
+		}
 	}
 
 	/**
@@ -125,11 +141,9 @@ public abstract class Developer {
 			UtilFile.write(runtimeFile, KernelObject.serialize(value));
 			if (RUMTIME_LISTENERS.size() > 0) {
 				ObjectEntry<String, File> entry = new ObjectEntry<String, File>();
-				entry.setKey(runtimeName);
+				entry.setKey(RUNTIME_PATH + runtimeName);
 				entry.setValue(runtimeFile);
-				for (CallbackTemplate<Entry<String, File>> listener : RUMTIME_LISTENERS) {
-					listener.doWith(entry);
-				}
+				doEntry(entry);
 			}
 
 		} catch (IOException e) {

@@ -43,6 +43,7 @@ import com.absir.appserv.system.bean.value.JaEmbedd;
 import com.absir.appserv.system.bean.value.JeEditable;
 import com.absir.appserv.system.helper.HelperJson;
 import com.absir.appserv.system.helper.HelperLang;
+import com.absir.appserv.system.helper.HelperString;
 import com.absir.appserv.system.service.CrudService;
 import com.absir.binder.BinderUtils;
 import com.absir.core.base.IBase;
@@ -99,7 +100,8 @@ public class EntityField extends DBField {
 
 		generated = editorObject.isGenerated();
 		embedd = editorObject.isEmbedd();
-		caption = HelperLang.getFieldCaption(editorObject.getLang(), editorObject.getTag(), name, joEntity.getEntityClass());
+		String field = HelperString.substringAfter(name, ".");
+		caption = HelperLang.getFieldCaption(editorObject.getLang(), editorObject.getTag(), KernelString.isEmpty(field) ? name : field, joEntity.getEntityClass());
 
 		// set joEntity
 		Accessor accessor = null;
@@ -545,6 +547,9 @@ public class EntityField extends DBField {
 
 					} else if (entityField.getEditable() == JeEditable.OPTIONAL) {
 						entityModel.addGroupField("optional", entityField);
+
+					} else if (entityField.getEditable() == JeEditable.LOCKED) {
+						entityModel.addGroupField("locked", entityField);
 					}
 				}
 			}

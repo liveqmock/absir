@@ -252,6 +252,5 @@ public class AopDefineProcessor implements IBeanDefineSupply, IBeanDefineProcess
 	@Override
 	public void afterRegister(BeanFactoryImpl beanFactory) {
 		// TODO Auto-generated method stub
-		BeanFactoryUtils.get().unRegisterBeanType(AopMethodDefine.class);
 	}
 }

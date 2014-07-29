@@ -20,6 +20,8 @@ import org.beetl.core.Function;
 import org.beetl.core.GroupTemplate;
 import org.beetl.core.ResourceLoader;
 import org.beetl.core.Tag;
+import org.beetl.core.Template;
+import org.beetl.core.misc.BeetlUtil;
 import org.beetl.core.resource.FileResourceLoader;
 
 import com.absir.appserv.support.web.WebBeetlDefine.BeetlConfigureFound;
@@ -29,6 +31,7 @@ import com.absir.appserv.support.web.value.BaTag;
 import com.absir.bean.basis.Basis;
 import com.absir.bean.basis.BeanDefine;
 import com.absir.bean.basis.BeanScope;
+import com.absir.bean.basis.Environment;
 import com.absir.bean.config.IBeanDefineSupply;
 import com.absir.bean.core.BeanFactoryImpl;
 import com.absir.bean.core.BeanFactoryUtils;
@@ -76,8 +79,19 @@ public class WebBeetlDefine implements IBeanDefineSupply, IMethodSupport<BeetlCo
 					public Object call(Object[] paras, Context ctx) {
 						// TODO Auto-generated method stub
 						try {
-							DynaBinder.to(paras, parameterTypes);
-							return method.invoke(object, paras);
+							int length = paras.length;
+							if (length == 0) {
+								return method.invoke(object, ctx);
+							}
+
+							Object[] parameters = new Object[length + 1];
+							parameters[0] = ctx;
+							for (int i = 0; i < length; i++) {
+								parameters[i + 1] = paras[i];
+							}
+
+							DynaBinder.to(parameters, parameterTypes);
+							return method.invoke(object, parameters);
 
 						} catch (Throwable e) {
 							// TODO Auto-generated catch block
@@ -301,5 +315,55 @@ public class WebBeetlDefine implements IBeanDefineSupply, IMethodSupport<BeetlCo
 				groupTemplate.registerTag(entry.getKey(), entry.getValue());
 			}
 		}
+	}
+
+	/**
+	 * 引入文件方法
+	 * 
+	 * @param ctx
+	 * @param path
+	 */
+	@BaFunction
+	public static void include(Context ctx, String path) {
+		String resourceId = ctx.getResourceId();
+		String relPath = BeetlUtil.getRelPath(resourceId, path);
+		Template t = ctx.gt.getTemplate(relPath, resourceId);
+		// 快速复制父模板的变量
+		t.binding(ctx.globalVar);
+		if (ctx.objectKeys != null && !ctx.objectKeys.isEmpty()) {
+			t.dynamic(ctx.objectKeys);
+		}
+
+		t.renderTo(ctx.byteWriter);
+	}
+
+	/**
+	 * 引入文件方法(忽略异常)
+	 * 
+	 * @param ctx
+	 * @param path
+	 */
+	@BaFunction(name = "@include")
+	public static void includeThrowable(Context ctx, String path) {
+		try {
+			include(ctx, path);
+
+		} catch (Throwable e) {
+			// TODO: handle exception
+			if (BeanFactoryUtils.getEnvironment().compareTo(Environment.DEBUG) <= 0) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	/**
+	 * 引入生成模版文件
+	 * 
+	 * @param ctx
+	 * @param path
+	 * @param render
+	 */
+	public static void includeRender(Context ctx, String path, String render) {
+		
 	}
 }

@@ -7,14 +7,19 @@
  */
 package com.absir.appserv.support.web;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.jsp.PageContext;
 
+import com.absir.appserv.support.developer.IRender;
 import com.absir.bean.basis.Base;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Value;
@@ -30,7 +35,7 @@ import com.absir.servlet.InputRequest;
 
 @Base(order = -1)
 @Bean
-public class WebJstlView extends ReturnedResolverView {
+public class WebJstlView extends ReturnedResolverView implements IRender {
 
 	@Value("web.view.prefix")
 	private String prefix = "/WEB-INF/jsp/";
@@ -79,6 +84,9 @@ public class WebJstlView extends ReturnedResolverView {
 		}
 	}
 
+	/** REQUEST_INPUT */
+	protected static final String REQUEST_INPUT = WebJstlView.class.getName() + "@INPUT";
+
 	/**
 	 * @param view
 	 * @param input
@@ -94,7 +102,7 @@ public class WebJstlView extends ReturnedResolverView {
 			request.setAttribute(entry.getKey(), entry.getValue());
 		}
 
-		request.setAttribute(WebJsplUtils.REQUEST_INPUT_NAME, input);
+		request.setAttribute(REQUEST_INPUT, input);
 		renderMergeOutputLayout(view, request, response, new WebResponseWrapper(response), LAYOUT_ITERATE_DEPTH);
 	}
 
@@ -172,6 +180,82 @@ public class WebJstlView extends ReturnedResolverView {
 
 		if (content != null) {
 			response.getWriter().append(content);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.support.developer.IRender#include(java.lang.String,
+	 * java.lang.Object[])
+	 */
+	@Override
+	public void include(String path, Object... renders) throws IOException {
+		// TODO Auto-generated method stub
+		try {
+			WebJsplUtils.include(path, (PageContext) renders[0], (HttpServletRequest) renders[1], (HttpServletResponse) renders[2]);
+
+		} catch (ServletException e) {
+			// TODO Auto-generated catch block
+			throw new IOException(e);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.support.developer.IRender#getPath(java.lang.Object[])
+	 */
+	@Override
+	public String getPath(Object... renders) throws IOException {
+		// TODO Auto-generated method stub
+		return WebJsplUtils.getServletPath((PageContext) renders[0]);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.support.developer.IRender#getFullPath(java.lang.String,
+	 * java.lang.Object[])
+	 */
+	@Override
+	public String getFullPath(String path, Object... renders) throws IOException {
+		// TODO Auto-generated method stub
+		return WebJsplUtils.getFullIncludePath(path, (PageContext) renders[0]);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.support.developer.IRender#getRealPath(java.lang.String,
+	 * java.lang.Object[])
+	 */
+	@Override
+	public String getRealPath(String path, Object... renders) throws IOException {
+		// TODO Auto-generated method stub
+		return InDispathFilter.getServletContext().getRealPath(path);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.support.developer.IRender#rend(java.io.OutputStream,
+	 * java.lang.String, java.lang.Object[])
+	 */
+	@Override
+	public void rend(OutputStream outputStream, String path, Object... renders) throws IOException {
+		// TODO Auto-generated method stub
+		try {
+			WebJsplUtils.render(outputStream, path, (HttpServletRequest) renders[1], (HttpServletResponse) renders[2]);
+
+		} catch (ServletException e) {
+			// TODO Auto-generated catch block
+			throw new IOException(e);
 		}
 	}
 }

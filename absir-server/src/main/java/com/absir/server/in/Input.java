@@ -22,6 +22,7 @@ import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.binder.BinderData;
 import com.absir.context.core.Bean;
 import com.absir.context.core.ContextUtils;
+import com.absir.context.lang.LangBundle;
 import com.absir.server.on.OnPut;
 import com.absir.server.route.RouteAction;
 import com.absir.server.route.RouteEntry;
@@ -40,6 +41,9 @@ public abstract class Input extends Bean<Serializable> implements IAttributes {
 
 	/** locale */
 	private Locale locale;
+
+	/** resourceBundle */
+	protected Map<String, String> resourceBundle;
 
 	/** dispatcher */
 	private IDispatcher dispatcher;
@@ -68,10 +72,10 @@ public abstract class Input extends Bean<Serializable> implements IAttributes {
 	 * @return the locale
 	 */
 	public Locale getLocale() {
-		if(locale == null) {
-			//get
+		if (locale == null) {
+			locale = getLocaled();
 		}
-		
+
 		return locale;
 	}
 
@@ -79,8 +83,42 @@ public abstract class Input extends Bean<Serializable> implements IAttributes {
 	 * @param locale
 	 *            the locale to set
 	 */
-	public void setLocale(Locale locale) {
-		this.locale = locale;
+	public void setLocale(Locale value) {
+		if (value != locale) {
+			locale = value;
+			resourceBundle = null;
+		}
+	}
+
+	/**
+	 * @param lang
+	 * @return
+	 */
+	public String getLang(String lang) {
+		Locale locale = getLocale();
+		if (resourceBundle == null) {
+			resourceBundle = LangBundle.ME.getResourceBundle(locale);
+		}
+
+		return LangBundle.ME.getLangResource(lang, resourceBundle, locale);
+	}
+
+	/**
+	 * @param lang
+	 * @return
+	 */
+	public String getLangValue(String lang) {
+		return getLangValue(lang, lang);
+	}
+
+	/**
+	 * @param lang
+	 * @param value
+	 * @return
+	 */
+	public String getLangValue(String lang, String value) {
+		LangBundle.ME.getResourceBundle().put(lang, value);
+		return getLang(lang);
 	}
 
 	/**
@@ -167,6 +205,13 @@ public abstract class Input extends Bean<Serializable> implements IAttributes {
 		}
 
 		return binderData;
+	}
+
+	/**
+	 * @return
+	 */
+	protected Locale getLocaled() {
+		return LangBundle.ME.getLocale();
 	}
 
 	/**

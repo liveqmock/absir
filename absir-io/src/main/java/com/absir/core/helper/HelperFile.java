@@ -14,16 +14,22 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.FileUtils;
 
 import com.absir.core.kernel.KernelLang.CallbackBreak;
+import com.absir.core.kernel.KernelString;
 
 /**
  * @author absir
@@ -271,6 +277,65 @@ public class HelperFile extends FileUtils {
 		// Do this last, as the above has probably affected directory metadata
 		if (preserveFileDate) {
 			destDir.setLastModified(srcDir.lastModified());
+		}
+	}
+
+	/**
+	 * @param url
+	 * @param destDir
+	 * @param overWrite
+	 * @param preserveFileDate
+	 * @throws IOException
+	 */
+	public static void copyDirectoryOverWrite(URL url, File destDir, boolean overWrite, FileFilter filter, boolean preserveFileDate) throws IOException {
+		URLConnection urlConnection = url.openConnection();
+		if (urlConnection instanceof JarURLConnection) {
+			copyDirectoryOverWrite((JarURLConnection) urlConnection, destDir, overWrite, filter, preserveFileDate);
+
+		} else {
+			copyDirectoryOverWrite(new File(url.getFile()), destDir, overWrite, filter, preserveFileDate);
+		}
+	}
+
+	/**
+	 * @param jarURLConnection
+	 * @param destDir
+	 * @param overWrite
+	 * @param preserveFileDate
+	 * @throws IOException
+	 */
+	public static void copyDirectoryOverWrite(JarURLConnection jarURLConnection, File destDir, boolean overWrite, FileFilter filter, boolean preserveFileDate) throws IOException {
+		JarFile jarFile = jarURLConnection.getJarFile();
+		Enumeration<JarEntry> enumeration = jarFile.entries();
+		String entryName = jarURLConnection.getEntryName();
+		int entryLength = entryName.length();
+		String destPath = destDir.getPath();
+		while (enumeration.hasMoreElements()) {
+			JarEntry jarEntry = enumeration.nextElement();
+			String filename = jarEntry.getName();
+			if (filename.startsWith(entryName)) {
+				filename = KernelString.leftSubString(filename, entryLength);
+				if (!jarEntry.isDirectory()) {
+					File destFile = new File(destPath + filename);
+					if ((overWrite || !destFile.exists()) && (filter == null || filter.accept(destFile))) {
+						InputStream inputStream = null;
+						try {
+							inputStream = jarFile.getInputStream(jarEntry);
+							HelperFile.copyInputStreamToFile(inputStream, destFile);
+
+						} finally {
+							if (inputStream != null) {
+								try {
+									inputStream.close();
+
+								} catch (Exception e) {
+									// TODO: handle exception
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 }

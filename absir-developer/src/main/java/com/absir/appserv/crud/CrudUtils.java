@@ -24,8 +24,6 @@ import com.absir.appserv.system.bean.value.JaCrud;
 import com.absir.appserv.system.crud.value.ICrudBean;
 import com.absir.bean.basis.Configure;
 import com.absir.bean.core.BeanFactoryUtils;
-import com.absir.bean.inject.value.Inject;
-import com.absir.bean.inject.value.InjectType;
 import com.absir.core.kernel.KernelArray;
 import com.absir.core.kernel.KernelLang;
 import com.absir.core.kernel.KernelLang.PropertyFilter;
@@ -41,10 +39,6 @@ import com.absir.orm.value.JoEntity;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 @Configure
 public abstract class CrudUtils {
-
-	/** crudDeveloper */
-	@Inject(type = InjectType.Selectable)
-	static IDeveloper crudDeveloper;
 
 	/** Entity_Name_Map_Crud_Entity */
 	private static final Map<JoEntity, CrudEntity> Jo_Entity_Map_Crud_Entity = new HashMap<JoEntity, CrudEntity>();
@@ -139,11 +133,11 @@ public abstract class CrudUtils {
 				filter = Jo_Entity_Map_Crud_Filter.get(joEntity);
 				if (filter == null) {
 					String runtimeName = UtilRuntime.getRuntimeName(CrudUtils.class, "crudFiters/" + joEntity);
-					if (crudDeveloper == null) {
+					if (IDeveloper.ME == null) {
 						filter = (Boolean) Developer.getRuntime(runtimeName);
 
 					} else {
-						IModel model = crudDeveloper.getModelEntity(joEntity);
+						IModel model = IDeveloper.ME.getModelEntity(joEntity);
 						filter = model == null ? false : model.isFilter();
 						Developer.setRuntime(runtimeName, filter);
 					}
@@ -172,11 +166,11 @@ public abstract class CrudUtils {
 				fields = Jo_Entity_Map_Crud_Fields.get(crudFieldsKey);
 				if (fields == null) {
 					String runtimeName = UtilRuntime.getRuntimeName(CrudUtils.class, "crudFields/" + crudFieldsKey);
-					if (crudDeveloper == null) {
+					if (IDeveloper.ME == null) {
 						fields = (String[]) Developer.getRuntime(runtimeName);
 
 					} else {
-						fields = crudDeveloper.getCrudFields(joEntity, group);
+						fields = IDeveloper.ME.getCrudFields(joEntity, group);
 						// if (fields != null) {
 						Developer.setRuntime(runtimeName, fields);
 						// }
@@ -465,12 +459,11 @@ public abstract class CrudUtils {
 
 		List<JCrudField> crudFields = null;
 		String runtimeName = UtilRuntime.getRuntimeName(CrudUtils.class, "Crud_Fields_" + joEntity.toString());
-		if (crudDeveloper == null) {
+		if (IDeveloper.ME == null) {
 			crudFields = (List<JCrudField>) UtilRuntime.getRuntime(runtimeName);
 
 		} else {
-			crudFields = crudDeveloper.getCrudFields(joEntity);
-
+			crudFields = IDeveloper.ME.getCrudFields(joEntity);
 		}
 
 		if (crudFields == null) {

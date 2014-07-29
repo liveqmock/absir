@@ -189,6 +189,5 @@ public class SessionFactoryScanner implements IBeanDefineSupply, IBeanFactoryAwa
 	@Override
 	public void afterRegister(BeanFactoryImpl beanFactory) {
 		// TODO Auto-generated method stub
-		BeanFactoryUtils.get().unRegisterBeanType(BasicType.class);
 	}
 }

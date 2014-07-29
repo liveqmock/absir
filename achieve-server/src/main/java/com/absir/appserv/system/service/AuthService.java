@@ -241,43 +241,60 @@ public class AuthService {
 		}
 
 		String[] fields = CrudUtils.getCrudFields(joEntity, "option");
+		Map<String, JeVote> fieldVotes = null;
 		if (fields == null || fields.length == 0) {
 			// 无过滤字段
-			if (permission(joEntity.getEntityName(), user, votePermission)) {
+			if (!permission(joEntity.getEntityName(), user, votePermission)) {
+				throw new ServerException(ServerStatus.ON_DENIED);
+			}
+
+		} else {
+			JMaMenu maMenu = BeanDao.get(BeanDao.getSession(), JMaMenu.class, joEntity.getEntityName());
+			if (maMenu == null || maMenu.getPermissions() == null) {
+				throw new ServerException(ServerStatus.ON_DENIED);
+			}
+
+			// 字段投票器
+			fieldVotes = new HashMap<String, JeVote>();
+			for (String field : fields) {
+				fieldVotes.put(field, null);
+			}
+
+			// 匿名用户
+			if (user == null) {
+				permissionFilter(maMenu, -1L, fieldVotes);
+				return permissionFilter(fieldVotes);
+			}
+
+			// 开发者用户
+			if (user.isDeveloper()) {
 				return null;
 			}
 
-			throw new ServerException(ServerStatus.ON_DENIED);
+			// 所有用户
+			permissionFilter(maMenu, 0L, fieldVotes);
+
+			// 用户角色
+			for (JiUserRole userRole : user.userRoles()) {
+				permissionFilter(maMenu, userRole.getId(), fieldVotes);
+			}
 		}
 
-		JMaMenu maMenu = BeanDao.get(BeanDao.getSession(), JMaMenu.class, joEntity.getEntityName());
-		if (maMenu == null || maMenu.getPermissions() == null) {
-			throw new ServerException(ServerStatus.ON_DENIED);
-		}
+		// 锁定字段
+		String[] lockeds = CrudUtils.getCrudFields(joEntity, "locked");
+		if (lockeds == null || lockeds.length == 0) {
+			if (fieldVotes == null) {
+				return null;
+			}
 
-		// 字段投票器
-		Map<String, JeVote> fieldVotes = new HashMap<String, JeVote>();
-		for (String field : fields) {
-			fieldVotes.put(field, null);
-		}
+		} else {
+			if (fieldVotes == null) {
+				fieldVotes = new HashMap<String, JeVote>();
+			}
 
-		// 匿名用户
-		if (user == null) {
-			permissionFilter(maMenu, -1L, fieldVotes);
-			return permissionFilter(fieldVotes);
-		}
-
-		// 开发者用户
-		if (user.isDeveloper()) {
-			return null;
-		}
-
-		// 所有用户
-		permissionFilter(maMenu, 0L, fieldVotes);
-
-		// 用户角色
-		for (JiUserRole userRole : user.userRoles()) {
-			permissionFilter(maMenu, userRole.getId(), fieldVotes);
+			for (String locked : lockeds) {
+				fieldVotes.put(locked, null);
+			}
 		}
 
 		return permissionFilter(fieldVotes);

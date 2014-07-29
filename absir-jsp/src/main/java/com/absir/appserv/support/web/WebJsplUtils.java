@@ -10,6 +10,7 @@ package com.absir.appserv.support.web;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.Collection;
@@ -37,15 +38,12 @@ import com.absir.server.in.Input;
  */
 public class WebJsplUtils {
 
-	/** REQUEST_INPUT_NAME */
-	protected static final String REQUEST_INPUT_NAME = WebJsplUtils.class.getName() + "@REQUEST_INPUT_NAME";
-
 	/**
 	 * @param request
 	 * @return
 	 */
 	public static Input getInput(ServletRequest request) {
-		return (Input) request.getAttribute(REQUEST_INPUT_NAME);
+		return (Input) request.getAttribute(WebJstlView.REQUEST_INPUT);
 	}
 
 	/**
@@ -171,7 +169,7 @@ public class WebJsplUtils {
 	 * @param pageContext
 	 * @return
 	 */
-	public static String getFullExsitIncludePath(String includePath, PageContext pageContext) {
+	public static String getFullExistIncludePath(String includePath, PageContext pageContext) {
 		includePath = getFullIncludePath(includePath, pageContext);
 		try {
 			if (pageContext.getServletContext().getResource(includePath) != null) {
@@ -232,8 +230,8 @@ public class WebJsplUtils {
 	 * @throws ServletException
 	 * @throws IOException
 	 */
-	public static boolean includeExsit(String includePath, PageContext pageContext, ServletRequest request, ServletResponse response) throws ServletException, IOException {
-		includePath = getFullExsitIncludePath(includePath, pageContext);
+	public static boolean includeExist(String includePath, PageContext pageContext, ServletRequest request, ServletResponse response) throws ServletException, IOException {
+		includePath = getFullExistIncludePath(includePath, pageContext);
 		if (includePath != null) {
 			include(includePath, pageContext, request, response);
 			return true;
@@ -249,7 +247,7 @@ public class WebJsplUtils {
 	 * @throws UnsupportedEncodingException
 	 * @throws IOException
 	 */
-	public static void render(FileOutputStream output, String includeContent, ServletResponse response) throws UnsupportedEncodingException, IOException {
+	public static void render(OutputStream output, String includeContent, ServletResponse response) throws UnsupportedEncodingException, IOException {
 		output.write(includeContent.getBytes(response.getCharacterEncoding()));
 	}
 
@@ -262,7 +260,7 @@ public class WebJsplUtils {
 	 * @throws IOException
 	 * @throws ServletException
 	 */
-	public static void render(FileOutputStream output, String includePath, ServletRequest request, ServletResponse response) throws UnsupportedEncodingException, IOException, ServletException {
+	public static void render(OutputStream output, String includePath, ServletRequest request, ServletResponse response) throws UnsupportedEncodingException, IOException, ServletException {
 		render(output, getIncludeContent(includePath, request, response), response);
 	}
 

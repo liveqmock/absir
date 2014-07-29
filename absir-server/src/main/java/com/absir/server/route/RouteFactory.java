@@ -400,8 +400,6 @@ public class RouteFactory implements IBeanDefineSupply, IBeanFactoryAware, IMeth
 		}
 
 		routeMapping.getRouteAdapter().registerAllMatcher();
-		BeanFactoryUtils.get().unRegisterBeanType(ParameterResolver.class, ReturnedResolver.class);
-		beanFactory.unRegisterBeanObject(BeanDefineType.getBeanName(null, RouteFactory.class));
 	}
 
 	/**

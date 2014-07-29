@@ -48,14 +48,24 @@ public class DeveloperService implements IDeveloper {
 	 */
 	@Started
 	protected static void postConstruct() {
-		// DeveloperService.class.getResource(arg0)
-		// HelperFile.copyDirectoryToDirectory(srcDir, destDir)
-		// new File(arg0)
 		if (developerWeb != null) {
-			String contextPath = HelperFileName.normalizeNoEndSeparator(developerWeb + "/../../../");
-			if ((HelperFileName.getName(contextPath)).equals(HelperFileName.getName(HelperFileName.normalizeNoEndSeparator(BeanFactoryUtils.getBeanConfig().getClassPath() + "/../../")))) {
-				final String resourcesPath = contextPath + "/src/main/resources";
+			String developePath = HelperFileName.normalizeNoEndSeparator(developerWeb + "/../../../");
+			String deployPath = HelperFileName.normalizeNoEndSeparator(BeanFactoryUtils.getBeanConfig().getClassPath() + "/../../");
+			if ((HelperFileName.getName(developePath)).equals(HelperFileName.getName(deployPath))) {
+				final String resourcesPath = developePath + "/src/main/resources/";
 				if (HelperFile.directoryExists(resourcesPath)) {
+					// 复制开发文件到开发环境
+					if (IDeveloper.ME != null) {
+						try {
+							HelperFile.copyDirectoryOverWrite(IDeveloper.ME.getClass().getResource("/deploy"), new File(deployPath), false, null, true);
+							HelperFile.copyDirectoryOverWrite(IDeveloper.ME.getClass().getResource("/deploy"), new File(developerWeb), false, null, true);
+
+						} catch (Throwable e) {
+							// TODO: handle exception
+							e.printStackTrace();
+						}
+					}
+
 					// 复制缓存文件到开发环境
 					Developer.addListener(new CallbackTemplate<Entry<String, File>>() {
 
@@ -63,7 +73,7 @@ public class DeveloperService implements IDeveloper {
 						public void doWith(Entry<String, File> template) {
 							// TODO Auto-generated method stub
 							try {
-								HelperFile.copyFile(template.getValue(), new File(resourcesPath + Developer.RUNTIME_PATH + template.getKey()));
+								HelperFile.copyFile(template.getValue(), new File(resourcesPath + template.getKey()));
 
 							} catch (IOException e) {
 								// TODO Auto-generated catch block
@@ -159,5 +169,18 @@ public class DeveloperService implements IDeveloper {
 		}
 
 		return KernelCollection.toArray(crudFields, String.class);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.support.developer.IDeveloper#generate(java.lang.String,
+	 * java.lang.String, java.lang.Object[])
+	 */
+	@Override
+	public void generate(String filepath, String includePath, Object... renders) throws IOException {
+		// TODO Auto-generated method stub
+		DeveloperUtils.generateRenders(filepath, includePath, renders);
 	}
 }

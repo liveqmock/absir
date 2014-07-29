@@ -11,6 +11,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.absir.bean.basis.Base;
 import com.absir.bean.basis.Environment;
@@ -93,7 +94,7 @@ public class LangBundle {
 	@Inject
 	protected void initBundle() {
 		Long reload = BeanFactoryUtils.getBeanConfigValue("local.reload", Long.class);
-		setReloadTime(reload == null ? BeanFactoryUtils.getEnvironment().compareTo(Environment.DEBUG) <= 0 ? -1 : 0 : reload);
+		setReloadTime(reload == null ? BeanFactoryUtils.getEnvironment().compareTo(Environment.DEVELOP) <= 0 ? -1 : 0 : reload);
 		String language = BeanFactoryUtils.getBeanConfigValue("local.language", String.class);
 		String country = BeanFactoryUtils.getBeanConfigValue("local.country", String.class);
 		String variant = BeanFactoryUtils.getBeanConfigValue("local.variant", String.class);
@@ -126,6 +127,13 @@ public class LangBundle {
 	/**
 	 * @return
 	 */
+	public Locale getLocale() {
+		return locale;
+	}
+
+	/**
+	 * @return
+	 */
 	public Map<String, String> getResourceBundle() {
 		if (reloadTime < 0) {
 			return getResourceBundle(locale);
@@ -145,8 +153,8 @@ public class LangBundle {
 	public void setResourceLang(String name, String lang) {
 		Map<String, String> resourceBundle = getResourceBundle();
 		if (!resourceBundle.containsKey(name)) {
-			resourceBundle.put(name, lang);
 			resourceLangs.put(name, lang);
+			resourceBundle.put(name, lang);
 		}
 	}
 
@@ -187,12 +195,29 @@ public class LangBundle {
 						}
 					}
 				}
-
-				return resourceBundle;
 			}
 		}
 
-		return locale == this.locale ? new HashMap<String, String>() : getResourceBundle();
+		if (locale == this.locale) {
+			if (resourceBundle == null) {
+				resourceBundle = new HashMap<String, String>();
+			}
+
+			this.resourceBundle = resourceBundle;
+			for (Entry<String, String> entry : resourceLangs.entrySet()) {
+				if (!resourceBundle.containsKey(entry.getKey())) {
+					resourceBundle.put(entry.getKey(), entry.getValue());
+				}
+			}
+
+			return resourceBundle;
+		}
+
+		if (resourceBundle == null) {
+			resourceBundle = getResourceBundle();
+		}
+
+		return resourceBundle;
 	}
 
 	/**
@@ -217,13 +242,10 @@ public class LangBundle {
 	 * @param locale
 	 * @return
 	 */
-	public String getLangResource(String lang, Map<String, String> resouceBunlde, Locale locale) {
-		String value = resouceBunlde.get(lang);
+	public String getLangResource(String lang, Map<String, String> resourceBundle, Locale locale) {
+		String value = resourceBundle.get(lang);
 		if (value == null) {
-			value = getResourceBundle().get(lang);
-			if (value == null) {
-				value = lang;
-			}
+			value = lang;
 		}
 
 		return value;

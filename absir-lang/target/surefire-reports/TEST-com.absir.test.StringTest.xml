@@ -61,5 +61,5 @@
     <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
-  <testcase time="0.018" classname="com.absir.test.StringTest" name="test"/>
+  <testcase time="0.013" classname="com.absir.test.StringTest" name="test"/>
 </testsuite>

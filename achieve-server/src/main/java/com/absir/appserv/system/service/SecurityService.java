@@ -235,6 +235,10 @@ public abstract class SecurityService implements ISecurityService {
 	public void logout(String name, Input input) {
 		// TODO Auto-generated method stub
 		SecurityContext securityContext = getSecurityContext(input);
+		if (securityContext == null) {
+			securityContext = autoLogin(name, false, 0, input);
+		}
+
 		if (securityContext != null) {
 			// 销毁之前的登录
 			securityContext.setSecuritySupply(null);

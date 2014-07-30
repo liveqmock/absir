@@ -106,7 +106,7 @@ public class DeveloperUtils {
 
 			EntityModel entityModel = joEntity == null ? null : ModelFactory.getModelEntity((JoEntity) joEntity);
 			// 非关联实体生成
-			if (entityModel == null && Generator_Map_Token.containsKey(filepath)) {
+			if (entityModel == null && BeanFactoryUtils.getEnvironment() != Environment.DEVELOP && Generator_Map_Token.containsKey(filepath)) {
 				return;
 			}
 
@@ -159,7 +159,7 @@ public class DeveloperUtils {
 						}
 
 						// 获取生成文件流
-						FileOutputStream output = HelperFile.openOutputStream(file, entityModel.lastModified());
+						FileOutputStream output = HelperFile.openOutputStream(file, entityModel == null ? null : entityModel.lastModified());
 						if (output != null) {
 							try {
 								request.setAttribute("entityModel", entityModel);
@@ -191,7 +191,7 @@ public class DeveloperUtils {
 
 		} catch (Exception e) {
 			// 显示生成错误
-			if (BeanFactoryUtils.getBeanConfig().getEnvironment() == Environment.DEVELOP && !(e instanceof DeveloperBreak)) {
+			if (BeanFactoryUtils.getBeanConfig().getEnvironment().compareTo(Environment.DEBUG) <= 0 && !(e instanceof DeveloperBreak)) {
 				e.printStackTrace();
 			}
 		}

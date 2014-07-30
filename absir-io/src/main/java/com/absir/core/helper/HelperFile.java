@@ -288,6 +288,10 @@ public class HelperFile extends FileUtils {
 	 * @throws IOException
 	 */
 	public static void copyDirectoryOverWrite(URL url, File destDir, boolean overWrite, FileFilter filter, boolean preserveFileDate) throws IOException {
+		if (url == null) {
+			return;
+		}
+
 		URLConnection urlConnection = url.openConnection();
 		if (urlConnection instanceof JarURLConnection) {
 			copyDirectoryOverWrite((JarURLConnection) urlConnection, destDir, overWrite, filter, preserveFileDate);

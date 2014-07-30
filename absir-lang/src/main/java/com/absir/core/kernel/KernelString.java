@@ -229,6 +229,14 @@ public abstract class KernelString {
 	 * @param value
 	 * @return
 	 */
+	public static String transferred(String value) {
+		return '"' + value.replace("\"", "\\\"") + '"';
+	}
+
+	/**
+	 * @param value
+	 * @return
+	 */
 	public static String unTransferred(String value) {
 		value = value.trim();
 		int length = value.length();

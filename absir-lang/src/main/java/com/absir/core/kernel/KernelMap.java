@@ -77,6 +77,21 @@ public abstract class KernelMap {
 
 	/**
 	 * @param map
+	 * @param value
+	 * @return
+	 */
+	public static <K> K getKey(Map<K, ?> map, Object value) {
+		for (Entry<K, ?> entry : map.entrySet()) {
+			if (KernelObject.equals(value, entry.getValue())) {
+				return entry.getKey();
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * @param map
 	 * @param to
 	 */
 	public static void copy(Map<Object, Object> map, Map<Object, Object> to) {

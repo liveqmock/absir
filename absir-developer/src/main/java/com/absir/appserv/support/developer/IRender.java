@@ -24,6 +24,18 @@ public interface IRender {
 	public static final IRender ME = BeanFactoryUtils.get(IRender.class);
 
 	/**
+	 * @param value
+	 * @return
+	 */
+	public String echo(String value);
+
+	/**
+	 * @param path
+	 * @return
+	 */
+	public String include(String path);
+
+	/**
 	 * @param path
 	 * @param renders
 	 * @throws IOException

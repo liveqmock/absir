@@ -31,6 +31,7 @@ import com.absir.core.kernel.KernelDyna;
 import com.absir.core.kernel.KernelObject;
 import com.absir.core.kernel.KernelString;
 import com.absir.server.in.Input;
+import com.absir.servlet.InDispathFilter;
 
 /**
  * @author absir
@@ -43,7 +44,7 @@ public class WebJsplUtils {
 	 * @return
 	 */
 	public static Input getInput(ServletRequest request) {
-		return (Input) request.getAttribute(WebJstlView.REQUEST_INPUT);
+		return InDispathFilter.getInput(request);
 	}
 
 	/**

@@ -18,7 +18,7 @@
 	ScripteNode.append(element, pageContext.getAttribute("node").toString());
 
 		} else {
-			DeveloperUtils.includeExist("edit", field.getTypes(), pageContext, request, response);
+	DeveloperUtils.includeExist("edit", field.getTypes(), pageContext, request, response);
 		}
 	}
 %>

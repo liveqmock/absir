@@ -51,14 +51,24 @@ public class DeveloperService implements IDeveloper {
 		if (developerWeb != null) {
 			String developePath = HelperFileName.normalizeNoEndSeparator(developerWeb + "/../../../");
 			String deployPath = HelperFileName.normalizeNoEndSeparator(BeanFactoryUtils.getBeanConfig().getClassPath() + "/../../");
+			if (IDeveloper.ME != null) {
+				try {
+					HelperFile.copyDirectoryOverWrite(IDeveloper.ME.getClass().getResource("/deploy"), new File(deployPath), false, null, true);
+
+				} catch (Throwable e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
 			if ((HelperFileName.getName(developePath)).equals(HelperFileName.getName(deployPath))) {
 				final String resourcesPath = developePath + "/src/main/resources/";
 				if (HelperFile.directoryExists(resourcesPath)) {
 					// 复制开发文件到开发环境
 					if (IDeveloper.ME != null) {
 						try {
-							HelperFile.copyDirectoryOverWrite(IDeveloper.ME.getClass().getResource("/deploy"), new File(deployPath), false, null, true);
-							HelperFile.copyDirectoryOverWrite(IDeveloper.ME.getClass().getResource("/deploy"), new File(developerWeb), false, null, true);
+							// HelperFile.copyDirectoryOverWrite(IDeveloper.ME.getClass().getResource("/deploy"),
+							// new File(developerWeb), false, null, true);
 
 						} catch (Throwable e) {
 							// TODO: handle exception

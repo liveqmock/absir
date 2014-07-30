@@ -84,9 +84,6 @@ public class WebJstlView extends ReturnedResolverView implements IRender {
 		}
 	}
 
-	/** REQUEST_INPUT */
-	protected static final String REQUEST_INPUT = WebJstlView.class.getName() + "@INPUT";
-
 	/**
 	 * @param view
 	 * @param input
@@ -102,7 +99,6 @@ public class WebJstlView extends ReturnedResolverView implements IRender {
 			request.setAttribute(entry.getKey(), entry.getValue());
 		}
 
-		request.setAttribute(REQUEST_INPUT, input);
 		renderMergeOutputLayout(view, request, response, new WebResponseWrapper(response), LAYOUT_ITERATE_DEPTH);
 	}
 
@@ -181,6 +177,29 @@ public class WebJstlView extends ReturnedResolverView implements IRender {
 		if (content != null) {
 			response.getWriter().append(content);
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.appserv.support.developer.IRender#echo(java.lang.String)
+	 */
+	@Override
+	public String echo(String value) {
+		// TODO Auto-generated method stub
+		return "<%=" + value + "%>";
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.support.developer.IRender#include(java.lang.String)
+	 */
+	@Override
+	public String include(String path) {
+		// TODO Auto-generated method stub
+		return "<jsp:include page=" + path + "/>";
 	}
 
 	/*

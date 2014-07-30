@@ -37,6 +37,10 @@ public class LangBundle {
 	/** ME */
 	public static final LangBundle ME = BeanFactoryUtils.get(LangBundle.class);
 
+	/** i18n */
+	@Value(value = "lang.i18n", defaultValue = "0")
+	private boolean i18n;
+
 	/** langResource */
 	@Value(value = "lang.resouce", defaultValue = "${classPath}lang/")
 	protected String langResource;
@@ -122,6 +126,13 @@ public class LangBundle {
 				BeanConfigImpl.writeProperties(resourceLangs, new File(resource + "/general.properties"));
 			}
 		}
+	}
+
+	/**
+	 * @return the i18n
+	 */
+	public boolean isI18n() {
+		return i18n;
 	}
 
 	/**

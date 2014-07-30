@@ -34,19 +34,20 @@ import com.absir.core.kernel.KernelArray;
 import com.absir.core.kernel.KernelLang.BreakException;
 import com.absir.core.kernel.KernelLang.CallbackBreak;
 import com.absir.core.kernel.KernelLang.ObjectTemplate;
+import com.absir.core.util.UtilAbsir;
 import com.absir.orm.value.JoEntity;
 
 @Configure
 public class DeveloperUtils {
 
 	@Value("developer.suffix")
-	protected static String suffix = ".dev";
-
-	/** Generator_Tokens */
-	private static Set<Object> Generator_Tokens = new HashSet<Object>();
+	protected static String suffix = ".html";
 
 	/** Generator_Map_Tokens */
 	private static Map<String, Object> Generator_Map_Token = new HashMap<String, Object>();
+
+	/** Generator_Tokens */
+	private static Set<Object> Generator_Tokens = new HashSet<Object>();
 
 	/**
 	 * @param includePath
@@ -59,21 +60,9 @@ public class DeveloperUtils {
 
 	/**
 	 * @param filepath
-	 * @return
 	 */
-	private static Object getGeneratorTokens(String filepath) {
-		Object token = Generator_Map_Token.get(filepath);
-		if (token == null) {
-			synchronized (Generator_Map_Token) {
-				token = Generator_Map_Token.get(filepath);
-				if (token == null) {
-					token = new Object();
-					Generator_Map_Token.put(filepath, token);
-				}
-			}
-		}
-
-		return token;
+	public static void clearToken(String filepath) {
+		Generator_Map_Token.remove(filepath);
 	}
 
 	/**
@@ -109,27 +98,25 @@ public class DeveloperUtils {
 				String entityName = value != null && value instanceof String ? (String) value : null;
 				value = request.getAttribute("entityClass");
 				Class<?> entityClass = value != null && value instanceof Class ? (Class<?>) value : null;
-				if (entityName == null && entityClass == null) {
-					return;
+				if (entityName != null || entityClass != null) {
+					joEntity = new JoEntity(entityName, entityClass);
+					request.setAttribute("joEntity", joEntity);
 				}
-
-				joEntity = new JoEntity(entityName, entityClass);
-				request.setAttribute("joEntity", joEntity);
 			}
 
-			EntityModel entityModel = ModelFactory.getModelEntity((JoEntity) joEntity);
-			// 如果实体信息不存在
-			if (entityModel == null) {
+			EntityModel entityModel = joEntity == null ? null : ModelFactory.getModelEntity((JoEntity) joEntity);
+			// 非关联实体生成
+			if (entityModel == null && Generator_Map_Token.containsKey(filepath)) {
 				return;
 			}
 
 			File file = new File(IRender.ME.getRealPath(filepath, renders));
 			// 如果生成文件没过期
-			if (file.exists() && entityModel.lastModified() != null && entityModel.lastModified() <= file.lastModified()) {
+			if (entityModel != null && file.exists() && entityModel.lastModified() != null && entityModel.lastModified() <= file.lastModified()) {
 				return;
 			}
 
-			Object token = getGeneratorTokens(filepath);
+			Object token = UtilAbsir.getToken(filepath, Generator_Map_Token);
 			try {
 				synchronized (token) {
 					if (!Generator_Tokens.add(token)) {

@@ -184,7 +184,9 @@ public class InDispathFilter extends InDispatcher<HttpServletRequest, HttpServle
 	@Override
 	protected Input input(String uri, InMethod inMethod, InModel model, HttpServletRequest req, HttpServletResponse res) {
 		// TODO Auto-generated method stub
-		return new InputRequest(uri, inMethod, model, req, res);
+		Input input = new InputRequest(uri, inMethod, model, req, res);
+		req.setAttribute(REQUEST_INPUT, input);
+		return input;
 	}
 
 	/*
@@ -195,5 +197,16 @@ public class InDispathFilter extends InDispatcher<HttpServletRequest, HttpServle
 	@Override
 	public void destroy() {
 		// TODO Auto-generated method stub
+	}
+
+	/** REQUEST_INPUT */
+	public static final String REQUEST_INPUT = InDispathFilter.class.getName() + "@REQUEST_INPUT";
+
+	/**
+	 * @param request
+	 * @return
+	 */
+	public static final Input getInput(ServletRequest request) {
+		return (Input) request.getAttribute(REQUEST_INPUT);
 	}
 }

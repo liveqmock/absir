@@ -24,6 +24,7 @@ import com.absir.appserv.developer.model.EntityModel;
 import com.absir.appserv.developer.model.ModelFactory;
 import com.absir.appserv.support.DeveloperBreak;
 import com.absir.appserv.support.developer.IRender;
+import com.absir.appserv.support.developer.IRenderSuffix;
 import com.absir.appserv.support.developer.RenderUtils;
 import com.absir.bean.basis.Configure;
 import com.absir.bean.basis.Environment;
@@ -34,6 +35,7 @@ import com.absir.core.kernel.KernelArray;
 import com.absir.core.kernel.KernelLang.BreakException;
 import com.absir.core.kernel.KernelLang.CallbackBreak;
 import com.absir.core.kernel.KernelLang.ObjectTemplate;
+import com.absir.core.kernel.KernelString;
 import com.absir.core.util.UtilAbsir;
 import com.absir.orm.value.JoEntity;
 
@@ -41,13 +43,26 @@ import com.absir.orm.value.JoEntity;
 public class DeveloperUtils {
 
 	@Value("developer.suffix")
-	protected static String suffix = ".html";
+	protected static String suffix = getSuffix();
 
 	/** Generator_Map_Tokens */
 	private static Map<String, Object> Generator_Map_Token = new HashMap<String, Object>();
 
 	/** Generator_Tokens */
 	private static Set<Object> Generator_Tokens = new HashSet<Object>();
+
+	/**
+	 * @return
+	 */
+	private static String getSuffix() {
+		IRenderSuffix renderSuffix = BeanFactoryUtils.get(IRenderSuffix.class);
+		String suffix = renderSuffix == null ? null : renderSuffix.getSuffix();
+		if (KernelString.isEmpty(suffix)) {
+			suffix = ".html";
+		}
+
+		return suffix;
+	}
 
 	/**
 	 * @param includePath

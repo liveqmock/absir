@@ -237,7 +237,7 @@ public abstract class KernelArray {
 	 */
 	public static <T> T getAssignable(Object[] array, Class<T> cls) {
 		for (Object value : array) {
-			if (cls.isAssignableFrom(value.getClass())) {
+			if (value != null && cls.isAssignableFrom(value.getClass())) {
 				return (T) value;
 			}
 		}

@@ -19,8 +19,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.PageContext;
 
+import com.absir.appserv.support.developer.IDeveloper;
 import com.absir.appserv.support.developer.IRender;
+import com.absir.appserv.support.developer.IRenderSuffix;
 import com.absir.bean.basis.Base;
+import com.absir.bean.basis.Environment;
+import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Value;
 import com.absir.context.core.ContextUtils;
@@ -35,7 +39,7 @@ import com.absir.servlet.InputRequest;
 
 @Base(order = -1)
 @Bean
-public class WebJstlView extends ReturnedResolverView implements IRender {
+public class WebJstlView extends ReturnedResolverView implements IRender, IRenderSuffix {
 
 	@Value("web.view.prefix")
 	private String prefix = "/WEB-INF/jsp/";
@@ -67,6 +71,17 @@ public class WebJstlView extends ReturnedResolverView implements IRender {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see com.absir.appserv.support.developer.IRenderSuffix#getSuffix()
+	 */
+	@Override
+	public String getSuffix() {
+		// TODO Auto-generated method stub
+		return suffix;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * com.absir.server.route.returned.ReturnedResolverView#resolveReturnedView
 	 * (java.lang.String, com.absir.server.on.OnPut)
@@ -93,10 +108,19 @@ public class WebJstlView extends ReturnedResolverView implements IRender {
 	 */
 	public void renderView(String view, Input input, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		response.setCharacterEncoding(ContextUtils.getCharset().displayName());
-		// request.setAttribute(LAYOUT_NAME, true);
 		request.setAttribute(PRERPARE_NAME, view);
 		for (Entry<String, Object> entry : input.getModel().entrySet()) {
 			request.setAttribute(entry.getKey(), entry.getValue());
+		}
+
+		if (BeanFactoryUtils.getEnvironment() != Environment.DEVELOP && IDeveloper.ME != null) {
+			try {
+				IDeveloper.ME.generate(view, view, null, request, response);
+
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+			}
 		}
 
 		renderMergeOutputLayout(view, request, response, new WebResponseWrapper(response), LAYOUT_ITERATE_DEPTH);

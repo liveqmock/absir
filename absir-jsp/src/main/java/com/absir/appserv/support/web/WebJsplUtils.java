@@ -13,9 +13,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -24,105 +21,15 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.PageContext;
 
-import com.absir.core.dyna.DynaBinder;
+import com.absir.appserv.support.developer.Pag;
 import com.absir.core.helper.HelperFile;
-import com.absir.core.kernel.KernelCollection;
-import com.absir.core.kernel.KernelDyna;
 import com.absir.core.kernel.KernelObject;
-import com.absir.core.kernel.KernelString;
-import com.absir.server.in.Input;
-import com.absir.servlet.InDispathFilter;
 
 /**
  * @author absir
  * 
  */
-public class WebJsplUtils {
-
-	/**
-	 * @param request
-	 * @return
-	 */
-	public static Input getInput(ServletRequest request) {
-		return InDispathFilter.getInput(request);
-	}
-
-	/**
-	 * @param obj
-	 * @return
-	 */
-	public static String value(Object obj) {
-		return obj == null ? "" : obj.toString();
-	}
-
-	/**
-	 * @param obj
-	 * @return
-	 */
-	public static String dateValue(Object obj) {
-		return dateValue(obj, 0);
-	}
-
-	/**
-	 * @param obj
-	 * @param type
-	 * @return
-	 */
-	public static String dateValue(Object obj, int type) {
-		Date date = KernelDyna.toDate(obj);
-		if (type >= 0) {
-			if (date == null) {
-				date = new Date();
-			}
-
-		} else {
-			type = -type - 1;
-		}
-
-		return value(KernelDyna.toString(date, type));
-	}
-
-	/**
-	 * @param obj
-	 * @return
-	 */
-	public static String enumValue(Object obj) {
-		if (obj != null) {
-			if (obj instanceof Enum) {
-				return ((Enum<?>) obj).name();
-			}
-		}
-
-		return value(obj);
-	}
-
-	/**
-	 * @param obj
-	 * @return
-	 */
-	public static String paramsValue(Object obj) {
-		if (obj != null) {
-			if (obj.getClass().isArray()) {
-				return KernelString.implode(DynaBinder.to(obj, Object[].class), ",");
-			}
-		}
-
-		return value(obj);
-	}
-
-	/**
-	 * @param obj
-	 * @return
-	 */
-	public static Map<?, ?> mapValue(Object obj) {
-		if (obj != null) {
-			if (obj instanceof Collection) {
-				return KernelCollection.toMap((Collection<?>) obj);
-			}
-		}
-
-		return null;
-	}
+public class WebJsplUtils extends Pag {
 
 	/**
 	 * @param request

@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
  * @author absir
  *
  */
-@Target({ ElementType.METHOD })
+@Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface BaTag {
 

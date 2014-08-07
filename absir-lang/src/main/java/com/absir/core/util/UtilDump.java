@@ -13,8 +13,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import com.absir.core.kernel.KernelArray;
 import com.absir.core.kernel.KernelArray.ArrayAccessor;
@@ -199,7 +201,7 @@ public class UtilDump {
 			return;
 		}
 
-		dumpObject(obj, fields, methods, ancest, level, DUMP_MAX_LEVEL);
+		dumpObject(obj, fields, methods, ancest, ancest == 0 ? null : new HashSet<Object>(), level, DUMP_MAX_LEVEL);
 	}
 
 	/** DUMP_MAX_LEVEL */
@@ -210,17 +212,18 @@ public class UtilDump {
 	 * @param fields
 	 * @param methods
 	 * @param ancest
+	 * @param ancests
 	 * @param level
 	 * @param maxlevel
 	 */
-	private static void dumpObject(Object obj, int fields, int methods, int ancest, int level, int maxlevel) {
+	private static void dumpObject(Object obj, int fields, int methods, int ancest, final Set<Object> ancests, int level, int maxlevel) {
 		if (maxlevel-- < 0) {
 			return;
 		}
 
 		dumpPrint("CLASS:" + (obj instanceof Class ? obj : obj.getClass() + ":" + obj) + obj + "==>dump", level++);
 		if (fields != -1) {
-			dumpFields(obj, fields, methods, ancest, level, maxlevel);
+			dumpFields(obj, fields, methods, ancest, ancests, level, maxlevel);
 		}
 
 		if (methods != -1) {
@@ -230,10 +233,14 @@ public class UtilDump {
 
 	/**
 	 * @param obj
-	 * @param modifiers
+	 * @param fields
+	 * @param methods
+	 * @param ancest
+	 * @param ancests
 	 * @param level
+	 * @param maxlevel
 	 */
-	private static void dumpFields(final Object obj, final int fields, final int methods, final int ancest, final int level, final int maxlevel) {
+	private static void dumpFields(final Object obj, final int fields, final int methods, final int ancest, final Set<Object> ancests, final int level, final int maxlevel) {
 		final Class cls = obj instanceof Class ? (Class) obj : obj.getClass();
 		dumpPrint("FIELDS:" + cls.getName() + ":" + fields, level);
 		KernelReflect.doWithDeclaredFields(cls, new CallbackBreak<Field>() {
@@ -244,8 +251,8 @@ public class UtilDump {
 					template.setAccessible(true);
 					Object value = KernelReflect.get(obj, template);
 					dumpPrint(template.getName() + ":" + value, level, true);
-					if (value != null && cls != obj && ancest != 0) {
-						dumpObject(value, fields, methods, ancest > 0 ? ancest - 1 : ancest, level, maxlevel);
+					if (value != null && cls != obj && ancest != 0 && !ancests.contains(value)) {
+						dumpObject(value, fields, methods, ancest > 0 ? ancest - 1 : ancest, ancests, level, maxlevel);
 					}
 				}
 			}

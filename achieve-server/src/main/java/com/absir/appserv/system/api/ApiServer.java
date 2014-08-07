@@ -92,7 +92,7 @@ public abstract class ApiServer {
 			e.printStackTrace();
 		}
 
-		if (BeanFactoryUtils.getEnvironment() == Environment.DEVELOP || input.isDebug() || !(e instanceof ServerException)) {
+		if (BeanFactoryUtils.getEnvironment().compareTo(Environment.DEBUG) <= 0 || input.isDebug() || !(e instanceof ServerException)) {
 			LOGGER.error("", e);
 		}
 

@@ -233,7 +233,7 @@ public abstract class Input extends Bean<Serializable> implements IAttributes {
 	 * @return
 	 */
 	public boolean isDebug() {
-		return BeanFactoryUtils.getEnvironment().compareTo(Environment.DEBUG) <= 0 && paramDebug();
+		return BeanFactoryUtils.getEnvironment() != Environment.PRODUCT && paramDebug();
 	}
 
 	public abstract boolean paramDebug();

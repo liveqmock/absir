@@ -23,7 +23,9 @@ import org.beetl.core.Tag;
 import org.beetl.core.Template;
 import org.beetl.core.misc.BeetlUtil;
 import org.beetl.core.resource.FileResourceLoader;
+import org.beetl.ext.web.WebVariableScope;
 
+import com.absir.appserv.support.developer.Pag;
 import com.absir.appserv.support.web.WebBeetlSupply.BeetlConfigureFound;
 import com.absir.appserv.support.web.value.BaFormat;
 import com.absir.appserv.support.web.value.BaFunction;
@@ -273,8 +275,13 @@ public class WebBeetlSupply implements IBeanDefineSupply, IMethodSupport<BeetlCo
 			BaTag baTag = beanType.getAnnotation(BaTag.class);
 			if (baTag != null) {
 				String name = baTag.name();
-				if (name == null) {
+				if (KernelString.isEmpty(name)) {
 					name = beanType.getSimpleName();
+					if (name.endsWith("Tag")) {
+						name = name.substring(0, name.length() - 3);
+					}
+
+					name = KernelString.unCapitalize(name);
 				}
 
 				nameMapTag.put(name, beanType);
@@ -315,6 +322,8 @@ public class WebBeetlSupply implements IBeanDefineSupply, IMethodSupport<BeetlCo
 				groupTemplate.registerTag(entry.getKey(), entry.getValue());
 			}
 		}
+		
+		groupTemplate.registerFunctionPackage("Pag", Pag.class);
 	}
 
 	/**
@@ -366,5 +375,16 @@ public class WebBeetlSupply implements IBeanDefineSupply, IMethodSupport<BeetlCo
 				e.printStackTrace();
 			}
 		}
+	}
+
+	/**
+	 * 输出变量
+	 * 
+	 * @param ctx
+	 * @param path
+	 */
+	@BaFunction
+	public static Object get(Context ctx, String name) {
+		return ((WebVariableScope) ctx.getGlobal("servlet")).get(name);
 	}
 }

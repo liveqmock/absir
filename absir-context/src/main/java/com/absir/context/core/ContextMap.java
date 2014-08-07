@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.absir.bean.core.BeanFactoryUtils;
+import com.absir.bean.inject.value.Inject;
 import com.absir.context.core.compare.CompareAbstract;
 import com.absir.property.Property;
 import com.absir.property.PropertyData;
@@ -23,6 +24,7 @@ import com.absir.property.PropertyData;
  * 
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
+@Inject
 public class ContextMap {
 
 	/** CONTEXT_MAP_SUPPLY */

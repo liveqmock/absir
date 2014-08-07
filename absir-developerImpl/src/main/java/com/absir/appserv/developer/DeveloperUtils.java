@@ -31,6 +31,7 @@ import com.absir.bean.basis.Environment;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Value;
 import com.absir.core.helper.HelperFile;
+import com.absir.core.helper.HelperIO;
 import com.absir.core.kernel.KernelArray;
 import com.absir.core.kernel.KernelLang.BreakException;
 import com.absir.core.kernel.KernelLang.CallbackBreak;
@@ -121,14 +122,24 @@ public class DeveloperUtils {
 
 			EntityModel entityModel = joEntity == null ? null : ModelFactory.getModelEntity((JoEntity) joEntity);
 			// 非关联实体生成
-			if (entityModel == null && BeanFactoryUtils.getEnvironment() != Environment.DEVELOP && Generator_Map_Token.containsKey(filepath)) {
-				return;
+			if (entityModel == null) {
+				joEntity = null;
+				if (BeanFactoryUtils.getEnvironment() != Environment.DEVELOP && Generator_Map_Token.containsKey(filepath)) {
+					joEntity = Boolean.TRUE;
+				}
 			}
 
 			File file = new File(IRender.ME.getRealPath(filepath, renders));
 			// 如果生成文件没过期
-			if (entityModel != null && file.exists() && entityModel.lastModified() != null && entityModel.lastModified() <= file.lastModified()) {
-				return;
+			if (file.exists()) {
+				if (entityModel == null) {
+					if (joEntity != null) {
+						return;
+					}
+
+				} else if (entityModel.lastModified() != null && entityModel.lastModified() <= file.lastModified()) {
+					return;
+				}
 			}
 
 			Object token = UtilAbsir.getToken(filepath, Generator_Map_Token);
@@ -141,7 +152,9 @@ public class DeveloperUtils {
 					final DeveloperGenerator generator = DeveloperGenerator.pushDeveloperGenerator(request);
 					try {
 						// 读取原文件定义信息
+						StringBuilder fileBuilder = new StringBuilder();
 						if (file.exists()) {
+							final StringBuilder readBuilder = fileBuilder;
 							final ObjectTemplate<String> gDefine = new ObjectTemplate<String>(null);
 							try {
 								HelperFile.doWithReadLine(file, new CallbackBreak<String>() {
@@ -149,6 +162,11 @@ public class DeveloperUtils {
 									@Override
 									public void doWith(String template) throws BreakException {
 										// TODO Auto-generated method stub
+										if (readBuilder.length() > 0) {
+											readBuilder.append("\r\n");
+										}
+
+										readBuilder.append(template);
 										String define = template.trim();
 										if (define.contains("<%-- G_DEFINED")) {
 											throw new DeveloperBreak();
@@ -180,6 +198,7 @@ public class DeveloperUtils {
 								request.setAttribute("entityModel", entityModel);
 								includePath = getDeveloperPath(includePath);
 								IRender.ME.rend(output, includePath, renders);
+								fileBuilder = null;
 
 								// 复制生成文件到开发环境
 								if (DeveloperService.getDeveloperWeb() != null) {
@@ -188,6 +207,10 @@ public class DeveloperUtils {
 
 							} finally {
 								if (output != null) {
+									if (fileBuilder != null) {
+										HelperIO.write(fileBuilder.toString(), output);
+									}
+
 									output.close();
 								}
 							}
@@ -206,7 +229,7 @@ public class DeveloperUtils {
 
 		} catch (Exception e) {
 			// 显示生成错误
-			if (BeanFactoryUtils.getBeanConfig().getEnvironment().compareTo(Environment.DEBUG) <= 0 && !(e instanceof DeveloperBreak)) {
+			if (BeanFactoryUtils.getBeanConfig().getEnvironment() == Environment.DEVELOP && !(e instanceof DeveloperBreak)) {
 				e.printStackTrace();
 			}
 		}

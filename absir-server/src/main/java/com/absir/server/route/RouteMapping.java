@@ -21,6 +21,7 @@ import com.absir.bean.basis.Base;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Inject;
+import com.absir.bean.inject.value.Value;
 import com.absir.core.helper.HelperFileName;
 import com.absir.core.kernel.KernelArray;
 import com.absir.core.kernel.KernelCollection;
@@ -38,6 +39,9 @@ public class RouteMapping implements IRoute {
 
 	@Inject
 	private RouteAdapter routeAdapter;
+
+	@Value("server.route.suffix")
+	private String routeSuffix;
 
 	/** routeParameter */
 	private RouteParameter routeParameter;
@@ -227,8 +231,12 @@ public class RouteMapping implements IRoute {
 	@Override
 	public void routeMapping(String name, Entry<Mapping, List<String>> mapping, Method method, List<String> parameterPathNames, List<String> mappings, List<InMethod> inMethods) {
 		// TODO Auto-generated method stub
-		routeMapping(null, name, mapping, method, method.getName(), KernelString.implode(KernelArray.repeat('*', parameterPathNames.size()), '/'),
-				KernelCollection.toArray(parameterPathNames, String.class), mappings, inMethods);
+		String parameterPathName = KernelString.implode(KernelArray.repeat('*', parameterPathNames.size()), '/');
+		if (routeSuffix != null) {
+			parameterPathName += routeSuffix;
+		}
+
+		routeMapping(null, name, mapping, method, method.getName(), parameterPathName, KernelCollection.toArray(parameterPathNames, String.class), mappings, inMethods);
 	}
 
 	/** PATH_PATTERN */

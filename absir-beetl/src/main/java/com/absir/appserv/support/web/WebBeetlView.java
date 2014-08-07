@@ -9,20 +9,21 @@ package com.absir.appserv.support.web;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.Field;
+import java.io.Writer;
 import java.util.Map.Entry;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.beetl.core.Configuration;
 import org.beetl.core.Context;
 import org.beetl.core.GroupTemplate;
 import org.beetl.core.Template;
+import org.beetl.core.exception.BeetlException;
 import org.beetl.core.resource.FileResourceLoader;
 import org.beetl.core.resource.WebAppResourceLoader;
-import org.beetl.ext.web.WebRender;
+import org.beetl.ext.web.WebVariableScope;
 
+import com.absir.appserv.feature.menu.MenuContextUtils;
 import com.absir.appserv.support.developer.IDeveloper;
 import com.absir.appserv.support.developer.IRender;
 import com.absir.bean.basis.Base;
@@ -32,7 +33,6 @@ import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Inject;
 import com.absir.bean.inject.value.Value;
 import com.absir.context.core.ContextUtils;
-import com.absir.core.kernel.KernelReflect;
 import com.absir.server.in.Input;
 import com.absir.server.on.OnPut;
 import com.absir.server.route.returned.ReturnedResolverView;
@@ -68,9 +68,6 @@ public class WebBeetlView extends ReturnedResolverView implements IRender {
 		return groupTemplate;
 	}
 
-	/** contextField */
-	private Field ctxField;
-
 	/**
 	 * @throws IOException
 	 * 
@@ -92,8 +89,6 @@ public class WebBeetlView extends ReturnedResolverView implements IRender {
 		if (groupTemplate.getResourceLoader() instanceof FileResourceLoader) {
 			fileResourceLoader = (FileResourceLoader) groupTemplate.getResourceLoader();
 		}
-
-		ctxField = KernelReflect.declaredField(Template.class, "ctx");
 	}
 
 	/*
@@ -109,7 +104,7 @@ public class WebBeetlView extends ReturnedResolverView implements IRender {
 		Input input = onPut.getInput();
 		if (input instanceof InputRequest) {
 			InputRequest inputRequest = (InputRequest) input;
-			renderView(prefix + view + suffix, input, inputRequest.getRequest(), inputRequest.getResponse());
+			renderView(getTemplate(prefix + view + suffix, inputRequest), inputRequest.getResponse());
 
 		} else {
 			onPut.getInput().write(view);
@@ -118,35 +113,37 @@ public class WebBeetlView extends ReturnedResolverView implements IRender {
 
 	/**
 	 * @param view
-	 * @param input
-	 * @param request
-	 * @param response
-	 * @throws Exception
+	 * @param inputRequest
+	 * @return
 	 */
-	public void renderView(final String view, final Input input, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		response.setCharacterEncoding(ContextUtils.getCharset().displayName());
-		new WebRender(groupTemplate) {
-			@Override
-			protected void modifyTemplate(Template template, String key, HttpServletRequest request, HttpServletResponse response, Object... args) {
-				template.binding("input", input);
+	public Template getTemplate(String view, InputRequest input) {
+		if (BeanFactoryUtils.getEnvironment() != Environment.PRODUCT && IDeveloper.ME != null) {
+			try {
+				Context ctx = new Context();
+				ctx.gt = groupTemplate;
+				ctx.set("input", input);
 				for (Entry<String, Object> entry : input.getModel().entrySet()) {
-					template.binding(entry.getKey(), entry.getValue());
+					ctx.set(entry.getKey(), entry.getValue());
 				}
 
-				if (BeanFactoryUtils.getEnvironment() != Environment.DEVELOP && IDeveloper.ME != null) {
-					try {
-						Context ctx = (Context) ctxField.get(template);
-						ctx.gt = groupTemplate;
-						IDeveloper.ME.generate(view, view, ctx, request);
+				IDeveloper.ME.generate(view, view, ctx, input.getRequest());
 
-					} catch (Exception e) {
-						// TODO: handle exception
-						e.printStackTrace();
-					}
-				}
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
 			}
+		}
 
-		}.render(view, request, response);
+		Template template = new WebVariableScope().ready(groupTemplate, view, input.getRequest());
+		template.binding("input", input);
+		template.binding("APP_NAME", MenuContextUtils.getAppName());
+		template.binding("SITE_ROUTE", MenuContextUtils.getSiteRoute());
+		template.binding("ADMIN_ROUTE", MenuContextUtils.getAdminRoute());
+		for (Entry<String, Object> entry : input.getModel().entrySet()) {
+			template.binding(entry.getKey(), entry.getValue());
+		}
+
+		return template;
 	}
 
 	/*
@@ -242,5 +239,61 @@ public class WebBeetlView extends ReturnedResolverView implements IRender {
 		}
 
 		t.renderTo(outputStream);
+	}
+
+	/**
+	 * @param template
+	 * @param response
+	 */
+	public static void renderView(Template template, HttpServletResponse response) {
+		response.setCharacterEncoding(ContextUtils.getCharset().displayName());
+		Writer writer = null;
+		OutputStream os = null;
+		try {
+			// response.setContentType(contentType);
+			if (template.gt.getConf().isDirectByteOutput()) {
+				os = response.getOutputStream();
+				template.renderTo(os);
+			} else {
+				writer = response.getWriter();
+				template.renderTo(writer);
+			}
+
+		} catch (IOException e) {
+			handleClientError(e);
+
+		} catch (BeetlException e) {
+			handleBeetlException(e);
+		}
+
+		finally {
+			try {
+				if (writer != null)
+					writer.flush();
+				if (os != null) {
+					os.flush();
+				}
+			} catch (IOException e) {
+				handleClientError(e);
+			}
+		}
+	}
+
+	/**
+	 * 处理客户端抛出的IO异常
+	 * 
+	 * @param ex
+	 */
+	protected static void handleClientError(IOException ex) {
+		// do nothing
+	}
+
+	/**
+	 * 处理客户端抛出的IO异常
+	 * 
+	 * @param ex
+	 */
+	protected static void handleBeetlException(BeetlException ex) {
+		throw ex;
 	}
 }

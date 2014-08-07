@@ -49,11 +49,10 @@ public class Pag {
 
 	/**
 	 * @param name
-	 * @param echo
 	 * @return
 	 */
-	public String lang(String name, boolean echo) {
-		return getLangRequest(name, getInput().getLang(name), echo);
+	public String lang(String name) {
+		return getInput().getLang(name);
 	}
 
 	/**
@@ -61,8 +60,16 @@ public class Pag {
 	 * @param echo
 	 * @return
 	 */
-	public String lang(String name, boolean echo, ServletRequest request) {
-		return getLangRequest(name, getInput(request).getLang(name), echo);
+	public String lang(String name, ServletRequest request) {
+		return getInput(request).getLang(name);
+	}
+
+	/**
+	 * @param lang
+	 * @return
+	 */
+	public String getLang(String lang) {
+		return getLang(lang, true);
 	}
 
 	/**
@@ -97,7 +104,7 @@ public class Pag {
 	 */
 	protected String getLangRequest(String name, String lang, boolean echo) {
 		if (LangBundle.ME.isI18n()) {
-			name = "DeveloperPage.getInput().getLang(" + KernelString.transferred(name) + ")";
+			name = "Pag.lang(" + KernelString.transferred(name) + ")";
 			return echo ? IRender.ME.echo(name) : name;
 
 		} else {

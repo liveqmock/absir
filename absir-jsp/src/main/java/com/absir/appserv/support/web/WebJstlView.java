@@ -21,7 +21,6 @@ import javax.servlet.jsp.PageContext;
 
 import com.absir.appserv.support.developer.IDeveloper;
 import com.absir.appserv.support.developer.IRender;
-import com.absir.appserv.support.developer.IRenderSuffix;
 import com.absir.bean.basis.Base;
 import com.absir.bean.basis.Environment;
 import com.absir.bean.core.BeanFactoryUtils;

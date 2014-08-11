@@ -25,4 +25,6 @@ public enum JeEditable {
 	/** 可配置的 */
 	OPTIONAL,
 
+	/** 锁定不管 */
+	LOCKABLE,
 }

@@ -208,7 +208,7 @@ public abstract class SecurityService implements ISecurityService {
 
 			SecurityManager securityManager = getSecurityManager(name);
 			if (!validator(userBase, password, securityManager.getError(), securityManager.getErrorTime())) {
-				throw new ServerException(ServerStatus.NO_USER, "password");
+				throw new ServerException(ServerStatus.NO_USER, userBase);
 			}
 
 			if (userBase.getUserRoleLevel() >= roleLevel) {

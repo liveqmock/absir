@@ -33,7 +33,7 @@
 						<div class="da-login-input">
 							<input type="text" name="verifycode" /><img
 								src="${site_route}/asset/verify" alt=""
-								width="66" height="24" onClick="this.src=this.src;" />
+								width="66" height="24" onclick="javascript:this.src=this.src+'?t='+Math.random()" />
 						</div>
 						<div class="da-login-input">
 							RememberMe:<input type="checkbox"

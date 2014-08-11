@@ -103,7 +103,11 @@ public class Admin_login extends AdminServer {
 				return "admin/login.failed";
 			}
 
-			ServerResolverRedirect.redirect(MenuContextUtils.getAdminRoute() + "/login?e=" + e.getServerStatus().ordinal(), false, input);
+			if (e.getServerStatus() == ServerStatus.NO_USER) {
+				input.getModel().put("user", e.getExceptionData());
+			}
+
+			return "admin/login";
 		}
 
 		if (!HelperInput.isAjax(input)) {

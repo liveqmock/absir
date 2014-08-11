@@ -514,6 +514,9 @@ public abstract class KernelClass {
 
 				break;
 			}
+
+			cls = superCls;
+			superCls = cls.getSuperclass();
 		}
 
 		return type;

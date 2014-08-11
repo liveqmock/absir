@@ -144,7 +144,7 @@ public class DeveloperUtils {
 
 			// 检测开发文件是否存在
 			includePath = getDeveloperPath(includePath);
-			if (!new File(IRender.ME.getFullPath(includePath, renders)).exists()) {
+			if (!new File(IRender.ME.getRealPath(includePath, renders)).exists()) {
 				return;
 			}
 

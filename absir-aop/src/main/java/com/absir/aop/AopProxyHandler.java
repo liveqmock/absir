@@ -7,6 +7,7 @@
  */
 package com.absir.aop;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -152,7 +153,13 @@ public class AopProxyHandler {
 			}
 		}
 
-		return invoke(proxy, method, args, methodProxy);
+		try {
+			return invoke(proxy, method, args, methodProxy);
+
+		} catch (InvocationTargetException e) {
+			// TODO: handle exception
+			throw e.getCause() == null ? e : e.getCause();
+		}
 	}
 
 	/**

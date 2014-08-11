@@ -151,7 +151,7 @@ public class EntityField extends DBField {
 		boolean referenceCrud = false;
 		// set fieldType
 		Class<?> fieldType = property.getType();
-		Class[] componentClasses = property.getField() == null ? KernelClass.componentClasses(fieldType) : KernelClass.componentClasses(accessor.getField().getGenericType());
+		Class[] componentClasses = property.getGenericType() == null ? KernelClass.componentClasses(fieldType) : KernelClass.componentClasses(property.getGenericType());
 		entityName = SessionFactoryUtils.getEntityNameNull(componentClasses[0]);
 		if (!typeFieldType(fieldType)) {
 			if (Map.class.isAssignableFrom(fieldType)) {

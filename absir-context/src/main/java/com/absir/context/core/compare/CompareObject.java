@@ -51,7 +51,7 @@ public class CompareObject implements PropertyObject<CompareAbstract> {
 
 		Class<?> type = property.getType();
 		if (type == null) {
-			type = property.getField().getType();
+			type = KernelClass.rawClass(property.getGenericType());
 		}
 
 		if (type.isArray()) {

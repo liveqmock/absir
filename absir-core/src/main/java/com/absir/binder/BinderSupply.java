@@ -53,7 +53,7 @@ public class BinderSupply extends PropertySupply<BinderObject, Binder> {
 			Binder binder = getPropertyObject(propertyData);
 			if (binder != null) {
 				if (toType == null) {
-					value = property.getField() == null ? binder.to(value, beanName, property.getType()) : binder.to(value, beanName, property.getField().getGenericType());
+					value = property.getGenericType() == null ? binder.to(value, beanName, property.getType()) : binder.to(value, beanName, property.getGenericType());
 
 				} else {
 					value = binder.to(value, beanName, toType);
@@ -62,7 +62,7 @@ public class BinderSupply extends PropertySupply<BinderObject, Binder> {
 
 			if (dynaBinder != null) {
 				if (toType == null) {
-					value = property.getField() == null ? dynaBinder.bind(value, beanName, property.getType()) : dynaBinder.bind(value, beanName, property.getField().getGenericType());
+					value = property.getGenericType() == null ? dynaBinder.bind(value, beanName, property.getType()) : dynaBinder.bind(value, beanName, property.getGenericType());
 
 				} else {
 					value = dynaBinder.bind(value, beanName, toType);

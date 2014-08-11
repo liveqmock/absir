@@ -142,6 +142,12 @@ public class DeveloperUtils {
 				}
 			}
 
+			// 检测开发文件是否存在
+			includePath = getDeveloperPath(includePath);
+			if (!new File(IRender.ME.getFullPath(includePath, renders)).exists()) {
+				return;
+			}
+
 			Object token = UtilAbsir.getToken(filepath, Generator_Map_Token);
 			try {
 				synchronized (token) {
@@ -196,7 +202,6 @@ public class DeveloperUtils {
 						if (output != null) {
 							try {
 								request.setAttribute("entityModel", entityModel);
-								includePath = getDeveloperPath(includePath);
 								IRender.ME.rend(output, includePath, renders);
 								fileBuilder = null;
 

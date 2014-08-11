@@ -9,8 +9,11 @@ package com.absir.property;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 
 import com.absir.bean.core.BeanFactoryUtils;
+import com.absir.core.kernel.KernelClass;
 import com.absir.core.util.UtilAccessor;
 import com.absir.core.util.UtilAccessor.Accessor;
 
@@ -25,6 +28,9 @@ public class Property {
 
 	/** type */
 	private Class<?> type;
+
+	/** genericType */
+	private Type genericType;
 
 	/** hidden <= -2 allow -1(set) 0(set|get) 1(get) */
 	private int allow;
@@ -79,6 +85,13 @@ public class Property {
 			if (field != null) {
 				if (type == null || type.isAssignableFrom(field.getType())) {
 					type = field.getType();
+					genericType = field.getGenericType();
+					if (genericType instanceof TypeVariable) {
+						genericType = KernelClass.type(beanClass, (TypeVariable<?>) genericType);
+						if (genericType != null) {
+							type = KernelClass.rawClass(genericType);
+						}
+					}
 				}
 			}
 
@@ -108,6 +121,13 @@ public class Property {
 	 */
 	public Class<?> getType() {
 		return type;
+	}
+
+	/**
+	 * @return the genericType
+	 */
+	public Type getGenericType() {
+		return genericType;
 	}
 
 	/**

@@ -397,13 +397,13 @@ public class KernelLang {
 	 */
 	public static enum MatcherType {
 
-		/** NONE */
-		NONE {
+		/** NORMAL */
+		NORMAL {
 
 			@Override
 			public boolean matchString(String match, String string) {
 				// TODO Auto-generated method stub
-				return false;
+				return string.contains(match);
 			}
 		},
 
@@ -427,8 +427,8 @@ public class KernelLang {
 			}
 		},
 
-		/** ALL */
-		ALL {
+		/** CONTAINS */
+		CONTAINS {
 
 			@Override
 			public boolean matchString(String match, String string) {
@@ -438,6 +438,61 @@ public class KernelLang {
 		};
 
 		public abstract boolean matchString(String match, String string);
+
+		/**
+		 * @param match
+		 * @return
+		 */
+		public static Entry<String, MatcherType> getMatchEntry(String match) {
+			ObjectEntry<String, MatcherType> matchEntry = new ObjectEntry<String, MatcherType>();
+			int last = match.length() - 1;
+			if (last >= 0) {
+				if (match.charAt(0) == '*') {
+					if (last > 0) {
+						if (match.charAt(last) == '*') {
+							if (last > 1) {
+								matchEntry.setValue(MatcherType.CONTAINS);
+								matchEntry.setKey(match.substring(1, last));
+							}
+
+						} else {
+							matchEntry.setValue(MatcherType.LEFT);
+							matchEntry.setKey(match.substring(1, last + 1));
+						}
+					}
+
+				} else if (match.charAt(last) == '*') {
+					if (last > 0) {
+						matchEntry.setValue(MatcherType.RIGHT);
+						matchEntry.setKey(match.substring(0, last));
+					}
+
+				} else {
+					matchEntry.setValue(MatcherType.NORMAL);
+					matchEntry.setKey(match);
+				}
+			}
+
+			return matchEntry;
+		}
+
+		/**
+		 * @param match
+		 * @param entry
+		 * @return
+		 */
+		public static boolean isMatch(String match, Entry<String, MatcherType> entry) {
+			MatcherType matcherType = entry.getValue();
+			if (matcherType == null) {
+				return true;
+			}
+
+			if (matcherType.matchString(entry.getKey(), match)) {
+				return true;
+			}
+
+			return false;
+		}
 	}
 
 	/**
@@ -572,41 +627,11 @@ public class KernelLang {
 
 				Entry<String, MatcherType> entry = matcher.getValue();
 				if (entry == null) {
-					String match = matcher.getKey();
-					ObjectEntry<String, MatcherType> objectEntry = new ObjectEntry<String, MatcherType>();
-					int last = match.length() - 1;
-					if (last >= 0) {
-						if (match.charAt(0) == '*') {
-							if (last > 0) {
-								if (match.charAt(last) == '*') {
-									if (last > 1) {
-										objectEntry.setValue(MatcherType.ALL);
-										objectEntry.setKey(match.substring(1, last));
-									}
-
-								} else {
-									objectEntry.setValue(MatcherType.LEFT);
-									objectEntry.setKey(match.substring(1, last + 1));
-								}
-							}
-
-						} else if (match.charAt(last) == '*') {
-							if (last > 0) {
-								objectEntry.setValue(MatcherType.RIGHT);
-								objectEntry.setKey(match.substring(0, last));
-							}
-						}
-					}
-
+					entry = MatcherType.getMatchEntry(matcher.getKey());
 					matcher.setValue(entry);
-					entry = objectEntry;
 				}
 
-				if (entry.getValue() == null) {
-					return true;
-				}
-
-				if (entry.getValue().matchString(entry.getKey(), propertyPath)) {
+				if (MatcherType.isMatch(propertyPath, entry)) {
 					return true;
 				}
 			}

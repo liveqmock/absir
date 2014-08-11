@@ -13,9 +13,11 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.GenericDeclaration;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -258,7 +260,10 @@ public abstract class KernelClass {
 	 * @return
 	 */
 	public static Class rawClass(Type type) {
-		if (type instanceof ParameterizedType) {
+		if (type instanceof Class) {
+			return (Class) type;
+
+		} else if (type instanceof ParameterizedType) {
 			return (Class) ((ParameterizedType) type).getRawType();
 
 		} else if (type instanceof GenericArrayType) {
@@ -267,9 +272,6 @@ public abstract class KernelClass {
 
 			} catch (Exception e) {
 			}
-
-		} else if (type instanceof Class) {
-			return (Class) type;
 		}
 
 		return Object.class;
@@ -460,6 +462,61 @@ public abstract class KernelClass {
 		}
 
 		return new Class[] { rawClass(componentType) };
+	}
+
+	/**
+	 * @param cls
+	 * @param typeVariable
+	 * @return
+	 */
+	public static Type type(Class cls, TypeVariable typeVariable) {
+		Type type = null;
+		GenericDeclaration genericDeclaration = typeVariable.getGenericDeclaration();
+		boolean impl = genericDeclaration instanceof Class && !((Class) genericDeclaration).isInterface();
+		Class superCls = cls.getSuperclass();
+		while (cls != null) {
+			if (impl) {
+				if (superCls == genericDeclaration) {
+					type = cls.getGenericSuperclass();
+				}
+
+			} else {
+				int i = 0;
+				for (Class iCls : cls.getInterfaces()) {
+					if (iCls == genericDeclaration) {
+						type = cls.getGenericInterfaces()[i];
+					}
+
+					i++;
+				}
+			}
+
+			if (type != null) {
+				if (type instanceof ParameterizedType) {
+					Type[] typeArguments = ((ParameterizedType) type).getActualTypeArguments();
+					int i = 0;
+					int len = typeArguments.length;
+					String name = typeVariable.getName();
+					type = null;
+					for (TypeVariable var : genericDeclaration.getTypeParameters()) {
+						if (name.equals(var.getName())) {
+							type = typeArguments[i];
+						}
+
+						if (i++ >= len) {
+							break;
+						}
+					}
+
+				} else {
+					type = null;
+				}
+
+				break;
+			}
+		}
+
+		return type;
 	}
 
 	/**

@@ -14,12 +14,12 @@ import java.util.Map;
 
 import javax.servlet.ServletRequest;
 
+import com.absir.appserv.system.helper.HelperLang;
 import com.absir.bean.basis.Configure;
 import com.absir.context.lang.LangBundle;
 import com.absir.core.dyna.DynaBinder;
 import com.absir.core.kernel.KernelCollection;
 import com.absir.core.kernel.KernelDyna;
-import com.absir.core.kernel.KernelMap;
 import com.absir.core.kernel.KernelString;
 import com.absir.server.in.Input;
 import com.absir.server.on.OnPut;
@@ -77,12 +77,7 @@ public class Pag {
 	 * @return
 	 */
 	public String getLang(String lang, boolean echo) {
-		String name = KernelMap.getKey(LangBundle.ME.getResourceBundle(), lang);
-		if (name == null) {
-			name = lang;
-		}
-
-		return getLang(name, lang, echo);
+		return getLang(HelperLang.getCaptionLang(lang), lang, echo);
 	}
 
 	/**

@@ -22,6 +22,12 @@ import com.absir.core.kernel.KernelString;
 @Bean
 public class SecurityManager {
 
+	/** error */
+	private int error;
+
+	/** errorTime */
+	private long errorTime;
+
 	/** sessionKey */
 	private String sessionKey;
 
@@ -40,6 +46,20 @@ public class SecurityManager {
 	@Inject
 	private void initialize() {
 		BeanConfig beanConfig = BeanFactoryUtils.getBeanConfig();
+		if (error <= 0) {
+			error = beanConfig.getExpressionValue("security.session.error", null, int.class);
+			if (error == 0) {
+				error = 5;
+			}
+		}
+
+		if (errorTime <= 0) {
+			errorTime = beanConfig.getExpressionValue("security.session.errorTime", null, long.class);
+			if (errorTime == 0) {
+				errorTime = 180000;
+			}
+		}
+
 		if (sessionKey == null) {
 			sessionKey = beanConfig.getExpressionObject("security.session.key", null, String.class);
 			if (KernelString.isEmpty(sessionKey)) {
@@ -67,6 +87,20 @@ public class SecurityManager {
 				cookiePath = "/";
 			}
 		}
+	}
+
+	/**
+	 * @return the error
+	 */
+	public int getError() {
+		return error;
+	}
+
+	/**
+	 * @return the errorTime
+	 */
+	public long getErrorTime() {
+		return errorTime;
 	}
 
 	/**

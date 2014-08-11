@@ -16,6 +16,7 @@ import com.absir.appserv.system.service.SecurityService;
 import com.absir.bean.basis.Base;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Inject;
+import com.absir.bean.inject.value.Value;
 import com.absir.core.kernel.KernelString;
 
 /**
@@ -25,6 +26,12 @@ import com.absir.core.kernel.KernelString;
 @Base
 @Bean
 public class IdentityServiceLocal implements IdentityService {
+
+	@Value("security.identity.error")
+	private int error = 99;
+
+	@Value("security.identity.errorTime")
+	private int errorTime = 60000;
 
 	/** identityServiceMap */
 	@Inject(value = "IdentityService")
@@ -61,7 +68,7 @@ public class IdentityServiceLocal implements IdentityService {
 		if (parameters.length == 3) {
 			JiUserBase userBase = SecurityService.ME.getUserBase(parameters[1]);
 			if (userBase != null) {
-				if (SecurityService.ME.validator(userBase, parameters[2])) {
+				if (SecurityService.ME.validator(userBase, parameters[2], error, errorTime)) {
 					return userBase;
 				}
 			}

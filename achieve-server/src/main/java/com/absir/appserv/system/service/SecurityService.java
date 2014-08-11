@@ -206,12 +206,12 @@ public abstract class SecurityService implements ISecurityService {
 				throw new ServerException(ServerStatus.NO_USER);
 			}
 
-			if (!validator(userBase, password)) {
+			SecurityManager securityManager = getSecurityManager(name);
+			if (!validator(userBase, password, securityManager.getError(), securityManager.getErrorTime())) {
 				throw new ServerException(ServerStatus.NO_USER, "password");
 			}
 
 			if (userBase.getUserRoleLevel() >= roleLevel) {
-				SecurityManager securityManager = getSecurityManager(name);
 				SecurityContext securityContext = loginUser(securityManager, userBase, remember, inputRequest);
 				if (securityContext != null) {
 					inputRequest.setSession(securityManager.getSessionKey(), securityContext.getId());

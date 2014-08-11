@@ -32,9 +32,11 @@ public interface ISecurityService {
 	/**
 	 * @param userBase
 	 * @param password
+	 * @param error
+	 * @param errorTime
 	 * @return
 	 */
-	public boolean validator(JiUserBase userBase, String password);
+	public boolean validator(JiUserBase userBase, String password, int error, long errorTime);
 
 	/**
 	 * @param username

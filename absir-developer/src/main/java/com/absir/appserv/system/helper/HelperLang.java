@@ -12,6 +12,7 @@ import java.lang.reflect.Method;
 
 import com.absir.appserv.system.bean.value.JaLang;
 import com.absir.context.lang.LangBundle;
+import com.absir.core.kernel.KernelMap;
 import com.absir.core.kernel.KernelReflect;
 import com.absir.core.kernel.KernelString;
 
@@ -115,5 +116,18 @@ public class HelperLang {
 	 */
 	public static String getEnumNameCaption(Enum enumerate) {
 		return getLangName(KernelReflect.declaredField(enumerate.getClass(), enumerate.name()).getAnnotation(JaLang.class), enumerate.name());
+	}
+
+	/**
+	 * @param lang
+	 * @return
+	 */
+	public static String getCaptionLang(String lang) {
+		String name = KernelMap.getKey(LangBundle.ME.getResourceBundle(), lang);
+		if (name == null) {
+			name = lang;
+		}
+
+		return name;
 	}
 }

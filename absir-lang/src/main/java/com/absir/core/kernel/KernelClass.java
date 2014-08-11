@@ -470,6 +470,7 @@ public abstract class KernelClass {
 	 * @return
 	 */
 	public static Type type(Class cls, TypeVariable typeVariable) {
+		Class root = cls;
 		Type type = null;
 		GenericDeclaration genericDeclaration = typeVariable.getGenericDeclaration();
 		boolean impl = genericDeclaration instanceof Class && !((Class) genericDeclaration).isInterface();
@@ -501,6 +502,9 @@ public abstract class KernelClass {
 					for (TypeVariable var : genericDeclaration.getTypeParameters()) {
 						if (name.equals(var.getName())) {
 							type = typeArguments[i];
+							if (type instanceof TypeVariable) {
+								return type(root, (TypeVariable) type);
+							}
 						}
 
 						if (i++ >= len) {

@@ -16,6 +16,7 @@ import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.core.kernel.KernelClass;
 import com.absir.core.util.UtilAccessor;
 import com.absir.core.util.UtilAccessor.Accessor;
+import com.absir.property.value.Allow;
 
 /**
  * @author absir
@@ -57,8 +58,8 @@ public class Property {
 	 */
 	public Property(Class<?> beanClass, String name, int include, int exclude, String beanName, Class<? extends PropertyFactory> factoryClass) {
 		accessor = UtilAccessor.getAccessorProperty(beanClass, name);
-		Field field = accessor.getField();
-		if (field == null || !Modifier.isPublic(field.getModifiers())) {
+		Field field = accessor == null ? null : accessor.getField();
+		if (field == null || (!Modifier.isPublic(field.getModifiers()) && field.getAnnotation(Allow.class) == null)) {
 			if (accessor == null) {
 				allow = -2;
 

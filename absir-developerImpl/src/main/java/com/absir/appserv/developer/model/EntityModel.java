@@ -52,6 +52,9 @@ public class EntityModel implements IModel {
 	/** jCruds */
 	private List<JCrud> jCruds;
 
+	/** fieldMap */
+	private Map<String, IField> fieldMap = new HashMap<String, IField>();
+
 	/** groups */
 	private Map<String, List<IField>> groups = new HashMap<String, List<IField>>();
 
@@ -186,14 +189,13 @@ public class EntityModel implements IModel {
 	 */
 	protected void addField(IField field) {
 		fields.add(field);
-		// KernelList(fields, field);
 	}
 
 	/**
-	 * @return
+	 * @return the fieldMap
 	 */
-	public Map<String, List<IField>> getGroups() {
-		return groups;
+	public IField getField(String name) {
+		return fieldMap.get(name);
 	}
 
 	/**
@@ -273,6 +275,31 @@ public class EntityModel implements IModel {
 			if (set != null) {
 				for (String r : set) {
 					addGroupField(r, field, false);
+				}
+			}
+		}
+	}
+
+	/**
+	 * 
+	 */
+	protected void addComplete() {
+		addGroupField(JaEdit.GROUP_LIST, primary);
+		for (IField parmary : primaries) {
+			fieldMap.put(parmary.getName(), parmary);
+			addGroupField(JaEdit.GROUP_SUGGEST, parmary);
+		}
+
+		for (IField field : fields) {
+			fieldMap.put(field.getName(), field);
+			if (field.getGroups() == null) {
+				if ("name".equals(field.getName())) {
+					addGroupField(JaEdit.GROUP_SUGGEST, field);
+				}
+
+			} else {
+				for (String group : field.getGroups()) {
+					addGroupField(group, field);
 				}
 			}
 		}

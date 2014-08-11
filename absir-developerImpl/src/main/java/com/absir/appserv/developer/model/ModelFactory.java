@@ -13,9 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.absir.appserv.support.Developer;
-import com.absir.appserv.support.developer.IField;
 import com.absir.appserv.system.bean.value.JaCrud;
-import com.absir.appserv.system.bean.value.JaEdit;
 import com.absir.appserv.system.helper.HelperLang;
 import com.absir.bean.basis.Environment;
 import com.absir.bean.core.BeanFactoryUtils;
@@ -128,25 +126,7 @@ public class ModelFactory {
 		}
 
 		EntityField.addEntityFieldScope(null, joEntity, entityModel.getFields(), entityModel);
-		for (IField parmary : entityModel.getPrimaries()) {
-			entityModel.addGroupField(JaEdit.GROUP_SUGGEST, parmary);
-		}
-
-		entityModel.addGroupField(JaEdit.GROUP_LIST, entityModel.getPrimary());
-		for (IField field : entityModel.getFields()) {
-			// entityModel.addField(field);
-			if (field.getGroups() == null) {
-				if ("name".equals(field.getName())) {
-					entityModel.addGroupField(JaEdit.GROUP_SUGGEST, field);
-				}
-
-			} else {
-				for (String group : field.getGroups()) {
-					entityModel.addGroupField(group, field);
-				}
-			}
-		}
-
+		entityModel.addComplete();
 		return entityModel;
 	}
 }

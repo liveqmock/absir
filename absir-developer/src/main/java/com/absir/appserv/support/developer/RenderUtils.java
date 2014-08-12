@@ -26,7 +26,7 @@ public class RenderUtils {
 	 * @throws IOException
 	 */
 	public static boolean includeExist(String path, Object... renders) throws IOException {
-		if (new File(IRender.ME.getRealPath(path, renders)).exists()) {
+		if (new File(IRender.ME.getRealPath(path)).exists()) {
 			IRender.ME.include(path, renders);
 			return true;
 		}

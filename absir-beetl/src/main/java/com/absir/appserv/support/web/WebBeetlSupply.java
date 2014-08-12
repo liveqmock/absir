@@ -322,7 +322,7 @@ public class WebBeetlSupply implements IBeanDefineSupply, IMethodSupport<BeetlCo
 				groupTemplate.registerTag(entry.getKey(), entry.getValue());
 			}
 		}
-		
+
 		groupTemplate.registerFunctionPackage("Pag", Pag.class);
 	}
 

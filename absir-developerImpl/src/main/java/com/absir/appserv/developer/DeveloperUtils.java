@@ -94,6 +94,17 @@ public class DeveloperUtils {
 		}
 	}
 
+	/** DIY */
+	protected static final String DIY = DeveloperUtils.class.getName() + "@DIY";
+
+	/**
+	 * @param request
+	 * @param diy
+	 */
+	public static void diy(ServletRequest request, boolean diy) {
+		request.setAttribute(DIY, diy);
+	}
+
 	/**
 	 * @param filePath
 	 * @param includePath
@@ -112,6 +123,10 @@ public class DeveloperUtils {
 			if (joEntity == null || !(joEntity instanceof JoEntity)) {
 				Object value = request.getAttribute("entityName");
 				String entityName = value != null && value instanceof String ? (String) value : null;
+				if (entityName == null) {
+					entityName = request.getParameter("entityName");
+				}
+
 				value = request.getAttribute("entityClass");
 				Class<?> entityClass = value != null && value instanceof Class ? (Class<?>) value : null;
 				if (entityName != null || entityClass != null) {
@@ -120,31 +135,34 @@ public class DeveloperUtils {
 				}
 			}
 
+			File file = new File(IRender.ME.getRealPath(filepath));
 			EntityModel entityModel = joEntity == null ? null : ModelFactory.getModelEntity((JoEntity) joEntity);
-			// 非关联实体生成
-			if (entityModel == null) {
-				joEntity = null;
-				if (BeanFactoryUtils.getEnvironment() != Environment.DEVELOP && Generator_Map_Token.containsKey(filepath)) {
-					joEntity = Boolean.TRUE;
-				}
-			}
-
-			File file = new File(IRender.ME.getRealPath(filepath, renders));
-			// 如果生成文件没过期
-			if (file.exists()) {
+			// DIY生成
+			if (request.getAttribute(DIY) == null) {
+				// 非关联实体生成
 				if (entityModel == null) {
-					if (joEntity != null) {
+					joEntity = null;
+					if (BeanFactoryUtils.getEnvironment() != Environment.DEVELOP && Generator_Map_Token.containsKey(filepath)) {
+						joEntity = Boolean.TRUE;
+					}
+				}
+
+				// 如果生成文件没过期
+				if (file.exists()) {
+					if (entityModel == null) {
+						if (joEntity != null) {
+							return;
+						}
+
+					} else if (entityModel.lastModified() != null && entityModel.lastModified() <= file.lastModified()) {
 						return;
 					}
-
-				} else if (entityModel.lastModified() != null && entityModel.lastModified() <= file.lastModified()) {
-					return;
 				}
 			}
 
 			// 检测开发文件是否存在
 			includePath = getDeveloperPath(includePath);
-			if (!new File(IRender.ME.getRealPath(includePath, renders)).exists()) {
+			if (!new File(IRender.ME.getRealPath(includePath)).exists()) {
 				return;
 			}
 

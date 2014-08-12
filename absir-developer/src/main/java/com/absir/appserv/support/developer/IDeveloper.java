@@ -10,6 +10,7 @@ package com.absir.appserv.support.developer;
 import java.io.IOException;
 import java.util.List;
 
+import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Inject;
 import com.absir.orm.value.JoEntity;
@@ -20,6 +21,19 @@ import com.absir.orm.value.JoEntity;
  */
 @Inject
 public interface IDeveloper {
+
+	/**
+	 * @author absir
+	 *
+	 */
+	public static interface ISecurity {
+
+		/**
+		 * @param render
+		 * @return
+		 */
+		public JiUserBase loginRender(Object render);
+	}
 
 	/** ME */
 	public static final IDeveloper ME = BeanFactoryUtils.get(IDeveloper.class);
@@ -42,6 +56,18 @@ public interface IDeveloper {
 	 * @return
 	 */
 	public String[] getCrudFields(JoEntity joEntity, String group);
+
+	/**
+	 * @param render
+	 * @return
+	 */
+	public int diy(Object render);
+
+	/**
+	 * @param includePath
+	 * @return
+	 */
+	public String getDeveloperPath(String includePath);
 
 	/**
 	 * @param filepath

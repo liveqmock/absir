@@ -9,7 +9,12 @@ package com.absir.appserv.system.service;
 
 import java.util.Map;
 
+import javax.servlet.ServletRequest;
+
+import com.absir.appserv.support.developer.IDeveloper.ISecurity;
+import com.absir.appserv.support.developer.Pag;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
+import com.absir.appserv.system.bean.value.JeRoleLevel;
 import com.absir.appserv.system.helper.HelperLong;
 import com.absir.appserv.system.helper.HelperRandom;
 import com.absir.appserv.system.security.ISecurityService;
@@ -28,7 +33,7 @@ import com.absir.servlet.InputRequest;
  * @author absir
  * 
  */
-public abstract class SecurityService implements ISecurityService {
+public abstract class SecurityService implements ISecurityService, ISecurity {
 
 	/** ME */
 	public static final SecurityService ME = BeanFactoryUtils.get(SecurityService.class);
@@ -253,5 +258,27 @@ public abstract class SecurityService implements ISecurityService {
 
 		setUserBase(null, input);
 		setSecurityContext(null, input);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.support.developer.IDeveloper.ISecurity#loginRender(
+	 * java.lang.Object)
+	 */
+	@Override
+	public JiUserBase loginRender(Object render) {
+		// TODO Auto-generated method stub
+		Input input = null;
+		if (render instanceof Input) {
+			input = (Input) render;
+
+		} else if (render instanceof ServletRequest) {
+			input = Pag.getInput((ServletRequest) render);
+		}
+
+		SecurityContext securityContext = input == null ? null : autoLogin("admin", true, JeRoleLevel.ROLE_ADMIN.ordinal(), input);
+		return securityContext == null ? null : securityContext.getUser();
 	}
 }

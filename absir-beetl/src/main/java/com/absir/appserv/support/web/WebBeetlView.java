@@ -117,24 +117,35 @@ public class WebBeetlView extends ReturnedResolverView implements IRender {
 	 * @return
 	 */
 	public Template getTemplate(String view, InputRequest input) {
-		if (BeanFactoryUtils.getEnvironment() != Environment.PRODUCT && IDeveloper.ME != null) {
-			try {
-				Context ctx = new Context();
-				ctx.gt = groupTemplate;
-				ctx.set("input", input);
-				for (Entry<String, Object> entry : input.getModel().entrySet()) {
-					ctx.set(entry.getKey(), entry.getValue());
+		int diy = 0;
+		if (IDeveloper.ME != null) {
+			diy = IDeveloper.ME.diy(input.getRequest());
+			if (diy == 2 || BeanFactoryUtils.getEnvironment() != Environment.PRODUCT) {
+				try {
+					Context ctx = new Context();
+					ctx.gt = groupTemplate;
+					ctx.set("input", input);
+					for (Entry<String, Object> entry : input.getModel().entrySet()) {
+						ctx.set(entry.getKey(), entry.getValue());
+					}
+
+					IDeveloper.ME.generate(view, view, ctx, input.getRequest());
+
+				} catch (Exception e) {
+					// TODO: handle exception
+					e.printStackTrace();
 				}
-
-				IDeveloper.ME.generate(view, view, ctx, input.getRequest());
-
-			} catch (Exception e) {
-				// TODO: handle exception
-				e.printStackTrace();
 			}
 		}
 
-		Template template = new WebVariableScope().ready(groupTemplate, view, input.getRequest());
+		Template template;
+		if (diy == 1) {
+			template = new WebVariableScope().ready(groupTemplate, view, input.getRequest());
+
+		} else {
+			template = new WebVariableScope().ready(groupTemplate, view, input.getRequest());
+		}
+
 		template.binding("input", input);
 		template.binding("APP_NAME", MenuContextUtils.getAppName());
 		template.binding("SITE_ROUTE", MenuContextUtils.getSiteRoute());

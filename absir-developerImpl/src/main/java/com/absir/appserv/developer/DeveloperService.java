@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
+import javax.servlet.ServletRequest;
+
 import com.absir.appserv.developer.model.EntityModel;
 import com.absir.appserv.developer.model.ModelFactory;
 import com.absir.appserv.support.Developer;
@@ -21,15 +23,20 @@ import com.absir.appserv.support.developer.IField;
 import com.absir.appserv.support.developer.IModel;
 import com.absir.appserv.support.developer.JCrud;
 import com.absir.appserv.support.developer.JCrudField;
+import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.bean.basis.Base;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
+import com.absir.bean.inject.value.Inject;
+import com.absir.bean.inject.value.InjectType;
 import com.absir.bean.inject.value.Started;
 import com.absir.bean.inject.value.Value;
+import com.absir.core.dyna.DynaBinder;
 import com.absir.core.helper.HelperFile;
 import com.absir.core.helper.HelperFileName;
 import com.absir.core.kernel.KernelCollection;
 import com.absir.core.kernel.KernelLang.CallbackTemplate;
+import com.absir.core.kernel.KernelString;
 import com.absir.orm.value.JoEntity;
 
 /**
@@ -40,15 +47,20 @@ import com.absir.orm.value.JoEntity;
 @Bean
 public class DeveloperService implements IDeveloper {
 
+	/** developerWeb */
 	@Value("developer.web")
 	private static String developerWeb;
+
+	/** security */
+	@Inject(type = InjectType.Selectable)
+	private ISecurity security;
 
 	/**
 	 * 初始化开发环境
 	 */
 	@Started
 	protected static void postConstruct() {
-		if (developerWeb != null) {
+		if (!KernelString.isEmpty(developerWeb)) {
 			String developePath = HelperFileName.normalizeNoEndSeparator(developerWeb + "/../../../");
 			String deployPath = HelperFileName.normalizeNoEndSeparator(BeanFactoryUtils.getBeanConfig().getClassPath() + "/../../");
 			if (IDeveloper.ME != null) {
@@ -61,7 +73,7 @@ public class DeveloperService implements IDeveloper {
 				}
 			}
 
-			if ((HelperFileName.getName(developePath)).equals(HelperFileName.getName(deployPath))) {
+			if (!KernelString.isEmpty(deployPath) && (HelperFileName.getName(developePath)).equals(HelperFileName.getName(deployPath))) {
 				final String resourcesPath = developePath + "/src/main/resources/";
 				if (HelperFile.directoryExists(resourcesPath)) {
 					// 复制开发文件到开发环境
@@ -179,6 +191,43 @@ public class DeveloperService implements IDeveloper {
 		}
 
 		return KernelCollection.toArray(crudFields, String.class);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.appserv.support.developer.IDeveloper#diy(java.lang.Object)
+	 */
+	@Override
+	public int diy(Object render) {
+		// TODO Auto-generated method stub
+		if (render != null && render instanceof ServletRequest && security != null) {
+			ServletRequest request = (ServletRequest) render;
+			JiUserBase userBase = security.loginRender(request);
+			if (userBase != null && userBase.isDeveloper()) {
+				String parameter = request.getParameter("diy");
+				if (parameter != null) {
+					boolean diy = DynaBinder.to(parameter, boolean.class);
+					DeveloperUtils.diy(request, diy);
+					return diy ? 1 : 2;
+				}
+			}
+		}
+
+		return 0;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.support.developer.IDeveloper#getDeveloperPath(java.
+	 * lang.String)
+	 */
+	@Override
+	public String getDeveloperPath(String includePath) {
+		// TODO Auto-generated method stub
+		return DeveloperUtils.getDeveloperPath(includePath);
 	}
 
 	/*

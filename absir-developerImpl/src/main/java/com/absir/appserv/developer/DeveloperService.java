@@ -19,6 +19,7 @@ import com.absir.appserv.developer.model.EntityModel;
 import com.absir.appserv.developer.model.ModelFactory;
 import com.absir.appserv.support.Developer;
 import com.absir.appserv.support.developer.IDeveloper;
+import com.absir.appserv.support.developer.IDeveloper.IDeploy;
 import com.absir.appserv.support.developer.IField;
 import com.absir.appserv.support.developer.IModel;
 import com.absir.appserv.support.developer.JCrud;
@@ -45,7 +46,7 @@ import com.absir.orm.value.JoEntity;
  */
 @Base
 @Bean
-public class DeveloperService implements IDeveloper {
+public class DeveloperService implements IDeveloper, IDeploy {
 
 	/** developerWeb */
 	@Value("developer.web")
@@ -60,19 +61,19 @@ public class DeveloperService implements IDeveloper {
 	 */
 	@Started
 	protected static void postConstruct() {
+		String deployPath = HelperFileName.normalizeNoEndSeparator(BeanFactoryUtils.getBeanConfig().getClassPath() + "/../../");
+		for (IDeploy deploy : BeanFactoryUtils.get().getBeanObjects(IDeploy.class)) {
+			try {
+				HelperFile.copyDirectoryOverWrite(deploy.getClass().getResource("/deploy"), new File(deployPath), false, null, true);
+
+			} catch (Throwable e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
 		if (!KernelString.isEmpty(developerWeb)) {
 			String developePath = HelperFileName.normalizeNoEndSeparator(developerWeb + "/../../../");
-			String deployPath = HelperFileName.normalizeNoEndSeparator(BeanFactoryUtils.getBeanConfig().getClassPath() + "/../../");
-			if (IDeveloper.ME != null) {
-				try {
-					HelperFile.copyDirectoryOverWrite(IDeveloper.ME.getClass().getResource("/deploy"), new File(deployPath), false, null, true);
-
-				} catch (Throwable e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-
 			if (!KernelString.isEmpty(deployPath) && (HelperFileName.getName(developePath)).equals(HelperFileName.getName(deployPath))) {
 				final String resourcesPath = developePath + "/src/main/resources/";
 				if (HelperFile.directoryExists(resourcesPath)) {

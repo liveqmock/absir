@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.absir.appserv.support.developer.IDeveloper;
 import com.absir.appserv.support.developer.IRender;
 import com.absir.appserv.system.asset.Asset_diy;
+import com.absir.appserv.system.helper.HelperInput;
 import com.absir.bean.basis.Environment;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Value;
@@ -75,6 +76,7 @@ public abstract class ServerDiyView extends ReturnedResolverView implements IRen
 
 		if (diy == 2) {
 			Asset_diy.authentication(input);
+			input.getModel().put("diy@url", HelperInput.getRequestUrl(request));
 			input.getModel().put("diy@view", view);
 			input.getModel().put("diy@Restore", getDiyRestore(view));
 			view = diyView;

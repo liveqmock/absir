@@ -26,6 +26,14 @@ public interface IDeveloper {
 	 * @author absir
 	 *
 	 */
+	public static interface IDeploy {
+
+	}
+
+	/**
+	 * @author absir
+	 *
+	 */
 	public static interface ISecurity {
 
 		/**

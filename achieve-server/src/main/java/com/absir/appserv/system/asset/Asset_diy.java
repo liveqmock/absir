@@ -21,6 +21,8 @@ import com.absir.server.exception.ServerStatus;
 import com.absir.server.in.Input;
 import com.absir.server.value.Before;
 import com.absir.server.value.Body;
+import com.absir.server.value.Nullable;
+import com.absir.server.value.Param;
 import com.absir.server.value.Server;
 import com.absir.servlet.InputRequest;
 
@@ -99,13 +101,13 @@ public class Asset_diy extends AssetServer {
 	 * @throws IOException
 	 */
 	@Body
-	public String save(String view, @Body String[] bodys) throws IOException {
+	public String save(String view, @Nullable @Param String generate, @Body String[] bodys) throws IOException {
 		if (IDeveloper.ME != null) {
 			view = IDeveloper.ME.getDeveloperPath(view);
+			HelperFile.write(new File(IRender.ME.getRealPath(view + diySuffix)), bodys[0]);
+			HelperFile.write(new File(IRender.ME.getRealPath(view)), bodys[1]);
 		}
 
-		HelperFile.write(new File(IRender.ME.getRealPath(view + diySuffix)), bodys[0]);
-		HelperFile.write(new File(IRender.ME.getRealPath(view)), bodys[1]);
-		return "OK";
+		return "ok";
 	}
 }

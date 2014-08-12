@@ -24,18 +24,13 @@ import org.beetl.core.resource.WebAppResourceLoader;
 import org.beetl.ext.web.WebVariableScope;
 
 import com.absir.appserv.feature.menu.MenuContextUtils;
-import com.absir.appserv.support.developer.IDeveloper;
-import com.absir.appserv.support.developer.IRender;
+import com.absir.appserv.system.server.ServerDiyView;
 import com.absir.bean.basis.Base;
-import com.absir.bean.basis.Environment;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Inject;
 import com.absir.bean.inject.value.Value;
 import com.absir.context.core.ContextUtils;
-import com.absir.server.in.Input;
-import com.absir.server.on.OnPut;
-import com.absir.server.route.returned.ReturnedResolverView;
 import com.absir.servlet.InputRequest;
 
 /**
@@ -44,7 +39,7 @@ import com.absir.servlet.InputRequest;
  */
 @Base(order = -1)
 @Bean
-public class WebBeetlView extends ReturnedResolverView implements IRender {
+public class WebBeetlView extends ServerDiyView {
 
 	/** ME */
 	public static final WebBeetlView ME = BeanFactoryUtils.get(WebBeetlView.class);
@@ -95,58 +90,58 @@ public class WebBeetlView extends ReturnedResolverView implements IRender {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * com.absir.server.route.returned.ReturnedResolverView#resolveReturnedView
-	 * (java.lang.String, com.absir.server.on.OnPut)
+	 * com.absir.appserv.system.server.ServerDiyView#getView(java.lang.String)
 	 */
 	@Override
-	public void resolveReturnedView(String view, OnPut onPut) throws Exception {
+	protected String getView(String view) {
 		// TODO Auto-generated method stub
-		Input input = onPut.getInput();
-		if (input instanceof InputRequest) {
-			InputRequest inputRequest = (InputRequest) input;
-			renderView(getTemplate(prefix + view + suffix, inputRequest), inputRequest.getResponse());
-
-		} else {
-			onPut.getInput().write(view);
-		}
+		return prefix + view + suffix;
 	}
 
-	/**
-	 * @param view
-	 * @param inputRequest
-	 * @return
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.system.server.ServerDiyView#getRender(java.lang.String,
+	 * com.absir.servlet.InputRequest)
 	 */
-	public Template getTemplate(String view, InputRequest input) {
-		int diy = 0;
-		if (IDeveloper.ME != null) {
-			diy = IDeveloper.ME.diy(input.getRequest());
-			if (diy == 2 || BeanFactoryUtils.getEnvironment() != Environment.PRODUCT) {
-				try {
-					Context ctx = new Context();
-					ctx.gt = groupTemplate;
-					ctx.set("input", input);
-					for (Entry<String, Object> entry : input.getModel().entrySet()) {
-						ctx.set(entry.getKey(), entry.getValue());
-					}
+	@Override
+	protected Object getRender(String view, InputRequest input) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-					IDeveloper.ME.generate(view, view, ctx, input.getRequest());
-
-				} catch (Exception e) {
-					// TODO: handle exception
-					e.printStackTrace();
-				}
-			}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.system.server.ServerDiyView#getRenders(java.lang.Object
+	 * , com.absir.servlet.InputRequest)
+	 */
+	@Override
+	protected Object[] getRenders(Object render, InputRequest input) {
+		// TODO Auto-generated method stub
+		Context ctx = new Context();
+		ctx.gt = groupTemplate;
+		ctx.set("input", input);
+		for (Entry<String, Object> entry : input.getModel().entrySet()) {
+			ctx.set(entry.getKey(), entry.getValue());
 		}
 
-		Template template;
-		if (diy == 1) {
-			template = new WebVariableScope().ready(groupTemplate, view, input.getRequest());
+		return new Object[] { ctx, input.getRequest() };
+	}
 
-		} else {
-			template = new WebVariableScope().ready(groupTemplate, view, input.getRequest());
-		}
-
-		template.binding("input", input);
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.system.server.ServerDiyView#renderView(java.lang.String
+	 * , java.lang.Object[], com.absir.servlet.InputRequest)
+	 */
+	@Override
+	protected void renderView(String view, Object[] renders, InputRequest input) {
+		// TODO Auto-generated method stub
+		Template template = new WebVariableScope().ready(groupTemplate, view, input.getRequest());
 		template.binding("APP_NAME", MenuContextUtils.getAppName());
 		template.binding("SITE_ROUTE", MenuContextUtils.getSiteRoute());
 		template.binding("ADMIN_ROUTE", MenuContextUtils.getAdminRoute());
@@ -154,7 +149,7 @@ public class WebBeetlView extends ReturnedResolverView implements IRender {
 			template.binding(entry.getKey(), entry.getValue());
 		}
 
-		return template;
+		renderView(template, input.getResponse());
 	}
 
 	/*

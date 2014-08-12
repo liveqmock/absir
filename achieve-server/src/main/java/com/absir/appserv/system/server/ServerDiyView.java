@@ -79,6 +79,8 @@ public abstract class ServerDiyView extends ReturnedResolverView implements IRen
 			input.getModel().put("diy_url", HelperInput.getRequestUrl(request));
 			input.getModel().put("diy_view", view);
 			input.getModel().put("diy_restore", getDiyRestore(view));
+			input.getModel().put("diy_include", include(","));
+			input.getModel().put("diy_expression", expression(","));
 			view = diyView;
 		}
 
@@ -113,6 +115,14 @@ public abstract class ServerDiyView extends ReturnedResolverView implements IRen
 	}
 
 	/**
+	 * @param expression
+	 * @return
+	 */
+	protected String expression(String expression) {
+		return "<% " + expression + " %>";
+	}
+
+	/**
 	 * @param view
 	 * @return
 	 */
@@ -137,5 +147,4 @@ public abstract class ServerDiyView extends ReturnedResolverView implements IRen
 	 * @param input
 	 */
 	protected abstract void renderView(String view, Object[] renders, InputRequest input);
-
 }

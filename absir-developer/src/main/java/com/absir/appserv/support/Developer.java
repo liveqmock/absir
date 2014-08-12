@@ -14,9 +14,11 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import com.absir.appserv.support.developer.IDeveloper;
+import com.absir.appserv.support.developer.IRender;
 import com.absir.appserv.system.helper.HelperString;
 import com.absir.bean.basis.Configure;
 import com.absir.bean.core.BeanFactoryUtils;
+import com.absir.core.helper.HelperFile;
 import com.absir.core.kernel.KernelLang.CallbackTemplate;
 import com.absir.core.kernel.KernelLang.ObjectEntry;
 import com.absir.core.kernel.KernelObject;
@@ -96,10 +98,35 @@ public abstract class Developer {
 	 * @param file
 	 */
 	public static void doEntry(File file) {
-		String path = file.getPath();
-		path = HelperString.substringAfter(path, BeanFactoryUtils.getBeanConfig().getClassPath());
-		if (!KernelString.isEmpty(path)) {
-			doEntry(new ObjectEntry<String, File>(path, file));
+		if (!RUMTIME_LISTENERS.isEmpty()) {
+			String path = file.getPath();
+			path = HelperString.substringAfter(path, BeanFactoryUtils.getBeanConfig().getClassPath());
+			if (!KernelString.isEmpty(path)) {
+				doEntry(new ObjectEntry<String, File>(path, file));
+			}
+		}
+	}
+
+	/**
+	 * @param file
+	 * @param data
+	 * @throws IOException
+	 */
+	public static void writeEntry(File file, CharSequence data) throws IOException {
+		HelperFile.write(file, data);
+		doEntry(file);
+	}
+
+	/**
+	 * @param File
+	 * @param data
+	 * @throws IOException
+	 */
+	public static void writeGenerate(String filePath, CharSequence data) throws IOException {
+		File file = new File(IRender.ME.getRealPath(filePath));
+		HelperFile.write(file, data);
+		if (IDeveloper.ME != null) {
+			IDeveloper.ME.copyDeveloper(file, filePath);
 		}
 	}
 

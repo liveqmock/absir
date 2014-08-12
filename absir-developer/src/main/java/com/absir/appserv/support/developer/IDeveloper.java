@@ -7,6 +7,7 @@
  */
 package com.absir.appserv.support.developer;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -76,6 +77,12 @@ public interface IDeveloper {
 	 * @return
 	 */
 	public String getDeveloperPath(String includePath);
+
+	/**
+	 * @param file
+	 * @param filePath
+	 */
+	public void copyDeveloper(File file, String filePath) throws IOException;
 
 	/**
 	 * @param filepath

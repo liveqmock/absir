@@ -76,9 +76,9 @@ public abstract class ServerDiyView extends ReturnedResolverView implements IRen
 
 		if (diy == 2) {
 			Asset_diy.authentication(input);
-			input.getModel().put("diy@url", HelperInput.getRequestUrl(request));
-			input.getModel().put("diy@view", view);
-			input.getModel().put("diy@Restore", getDiyRestore(view));
+			input.getModel().put("diy_url", HelperInput.getRequestUrl(request));
+			input.getModel().put("diy_view", view);
+			input.getModel().put("diy_restore", getDiyRestore(view));
 			view = diyView;
 		}
 

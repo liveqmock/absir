@@ -10,10 +10,13 @@ package com.absir.appserv.system.asset;
 import java.io.File;
 import java.io.IOException;
 
+import com.absir.appserv.support.Developer;
 import com.absir.appserv.support.developer.IDeveloper;
 import com.absir.appserv.support.developer.IRender;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.service.SecurityService;
+import com.absir.bean.basis.Environment;
+import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Value;
 import com.absir.core.helper.HelperFile;
 import com.absir.server.exception.ServerException;
@@ -21,7 +24,6 @@ import com.absir.server.exception.ServerStatus;
 import com.absir.server.in.Input;
 import com.absir.server.value.Before;
 import com.absir.server.value.Body;
-import com.absir.server.value.Nullable;
 import com.absir.server.value.Param;
 import com.absir.server.value.Server;
 import com.absir.servlet.InputRequest;
@@ -61,6 +63,10 @@ public class Asset_diy extends AssetServer {
 	 */
 	@Before
 	protected void onAuthentication(Input input) throws Exception {
+		if (BeanFactoryUtils.getEnvironment() == Environment.DEVELOP) {
+			return;
+		}
+
 		if (input instanceof InputRequest) {
 			if (((InputRequest) input).getSession(DIY_AUTHENTICATION) != null) {
 				return;
@@ -97,15 +103,16 @@ public class Asset_diy extends AssetServer {
 
 	/**
 	 * @param view
+	 * @param bodies
 	 * @return
 	 * @throws IOException
 	 */
 	@Body
-	public String save(String view, @Nullable @Param String generate, @Body String[] bodys) throws IOException {
+	public String save(String view, @Param("bodies[]") String[] bodies) throws IOException {
 		if (IDeveloper.ME != null) {
 			view = IDeveloper.ME.getDeveloperPath(view);
-			HelperFile.write(new File(IRender.ME.getRealPath(view + diySuffix)), bodys[0]);
-			HelperFile.write(new File(IRender.ME.getRealPath(view)), bodys[1]);
+			Developer.writeGenerate(view + diySuffix, bodies[0]);
+			Developer.writeGenerate(view, bodies[1]);
 		}
 
 		return "ok";

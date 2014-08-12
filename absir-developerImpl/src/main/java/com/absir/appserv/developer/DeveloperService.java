@@ -15,6 +15,8 @@ import java.util.Map.Entry;
 
 import javax.servlet.ServletRequest;
 
+import org.apache.commons.io.FileUtils;
+
 import com.absir.appserv.developer.model.EntityModel;
 import com.absir.appserv.developer.model.ModelFactory;
 import com.absir.appserv.support.Developer;
@@ -26,6 +28,7 @@ import com.absir.appserv.support.developer.JCrud;
 import com.absir.appserv.support.developer.JCrudField;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.bean.basis.Base;
+import com.absir.bean.basis.Environment;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Inject;
@@ -194,6 +197,15 @@ public class DeveloperService implements IDeveloper, IDeploy {
 		return KernelCollection.toArray(crudFields, String.class);
 	}
 
+	/**
+	 * @param render
+	 * @return
+	 */
+	public boolean isDeveloper(Object render) {
+		JiUserBase user = security.loginRender(render);
+		return user != null && user.isDeveloper();
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -204,8 +216,7 @@ public class DeveloperService implements IDeveloper, IDeploy {
 		// TODO Auto-generated method stub
 		if (render != null && render instanceof ServletRequest && security != null) {
 			ServletRequest request = (ServletRequest) render;
-			JiUserBase userBase = security.loginRender(request);
-			if (userBase != null && userBase.isDeveloper()) {
+			if (BeanFactoryUtils.getEnvironment() == Environment.DEVELOP || isDeveloper(render)) {
 				String parameter = request.getParameter("diy");
 				if (parameter != null) {
 					boolean diy = DynaBinder.to(parameter, boolean.class);
@@ -229,6 +240,21 @@ public class DeveloperService implements IDeveloper, IDeploy {
 	public String getDeveloperPath(String includePath) {
 		// TODO Auto-generated method stub
 		return DeveloperUtils.getDeveloperPath(includePath);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.support.developer.IDeveloper#copyDeveloper(java.io.
+	 * File, java.lang.String)
+	 */
+	@Override
+	public void copyDeveloper(File file, String filePath) throws IOException {
+		// TODO Auto-generated method stub
+		if (developerWeb != null) {
+			FileUtils.copyFile(file, new File(developerWeb + filePath));
+		}
 	}
 
 	/*

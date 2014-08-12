@@ -160,7 +160,7 @@ public class WebBeetlView extends ServerDiyView {
 	@Override
 	public String echo(String value) {
 		// TODO Auto-generated method stub
-		return "print(" + value + ")";
+		return groupTemplate.getConf().getPlaceholderStart() + value + groupTemplate.getConf().getPlaceholderEnd();
 	}
 
 	/*
@@ -172,7 +172,7 @@ public class WebBeetlView extends ServerDiyView {
 	@Override
 	public String include(String path) {
 		// TODO Auto-generated method stub
-		return "include(" + path + ")";
+		return groupTemplate.getConf().getStatementStart() + " include(\"" + path + "\"); " + groupTemplate.getConf().getStatementEnd();
 	}
 
 	/*

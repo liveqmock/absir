@@ -18,11 +18,10 @@ import java.util.Set;
 
 import javax.servlet.ServletRequest;
 
-import org.apache.commons.io.FileUtils;
-
 import com.absir.appserv.developer.model.EntityModel;
 import com.absir.appserv.developer.model.ModelFactory;
 import com.absir.appserv.support.DeveloperBreak;
+import com.absir.appserv.support.developer.IDeveloper;
 import com.absir.appserv.support.developer.IRender;
 import com.absir.appserv.support.developer.IRenderSuffix;
 import com.absir.appserv.support.developer.RenderUtils;
@@ -112,7 +111,7 @@ public class DeveloperUtils {
 	 * @param response
 	 * @throws IOException
 	 */
-	public static void generate(String filepath, String includePath, ServletRequest request, Object... renders) throws IOException {
+	public static void generate(String filePath, String includePath, ServletRequest request, Object... renders) throws IOException {
 		if (IRender.ME == null) {
 			return;
 		}
@@ -135,14 +134,14 @@ public class DeveloperUtils {
 				}
 			}
 
-			File file = new File(IRender.ME.getRealPath(filepath));
+			File file = new File(IRender.ME.getRealPath(filePath));
 			EntityModel entityModel = joEntity == null ? null : ModelFactory.getModelEntity((JoEntity) joEntity);
 			// DIY生成
 			if (request.getAttribute(DIY) == null) {
 				// 非关联实体生成
 				if (entityModel == null) {
 					joEntity = null;
-					if (BeanFactoryUtils.getEnvironment() != Environment.DEVELOP && Generator_Map_Token.containsKey(filepath)) {
+					if (BeanFactoryUtils.getEnvironment() != Environment.DEVELOP && Generator_Map_Token.containsKey(filePath)) {
 						joEntity = Boolean.TRUE;
 					}
 				}
@@ -166,7 +165,7 @@ public class DeveloperUtils {
 				return;
 			}
 
-			Object token = UtilAbsir.getToken(filepath, Generator_Map_Token);
+			Object token = UtilAbsir.getToken(filePath, Generator_Map_Token);
 			try {
 				synchronized (token) {
 					if (!Generator_Tokens.add(token)) {
@@ -224,9 +223,7 @@ public class DeveloperUtils {
 								fileBuilder = null;
 
 								// 复制生成文件到开发环境
-								if (DeveloperService.getDeveloperWeb() != null) {
-									FileUtils.copyFile(file, new File(DeveloperService.getDeveloperWeb() + filepath));
-								}
+								IDeveloper.ME.copyDeveloper(file, filePath);
 
 							} finally {
 								if (output != null) {

@@ -223,7 +223,7 @@ public class WebJstlView extends ReturnedResolverView implements IRender, IRende
 	@Override
 	public String include(String path) {
 		// TODO Auto-generated method stub
-		return "<jsp:include page=" + path + "/>";
+		return "<jsp:include page=\"" + path + "\"/>";
 	}
 
 	/*

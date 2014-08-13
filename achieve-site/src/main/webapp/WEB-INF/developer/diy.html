@@ -94,7 +94,7 @@
           <li class="nav-header">
             <i class="icon-plus icon-white"></i> 页面设置 </li>
           <li style="display: list-item;" class="rows" id="estRows">
-          	<div class="lyrow ui-draggable"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span> <span class="configuration"><span class="btn-group"> <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">宽度 <span class="caret"></span></a>
+          	<div class="lyrow ui-draggable"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span> <span class="configuration"><button type="button" class="btn btn-mini" data-target="#editorModal" role="button" data-toggle="modal">编辑</button> <span class="btn-group"> <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">宽度 <span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <li class="active"><a href="#" rel="container-fluid">自动宽度</a></li>
                 <li class=""><a href="#" rel="container">固定宽度</a></li>
@@ -105,8 +105,8 @@
               </div>
               <div class="view">
                 <div class="container-fluid">
-                	<div class="contain lyrow">
-                	<div class="removeClean column"></div>
+                	<div class="lyrow">
+                	<div class="removeClean column contain"></div>
                 	</div>
                 </div>
               </div>
@@ -125,6 +125,17 @@
               </div>
               <div class="view">
                 <srpt contenteditable="true"></srpt>
+              </div>
+            </div>
+            <div class="lyrow ui-draggable"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span> <span class="configuration-hook"><span class="input-group"><span class="input-group-addon">引用路径:</span><span class="include-input" contenteditable="true"></span> <a href="#" class="btn btn-mini" data-target="#includeModal">重新载入</a></span></span>
+              <div class="preview">
+                载入引用文件
+              </div>
+              <div class="view">
+                <div class="lyrow">
+                <div class="removeClean column include">
+                </div>
+                </div>
               </div>
             </div>
           </li>
@@ -899,41 +910,70 @@
     <div>
   	<span class="configuration"><button type="button" class="btn btn-mini" data-target="#editorModal" role="button" data-toggle="modal">编辑</button></span>
     <div class="demo view">
+
+ 
     
-  <div class="lyrow ui-draggable" style="display: block;"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>
+ 
+    
+  <div class="lyrow"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>
               <div class="preview">
                 \执行代码
               </div>
               <div class="view">
-                <srpt bef="\" contenteditable="true" class="bef">layout("/WEB-INF/beetl/layout.html",{page_title:'主题'}) {</srpt>
+                <srpt bef="\" contenteditable="true" class="bef">layout("/WEB-INF/beetl/layout.html",{page_title:'power by Achieve Server Framework'}) {</srpt>
               </div>
             </div>
-            
-  <div class="lyrow">
-  <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>remove</a>
-  <span class="drag label"><i class="icon-move"></i>drag</span>
-  <div class="preview">9 3</div>
-  <div class="view">
-    <div class="row-fluid clearfix">
-      <div class="span12 column ui-sortable">
-        
-        <div class="box box-element ui-draggable" style="display: block; "> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span> <span class="configuration"><button type="button" class="btn btn-mini" data-target="#editorModal" role="button" data-toggle="modal">编辑</button> <a class="btn btn-mini" href="#" rel="well">嵌入</a> </span>
-              <div class="preview">概述</div>
+     
+     
+  
+  <div class="lyrow ui-draggable" style="display: block;"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span> <span class="configuration"><button type="button" class="btn btn-mini" data-target="#editorModal" role="button" data-toggle="modal">编辑</button> <span class="btn-group"> <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">宽度 <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li class="active"><a href="#" rel="container-fluid">自动宽度</a></li>
+                <li class=""><a href="#" rel="container">固定宽度</a></li>
+              </ul>
+              </span></span>
+              <div class="preview">
+                容器
+              </div>
               <div class="view">
-                <div class="hero-unit" contenteditable="true">
-                  <p>一种风，只流浪在一座山谷；</p>
-                  <p>一道堤，只护住一湾星河。</p>
-                  <p>每次仰望星空，我总是闭上眼，</p>
-                  <p>因为最美的一颗不在天上。</p>                  
+                <div class="container-fluid">
+                	<div class="lyrow ui-draggable">
+                	<div class="removeClean column contain ui-sortable"><div class="lyrow ui-draggable" style="display: block;"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>
+              <div class="preview">
+                <input value="12" type="text">
+              </div>
+              <div class="view">
+                <div class="row-fluid clearfix">
+                  <div class="span12 column ui-sortable"><div class="box box-element ui-draggable" style="display: block;"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span> 
+            	 <span class="configuration"><button type="button" class="btn btn-mini" data-target="#editorModal" role="button" data-toggle="modal">编辑</button> <span class="btn-group"> <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">对齐 <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li class="active"><a href="#" rel="">默认</a></li>
+                <li class=""><a href="#" rel="text-left">靠左</a></li>
+                <li class=""><a href="#" rel="text-center">居中</a></li>
+                <li class=""><a href="#" rel="text-right">靠右</a></li>
+              </ul>
+              </span> <span class="btn-group"> <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">标记 <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li class="active"><a href="#" rel="">默认</a></li>
+                <li class=""><a href="#" rel="muted">禁用</a></li>
+                <li class=""><a href="#" rel="text-warning">警告</a></li>
+                <li class=""><a href="#" rel="text-error">错误</a></li>
+                <li class=""><a href="#" rel="text-info">提示</a></li>
+                <li class=""><a href="#" rel="text-success">成功</a></li>
+              </ul>
+              </span> </span>
+              <div class="preview">标题栏</div>
+              <div class="view">
+                <h3 contenteditable="true">h3. 这是一套可视化布局系统.</h3>
+              </div>
+            </div></div>
                 </div>
               </div>
-            </div>
-      </div>
-    </div>
-  </div>
-</div>
-  
-  <div class="lyrow ui-draggable" style="display: block;"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>
+            </div></div>
+                	</div>
+                </div>
+              </div>
+            </div><div class="lyrow"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>
               <div class="preview">
                 \执行代码
               </div>
@@ -942,6 +982,8 @@
               </div>
             </div>
 
+
+    
     </div>
     </div>
     <!-- end demo -->
@@ -987,6 +1029,13 @@
     <h3>保存</h3>
   </div>
   <div class="modal-body">保存成功</div>
+  <div class="modal-footer"> <a class="btn" data-dismiss="modal">Close</a> </div>
+</div>
+<div class="modal hide fade" role="dialog" id="includeModal">
+  <div class="modal-header"> <a class="close" data-dismiss="modal">×</a>
+    <h3>载入</h3>
+  </div>
+  <div class="modal-body">载入成功</div>
   <div class="modal-footer"> <a class="btn" data-dismiss="modal">Close</a> </div>
 </div>
 </body>

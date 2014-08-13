@@ -1,37 +1,68 @@
 
+
+ 
     
-  <div class="lyrow ui-draggable" style="display: block;"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span> <span class="configuration"><a class="btn btn-mini" href="#" rel="inline">固定宽度</a></span>
+ 
+    
+  <div class="lyrow"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>
+              <div class="preview">
+                \执行代码
+              </div>
+              <div class="view">
+                <srpt bef="\" contenteditable="true" class="bef">layout("/WEB-INF/beetl/layout.html",{page_title:'power by Achieve Server Framework'}) {</srpt>
+              </div>
+            </div>
+     
+     
+  
+  <div class="lyrow ui-draggable" style="display: block;"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span> <span class="configuration"><button type="button" class="btn btn-mini" data-target="#editorModal" role="button" data-toggle="modal">编辑</button> <span class="btn-group"> <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">宽度 <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li class="active"><a href="#" rel="container-fluid">自动宽度</a></li>
+                <li class=""><a href="#" rel="container">固定宽度</a></li>
+              </ul>
+              </span></span>
               <div class="preview">
                 容器
               </div>
               <div class="view">
                 <div class="container-fluid">
-                	<div class="contain lyrow ui-draggable">
-                	<div class="removeClean column ui-sortable"></div>
-                	</div>
-                </div>
-              </div>
-            </div><div class="lyrow ui-draggable" style="display: block;"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>
-              <div class="preview">
-                \执行代码
-              </div>
-              <div class="view">
-                <srpt bef="\" contenteditable="true" class="bef">layout("/WEB-INF/beetl/layout.html",{page_title:'后台登录'}) {</srpt>
-              </div>
-            </div>
-            
-  
-  
-  <div class="lyrow ui-draggable" style="display: block;"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>
+                	<div class="lyrow ui-draggable">
+                	<div class="removeClean column contain ui-sortable"><div class="lyrow ui-draggable" style="display: block;"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>
               <div class="preview">
                 <input value="12" type="text">
               </div>
               <div class="view">
                 <div class="row-fluid clearfix">
-                  <div class="span12 column ui-sortable"></div>
+                  <div class="span12 column ui-sortable"><div class="box box-element ui-draggable" style="display: block;"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span> 
+            	 <span class="configuration"><button type="button" class="btn btn-mini" data-target="#editorModal" role="button" data-toggle="modal">编辑</button> <span class="btn-group"> <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">对齐 <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li class="active"><a href="#" rel="">默认</a></li>
+                <li class=""><a href="#" rel="text-left">靠左</a></li>
+                <li class=""><a href="#" rel="text-center">居中</a></li>
+                <li class=""><a href="#" rel="text-right">靠右</a></li>
+              </ul>
+              </span> <span class="btn-group"> <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">标记 <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li class="active"><a href="#" rel="">默认</a></li>
+                <li class=""><a href="#" rel="muted">禁用</a></li>
+                <li class=""><a href="#" rel="text-warning">警告</a></li>
+                <li class=""><a href="#" rel="text-error">错误</a></li>
+                <li class=""><a href="#" rel="text-info">提示</a></li>
+                <li class=""><a href="#" rel="text-success">成功</a></li>
+              </ul>
+              </span> </span>
+              <div class="preview">标题栏</div>
+              <div class="view">
+                <h3 contenteditable="true">h3. 这是一套可视化布局系统.</h3>
+              </div>
+            </div></div>
                 </div>
               </div>
-            </div><div class="lyrow ui-draggable" style="display: block;"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>
+            </div></div>
+                	</div>
+                </div>
+              </div>
+            </div><div class="lyrow"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>
               <div class="preview">
                 \执行代码
               </div>
@@ -40,4 +71,6 @@
               </div>
             </div>
 
+
+    
     

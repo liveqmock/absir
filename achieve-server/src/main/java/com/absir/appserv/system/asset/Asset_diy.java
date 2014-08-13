@@ -97,7 +97,11 @@ public class Asset_diy extends AssetServer {
 	 */
 	@Body
 	public String body(String view) throws IOException {
-		File file = new File(IRender.ME.getRealPath(view));
+		if (IDeveloper.ME != null) {
+			view = IDeveloper.ME.getDeveloperPath(view);
+		}
+
+		File file = new File(IRender.ME.getRealPath(view + diySuffix));
 		return file.exists() ? HelperFile.readFileToString(file) : "";
 	}
 

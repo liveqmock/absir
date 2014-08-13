@@ -90,19 +90,16 @@
   <div class="row-fluid">
     <div class="">
       <div class="sidebar-nav">
-        <ul class="nav nav-list accordion-group">
+      	<ul class="nav nav-list accordion-group">
           <li class="nav-header">
-            <div class="pull-right popover-info"><i class="icon-question-sign "></i>
-              <div class="popover fade right">
-                <div class="arrow"></div>
-                <h3 class="popover-title">功能</h3>
-                <div class="popover-content">在这里设置你的栅格布局, 栅格总数默认为12, 用空格分割每列的栅格值, 如果您需要了解更多信息，请访问<a target="_blank" href="http://twitter.github.io/bootstrap/scaffolding.html#gridSystem">Bootstrap栅格系统.</a></div>
-              </div>
-            </div>
-            <i class="icon-plus icon-white"></i> 布局设置 </li>
+            <i class="icon-plus icon-white"></i> 页面设置 </li>
           <li style="display: list-item;" class="rows" id="estRows">
-          <div class="lyrow ui-draggable"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>
-              <span class="configuration"><button type="button" class="btn btn-mini" data-target="#editorModal" role="button" data-toggle="modal">编辑</button></span>
+          	<div class="lyrow ui-draggable"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span> <span class="configuration"><span class="btn-group"> <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">宽度 <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li class="active"><a href="#" rel="container-fluid">自动宽度</a></li>
+                <li class=""><a href="#" rel="container">固定宽度</a></li>
+              </ul>
+              </span></span>
               <div class="preview">
                 容器
               </div>
@@ -114,6 +111,35 @@
                 </div>
               </div>
             </div>
+          	<div class="lyrow ui-draggable"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>
+              <div class="preview">
+                \执行代码
+              </div>
+              <div class="view">
+                <srpt bef="\" contenteditable="true"></srpt>
+              </div>
+            </div>
+            <div class="lyrow ui-draggable"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>
+              <div class="preview">
+                生成执行代码
+              </div>
+              <div class="view">
+                <srpt contenteditable="true"></srpt>
+              </div>
+            </div>
+          </li>
+        </ul>
+        <ul class="nav nav-list accordion-group">
+          <li class="nav-header">
+            <div class="pull-right popover-info"><i class="icon-question-sign "></i>
+              <div class="popover fade right">
+                <div class="arrow"></div>
+                <h3 class="popover-title">功能</h3>
+                <div class="popover-content">在这里设置你的栅格布局, 栅格总数默认为12, 用空格分割每列的栅格值, 如果您需要了解更多信息，请访问<a target="_blank" href="http://twitter.github.io/bootstrap/scaffolding.html#gridSystem">Bootstrap栅格系统.</a></div>
+              </div>
+            </div>
+            <i class="icon-plus icon-white"></i> 布局设置 </li>
+          <li style="display: list-item;" class="rows" id="estRows">
             <div class="lyrow ui-draggable"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>
               <div class="preview">
                 <input value="12" type="text">
@@ -527,7 +553,7 @@
                 </ul>
               </div>
             </div>
-            <div class="box box-element ui-draggable"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>
+            <div class="box box-element ui-draggable"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label">i class="icon-move"></i>拖动</span>
               <span class="configuration"><button type="button" class="btn btn-mini" data-target="#editorModal" role="button" data-toggle="modal">编辑</button></span>
               <div class="preview">面包导航</div>
               <div class="view">
@@ -860,6 +886,7 @@
             </div>
           </li>
         </ul>
+        
         <ul class="nav nav-list accordion-group">
           <li class="nav-header"><i class="icon-plus icon-white"></i> 应用扩展 </li>
           <li style="display: none;" class="boxes mute" id="elmComm">
@@ -869,14 +896,20 @@
       </div>
     </div>
     <!--/span-->
-    <div class="demo">
-    <div class="lyrow">
-    <span class="configuration"><button type="button" class="btn btn-mini" data-target="#editorModal" role="button" data-toggle="modal">编辑</button></span>
-<div class="view ui-sortable" style="min-height:304px;">
-<srpt bef="\\">
-layout("/WEB-INF/beetl/layout.html",{page_title:'主题'}) {
-</srpt>
-      <div class="lyrow">
+    <div>
+  	<span class="configuration"><button type="button" class="btn btn-mini" data-target="#editorModal" role="button" data-toggle="modal">编辑</button></span>
+    <div class="demo view">
+    
+  <div class="lyrow ui-draggable" style="display: block;"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>
+              <div class="preview">
+                \执行代码
+              </div>
+              <div class="view">
+                <srpt bef="\" contenteditable="true" class="bef">layout("/WEB-INF/beetl/layout.html",{page_title:'主题'}) {</srpt>
+              </div>
+            </div>
+            
+  <div class="lyrow">
   <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>remove</a>
   <span class="drag label"><i class="icon-move"></i>drag</span>
   <div class="preview">9 3</div>
@@ -898,10 +931,18 @@ layout("/WEB-INF/beetl/layout.html",{page_title:'主题'}) {
       </div>
     </div>
   </div>
-</div> 
-<srpt bef="\\">}</srpt>
 </div>
-</div> 
+  
+  <div class="lyrow ui-draggable" style="display: block;"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>
+              <div class="preview">
+                \执行代码
+              </div>
+              <div class="view">
+                <srpt bef="\" contenteditable="true" class="bef">}</srpt>
+              </div>
+            </div>
+
+    </div>
     </div>
     <!-- end demo -->
     <!--/span-->

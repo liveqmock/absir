@@ -1,0 +1,43 @@
+
+    
+  <div class="lyrow ui-draggable" style="display: block;"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span> <span class="configuration"><a class="btn btn-mini" href="#" rel="inline">固定宽度</a></span>
+              <div class="preview">
+                容器
+              </div>
+              <div class="view">
+                <div class="container-fluid">
+                	<div class="contain lyrow ui-draggable">
+                	<div class="removeClean column ui-sortable"></div>
+                	</div>
+                </div>
+              </div>
+            </div><div class="lyrow ui-draggable" style="display: block;"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>
+              <div class="preview">
+                \执行代码
+              </div>
+              <div class="view">
+                <srpt bef="\" contenteditable="true" class="bef">layout("/WEB-INF/beetl/layout.html",{page_title:'后台登录'}) {</srpt>
+              </div>
+            </div>
+            
+  
+  
+  <div class="lyrow ui-draggable" style="display: block;"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>
+              <div class="preview">
+                <input value="12" type="text">
+              </div>
+              <div class="view">
+                <div class="row-fluid clearfix">
+                  <div class="span12 column ui-sortable"></div>
+                </div>
+              </div>
+            </div><div class="lyrow ui-draggable" style="display: block;"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>
+              <div class="preview">
+                \执行代码
+              </div>
+              <div class="view">
+                <srpt bef="\" contenteditable="true" class="bef">}</srpt>
+              </div>
+            </div>
+
+    

@@ -23,7 +23,7 @@
 			<div class="searchBar">
 				<div class="searchFormContent">
 					<%
-						RenderUtils.include("bean/search/" + request.getAttribute("entityName") + ".jsp", "search.jsp", pageContext, request, response);
+						RenderUtils.generate("bean/search/" + request.getAttribute("entityName") + ".jsp", "search.jsp", pageContext, request, response);
 					%>
 				</div>
 				<div class="subBar">
@@ -46,7 +46,7 @@
 	<div class="pageContent">
 		<table class="table" width="100%" targetType="dialog" layoutH="138">
 			<%
-				RenderUtils.include("bean/lookup/" + request.getAttribute("entityName") + ".jsp", pageContext, request, response);
+				RenderUtils.generate("bean/lookup/" + request.getAttribute("entityName") + ".jsp", pageContext, request, response);
 			%>
 		</table>
 	</div>

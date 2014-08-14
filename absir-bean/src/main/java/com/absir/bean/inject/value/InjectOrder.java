@@ -15,6 +15,8 @@ import java.lang.annotation.Target;
 /**
  * @author absir
  * 
+ * @see inject must need @Inject
+ * 
  */
 @Target({ ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)

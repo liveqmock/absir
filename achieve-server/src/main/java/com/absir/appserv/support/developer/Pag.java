@@ -114,7 +114,7 @@ public class Pag {
 	 * @throws IOException
 	 */
 	public String getInclude(String include, Object... renders) throws IOException {
-		return getInclude(include, IRender.ME.getPath(renders), renders);
+		return getInclude(include, include, renders);
 	}
 
 	/**
@@ -125,7 +125,7 @@ public class Pag {
 	 * @throws IOException
 	 */
 	public String getInclude(String include, String generate, Object... renders) throws IOException {
-		RenderUtils.include(include, generate, renders);
+		RenderUtils.generate(include, generate, renders);
 		return IRender.ME.include(include);
 	}
 

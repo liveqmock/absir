@@ -62,7 +62,7 @@
             </div>
             <div class="btn-group">
               <button type="button" class="btn btn-primary" data-target="#downloadModal" rel="/build/downloadModal" role="button" data-toggle="modal"><i class="icon-chevron-down icon-white"></i>下载</button>
-              <button class="btn btn-primary" href="/share/index" role="button" data-toggle="modal" data-target="#shareModal"><i class="icon-share icon-white"></i>保存</button>
+              <button class="btn btn-primary" href="/share/index" role="button" data-target="#shareModal"><i class="icon-share icon-white"></i>保存</button>
               <button class="btn btn-primary" href="#clear" id="clear"><i class="icon-trash icon-white"></i>清空</button>
             </div>
             <div class="btn-group">
@@ -116,7 +116,7 @@
                 \执行代码
               </div>
               <div class="view">
-                <srpt bef="\" contenteditable="true"></srpt>
+                <diyexpression before="\" contenteditable="true"></diyexpression>
               </div>
             </div>
             <div class="lyrow ui-draggable"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>
@@ -124,18 +124,14 @@
                 生成执行代码
               </div>
               <div class="view">
-                <srpt contenteditable="true"></srpt>
+                <diyexpression contenteditable="true"></diyexpression>
               </div>
             </div>
-            <div class="lyrow ui-draggable"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span> <span class="configuration-hook"><span class="input-group"><span class="input-group-addon">引用路径:</span><span class="include-input" contenteditable="true"></span> <a href="#" class="btn btn-mini" data-target="#includeModal">重新载入</a></span></span>
+            <div class="lyrow ui-draggable"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span> <span class="configuration-hook">引用路径:<i class="diyincludeinput" contenteditable="true"></i><a href="#" class="btn btn-mini" data-target="#includeModal">重新载入</a> <button type="button" class="btn btn-mini" data-target="#editorModal" role="button" data-toggle="modal">编辑</button></span>
               <div class="preview">
                 载入引用文件
               </div>
-              <div class="view disable">
-                <div class="lyrow">
-                <div class="removeClean column include">
-                </div>
-                </div>
+              <div class="view removeClean column diyinclude diydisable">
               </div>
             </div>
           </li>
@@ -920,7 +916,7 @@
                 \执行代码
               </div>
               <div class="view">
-                <srpt bef="\" contenteditable="true" class="bef">layout("/WEB-INF/beetl/layout.html",{page_title:'power by Achieve Server Framework'}) {</srpt>
+                <diyexpression before="\" contenteditable="true" class="bef">layout("/WEB-INF/beetl/layout.html",{page_title:'power by Achieve Server Framework'}) {</diyexpression>
               </div>
             </div>
      
@@ -978,7 +974,7 @@
                 \执行代码
               </div>
               <div class="view">
-                <srpt bef="\" contenteditable="true" class="bef">}</srpt>
+                <diyexpression before="\" contenteditable="true" class="bef">}</diyexpression>
               </div>
             </div>
 
@@ -1028,7 +1024,7 @@
   <div class="modal-header"> <a class="close" data-dismiss="modal">×</a>
     <h3>保存</h3>
   </div>
-  <div class="modal-body">保存成功</div>
+  <div id="shareModalTitle" class="modal-body">保存成功</div>
   <div class="modal-footer"> <a class="btn" data-dismiss="modal">Close</a> </div>
 </div>
 <div class="modal hide fade" role="dialog" id="includeModal">
@@ -1038,5 +1034,6 @@
   <div class="modal-body">载入成功</div>
   <div class="modal-footer"> <a class="btn" data-dismiss="modal">Close</a> </div>
 </div>
+<div id="demo-hook"></div>
 </body>
 </html>

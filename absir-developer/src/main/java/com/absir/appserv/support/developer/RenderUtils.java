@@ -20,18 +20,26 @@ import com.absir.bean.core.BeanFactoryUtils;
 public class RenderUtils {
 
 	/**
-	 * @param path
+	 * @param include
 	 * @param renders
-	 * @return
 	 * @throws IOException
 	 */
-	public static boolean includeExist(String path, Object... renders) throws IOException {
-		if (new File(IRender.ME.getRealPath(path)).exists()) {
-			IRender.ME.include(path, renders);
-			return true;
+	public static void generate(String include, Object... renders) throws IOException {
+		if (BeanFactoryUtils.getEnvironment() != Environment.PRODUCT && IDeveloper.ME != null) {
+			generate(include, IRender.ME.getPath(renders), renders);
 		}
+	}
 
-		return false;
+	/**
+	 * @param include
+	 * @param generate
+	 * @param renders
+	 * @throws IOException
+	 */
+	public static void generate(String include, String generate, Object... renders) throws IOException {
+		if (BeanFactoryUtils.getEnvironment() != Environment.PRODUCT && IDeveloper.ME != null) {
+			IDeveloper.ME.generate(IRender.ME.getFullPath(include, renders), IRender.ME.getFullPath(generate, renders), renders);
+		}
 	}
 
 	/**
@@ -52,10 +60,23 @@ public class RenderUtils {
 	 * @throws IOException
 	 */
 	public static void include(String include, String generate, Object... renders) throws IOException {
-		if (BeanFactoryUtils.getEnvironment() != Environment.PRODUCT && IDeveloper.ME != null) {
-			IDeveloper.ME.generate(IRender.ME.getFullPath(include, renders), IRender.ME.getFullPath(generate, renders), renders);
-		}
-
+		generate(include, generate, renders);
 		IRender.ME.include(include, renders);
 	}
+
+	/**
+	 * @param path
+	 * @param renders
+	 * @return
+	 * @throws IOException
+	 */
+	public static boolean includeExist(String path, Object... renders) throws IOException {
+		if (new File(IRender.ME.getRealPath(path)).exists()) {
+			IRender.ME.include(path, renders);
+			return true;
+		}
+
+		return false;
+	}
+
 }

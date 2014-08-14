@@ -63,6 +63,16 @@ public class WebBeetlView extends ServerDiyView {
 		return groupTemplate;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.appserv.system.server.ServerDiyView#diyExpression()
+	 */
+	@Override
+	protected String diyExpression() {
+		return groupTemplate.getConf().getStatementStart() + " , " + groupTemplate.getConf().getStatementEnd();
+	}
+
 	/**
 	 * @throws IOException
 	 * 

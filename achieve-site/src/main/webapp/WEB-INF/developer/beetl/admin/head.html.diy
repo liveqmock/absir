@@ -1,8 +1,4 @@
-<div class="lyrow ui-draggable" style="display: block;"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span> <span class="configuration-hook">引用路径:<i class="diyincludeinput" contenteditable="true">head.html</i><a href="#" class="btn btn-mini" data-target="#includeModal">重新载入</a> <button type="button" class="btn btn-mini" data-target="#editorModal" role="button" data-toggle="modal">编辑</button></span>
-              <div class="preview">
-                载入引用文件
-              </div>
-              <div class="view removeClean column diyinclude ui-sortable">
+
               <div class="lyrow ui-draggable" style="display: block; position: relative; opacity: 1; z-index: 0;"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span> <span class="configuration-hook">引用路径:<i class="diyincludeinput" contenteditable="true">top.html</i><a href="#" class="btn btn-mini" data-target="#includeModal">重新载入</a> <button type="button" class="btn btn-mini" data-target="#editorModal" role="button" data-toggle="modal">编辑</button></span>
               <div class="preview">
                 载入引用文件
@@ -24,6 +20,5 @@
                 	</div>
                 </div>
               </div>
-            </div></div>
             </div></div>
             </div>

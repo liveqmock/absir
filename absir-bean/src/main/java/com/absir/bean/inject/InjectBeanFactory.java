@@ -662,6 +662,7 @@ public class InjectBeanFactory implements IBeanFactorySupport, IBeanDefineSupply
 
 					// 注入排序
 					KernelList.sortOrderable(iInvokerList);
+					KernelList.sortOrderable(pInvokerList);
 					int iSize = iInvokerList.size();
 					int pSize = pInvokerList.size();
 					injectInvokers = iSize == 0 && pSize == 0 ? KernelLang.NULL_OBJECTS : new Object[] { iSize == 0 ? KernelLang.NULL_LIST_SET : iInvokerList,

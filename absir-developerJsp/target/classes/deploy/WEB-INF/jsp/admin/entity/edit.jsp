@@ -8,7 +8,7 @@
 		action="${admin_route}/entity/save/${entityName}${empty id ? "" : "/".concat(id)}" ${multipart ? "enctype=\"multipart/form-data\"" : ""}
 		onsubmit="return ${multipart ? "iframeCallback" : "validateCallback"}(this, navTabAjaxErrors);">
 		<%
-			RenderUtils.include("bean/edit/" + request.getAttribute("entityName") + ".jsp", pageContext, request, response);
+			RenderUtils.generate("bean/edit/" + request.getAttribute("entityName") + ".jsp", pageContext, request, response);
 		%>
 		<div class="formBar">
 			<ul>

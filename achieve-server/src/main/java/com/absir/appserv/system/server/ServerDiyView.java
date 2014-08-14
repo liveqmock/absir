@@ -18,6 +18,8 @@ import com.absir.appserv.system.asset.Asset_diy;
 import com.absir.appserv.system.helper.HelperInput;
 import com.absir.bean.basis.Environment;
 import com.absir.bean.core.BeanFactoryUtils;
+import com.absir.bean.inject.value.Inject;
+import com.absir.bean.inject.value.InjectOrder;
 import com.absir.bean.inject.value.Value;
 import com.absir.core.helper.HelperFile;
 import com.absir.server.in.Input;
@@ -34,6 +36,41 @@ public abstract class ServerDiyView extends ReturnedResolverView implements IRen
 	/** diyView */
 	@Value("developer.diy.view")
 	private String diyView = "/WEB-INF/developer/diy.html";
+
+	/** diyExpression */
+	protected String diyExpression;
+
+	/** diyInclude */
+	protected String diyInclude;
+
+	/**
+	 * @return
+	 */
+	protected String diyExpression() {
+		return "<% , %>";
+	}
+
+	/**
+	 * @return
+	 */
+	protected String diyInclude() {
+		return echo("Pag.getInclude(\",\")");
+	}
+
+	/**
+	 * 
+	 */
+	@Inject
+	@InjectOrder(value = 255)
+	protected void initDiyView() {
+		if (diyExpression == null) {
+			diyExpression = diyExpression();
+		}
+
+		if (diyInclude == null) {
+			diyInclude = diyInclude();
+		}
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -62,7 +99,6 @@ public abstract class ServerDiyView extends ReturnedResolverView implements IRen
 	public void render(String view, InputRequest input) throws Exception {
 		HttpServletRequest request = input.getRequest();
 		request.setAttribute("input", input);
-		// input.getResponse().setCharacterEncoding(ContextUtils.getCharset().displayName());
 		Object[] renders = null;
 		int diy = 0;
 		Object render = getRender(view, input);
@@ -79,8 +115,8 @@ public abstract class ServerDiyView extends ReturnedResolverView implements IRen
 			input.getModel().put("diy_url", HelperInput.getRequestUrl(request));
 			input.getModel().put("diy_view", view);
 			input.getModel().put("diy_restore", getDiyRestore(view));
-			input.getModel().put("diy_include", include(","));
-			input.getModel().put("diy_expression", expression(","));
+			input.getModel().put("diy_expression", diyExpression);
+			input.getModel().put("diy_include", diyInclude);
 			view = diyView;
 		}
 
@@ -112,14 +148,6 @@ public abstract class ServerDiyView extends ReturnedResolverView implements IRen
 		}
 
 		return "";
-	}
-
-	/**
-	 * @param expression
-	 * @return
-	 */
-	protected String expression(String expression) {
-		return "<% " + expression + " %>";
 	}
 
 	/**

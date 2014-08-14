@@ -2,7 +2,7 @@
 <%@ taglib prefix="json" uri="http://www.atg.com/taglibs/json"%>
 <%
 	request.setAttribute("suggest", request.getParameter("suggest"));
-	RenderUtils.include("/WEB-INF/jsp/bean/suggest/" + request.getAttribute("entityName") + ".jsp", pageContext, request, response);
+	RenderUtils.generate("/WEB-INF/jsp/bean/suggest/" + request.getAttribute("entityName") + ".jsp", pageContext, request, response);
 %>
 <c:set var="primary" value="${entityName}${\"$primary\"}" />
 <c:set var="primary" value="${requestScope[primary]}" />

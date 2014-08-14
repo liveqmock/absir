@@ -1,1 +1,20 @@
-${Pag.getInclude("/WEB-INF/beetl/admin/head.html")}
+\<% 
+	var page_title = APP_NAME+${Pag.getLang("管理平台",false)};
+ %>
+\<% 
+	 <span style="background-color: rgb(102, 102, 102);">layout("/WEB-INF/beetl/layout.html"</span><span style="background-color: rgb(102, 102, 102);">) {</span>
+ %>
+<div class="container-fluid">
+	<div class="row-fluid">
+		<div class="span12">
+			<form>
+				<fieldset>
+					 <legend>${Pag.getLang("用户登录")}</legend> <label>用户名</label><input type="text" placeholder="Type something…" /> <span class="help-block">这里填写帮助信息.</span> <label class="checkbox"><input type="checkbox" />记住密码</label> <button type="submit" class="btn">提交</button>
+				</fieldset>
+			</form>
+		</div>
+	</div>
+</div>
+\<% 
+	}
+ %>

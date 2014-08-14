@@ -1,14 +1,24 @@
-<div class="lyrow ui-draggable" style="display: block;"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span> <span class="configuration-hook">引用路径:<i class="diyincludeinput" contenteditable="true">head.html</i><a href="#" class="btn btn-mini" data-target="#includeModal">重新载入</a> <button type="button" class="btn btn-mini" data-target="#editorModal" role="button" data-toggle="modal">编辑</button></span>
+
+
+ 
+    
+ 
+    
+  <div class="lyrow"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>
               <div class="preview">
-                载入引用文件
+                \执行代码
               </div>
-              <div class="view removeClean column diyinclude ui-sortable">
-              <div class="lyrow ui-draggable" style="display: block; position: relative; opacity: 1; z-index: 0;"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span> <span class="configuration-hook">引用路径:<i class="diyincludeinput" contenteditable="true">top.html</i><a href="#" class="btn btn-mini" data-target="#includeModal">重新载入</a> <button type="button" class="btn btn-mini" data-target="#editorModal" role="button" data-toggle="modal">编辑</button></span>
+              <div class="view">
+                <diyexpression before="\" contenteditable="true" class="bef before">var page_title =&nbsp;APP_NAME+${Pag.getLang("管理平台",false)};</diyexpression>
+              </div>
+            </div><div class="lyrow ui-draggable" style="display: block;"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>
               <div class="preview">
-                载入引用文件
+                \执行代码
               </div>
-              <div class="view removeClean column diyinclude ui-sortable diydisable">
-              <div class="lyrow ui-draggable" style="display: block;"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span> <span class="configuration"><button type="button" class="btn btn-mini" data-target="#editorModal" role="button" data-toggle="modal">编辑</button> <span class="btn-group"> <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">宽度 <span class="caret"></span></a>
+              <div class="view">
+                <diyexpression before="\" contenteditable="true" class="before"><span style="background-color: rgb(102, 102, 102);">layout("/WEB-INF/beetl/layout.html"</span><span style="background-color: rgb(102, 102, 102);">) {</span></diyexpression>
+              </div>
+            </div><div class="lyrow ui-draggable" style="display: block;"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span> <span class="configuration"><button type="button" class="btn btn-mini" data-target="#editorModal" role="button" data-toggle="modal">编辑</button> <span class="btn-group"> <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">宽度 <span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <li class="active"><a href="#" rel="container-fluid">自动宽度</a></li>
                 <li class=""><a href="#" rel="container">固定宽度</a></li>
@@ -20,10 +30,47 @@
               <div class="view">
                 <div class="container-fluid">
                 	<div class="lyrow ui-draggable">
-                	<div class="removeClean column contain ui-sortable"></div>
-                	</div>
+                	<div class="removeClean column contain ui-sortable"><div class="lyrow ui-draggable" style="display: block;"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>
+              <div class="preview">
+                <input value="12" type="text">
+              </div>
+              <div class="view">
+                <div class="row-fluid clearfix">
+                  <div class="span12 column ui-sortable"><div class="box box-element ui-draggable" style="display: block;"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span> <span class="configuration"><button type="button" class="btn btn-mini" data-target="#editorModal" role="button" data-toggle="modal">编辑</button> <a class="btn btn-mini" href="#" rel="form-inline">嵌入</a> </span>
+              <div class="preview">提交表单</div>
+              <div class="view">
+				<form>
+					<fieldset>
+					<legend contenteditable="true">${Pag.getLang("用户登录")}</legend>
+					<label contenteditable="true">用户名</label>
+					<input type="text" placeholder="Type something…">
+					<span class="help-block" contenteditable="true">这里填写帮助信息.</span>
+					<label class="checkbox" contenteditable="true">
+					<input type="checkbox">记住密码</label>
+					<button type="submit" class="btn" contenteditable="true">提交</button>
+					</fieldset>
+				</form>
+              </div>
+            </div></div>
                 </div>
               </div>
             </div></div>
-            </div></div>
+                	</div>
+                </div>
+              </div>
             </div>
+     
+     
+  
+  <div class="lyrow"> <a href="#close" class="remove label label-important"><i class="icon-remove icon-white"></i>删除</a> <span class="drag label"><i class="icon-move"></i>拖动</span>
+              <div class="preview">
+                \执行代码
+              </div>
+              <div class="view">
+                <diyexpression before="\" contenteditable="true" class="bef before">}</diyexpression>
+              </div>
+            </div>
+
+
+    
+    

@@ -28,6 +28,17 @@ public abstract class JConfigureUtils {
 	/** Configure_Class_Map_Instance */
 	private static Map<Serializable, JConfigureBase> Configure_Class_Map_Instance = new HashMap<Serializable, JConfigureBase>();
 
+	/** Configure_Class_Map_Class */
+	private static Map<Class<? extends JConfigureBase>, Class<? extends JConfigureBase>> Configure_Class_Map_Class = new HashMap<Class<? extends JConfigureBase>, Class<? extends JConfigureBase>>();
+
+	/**
+	 * @param cls
+	 * @param configureClass
+	 */
+	public static void put(Class<? extends JConfigureBase> cls, Class<? extends JConfigureBase> configureClass) {
+		Configure_Class_Map_Class.put(cls, configureClass);
+	}
+
 	/**
 	 * @param cls
 	 */
@@ -37,13 +48,19 @@ public abstract class JConfigureUtils {
 			synchronized (cls) {
 				configure = Configure_Class_Map_Instance.get(cls);
 				if (configure == null) {
-					configure = KernelClass.newInstance(cls);
-					try {
-						initConfigure(configure);
+					Class<? extends JConfigureBase> configureClass = Configure_Class_Map_Class.get(cls);
+					if (configureClass == null) {
+						configure = KernelClass.newInstance(cls);
+						try {
+							initConfigure(configure);
 
-					} catch (Throwable e) {
-						// TODO: handle exception
-						e.printStackTrace();
+						} catch (Throwable e) {
+							// TODO: handle exception
+							e.printStackTrace();
+						}
+
+					} else {
+						configure = getConfigure(configureClass);
 					}
 
 					Configure_Class_Map_Instance.put(cls, configure);

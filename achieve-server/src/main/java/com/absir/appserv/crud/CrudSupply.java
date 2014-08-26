@@ -19,6 +19,7 @@ import com.absir.appserv.feature.menu.value.MaEntity;
 import com.absir.appserv.jdbc.JdbcCondition;
 import com.absir.appserv.jdbc.JdbcPage;
 import com.absir.appserv.system.bean.value.JaCrud.Crud;
+import com.absir.appserv.system.bean.value.JaName;
 import com.absir.appserv.system.helper.HelperQuery;
 import com.absir.bean.basis.BeanDefine;
 import com.absir.bean.config.IBeanDefineSupply;
@@ -64,6 +65,13 @@ public abstract class CrudSupply<T> implements ICrudSupply, IBeanDefineSupply {
 		return 32;
 	}
 
+	/**
+	 * @param type
+	 * @param beanType
+	 */
+	protected void put(Class<?> type, Class<?> beanType) {
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -78,8 +86,25 @@ public abstract class CrudSupply<T> implements ICrudSupply, IBeanDefineSupply {
 		if (supplyClass.isAssignableFrom(beanType)) {
 			JaEntity jaEntity = beanType.getAnnotation(JaEntity.class);
 			if (jaEntity != null || beanType.getAnnotation(MaEntity.class) != null) {
-				String entityName = beanType.getSimpleName();
-				entityNameMapClass.put(entityName, (Class<? extends T>) beanType);
+				JaName jaName = beanType.getAnnotation(JaName.class);
+				String entityName = jaName == null ? beanType.getSimpleName() : jaName.value();
+				Class<?> type = entityNameMapClass.get(entityName);
+				if (type == null || beanType.isAssignableFrom(type)) {
+					entityNameMapClass.put(entityName, (Class<? extends T>) beanType);
+					if (type != null) {
+						put(type, beanType);
+					}
+
+				} else if (type.isAssignableFrom(beanType)) {
+					put(beanType, type);
+					if (SessionFactoryUtils.get().getNameMapPermissions().get(entityName) != null) {
+						jaEntity = null;
+					}
+
+				} else {
+					jaEntity = null;
+				}
+
 				if (jaEntity != null && jaEntity.permissions().length > 0) {
 					SessionFactoryUtils.get().getNameMapPermissions().put(entityName, jaEntity.permissions());
 				}

@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
  * @author absir
  * 
  */
-@Target({ ElementType.FIELD, ElementType.PARAMETER })
+@Target({ ElementType.TYPE, ElementType.FIELD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface JaName {
 

@@ -102,6 +102,10 @@ public class Asset_diy extends AssetServer {
 		}
 
 		File file = new File(IRender.ME.getRealPath(view + diySuffix));
+		if (!file.exists()) {
+			file = new File(IRender.ME.getRealPath(view));
+		}
+
 		return file.exists() ? HelperFile.readFileToString(file) : "";
 	}
 
@@ -112,13 +116,18 @@ public class Asset_diy extends AssetServer {
 	 * @throws IOException
 	 */
 	@Body
-	public String save(String view, @Param("bodies[]") String[] bodies) throws IOException {
+	public void save(String view, @Param("bodies[]") String[] bodies) throws IOException {
 		if (IDeveloper.ME != null) {
 			view = IDeveloper.ME.getDeveloperPath(view);
-			Developer.writeGenerate(view + diySuffix, bodies[0]);
-			Developer.writeGenerate(view, bodies[1]);
-		}
+			String body = bodies[0];
+			if (body != null) {
+				Developer.writeGenerate(view + diySuffix, bodies[0]);
+			}
 
-		return "ok";
+			body = bodies[1];
+			if (body != null) {
+				Developer.writeGenerate(view, bodies[1]);
+			}
+		}
 	}
 }

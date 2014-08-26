@@ -23,6 +23,11 @@ public @interface MaEntity {
 	/**
 	 * @return
 	 */
+	boolean closed() default false;
+
+	/**
+	 * @return
+	 */
 	MaMenu[] parent() default {};
 
 	/**

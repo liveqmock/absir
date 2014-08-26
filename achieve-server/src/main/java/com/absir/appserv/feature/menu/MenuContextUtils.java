@@ -231,8 +231,8 @@ public abstract class MenuContextUtils {
 	 */
 	public static void addMenuBeanRoot(MenuBeanRoot menuBeanRoot, final String entityName, Class<?> entityClass, String menuName, String suffix, String option, List<String> entityNames) {
 		String entityCaption = null;
-		MaEntity maEntity = entityClass.getAnnotation(MaEntity.class);
-		if (maEntity != null) {
+		MaEntity maEntity = KernelClass.fetchAnnotation(entityClass, MaEntity.class);
+		if (maEntity != null && !maEntity.closed()) {
 			entityCaption = HelperLang.getTypeCaption(entityClass, entityName);
 			int index = maEntity.parent().length - 2;
 			menuBeanRoot = menuBeanRoot.getChildrenRoot(index >= 0 ? maEntity.parent()[index] : null, menuName);

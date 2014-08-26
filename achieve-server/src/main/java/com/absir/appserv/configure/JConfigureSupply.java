@@ -21,10 +21,23 @@ import com.absir.orm.transaction.value.Transaction;
  * @author absir
  * 
  */
+@SuppressWarnings("unchecked")
 @Bean
 @Basis
 @MaSupply(folder = "系统配置", name = "配置", method = "edit")
 public class JConfigureSupply extends CrudSupply<JConfigureBase> {
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.appserv.crud.CrudSupply#put(java.lang.Class,
+	 * java.lang.Class)
+	 */
+	@Override
+	protected void put(Class<?> type, Class<?> beanType) {
+		// TODO Auto-generated method stub
+		JConfigureUtils.put((Class<? extends JConfigureBase>) type, (Class<? extends JConfigureBase>) beanType);
+	}
 
 	/*
 	 * (non-Javadoc)

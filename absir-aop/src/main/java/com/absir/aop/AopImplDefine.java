@@ -131,6 +131,6 @@ public class AopImplDefine extends BeanDefineAbstractor {
 			}
 		}
 
-		return AopProxyUtils.proxyInterceptor(beanDefine == null ? null : beanDefine.getBeanObject(beanFactory), beanType, null);
+		return AopProxyUtils.proxyInterceptors(beanDefine == null ? null : beanDefine.getBeanObject(beanFactory), beanType, null);
 	}
 }

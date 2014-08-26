@@ -8,6 +8,7 @@
 package com.absir.aop;
 
 import java.lang.reflect.Modifier;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -144,11 +145,11 @@ public class AopProxyUtils {
 
 	/**
 	 * @param beanObject
-	 * @param aopInterceptor
+	 * @param aopInterceptors
 	 * @return
 	 */
-	public static AopProxy proxyInterceptor(Object beanObject, AopInterceptor aopInterceptor) {
-		return proxyInterceptor(beanObject, null, aopInterceptor);
+	public static AopProxy proxyInterceptors(Object beanObject, Collection<AopInterceptor> aopInterceptors) {
+		return proxyInterceptors(beanObject, null, aopInterceptors);
 	}
 
 	/**
@@ -157,22 +158,41 @@ public class AopProxyUtils {
 	 * @param aopInterceptor
 	 * @return
 	 */
-	public static AopProxy proxyInterceptor(Object beanObject, Class<?> beanType, AopInterceptor aopInterceptor) {
+	public static AopProxy proxyInterceptors(Object beanObject, Class<?> beanType, Collection<AopInterceptor> aopInterceptors) {
 		AopProxy aopProxy = null;
+		Set<Class<?>> interfaces = null;
+		if (aopInterceptors != null) {
+			interfaces = new HashSet<Class<?>>();
+			for (AopInterceptor aopInterceptor : aopInterceptors) {
+				Class<?> iCls = aopInterceptor.getInterface();
+				if (iCls != null) {
+					interfaces.add(iCls);
+				}
+			}
+
+			if (interfaces.isEmpty()) {
+				interfaces = null;
+			}
+		}
+
 		if (beanObject == null || !(beanObject instanceof AopProxy)) {
 			if (beanType == null) {
 				beanType = beanObject.getClass();
 			}
 
 			Proxy proxy = beanType.getAnnotation(Proxy.class);
-			aopProxy = getProxy(beanObject, beanType, null, proxy == null ? false : proxy.jdk(), proxy == null ? true : proxy.impl());
+			aopProxy = getProxy(beanObject, beanType, interfaces, proxy == null ? false : proxy.jdk(), proxy == null ? true : proxy.impl());
 
 		} else {
 			aopProxy = (AopProxy) beanObject;
+			if (interfaces != null) {
+				Proxy proxy = beanType.getAnnotation(Proxy.class);
+				aopProxy = getProxy(aopProxy.getBeanObject(), beanType, interfaces, proxy == null ? false : proxy.jdk(), proxy == null ? true : proxy.impl());
+			}
 		}
 
-		if (aopInterceptor != null) {
-			aopProxy.getAopInterceptors().add(aopInterceptor);
+		if (aopInterceptors != null) {
+			aopProxy.getAopInterceptors().addAll(aopInterceptors);
 		}
 
 		return aopProxy;

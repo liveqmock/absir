@@ -25,6 +25,16 @@ public class AopInterceptorAbstract<T> implements AopInterceptor<T> {
 	/** methodMapInterceptor */
 	protected Map<Method, T> methodMapInterceptor = new HashMap<Method, T>();
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.aop.AopInterceptor#getInterface()
+	 */
+	@Override
+	public Class<?> getInterface() {
+		return null;
+	}
+
 	/**
 	 * @return the methodMapInterceptor
 	 */

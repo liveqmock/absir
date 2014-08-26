@@ -12,7 +12,10 @@ import java.util.List;
 
 import com.absir.bean.basis.BeanDefine;
 import com.absir.bean.basis.BeanFactory;
+import com.absir.bean.core.BeanDefineType;
 import com.absir.bean.core.BeanDefineWrapper;
+import com.absir.bean.core.BeanFactoryParameters;
+import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.core.kernel.KernelLang;
 
 /**
@@ -52,17 +55,7 @@ public class AopBeanDefine extends BeanDefineWrapper {
 		}
 
 		if (!aopInterceptors.isEmpty()) {
-			AopProxy aopProxy = null;
-			for (AopInterceptor aopInterceptor : aopInterceptors) {
-				if (aopProxy == null) {
-					aopProxy = AopProxyUtils.proxyInterceptor(beanObject, aopInterceptor);
-
-				} else {
-					aopProxy.getAopInterceptors().add(aopInterceptor);
-				}
-			}
-
-			beanObject = aopProxy;
+			beanObject = AopProxyUtils.proxyInterceptors(beanObject, aopInterceptors);
 		}
 
 		return beanObject;
@@ -80,5 +73,21 @@ public class AopBeanDefine extends BeanDefineWrapper {
 		}
 
 		return aopInterceptors.isEmpty() ? beanDefine : this;
+	}
+
+	/**
+	 * @param beanType
+	 * @return
+	 */
+	public static <T> T instanceBeanObject(Class<?> beanType) {
+		return (T) new AopBeanDefine(new BeanDefineType(beanType)).getBeanObject(BeanFactoryUtils.get());
+	}
+
+	/**
+	 * @param beanType
+	 * @return
+	 */
+	public static <T> T instanceBeanObject(Class<?> beanType, Object... initargs) {
+		return (T) new AopBeanDefine(new BeanDefineType(beanType)).getBeanObject(new BeanFactoryParameters(BeanFactoryUtils.get(), initargs));
 	}
 }

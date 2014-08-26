@@ -12,9 +12,9 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.absir.aop.AopBeanDefine;
 import com.absir.appserv.system.bean.JConfigure;
 import com.absir.appserv.system.helper.HelperAccessor;
-import com.absir.core.kernel.KernelClass;
 import com.absir.core.kernel.KernelObject;
 import com.absir.core.kernel.KernelString;
 
@@ -50,7 +50,7 @@ public abstract class JConfigureUtils {
 				if (configure == null) {
 					Class<? extends JConfigureBase> configureClass = Configure_Class_Map_Class.get(cls);
 					if (configureClass == null) {
-						configure = KernelClass.newInstance(cls);
+						configure = AopBeanDefine.instanceBeanObject(cls);
 						try {
 							initConfigure(configure);
 
@@ -121,8 +121,15 @@ public abstract class JConfigureUtils {
 			synchronized (JConfigureUtils.class) {
 				configure = Configure_Class_Map_Instance.get(configureKey);
 				if (configure == null) {
-					configure = KernelClass.newInstance(cls, initargs);
-					initConfigure(configure);
+					configure = AopBeanDefine.instanceBeanObject(cls, initargs);
+					try {
+						initConfigure(configure);
+
+					} catch (Throwable e) {
+						// TODO: handle exception
+						e.printStackTrace();
+					}
+
 					Configure_Class_Map_Instance.put(configureKey, configure);
 				}
 			}

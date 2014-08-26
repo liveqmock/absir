@@ -8,13 +8,20 @@
 package com.absir.appserv.lang;
 
 import java.io.File;
+import java.lang.reflect.Method;
+import java.util.Map.Entry;
 
+import com.absir.aop.AopInterceptorAbstract;
+import com.absir.aop.AopMethodDefine;
+import com.absir.appserv.lang.LangBundleImpl.LangIterceptor;
 import com.absir.appserv.support.Developer;
 import com.absir.bean.basis.Base;
+import com.absir.bean.basis.BeanDefine;
 import com.absir.bean.core.BeanConfigImpl;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Stopping;
 import com.absir.context.lang.LangBundle;
+import com.absir.core.kernel.KernelLang.ObjectEntry;
 import com.absir.core.kernel.KernelString;
 
 /**
@@ -23,7 +30,17 @@ import com.absir.core.kernel.KernelString;
  */
 @Base(order = -1)
 @Bean
-public class LangBundleImpl extends LangBundle {
+public class LangBundleImpl extends LangBundle implements AopMethodDefine<LangIterceptor, Entry<String, Class<?>>, String> {
+
+	/**
+	 * @author absir
+	 *
+	 */
+	public static class LangIterceptor extends AopInterceptorAbstract<Entry<String, Class<?>>> {
+
+		// private static
+
+	}
 
 	/**
 	 * 内置国际化资源写入
@@ -48,5 +65,106 @@ public class LangBundleImpl extends LangBundle {
 				Developer.doEntry(file);
 			}
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.core.kernel.KernelList.Orderable#getOrder()
+	 */
+	@Override
+	public int getOrder() {
+		// TODO Auto-generated method stub
+		return 1024;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.aop.AopMethodDefine#getAopInterceptor(com.absir.bean.basis.
+	 * BeanDefine, java.lang.Object)
+	 */
+	@Override
+	public LangIterceptor getAopInterceptor(BeanDefine beanDefine, Object beanObject) {
+		// TODO Auto-generated method stub
+		return new LangIterceptor();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.aop.AopMethodDefine#isEmpty(com.absir.aop.AopInterceptor)
+	 */
+	@Override
+	public boolean isEmpty(LangIterceptor aopInterceptor) {
+		// TODO Auto-generated method stub
+		return !aopInterceptor.setunmodifiableMethodMapInterceptor();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.aop.AopMethodDefine#getVariable(com.absir.aop.AopInterceptor,
+	 * com.absir.bean.basis.BeanDefine, java.lang.Object)
+	 */
+	@Override
+	public String getVariable(LangIterceptor aopInterceptor, BeanDefine beanDefine, Object beanObject) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.aop.AopMethodDefine#getAopInterceptor(java.lang.Object,
+	 * java.lang.Class)
+	 */
+	@Override
+	public Entry<String, Class<?>> getAopInterceptor(String variable, Class<?> beanType) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.aop.AopMethodDefine#getAopInterceptor(java.lang.Object,
+	 * java.lang.Object, java.lang.Class, java.lang.reflect.Method)
+	 */
+	@Override
+	public Entry<String, Class<?>> getAopInterceptor(Entry<String, Class<?>> interceptor, String variable, Class<?> beanType, Method method) {
+		// TODO Auto-generated method stub
+		if (isI18n() && method.getParameterTypes().length == 0) {
+			String name = method.getName();
+			int length = name.length();
+			if (length > 3) {
+				if (name.startsWith("get")) {
+					return new ObjectEntry<String, Class<?>>(KernelString.unCapitalize(name.substring(3, length)), method.getReturnType());
+				}
+			}
+
+			if (length > 2) {
+				if (name.startsWith("is")) {
+					return new ObjectEntry<String, Class<?>>(KernelString.unCapitalize(name.substring(2, length)), method.getReturnType());
+				}
+			}
+		}
+
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.aop.AopMethodDefine#setAopInterceptor(java.lang.Object,
+	 * com.absir.aop.AopInterceptor, java.lang.Class, java.lang.reflect.Method,
+	 * java.lang.reflect.Method)
+	 */
+	@Override
+	public void setAopInterceptor(Entry<String, Class<?>> interceptor, LangIterceptor aopInterceptor, Class<?> beanType, Method method, Method beanMethod) {
+		// TODO Auto-generated method stub
+		aopInterceptor.getMethodMapInterceptor().put(beanMethod, interceptor);
 	}
 }

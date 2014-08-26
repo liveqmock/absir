@@ -166,31 +166,33 @@ public abstract class SecurityService implements ISecurityService, ISecurity {
 	@Override
 	public SecurityContext autoLogin(String name, boolean remeber, int roleLevel, Input input) {
 		// TODO Auto-generated method stub
-		if (input instanceof InputRequest) {
-			InputRequest inputRequest = (InputRequest) input;
-			SecurityManager securityManager = getSecurityManager(name);
-			String sessionId = inputRequest.getSession(securityManager.getSessionKey());
-			if (sessionId == null && remeber) {
-				sessionId = inputRequest.getCookie(securityManager.getSessionKey());
-			}
-
-			if (sessionId != null) {
-				SecurityContext securityContext = ContextUtils.findContext(SecurityContext.class, sessionId);
-				if (securityContext == null) {
-					securityContext = ME.findSecurityContext(sessionId, securityManager);
-					if (securityContext == null) {
-						return null;
-					}
+		SecurityContext securityContext = getSecurityContext(input);
+		if (securityContext == null) {
+			if (input instanceof InputRequest) {
+				InputRequest inputRequest = (InputRequest) input;
+				SecurityManager securityManager = getSecurityManager(name);
+				String sessionId = inputRequest.getSession(securityManager.getSessionKey());
+				if (sessionId == null && remeber) {
+					sessionId = inputRequest.getCookie(securityManager.getSessionKey());
 				}
 
-				securityContext.retainAt();
-				setSecurityContext(securityContext, input);
-				setUserBase(securityContext.getUser(), input);
-				return securityContext;
+				if (sessionId != null) {
+					securityContext = ContextUtils.findContext(SecurityContext.class, sessionId);
+					if (securityContext == null) {
+						securityContext = ME.findSecurityContext(sessionId, securityManager);
+						if (securityContext == null) {
+							return null;
+						}
+					}
+
+					securityContext.retainAt();
+					setSecurityContext(securityContext, input);
+					setUserBase(securityContext.getUser(), input);
+				}
 			}
 		}
 
-		return null;
+		return securityContext;
 	}
 
 	/*
@@ -239,11 +241,7 @@ public abstract class SecurityService implements ISecurityService, ISecurity {
 	@Override
 	public void logout(String name, Input input) {
 		// TODO Auto-generated method stub
-		SecurityContext securityContext = getSecurityContext(input);
-		if (securityContext == null) {
-			securityContext = autoLogin(name, false, 0, input);
-		}
-
+		SecurityContext securityContext = autoLogin(name, false, 0, input);
 		if (securityContext != null) {
 			// 销毁之前的登录
 			securityContext.setSecuritySupply(null);
@@ -254,10 +252,11 @@ public abstract class SecurityService implements ISecurityService, ISecurity {
 				inputRequest.removeSession(securityManager.getSessionKey());
 				inputRequest.removeCookie(securityManager.getSessionKey(), securityManager.getCookiePath());
 			}
+
+			setSecurityContext(null, input);
 		}
 
 		setUserBase(null, input);
-		setSecurityContext(null, input);
 	}
 
 	/*

@@ -20,6 +20,11 @@ import net.sf.cglib.proxy.MethodProxy;
 public interface AopInterceptor<T> {
 
 	/**
+	 * @return
+	 */
+	public Class<?> getInterface();
+
+	/**
 	 * @param proxyHandler
 	 * @param beanObject
 	 * @param method

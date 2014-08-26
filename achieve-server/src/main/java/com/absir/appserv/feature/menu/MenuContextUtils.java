@@ -61,7 +61,7 @@ public abstract class MenuContextUtils {
 	/** Admin_Route */
 	private static String Admin_Route;
 
-	/** menuService */
+	/** menuBeanService */
 	@Inject
 	static MenuBeanService menuBeanService;
 

@@ -27,4 +27,7 @@ public enum JeEditable {
 
 	/** 锁定不管 */
 	LOCKABLE,
+	
+	/** 锁定不显示 */
+	LOCKNONE,
 }

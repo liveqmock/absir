@@ -479,7 +479,7 @@ public class EntityField extends DBField {
 			}
 		}
 
-		if (embedd) {
+		if (embedd && editable != JeEditable.LOCKED) {
 			addEntityFieldScope(crudField.getName(), crudField.getJoEntity(), fieldScope, null);
 
 		} else {
@@ -553,6 +553,10 @@ public class EntityField extends DBField {
 
 					} else if (entityField.getEditable() == JeEditable.LOCKABLE) {
 						entityField.editable = JeEditable.LOCKED;
+
+					} else if (entityField.getEditable() == JeEditable.LOCKNONE) {
+						entityField.editable = JeEditable.LOCKED;
+						entityModel.addGroupField("none", entityField);
 					}
 				}
 			}

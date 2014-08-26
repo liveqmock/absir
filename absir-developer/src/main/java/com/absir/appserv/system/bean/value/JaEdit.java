@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
  * @author absir
  * 
  */
-@Target({ ElementType.FIELD })
+@Target({ ElementType.FIELD, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface JaEdit {
 

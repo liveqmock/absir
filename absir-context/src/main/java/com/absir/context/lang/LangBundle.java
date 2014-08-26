@@ -9,6 +9,7 @@ package com.absir.context.lang;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -53,6 +54,9 @@ public class LangBundle {
 
 	/** local */
 	protected Locale locale;
+
+	/** locales */
+	protected List<Locale> locales;
 
 	/** resourceBundle */
 	protected Map<String, String> resourceBundle;
@@ -140,6 +144,17 @@ public class LangBundle {
 	 */
 	public Locale getLocale() {
 		return locale;
+	}
+
+	/**
+	 * @return
+	 */
+	public Locale getLocale(int index) {
+		if (locales == null || index < 0 || index >= locales.size()) {
+			return locale;
+		}
+
+		return locales.get(index);
 	}
 
 	/**

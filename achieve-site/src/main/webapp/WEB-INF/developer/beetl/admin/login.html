@@ -1,0 +1,21 @@
+\<%layout("/WEB-INF/beetl/layout.html",{page_title:'登录页面'}) {%>
+<div class="login_form">
+	<form method="post">
+		<div class="form-group">
+			 <label>${Pag.getLang("用户名")}:</label><input name="username" type="text" class="form-control x319 in">
+		</div>
+		<div class="form-group">
+			 <label>${Pag.getLang("密码")}:</label><input name="password" type="text" class="form-control x319 in">
+		</div>
+		<div class="form-group">
+			 <label>${Pag.getLang("验证码")}:</label><input name="verifycode" type="text" class="form-control x319 in"><img src="\${SITE_ROUTE}/asset/verify" class="m" alt="">
+		</div>
+		<div class="form-group">
+			 <label class="m"><input id="remeber" type="checkbox" value="true">${Pag.getLang("记住账号")}</label>
+		</div>
+		<div class="form-group space">
+			<label class="t"></label><input type="submit" id="login_ok" value="${Pag.getLang('登录')}" class="btn btn-primary btn-lg"><input type="reset" value="${Pag.getLang('重置')}" class="btn btn-default btn-lg">
+		</div>
+	</form>
+</div>
+\<%}%>

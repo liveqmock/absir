@@ -1,31 +1,21 @@
-<% 
-	var page_title = APP_NAME + "管理平台";layout("/WEB-INF/beetl/layout.html",{page_title: page_title}) {
- %>
-<div class="container-fluid">
-	<div class="row-fluid">
-		<div class="span12">
-			<form class="form-horizontal">
-				<div class="control-group">
-					 <label class="control-label" for="inputEmail">用户名</label>
-					<div class="controls">
-						<input id="inputEmail" placeholder="Email" type="text" />
-					</div>
-				</div>
-				<div class="control-group">
-					 <label class="control-label" for="inputPassword">密码</label>
-					<div class="controls">
-						<input id="inputPassword" placeholder="Password" type="password" />
-					</div>
-				</div>
-				<div class="control-group">
-					<div class="controls">
-						 <label class="checkbox"><input type="checkbox" /><span style="text-align: right;">记住登录</span></label> <button type="submit" class="btn">登录</button>
-					</div>
-				</div>
-			</form>
+<%layout("/WEB-INF/beetl/layout.html",{page_title:'登录页面'}) {%>
+<div class="login_form">
+	<form method="post">
+		<div class="form-group">
+			 <label>用户名:</label><input name="username" type="text" class="form-control x319 in">
 		</div>
-	</div>
+		<div class="form-group">
+			 <label>密码:</label><input name="password" type="text" class="form-control x319 in">
+		</div>
+		<div class="form-group">
+			 <label>验证码:</label><input name="verifycode" type="text" class="form-control x319 in"><img src="${SITE_ROUTE}/asset/verify" class="m" alt="">
+		</div>
+		<div class="form-group">
+			 <label class="m"><input id="remeber" type="checkbox" value="true">记住账号</label>
+		</div>
+		<div class="form-group space">
+			<label class="t"></label><input type="submit" id="login_ok" value="登录" class="btn btn-primary btn-lg"><input type="reset" value="重置" class="btn btn-default btn-lg">
+		</div>
+	</form>
 </div>
-<% 
-	}
- %>
+<%}%>

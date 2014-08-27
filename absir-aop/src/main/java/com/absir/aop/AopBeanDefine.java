@@ -80,7 +80,7 @@ public class AopBeanDefine extends BeanDefineWrapper {
 	 * @return
 	 */
 	public static <T> T instanceBeanObject(Class<?> beanType) {
-		return (T) new AopBeanDefine(new BeanDefineType(beanType)).getBeanObject(BeanFactoryUtils.get());
+		return (T) new AopBeanDefine(new BeanDefineType("@", beanType)).getBeanObject(BeanFactoryUtils.get());
 	}
 
 	/**
@@ -88,6 +88,6 @@ public class AopBeanDefine extends BeanDefineWrapper {
 	 * @return
 	 */
 	public static <T> T instanceBeanObject(Class<?> beanType, Object... initargs) {
-		return (T) new AopBeanDefine(new BeanDefineType(beanType)).getBeanObject(new BeanFactoryParameters(BeanFactoryUtils.get(), initargs));
+		return (T) new AopBeanDefine(new BeanDefineType("@", beanType)).getBeanObject(new BeanFactoryParameters(BeanFactoryUtils.get(), initargs));
 	}
 }

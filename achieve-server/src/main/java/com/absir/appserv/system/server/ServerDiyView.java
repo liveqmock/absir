@@ -131,12 +131,7 @@ public abstract class ServerDiyView extends ReturnedResolverView implements IRen
 	public String getDiyRestore(String view) throws IOException {
 		if (IDeveloper.ME != null) {
 			String diyView = IDeveloper.ME.getDeveloperPath(view);
-			File file = new File(getRealPath(diyView + Asset_diy.getDiySuffix()));
-			if (file.exists()) {
-				return HelperFile.readFileToString(file);
-			}
-
-			file = new File(getRealPath(diyView));
+			File file = new File(getRealPath(diyView));
 			if (file.exists()) {
 				return HelperFile.readFileToString(file);
 			}

@@ -32,12 +32,14 @@ public abstract class BeanDefineAbstractor extends BeanDefineAbstract {
 	public Object getBeanObject(BeanFactory beanFactory, BeanDefine beanDefineRoot, BeanDefine beanDefineWrapper) {
 		if (loaded) {
 			BeanDefine beanDefineLoaded = beanFactory.getBeanDefine(beanDefineRoot.getBeanName());
-			if (beanDefineLoaded != beanDefineRoot) {
+			if (beanDefineLoaded != null && beanDefineLoaded != beanDefineRoot) {
 				return beanDefineLoaded.getBeanObject(beanFactory);
 			}
 
 		} else {
-			loaded = true;
+			if (beanDefineRoot.getBeanScope() != BeanScope.PROTOTYPE) {
+				loaded = true;
+			}
 		}
 
 		return getBeanObject(beanFactory, this, beanDefineRoot, beanDefineWrapper);
@@ -67,7 +69,7 @@ public abstract class BeanDefineAbstractor extends BeanDefineAbstract {
 		Object beanObject = beanDefine.getBeanObject(beanFactory);
 		if (beanDefine instanceof BeanDefineAbstractor && ((BeanDefineAbstractor) beanDefine).loaded) {
 			BeanDefine beanDefineLoaded = beanFactory.getBeanDefine(beanDefineRoot.getBeanName());
-			if (beanDefineLoaded != beanDefineRoot) {
+			if (beanDefineLoaded != null && beanDefineLoaded != beanDefineRoot) {
 				return beanDefineLoaded.getBeanObject(beanFactory);
 			}
 		}

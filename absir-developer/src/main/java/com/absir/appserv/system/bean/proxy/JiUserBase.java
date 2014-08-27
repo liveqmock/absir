@@ -25,12 +25,22 @@ public interface JiUserBase {
 	/**
 	 * @return
 	 */
-	public String getUsername();
+	public boolean isDeveloper();
 
 	/**
 	 * @return
 	 */
-	public boolean isDeveloper();
+	public boolean isActivation();
+
+	/**
+	 * @return
+	 */
+	public boolean isDisabled();
+
+	/**
+	 * @return
+	 */
+	public String getUsername();
 
 	/**
 	 * @return
@@ -46,4 +56,16 @@ public interface JiUserBase {
 	 * @return
 	 */
 	public Collection<? extends JbUserRole> getUserRoles();
+
+	/**
+	 * @param key
+	 * @return
+	 */
+	public Object getMetaMap(String key);
+
+	/**
+	 * @param key
+	 * @param value
+	 */
+	public void setMetaMap(String key, String value);
 }

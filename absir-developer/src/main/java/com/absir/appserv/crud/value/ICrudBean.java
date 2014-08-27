@@ -5,7 +5,7 @@
  *
  * Create on 2014年7月15日 下午5:43:32
  */
-package com.absir.appserv.system.crud.value;
+package com.absir.appserv.crud.value;
 
 import com.absir.appserv.system.bean.value.JaCrud.Crud;
 

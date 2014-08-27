@@ -68,7 +68,7 @@ public abstract class AdminServer {
 	@Before
 	protected SecurityContext onAuthentication(Input input) throws Exception {
 		SecurityContext securityContext = SecurityService.ME.autoLogin("admin", true, JeRoleLevel.ROLE_ADMIN.ordinal(), input);
-		if (securityContext == null) {
+		if (securityContext == null || !securityContext.getUser().isActivation()) {
 			ServerResolverRedirect.redirect(MenuContextUtils.getAdminRoute() + "/login", false, input);
 		}
 

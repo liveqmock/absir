@@ -11,11 +11,18 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+
 import com.absir.appserv.system.service.impl.BeanServiceBase;
 import com.absir.appserv.system.service.impl.BeanServiceImpl;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Inject;
+import com.absir.core.kernel.KernelLang.CallbackTemplate;
+import com.absir.orm.hibernate.SessionFactoryUtils;
 import com.absir.orm.transaction.TransactionAttribute;
+import com.absir.orm.transaction.TransactionContext;
+import com.absir.orm.transaction.TransactionUtils;
 import com.absir.orm.transaction.value.Transaction;
 
 /**
@@ -34,6 +41,48 @@ public interface BeanService {
 
 	/** TRANSACTION_READ_WRITE */
 	public static final TransactionAttribute TRANSACTION_READ_WRITE = new TransactionAttribute(false, new Class[] { Throwable.class }, false, true, 0);
+
+	/**
+	 * @author absir
+	 *
+	 */
+	public static class MERGE {
+
+		/**
+		 * @param entity
+		 * @param id
+		 * @param merge
+		 * @return
+		 */
+		public static Object merge(Object entity, Serializable id, CallbackTemplate<Object> merge) {
+			if (entity instanceof IMergeService) {
+				return ((IMergeService) entity).merge(merge, id);
+
+			} else {
+				SessionFactory sessionFactory = SessionFactoryUtils.getSessionFactory(entity.getClass());
+				if (sessionFactory != null) {
+					TransactionContext transactionContext = TransactionUtils.getTransactionContext(sessionFactory);
+					transactionContext.add(BeanService.TRANSACTION_READ_WRITE);
+					Throwable ex = null;
+					try {
+						Session session = sessionFactory.getCurrentSession();
+						session.load(entity, id);
+						merge.doWith(entity);
+						session.flush();
+
+					} catch (Exception e) {
+						// TODO: handle exception
+						ex = e;
+
+					} finally {
+						transactionContext.closeCurrent(ex, null);
+					}
+				}
+			}
+
+			return entity;
+		}
+	}
 
 	/**
 	 * @param entityClass

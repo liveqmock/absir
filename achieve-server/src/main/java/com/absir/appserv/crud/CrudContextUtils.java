@@ -13,9 +13,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.absir.appserv.crud.CrudHandler.CrudInvoker;
+import com.absir.appserv.crud.value.ICrudBean;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.bean.value.JaCrud;
-import com.absir.appserv.system.crud.value.ICrudBean;
 import com.absir.core.kernel.KernelLang.PropertyFilter;
 import com.absir.orm.value.JoEntity;
 import com.absir.property.PropertyErrors;

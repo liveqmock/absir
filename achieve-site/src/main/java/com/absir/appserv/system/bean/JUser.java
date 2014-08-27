@@ -142,7 +142,7 @@ public class JUser extends JbUser implements JpUserBase, JpMeta, Serializable {
 	/**
 	 * @return the expired
 	 */
-	public boolean isExpired() {
+	public boolean isDisabled() {
 		return expired;
 	}
 

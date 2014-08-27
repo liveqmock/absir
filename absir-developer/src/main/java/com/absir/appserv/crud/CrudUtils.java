@@ -15,13 +15,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.absir.appserv.crud.CrudHandler.CrudInvoker;
+import com.absir.appserv.crud.value.ICrudBean;
 import com.absir.appserv.support.Developer;
 import com.absir.appserv.support.developer.IDeveloper;
 import com.absir.appserv.support.developer.IModel;
 import com.absir.appserv.support.developer.JCrudField;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.bean.value.JaCrud;
-import com.absir.appserv.system.crud.value.ICrudBean;
 import com.absir.bean.basis.Configure;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.core.kernel.KernelArray;

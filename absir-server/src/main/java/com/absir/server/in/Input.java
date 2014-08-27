@@ -19,6 +19,7 @@ import java.util.Map;
 import com.absir.bean.basis.Environment;
 import com.absir.bean.core.BeanConfigImpl;
 import com.absir.bean.core.BeanFactoryUtils;
+import com.absir.bean.inject.value.Inject;
 import com.absir.binder.BinderData;
 import com.absir.context.core.Bean;
 import com.absir.context.core.ContextUtils;
@@ -34,7 +35,11 @@ import com.absir.server.route.returned.ReturnedResolver;
  * 
  */
 @SuppressWarnings("rawtypes")
+@Inject
 public abstract class Input extends Bean<Serializable> implements IAttributes {
+
+	/** GET */
+	public final IGet GET = BeanFactoryUtils.get(IGet.class);
 
 	/** model */
 	private InModel model;
@@ -73,7 +78,13 @@ public abstract class Input extends Bean<Serializable> implements IAttributes {
 	 */
 	public Locale getLocale() {
 		if (locale == null) {
-			locale = getLocaled();
+			if (GET != null) {
+				locale = GET.getLocale(this);
+			}
+
+			if (locale == null) {
+				locale = LangBundle.ME.getLocale();
+			}
 		}
 
 		return locale;

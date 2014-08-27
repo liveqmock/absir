@@ -48,7 +48,7 @@ public class LangBundleImpl extends LangBundle implements AopMethodDefine<LangIt
 	public static void setLangEntity(ILangBase langBase, String value) {
 		String[] langs = value.split(",", 3);
 		if (langs.length == 3) {
-			langBase.setLang(langs[0], LangBundle.ME.getLocale(DynaBinder.to(langs[1], int.class)), langs[2]);
+			langBase.setLang(langs[0], ME.getLocale(DynaBinder.to(langs[1], int.class)), langs[2]);
 		}
 	}
 
@@ -70,11 +70,11 @@ public class LangBundleImpl extends LangBundle implements AopMethodDefine<LangIt
 		public Object before(Object proxy, Iterator<AopInterceptor> iterator, Entry<String, Class<?>> interceptor, AopProxyHandler proxyHandler, Method method, Object[] args, MethodProxy methodProxy)
 				throws Throwable {
 			// TODO Auto-generated method stub
-			if (LangBundleImpl.ME.isI18n()) {
+			if (ME.isI18n()) {
 				OnPut onPut = OnPut.get();
 				if (onPut != null) {
 					Locale locale = onPut.getInput().getLocale();
-					if (locale != null) {
+					if (locale != null && locale != ME.getLocale()) {
 						return ((ILangBase) proxy).getLang(interceptor.getKey(), locale, interceptor.getValue());
 					}
 				}

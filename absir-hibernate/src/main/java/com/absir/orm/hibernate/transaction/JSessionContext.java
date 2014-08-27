@@ -102,11 +102,6 @@ public class JSessionContext implements CurrentSessionContext, ISessionContext {
 	 * @return
 	 */
 	public static ISessionHolder open(SessionFactory sessionFactory, ISessionHolder sessionHolder, TransactionAttribute transactionAttribute, final JTransactionSession jTransactionSession) {
-		// if (jTransactionSession.getCurrentSession() == null &&
-		// !transactionAttribute.isRequired()) {
-		// return null;
-		// }
-
 		TransactionHolder transactionHolder = new TransactionHolder(sessionHolder, transactionAttribute) {
 
 			@Override

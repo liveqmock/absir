@@ -7,10 +7,12 @@
  */
 package com.absir.appserv.system.service;
 
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.ServletRequest;
 
+import com.absir.appserv.dyna.DynaBinderUtils;
 import com.absir.appserv.support.developer.IDeveloper.ISecurity;
 import com.absir.appserv.support.developer.Pag;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
@@ -23,9 +25,12 @@ import com.absir.appserv.system.security.SecurityManager;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Inject;
 import com.absir.context.core.ContextUtils;
+import com.absir.context.lang.LangBundle;
+import com.absir.core.kernel.KernelLang.CallbackTemplate;
 import com.absir.core.kernel.KernelString;
 import com.absir.server.exception.ServerException;
 import com.absir.server.exception.ServerStatus;
+import com.absir.server.in.IGet;
 import com.absir.server.in.Input;
 import com.absir.servlet.InputRequest;
 
@@ -33,7 +38,7 @@ import com.absir.servlet.InputRequest;
  * @author absir
  * 
  */
-public abstract class SecurityService implements ISecurityService, ISecurity {
+public abstract class SecurityService implements ISecurityService, ISecurity, IGet {
 
 	/** ME */
 	public static final SecurityService ME = BeanFactoryUtils.get(SecurityService.class);
@@ -192,6 +197,10 @@ public abstract class SecurityService implements ISecurityService, ISecurity {
 			}
 		}
 
+		if (securityContext.getUser() == null || securityContext.getUser().isDisabled()) {
+			return null;
+		}
+
 		return securityContext;
 	}
 
@@ -209,7 +218,7 @@ public abstract class SecurityService implements ISecurityService, ISecurity {
 		if (input instanceof InputRequest) {
 			InputRequest inputRequest = (InputRequest) input;
 			JiUserBase userBase = ME.getUserBase(username);
-			if (userBase == null) {
+			if (userBase == null || userBase.isDisabled()) {
 				throw new ServerException(ServerStatus.NO_USER);
 			}
 
@@ -279,5 +288,71 @@ public abstract class SecurityService implements ISecurityService, ISecurity {
 
 		SecurityContext securityContext = input == null ? null : autoLogin("admin", true, JeRoleLevel.ROLE_ADMIN.ordinal(), input);
 		return securityContext == null ? null : securityContext.getUser();
+	}
+
+	/** SECURITY_SESSION_NAME */
+	protected static final String SECURITY_SESSION_NAME = SecurityService.class.getName() + "@" + "SECURITY_SESSION_NAME" + "@";
+
+	/**
+	 * @param name
+	 * @param toClass
+	 * @param input
+	 * @return
+	 */
+	public <T> T getSession(String name, Class<T> toClass, Input input) {
+		T value = null;
+		JiUserBase user = getUserBase(input);
+		if (user != null) {
+			value = DynaBinderUtils.to(user.getMetaMap(name), toClass);
+		}
+
+		if (value == null && input instanceof InputRequest) {
+			value = DynaBinderUtils.to(((InputRequest) input).getSession(SECURITY_SESSION_NAME + name), toClass);
+		}
+
+		return value;
+	}
+
+	/**
+	 * @param name
+	 * @param value
+	 * @param input
+	 */
+	public void setSession(final String name, final Object value, Input input) {
+		JiUserBase user = getUserBase(input);
+		if (user == null) {
+			if (input instanceof InputRequest) {
+				((InputRequest) input).setSession(SECURITY_SESSION_NAME + name, DynaBinderUtils.to(value, String.class));
+			}
+
+		} else {
+			BeanService.MERGE.merge(user, user.getUserId(), new CallbackTemplate<Object>() {
+
+				@Override
+				public void doWith(Object template) {
+					// TODO Auto-generated method stub
+					((JiUserBase) template).setMetaMap(name, DynaBinderUtils.to(value, String.class));
+				}
+			});
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.server.in.IGet#getLocale(com.absir.server.in.Input)
+	 */
+	@Override
+	public Locale getLocale(Input input) {
+		// TODO Auto-generated method stub
+		Integer locale = getSession("locale", Integer.class, input);
+		if (locale == null && input instanceof InputRequest) {
+			locale = LangBundle.ME.getLocaleCode(((InputRequest) input).getRequest().getLocale());
+			if (locale != null) {
+				setSession("locale", locale, input);
+			}
+		}
+
+		return LangBundle.ME.getLocale(locale);
 	}
 }

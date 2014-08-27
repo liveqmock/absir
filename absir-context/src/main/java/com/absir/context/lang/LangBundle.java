@@ -9,6 +9,7 @@ package com.absir.context.lang;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -23,6 +24,7 @@ import com.absir.bean.inject.value.Stopping;
 import com.absir.bean.inject.value.Value;
 import com.absir.context.core.ContextUtils;
 import com.absir.context.schedule.cron.CronFixDelayRunable;
+import com.absir.core.dyna.DynaBinder;
 import com.absir.core.kernel.KernelString;
 
 /**
@@ -67,6 +69,84 @@ public class LangBundle {
 	protected Map<Locale, Map<String, String>> localeMapResourceBunlde = new HashMap<Locale, Map<String, String>>();
 
 	/**
+	 * @param locale
+	 * @return
+	 */
+	public static Locale getLocaleFromString(String locale) {
+		if (locale != null) {
+			String[] locales = locale.split("_");
+			locale = locales[0];
+			int length = locales.length;
+			String country = length > 1 ? locales[1] : null;
+			String variant = length > 2 ? locales[2] : null;
+			return new Locale(locale, country, variant);
+		}
+
+		return null;
+	}
+
+	/**
+	 * 初始化国际化资源
+	 */
+	@Inject
+	protected void initBundle() {
+		Long reload = BeanFactoryUtils.getBeanConfigValue("lang.reload", Long.class);
+		setReloadTime(reload == null ? BeanFactoryUtils.getEnvironment().compareTo(Environment.DEVELOP) <= 0 ? -1 : 0 : reload);
+		locale = getLocaleFromString(BeanFactoryUtils.getBeanConfigValue("lang.locale", String.class));
+		if (locale == null) {
+			locale = Locale.getDefault();
+		}
+
+		String[] locales = BeanFactoryUtils.getBeanConfigValue("lang.locales", String[].class);
+		if (locales != null) {
+			codeMaplocale = new LinkedHashMap<Integer, Locale>();
+			for (String locale : locales) {
+				String[] codes = locale.split(":", 2);
+				if (codes.length == 2) {
+					codeMaplocale.put(DynaBinder.to(codes[0], Integer.class), getLocaleFromString(codes[1]));
+				}
+			}
+
+			if (codeMaplocale.isEmpty()) {
+				codeMaplocale = null;
+
+			} else {
+				if (codeMaplocale.containsValue(locale)) {
+					if (codeMaplocale.size() == 1) {
+						codeMaplocale = null;
+					}
+
+				} else {
+					codeMaplocale.put(0, locale);
+				}
+			}
+		}
+	}
+
+	/**
+	 * 内置国际化资源写入
+	 */
+	@Stopping
+	public void stopping() {
+		if (!resourceLangs.isEmpty()) {
+			String var = locale.getLanguage();
+			if (!KernelString.isEmpty(var)) {
+				String resource = langResource + var;
+				var = locale.getCountry();
+				if (!KernelString.isEmpty(var)) {
+					resource += '_' + var;
+					var = locale.getVariant();
+					if (!KernelString.isEmpty(var)) {
+						resource += '_' + var;
+					}
+				}
+
+				BeanConfigImpl.writeProperties(resourceLangs, new File(resource + "/general.properties"));
+			}
+		}
+	}
+
+	/**
 	 * @param reloadTime
 	 *            the reloadTime to set
 	 */
@@ -96,42 +176,6 @@ public class LangBundle {
 	}
 
 	/**
-	 * 初始化国际化资源
-	 */
-	@Inject
-	protected void initBundle() {
-		Long reload = BeanFactoryUtils.getBeanConfigValue("local.reload", Long.class);
-		setReloadTime(reload == null ? BeanFactoryUtils.getEnvironment().compareTo(Environment.DEVELOP) <= 0 ? -1 : 0 : reload);
-		String language = BeanFactoryUtils.getBeanConfigValue("local.language", String.class);
-		String country = BeanFactoryUtils.getBeanConfigValue("local.country", String.class);
-		String variant = BeanFactoryUtils.getBeanConfigValue("local.variant", String.class);
-		locale = language == null || country == null ? Locale.getDefault() : new Locale(language, country, variant);
-	}
-
-	/**
-	 * 内置国际化资源写入
-	 */
-	@Stopping
-	public void stopping() {
-		if (!resourceLangs.isEmpty()) {
-			String var = locale.getLanguage();
-			if (!KernelString.isEmpty(var)) {
-				String resource = langResource + var;
-				var = locale.getCountry();
-				if (!KernelString.isEmpty(var)) {
-					resource += '_' + var;
-					var = locale.getVariant();
-					if (!KernelString.isEmpty(var)) {
-						resource += '_' + var;
-					}
-				}
-
-				BeanConfigImpl.writeProperties(resourceLangs, new File(resource + "/general.properties"));
-			}
-		}
-	}
-
-	/**
 	 * @return the i18n
 	 */
 	public boolean isI18n() {
@@ -148,15 +192,43 @@ public class LangBundle {
 	/**
 	 * @return
 	 */
-	public Locale getLocale(Integer index) {
-		if (index != null && codeMaplocale != null) {
-			Locale locale = codeMaplocale.get(index);
+	public Locale getLocale(Integer code) {
+		if (code != null && codeMaplocale != null) {
+			Locale locale = codeMaplocale.get(code);
 			if (locale != null) {
 				return locale;
 			}
 		}
 
 		return locale;
+	}
+
+	/**
+	 * @param locale
+	 * @return
+	 */
+	public Integer getLocaleCode(Locale locale) {
+		if (locale == null || codeMaplocale == null) {
+			return null;
+		}
+
+		Integer code = 0;
+		float max = 0;
+		float similar;
+		String localeStr = locale.toString();
+		for (Entry<Integer, Locale> entry : codeMaplocale.entrySet()) {
+			similar = KernelString.similar(localeStr, entry.getValue().toString());
+			if (similar >= 1.0f) {
+				return entry.getKey();
+			}
+
+			if (similar > max) {
+				max = similar;
+				code = entry.getKey();
+			}
+		}
+
+		return code;
 	}
 
 	/**

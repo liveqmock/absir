@@ -20,6 +20,7 @@ import com.absir.bean.basis.Basis;
 import com.absir.bean.basis.BeanFactory;
 import com.absir.bean.config.IBeanFactoryStopping;
 import com.absir.bean.inject.value.Value;
+import com.absir.core.kernel.KernelString;
 import com.absir.orm.hibernate.boost.EntityAssoc.AssocEntity;
 import com.absir.orm.hibernate.boost.EntityAssoc.AssocField;
 import com.absir.orm.hibernate.boost.EntityAssoc.EntityAssocEntity;
@@ -33,10 +34,13 @@ import com.absir.orm.value.JePermission;
 public class SessionFactoryBean implements IBeanFactoryStopping {
 
 	/** sessionFactory */
-	SessionFactoryImpl sessionFactory;
+	private SessionFactoryImpl sessionFactory;
 
 	/** nameMapSessionFactory */
-	Map<String, SessionFactoryImpl> nameMapSessionFactory = new HashMap<String, SessionFactoryImpl>();
+	private Map<String, SessionFactoryImpl> nameMapSessionFactory = new HashMap<String, SessionFactoryImpl>();
+
+	/** sessionFactoryMapName */
+	private Map<SessionFactoryImpl, String> sessionFactoryMapName = new HashMap<SessionFactoryImpl, String>();
 
 	@Value(value = "entity.assoc.depth")
 	private int assocDepth = 8;
@@ -60,6 +64,20 @@ public class SessionFactoryBean implements IBeanFactoryStopping {
 	private Map<String, Entry<Class<?>, SessionFactory>> jpaEntityNameMapEntityClassFactory = new HashMap<String, Entry<Class<?>, SessionFactory>>();
 
 	/**
+	 * @param name
+	 * @param sessionFactory
+	 */
+	protected void setSessionFactory(String name, SessionFactoryImpl sessionFactory) {
+		if (KernelString.isEmpty(name)) {
+			this.sessionFactory = sessionFactory;
+
+		} else {
+			nameMapSessionFactory.put(name, sessionFactory);
+			sessionFactoryMapName.put(sessionFactory, name);
+		}
+	}
+
+	/**
 	 * @return the sessionFactory
 	 */
 	public SessionFactoryImpl getSessionFactory() {
@@ -67,10 +85,19 @@ public class SessionFactoryBean implements IBeanFactoryStopping {
 	}
 
 	/**
-	 * @return the nameMapSessionFactory
+	 * @param name
+	 * @return
 	 */
 	public SessionFactory getNameMapSessionFactory(String name) {
 		return name == null ? sessionFactory : nameMapSessionFactory.get(name);
+	}
+
+	/**
+	 * @param sessionFactory
+	 * @return
+	 */
+	public String getSessionFactoryMapName(SessionFactory sessionFactory) {
+		return sessionFactoryMapName.get(sessionFactory);
 	}
 
 	/**
@@ -150,23 +177,5 @@ public class SessionFactoryBean implements IBeanFactoryStopping {
 	@Override
 	public void stopping(BeanFactory beanFactory) {
 		// TODO Auto-generated method stub
-		/*
-		 * if (sessionFactory != null) { sessionFactory.close();
-		 * sessionFactory.getServiceRegistry().destroy(); ConnectionProvider
-		 * connectionProvider = sessionFactory.getConnectionProvider(); if
-		 * (connectionProvider instanceof Stoppable) { ((Stoppable)
-		 * connectionProvider).stop(); } }
-		 * 
-		 * for (SessionFactoryImpl sessionFactory :
-		 * nameMapSessionFactory.values()) { sessionFactory.close();
-		 * sessionFactory.getServiceRegistry().destroy(); ConnectionProvider
-		 * connectionProvider = sessionFactory.getConnectionProvider(); if
-		 * (connectionProvider instanceof Stoppable) { ((Stoppable)
-		 * connectionProvider).stop(); } }
-		 * 
-		 * try { Thread.sleep(1000);
-		 * 
-		 * } catch (InterruptedException e) { e.printStackTrace(); }
-		 */
 	}
 }

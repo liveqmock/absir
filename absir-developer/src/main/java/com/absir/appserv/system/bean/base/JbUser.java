@@ -27,6 +27,12 @@ public class JbUser extends JbBean {
 	@JaField(assocClasses = JbPermission.class, referencEntityClass = DeveloperAssoc.class)
 	private boolean developer;
 
+	@JaLang("激活")
+	private boolean activation;
+
+	@JaLang("禁用")
+	private boolean disabled;
+
 	/**
 	 * @return the developer
 	 */
@@ -40,5 +46,35 @@ public class JbUser extends JbBean {
 	 */
 	public void setDeveloper(boolean developer) {
 		this.developer = developer;
+	}
+
+	/**
+	 * @return the activation
+	 */
+	public boolean isActivation() {
+		return activation;
+	}
+
+	/**
+	 * @param activation
+	 *            the activation to set
+	 */
+	public void setActivation(boolean activation) {
+		this.activation = activation;
+	}
+
+	/**
+	 * @return the disabled
+	 */
+	public boolean isDisabled() {
+		return disabled;
+	}
+
+	/**
+	 * @param disabled
+	 *            the disabled to set
+	 */
+	public void setDisabled(boolean disabled) {
+		this.disabled = disabled;
 	}
 }

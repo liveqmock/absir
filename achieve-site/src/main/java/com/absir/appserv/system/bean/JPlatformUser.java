@@ -19,6 +19,7 @@ import com.absir.appserv.system.bean.base.JbBean;
 import com.absir.appserv.system.bean.base.JbUserRole;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.bean.proxy.JiUserRole;
+import com.absir.appserv.system.bean.proxy.JpMeta;
 import com.absir.appserv.system.bean.value.JaEdit;
 import com.absir.appserv.system.bean.value.JaLang;
 import com.absir.orm.value.JaColum;
@@ -30,7 +31,7 @@ import com.absir.orm.value.JaColum;
 @SuppressWarnings({ "serial" })
 @MaEntity(parent = { @MaMenu("游戏管理") }, name = "用户")
 @Entity
-public class JPlatformUser extends JbBean implements JiUserBase, Serializable {
+public class JPlatformUser extends JbBean implements JiUserBase, Serializable, JpMeta {
 
 	@JaLang("平台名称")
 	@JaEdit(groups = { JaEdit.GROUP_SUGGEST })
@@ -164,6 +165,28 @@ public class JPlatformUser extends JbBean implements JiUserBase, Serializable {
 	 */
 	@Override
 	public boolean isDeveloper() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.appserv.system.bean.proxy.JiUserBase#isActivation()
+	 */
+	@Override
+	public boolean isActivation() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.appserv.system.bean.proxy.JiUserBase#isExpired()
+	 */
+	@Override
+	public boolean isDisabled() {
 		// TODO Auto-generated method stub
 		return false;
 	}

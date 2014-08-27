@@ -156,20 +156,8 @@ public class SessionFactoryScanner implements IBeanDefineSupply, IBeanFactoryAwa
 					}
 				}
 
-				/**
-				 * new ServiceRegistryBuilder().applySettings(properties).
-				 * buildServiceRegistry() (SessionFactoryImpl)
-				 * config.buildSessionFactory(new
-				 * StandardServiceRegistryBuilder(
-				 * ).applySettings(properties).build());
-				 */
 				SessionFactoryImpl sessionFactory = (SessionFactoryImpl) config.buildSessionFactory(new StandardServiceRegistryBuilder().applySettings(properties).build());
-				if (name == KernelLang.NULL_STRING) {
-					SessionFactoryUtils.get().sessionFactory = sessionFactory;
-
-				} else {
-					SessionFactoryUtils.get().nameMapSessionFactory.put(name, sessionFactory);
-				}
+				SessionFactoryUtils.get().setSessionFactory(name, sessionFactory);
 			}
 		}
 

@@ -10,8 +10,11 @@ package com.absir.orm.transaction;
 import java.util.Collection;
 import java.util.Map.Entry;
 
+import org.hibernate.SessionFactory;
+
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Inject;
+import com.absir.orm.hibernate.SessionFactoryUtils;
 
 /**
  * @author absir
@@ -29,6 +32,14 @@ public abstract class TransactionUtils {
 	 */
 	public static TransactionService get() {
 		return transactionService;
+	}
+
+	/**
+	 * @param name
+	 * @return
+	 */
+	public static TransactionContext getTransactionContext(SessionFactory sessionFactory) {
+		return transactionService.getNameMapTransactionContext(SessionFactoryUtils.get().getSessionFactoryMapName(sessionFactory));
 	}
 
 	/**

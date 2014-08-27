@@ -42,7 +42,7 @@ import com.absir.orm.value.JiRelation;
 @SuppressWarnings("unchecked")
 @Base
 @Bean
-public class SessionFactoryBoost  {
+public class SessionFactoryBoost {
 
 	@Inject(type = InjectType.Selectable)
 	private BasicType[] basicTypes;

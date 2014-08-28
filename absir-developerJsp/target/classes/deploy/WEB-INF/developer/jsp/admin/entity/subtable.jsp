@@ -1,7 +1,7 @@
 <%@page import="java.util.Map"%>
 <%@include file="../../../common/option.jsp"%>
 <%
-	DeveloperScenario.set("subtable", request);
+	Scenario.set("subtable", request);
 	element = (Element) request.getAttribute("element");
 	Object subtable = request.getAttribute("subtable");
 	if (subtable == null || !(subtable instanceof Map)) {
@@ -12,7 +12,7 @@
 	if (!((Map) subtable).containsKey("index")) {
 		((Map) subtable).put("index", "#index#");
 	}
-	DeveloperScenario.pop(request);
+	Scenario.pop(request);
 %>
 <%="<c:set value=\"${field.defaultEntity}\" var=\"entity\"/>\r\n"%>
 <%="<c:set value=\"${subtable}\" var=\"i\"/>\r\n"%>

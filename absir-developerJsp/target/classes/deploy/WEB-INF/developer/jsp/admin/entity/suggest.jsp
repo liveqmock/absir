@@ -4,7 +4,7 @@
 <%=DeveloperCode.importClass(List.class.getName())%>
 <%=DeveloperCode.importClass(ArrayList.class.getName())%>
 <%
-	DeveloperScenario.set("suggest", request);
+	Scenario.set("suggest", request);
 	String entityName = (String) request.getAttribute("entityName");
 	EntityModel entityModel = (EntityModel) request.getAttribute("entityModel");
 	out.println(DeveloperCode.scriptBegin());
@@ -14,10 +14,10 @@
 	out.println("request.setAttribute(\"" + entityName + "$suggests\", suggests);");
 	if (entityModel.getGroupFields(JaEdit.GROUP_SUGGEST) != null) {
 		for (IField field : entityModel.getGroupFields(JaEdit.GROUP_SUGGEST)) {
-			out.println("suggests.add(\"" + field.getName() + "\");");
+	out.println("suggests.add(\"" + field.getName() + "\");");
 		}
 	}
 
 	out.println(DeveloperCode.scriptEnd());
-	DeveloperScenario.pop(request);
+	Scenario.pop(request);
 %>

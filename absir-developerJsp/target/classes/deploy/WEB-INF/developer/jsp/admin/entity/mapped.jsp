@@ -1,6 +1,6 @@
 <%@include file="../../../common/option.jsp"%>
 <%
-	DeveloperScenario.set("mapped", request);
+	Scenario.set("mapped", request);
 	IField field = (IField) request.getAttribute("field");
 	// 如果实体已经持久化，则可以联动管理
 %>
@@ -22,9 +22,9 @@
 <table class="table" width="100%">
 	<%
 		// 实现实体列表
-		String filepath = "/WEB-INF/jsp/admin/entity/bean/list/" + field.getEntityName() + ".jsp";
-		DeveloperUtils.generate(filepath, "/WEB-INF/jsp/admin/entity/list.jsp", pageContext, request, response);
-		DeveloperScenario.pop(request);
+			String filepath = "/WEB-INF/jsp/admin/entity/bean/list/" + field.getEntityName() + ".jsp";
+			DeveloperUtils.generate(filepath, "/WEB-INF/jsp/admin/entity/list.jsp", pageContext, request, response);
+			Scenario.pop(request);
 	%>
 	<%="<jsp:include page=\"" + filepath + "\" />"%>
 </table>

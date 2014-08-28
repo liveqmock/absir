@@ -185,31 +185,20 @@ public final class BeanFactoryImpl implements BeanFactory {
 			return DynaBinder.to(beanObjects, beanType);
 		}
 
-		/*
-		 * Collection or Map By BeanType
-		 * 
-		 * else if (Collection.class.isAssignableFrom(beanType) ||
-		 * Map.class.isAssignableFrom(beanType)) { return (T)
-		 * getBeanObject(beanName, beanType.getGenericSuperclass(), forcible); }
-		 */
-
 		if (KernelString.isEmpty(beanName)) {
-			return getBeanObject(beanType);
+			beanName = null;
 		}
 
-		Object beanObject = getBeanObject(beanName);
-		if (beanObject != null) {
-			if (beanType.isAssignableFrom(beanObject.getClass())) {
-				return (T) beanObject;
-
-			} else {
-				if (forcible) {
-					throw new RuntimeException("BeanName = " + beanName + " is " + beanObject + " not match " + beanType);
-				}
-			}
+		Object beanObject = beanName == null ? getBeanObject(beanType) : getBeanObject(beanName);
+		if (beanObject == null || !beanType.isAssignableFrom(beanObject.getClass())) {
+			beanObject = beanName == null ? null : getBeanObject(null, beanName, beanType, -1.0f);
 		}
 
-		return (T) getBeanObject(null, beanName, beanType, -1.0f);
+		if (beanObject == null && forcible) {
+			throw new RuntimeException("BeanName = " + beanName + " is " + beanObject + " not match " + beanType);
+		}
+
+		return (T) beanObject;
 	}
 
 	/**

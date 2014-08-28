@@ -1,6 +1,6 @@
 <%@ include file="../../../common/option.jsp"%>
 <%
-	DeveloperScenario.set("search", request);
+	Scenario.set("search", request);
 	element = document.appendElement("tr");
 %>
 <%=DeveloperCode.script("EntityStatics.searchConditionMap(WebJsplUtils.getInput(request));")%>
@@ -11,7 +11,7 @@
 	// 显示搜索内容
 		identifier = "<p class=\"s_" + field.getName();
 		if (!generator.append(identifier, element)) {
-			request.setAttribute("field", field);
+	request.setAttribute("field", field);
 %>
 <c:set var="node">
 	<%=identifier + "\">"%>
@@ -31,6 +31,6 @@
 %>
 <%
 	request.setAttribute("element", element);
-	DeveloperScenario.pop(request);
+	Scenario.pop(request);
 %>
 <%=element.html() + "\r\n"%>

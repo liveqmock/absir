@@ -20,10 +20,10 @@ import com.absir.orm.value.JoEntity;
  *
  */
 @SuppressWarnings("unchecked")
-public class DeveloperScenario {
+public class Scenario {
 
 	/** DeveloperScenarioStacks */
-	private static String DeveloperScenarioStacks = DeveloperScenario.class.getName() + "_STACKS";
+	private static String DeveloperScenarioStacks = Scenario.class.getName() + "_STACKS";
 
 	/**
 	 * @param request

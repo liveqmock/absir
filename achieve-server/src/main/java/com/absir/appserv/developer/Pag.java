@@ -5,15 +5,18 @@
  *
  * Create on 2014年7月30日 上午10:49:12
  */
-package com.absir.appserv.support.developer;
+package com.absir.appserv.developer;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.ServletRequest;
 
+import com.absir.appserv.support.developer.IRender;
+import com.absir.appserv.support.developer.RenderUtils;
 import com.absir.appserv.system.helper.HelperLang;
 import com.absir.bean.basis.Configure;
 import com.absir.context.lang.LangBundle;
@@ -45,6 +48,13 @@ public class Pag {
 	 */
 	public static Input getInput(ServletRequest request) {
 		return InDispathFilter.getInput(request);
+	}
+
+	/**
+	 * @return
+	 */
+	public static Locale locale() {
+		return LangBundle.ME.isI18n() ? LangBundle.ME.getLocale() : getInput().getLocale();
 	}
 
 	/**

@@ -21,7 +21,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.PageContext;
 
-import com.absir.appserv.support.developer.Pag;
+import com.absir.appserv.developer.Pag;
 import com.absir.core.helper.HelperFile;
 import com.absir.core.kernel.KernelObject;
 

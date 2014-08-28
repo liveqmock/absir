@@ -2,7 +2,7 @@
 <%
 	String value = input.attr("value");
 	element.before("<c:set var=\"value\" value=\"" + value + "\"/>");
-	boolean search = "search".equals(DeveloperScenario.get(request));
+	boolean search = "search".equals(Scenario.get(request));
 	input.attr("value", DeveloperCode.print("WebJsplUtils.dateValue(pageContext.getAttribute(\"value\"), " + (search ? -1 : 0) + ")"));
 	if (search || field.getEditable() != JeEditable.LOCKED) {
 		input.addClass("date");

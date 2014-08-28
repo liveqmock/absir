@@ -25,7 +25,7 @@ import org.beetl.core.misc.BeetlUtil;
 import org.beetl.core.resource.FileResourceLoader;
 import org.beetl.ext.web.WebVariableScope;
 
-import com.absir.appserv.support.developer.Pag;
+import com.absir.appserv.developer.Pag;
 import com.absir.appserv.support.web.WebBeetlSupply.BeetlConfigureFound;
 import com.absir.appserv.support.web.value.BaFormat;
 import com.absir.appserv.support.web.value.BaFunction;

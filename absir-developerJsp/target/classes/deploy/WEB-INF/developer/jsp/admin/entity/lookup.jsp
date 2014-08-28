@@ -4,7 +4,7 @@
 		<th width="22"><input type="checkbox" group="ids"
 			class="checkboxCtrl"></th>
 		<%
-			DeveloperScenario.set("lookup", request);
+			Scenario.set("lookup", request);
 			element = document.appendElement("tr");
 		%>
 		<%
@@ -82,7 +82,7 @@
 			// 适配实体特性
 			request.setAttribute("element", element);
 			DeveloperUtils.includeExist("list", entityModel.getJoEntity().getEntityName(), pageContext, request, response);
-			DeveloperScenario.pop(request);
+			Scenario.pop(request);
 		%>
 		<%=element.html() + "\r\n"%>
 	</tr>

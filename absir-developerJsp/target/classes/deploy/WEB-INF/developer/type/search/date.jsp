@@ -1,6 +1,6 @@
 <%@ include file="../../common/edit.jsp"%>
 <%
-	DeveloperScenario.pop("search", request);
+	Scenario.pop("search", request);
 	String name = input.attr("name");
 	String cname = name + " >=";
 	input.attr("name", cname);

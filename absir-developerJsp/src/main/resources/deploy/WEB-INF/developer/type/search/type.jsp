@@ -1,14 +1,14 @@
 <%@ include file="../edit/base.jsp"%>
 <%
-	if (DeveloperScenario.pop("search", request) != null) {
+	if (Scenario.pop("search", request) != null) {
 		if (KernelClass.getMatchNumberClass(field.getType()) != null) {
-			input.attr("size", "10");
-			String name = input.attr("name");
-			String cname = name + " >=";
-			input.attr("name", cname);
-			input.attr("value", "${searchConditionMap['" + cname + "']}");
+	input.attr("size", "10");
+	String name = input.attr("name");
+	String cname = name + " >=";
+	input.attr("name", cname);
+	input.attr("value", "${searchConditionMap['" + cname + "']}");
 
-			cname = name + " <=";
+	cname = name + " <=";
 %>
 <c:set var="node">
 	<input name="<%=cname%>" type="text" size="10"

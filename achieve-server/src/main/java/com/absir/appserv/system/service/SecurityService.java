@@ -197,7 +197,7 @@ public abstract class SecurityService implements ISecurityService, ISecurity, IG
 			}
 		}
 
-		if (securityContext.getUser() == null || securityContext.getUser().isDisabled()) {
+		if (securityContext == null || securityContext.getUser() == null || securityContext.getUser().isDisabled()) {
 			return null;
 		}
 

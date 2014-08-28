@@ -9,6 +9,7 @@ package com.absir.appserv.system.admin;
 
 import com.absir.appserv.feature.menu.MenuContextUtils;
 import com.absir.appserv.system.server.value.Redirect;
+import com.absir.bean.basis.Base;
 import com.absir.server.in.InModel;
 import com.absir.server.on.OnPut;
 import com.absir.server.value.Server;
@@ -17,6 +18,7 @@ import com.absir.server.value.Server;
  * @author absir
  * 
  */
+@Base
 @Server
 public class Admin_route extends AdminServer {
 

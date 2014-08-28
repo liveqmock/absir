@@ -15,6 +15,7 @@ import com.absir.appserv.support.developer.IDeveloper;
 import com.absir.appserv.support.developer.IRender;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.service.SecurityService;
+import com.absir.bean.basis.Base;
 import com.absir.bean.basis.Environment;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.core.helper.HelperFile;
@@ -31,6 +32,7 @@ import com.absir.servlet.InputRequest;
  * @author absir
  * 
  */
+@Base
 @Server
 public class Asset_diy extends AssetServer {
 

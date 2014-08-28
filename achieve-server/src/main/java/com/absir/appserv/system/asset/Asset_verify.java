@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.absir.appserv.system.helper.HelperRandom;
+import com.absir.bean.basis.Base;
 import com.absir.bean.inject.value.Value;
 import com.absir.server.in.Input;
 import com.absir.server.value.Body;
@@ -30,6 +31,7 @@ import com.absir.servlet.InputRequest;
  * @author absir
  * 
  */
+@Base
 @Server
 public class Asset_verify extends AssetServer {
 

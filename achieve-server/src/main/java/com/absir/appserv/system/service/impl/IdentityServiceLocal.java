@@ -47,7 +47,12 @@ public class IdentityServiceLocal implements IdentityService {
 			if (parameters.length > 0) {
 				IdentityService identityService = identityServiceMap.get(parameters[0]);
 				if (identityService != null) {
-					return identityService.getUserBase(parameters);
+					JiUserBase user = identityService.getUserBase(parameters);
+					if (user == null || user.isDisabled()) {
+						return null;
+					}
+
+					return user;
 				}
 			}
 		}

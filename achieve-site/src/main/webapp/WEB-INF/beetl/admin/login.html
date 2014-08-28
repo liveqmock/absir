@@ -1,21 +1,32 @@
 <%layout("/WEB-INF/beetl/layout.html",{page_title:'登录页面'}) {%>
-<div class="login_form">
-	<form method="post">
-		<div class="form-group">
-			 <label>用户名:</label><input name="username" type="text" class="form-control x319 in">
-		</div>
-		<div class="form-group">
-			 <label>密码:</label><input name="password" type="text" class="form-control x319 in">
-		</div>
-		<div class="form-group">
-			 <label>验证码:</label><input name="verifycode" type="text" class="form-control x319 in"><img src="${SITE_ROUTE}/asset/verify" class="m" alt="">
-		</div>
-		<div class="form-group">
-			 <label class="m"><input id="remeber" type="checkbox" value="true">记住账号</label>
-		</div>
-		<div class="form-group space">
-			<label class="t"></label><input type="submit" id="login_ok" value="登录" class="btn btn-primary btn-lg"><input type="reset" value="重置" class="btn btn-default btn-lg">
-		</div>
-	</form>
+<div class="container-fluid">
+	<div class="row">
+		<section>
+			<div class="login-text">
+				<h1>
+					欢迎登录ThinkOX
+				</h1>
+			</div>
+			<div class="login-form-inbox">
+				<form class="login-form" method="post">
+					<div class="form-group">
+						<label>用户名:</label><input class="form-control x319 in" name="username" type="text">
+					</div>
+					<div class="form-group">
+						<label>密码:</label><input class="form-control x319 in" name="password" type="text">
+					</div>
+					<div class="form-group">
+						<label>验证码:</label><input class="form-control x319 in" name="verifycode" type="text"><img alt="" class="m" src="${SITE_ROUTE}/asset/verify">
+					</div>
+					<div class="form-group">
+						<label class="m"><input id="remeber" type="checkbox" value="true">记住账号</label>
+					</div>
+					<div class="form-group space">
+						<input class="btn btn-primary btn-lg" id="login_ok" type="submit" value="登录"><input class="btn btn-default btn-lg" type="reset" value="重置">
+					</div>
+				</form>
+			</div>
+		</section>
+	</div>
 </div>
 <%}%>

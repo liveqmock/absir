@@ -33,6 +33,7 @@ import com.absir.bean.config.IBeanConfigProvider;
 import com.absir.bean.config.IBeanDefineAware;
 import com.absir.bean.config.IBeanDefineEager;
 import com.absir.bean.config.IBeanDefineProcessor;
+import com.absir.bean.config.IBeanDefineScanner;
 import com.absir.bean.config.IBeanDefineSupply;
 import com.absir.bean.config.IBeanFactoryAware;
 import com.absir.bean.config.IBeanFactoryStarted;
@@ -312,12 +313,11 @@ public class BeanFactoryProvider implements IBeanConfigProvider {
 
 		beanDefineObjects.clear();
 
-		// BeanDefine Processor Register BeanDefine
+		// BeanDefine Processor IBeanDefineScanner
 		for (String beanDefineName : beanDefineNames) {
-			BeanDefine registerBeanDefine = beanNameDefineMap.get(beanDefineName);
-			BeanDefine beanDefine = registerBeanDefine;
-			if (beanDefine == null || BeanFactoryImpl.getBeanDefine(beanDefine, BeanDefineAbstractor.class) == null) {
-				continue;
+			BeanDefine beanDefine = beanNameDefineMap.get(beanDefineName);
+			if (beanDefine != null && IBeanDefineScanner.class.isAssignableFrom(beanDefine.getBeanType())) {
+				beanDefine.getBeanObject(beanFactory);
 			}
 		}
 

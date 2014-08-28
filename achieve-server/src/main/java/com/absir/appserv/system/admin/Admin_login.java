@@ -14,6 +14,7 @@ import com.absir.appserv.system.helper.HelperInput;
 import com.absir.appserv.system.security.SecurityContext;
 import com.absir.appserv.system.server.ServerResolverRedirect;
 import com.absir.appserv.system.service.SecurityService;
+import com.absir.bean.basis.Base;
 import com.absir.server.exception.ServerException;
 import com.absir.server.exception.ServerStatus;
 import com.absir.server.in.InMethod;
@@ -27,6 +28,7 @@ import com.absir.server.value.Server;
  * @author absir
  * 
  */
+@Base
 @Server
 public class Admin_login extends AdminServer {
 

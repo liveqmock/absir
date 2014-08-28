@@ -20,6 +20,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import com.absir.appserv.configure.xls.XlsAccessorUtils;
 import com.absir.appserv.system.crud.UploadCrudFactory;
 import com.absir.appserv.system.helper.HelperHtml;
+import com.absir.bean.basis.Base;
 import com.absir.server.value.Body;
 import com.absir.server.value.Server;
 import com.absir.servlet.InputRequest;
@@ -28,6 +29,7 @@ import com.absir.servlet.InputRequest;
  * @author absir
  * 
  */
+@Base
 @Server
 public class Asset_excel extends AssetServer {
 

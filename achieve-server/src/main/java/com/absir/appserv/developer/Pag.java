@@ -15,10 +15,13 @@ import java.util.Map;
 
 import javax.servlet.ServletRequest;
 
+import com.absir.appserv.configure.JConfigureBase;
+import com.absir.appserv.configure.JConfigureSupply;
+import com.absir.appserv.configure.JConfigureUtils;
 import com.absir.appserv.support.developer.IRender;
 import com.absir.appserv.support.developer.RenderUtils;
+import com.absir.appserv.system.configure.JSiteConfigure;
 import com.absir.appserv.system.helper.HelperLang;
-import com.absir.bean.basis.Configure;
 import com.absir.context.lang.LangBundle;
 import com.absir.core.dyna.DynaBinder;
 import com.absir.core.kernel.KernelCollection;
@@ -32,7 +35,6 @@ import com.absir.servlet.InDispathFilter;
  * @author absir
  *
  */
-@Configure
 public class Pag {
 
 	/**
@@ -115,6 +117,25 @@ public class Pag {
 		} else {
 			return echo ? lang : KernelString.transferred(lang);
 		}
+	}
+
+	/** CONFIGURE */
+	public static final JSiteConfigure CONFIGURE = JConfigureUtils.getConfigure(JSiteConfigure.class);
+
+	/**
+	 * @param name
+	 * @return
+	 */
+	public JConfigureBase configure(String name) {
+		return (JConfigureBase) JConfigureSupply.ME.create(name);
+	}
+
+	/**
+	 * @param cls
+	 * @return
+	 */
+	public JConfigureBase getConfigure(Class<? extends JConfigureBase> cls) {
+		return JConfigureUtils.getConfigure(cls);
 	}
 
 	/**

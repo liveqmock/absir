@@ -14,6 +14,7 @@ import com.absir.appserv.feature.menu.value.MaSupply;
 import com.absir.appserv.system.bean.JConfigure;
 import com.absir.appserv.system.dao.BeanDao;
 import com.absir.bean.basis.Basis;
+import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
 import com.absir.orm.transaction.value.Transaction;
 
@@ -26,6 +27,9 @@ import com.absir.orm.transaction.value.Transaction;
 @Basis
 @MaSupply(folder = "系统配置", name = "配置", method = "edit")
 public class JConfigureSupply extends CrudSupply<JConfigureBase> {
+
+	/** ME */
+	public static final JConfigureSupply ME = BeanFactoryUtils.get(JConfigureSupply.class);
 
 	/*
 	 * (non-Javadoc)

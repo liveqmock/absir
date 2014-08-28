@@ -34,6 +34,7 @@ import com.absir.appserv.system.service.statics.EntityStatics;
 import com.absir.appserv.system.service.utils.AccessServiceUtils;
 import com.absir.appserv.system.service.utils.AuthServiceUtils;
 import com.absir.appserv.system.service.utils.InputServiceUtils;
+import com.absir.bean.basis.Base;
 import com.absir.binder.BinderData;
 import com.absir.binder.BinderResult;
 import com.absir.binder.BinderUtils;
@@ -54,6 +55,7 @@ import com.absir.server.value.Server;
 import com.absir.servlet.InputRequest;
 
 @SuppressWarnings("unchecked")
+@Base
 @Server
 public class Admin_entity extends AdminServer {
 

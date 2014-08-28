@@ -32,6 +32,7 @@ import com.absir.appserv.system.service.utils.AuthServiceUtils;
 import com.absir.appserv.system.service.utils.CrudServiceUtils;
 import com.absir.appserv.system.service.utils.EntityServiceUtils;
 import com.absir.appserv.system.service.utils.SearchServiceUtils;
+import com.absir.bean.basis.Base;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Inject;
 import com.absir.bean.inject.value.Value;
@@ -55,6 +56,7 @@ import com.absir.server.value.Server;
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
 @Interceptors(ApiServer.TransactionRoute.class)
+@Base
 @Server
 public class Api_entity extends ApiServer {
 

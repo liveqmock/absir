@@ -45,7 +45,7 @@ public class WebBeetlView extends ServerDiyView {
 	public static final WebBeetlView ME = BeanFactoryUtils.get(WebBeetlView.class);
 
 	@Value("web.view.prefix")
-	private String prefix = "/WEB-INF/beetl/";
+	private String prefix = "/WEB-INF/tpl/";
 
 	@Value("web.view.suffix")
 	private String suffix = ".html";

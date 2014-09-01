@@ -45,6 +45,7 @@
 		<module>absir-test</module>
 		<module>absir-beetl</module>
 		<module>absir-beetlDeveloper</module>
+		<module>absir-webit</module>
 	</modules>
 	<dependencies>
 		<dependency>

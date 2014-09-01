@@ -46,21 +46,6 @@ public class JUser extends JbUser implements JpUserBase, JpMeta, Serializable {
 	@JaEdit(editable = JeEditable.DISABLE)
 	private String salt;
 
-	@JaLang("激活用户")
-	@Prop(include = 99)
-	@JaEdit(groups = JaEdit.GROUP_LIST)
-	private boolean enable;
-
-	@JaLang("过期用户")
-	@Prop(include = 99)
-	@JaEdit(groups = JaEdit.GROUP_LIST)
-	private boolean expired;
-
-	@JaLang("锁定用户")
-	@Prop(include = 99)
-	@JaEdit(groups = JaEdit.GROUP_LIST)
-	private boolean locked;
-
 	@JaLang("最后登录")
 	@Prop(include = 99)
 	@JaEdit(types = "dateTime", groups = JaEdit.GROUP_LIST)
@@ -122,51 +107,6 @@ public class JUser extends JbUser implements JpUserBase, JpMeta, Serializable {
 	 */
 	public void setSalt(String salt) {
 		this.salt = salt;
-	}
-
-	/**
-	 * @return the enable
-	 */
-	public boolean isEnable() {
-		return enable;
-	}
-
-	/**
-	 * @param enable
-	 *            the enable to set
-	 */
-	public void setEnable(boolean enable) {
-		this.enable = enable;
-	}
-
-	/**
-	 * @return the expired
-	 */
-	public boolean isDisabled() {
-		return expired;
-	}
-
-	/**
-	 * @param expired
-	 *            the expired to set
-	 */
-	public void setExpired(boolean expired) {
-		this.expired = expired;
-	}
-
-	/**
-	 * @return the locked
-	 */
-	public boolean isLocked() {
-		return locked;
-	}
-
-	/**
-	 * @param locked
-	 *            the locked to set
-	 */
-	public void setLocked(boolean locked) {
-		this.locked = locked;
 	}
 
 	/**

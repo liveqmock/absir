@@ -63,7 +63,7 @@ public class Pag {
 	 * @param name
 	 * @return
 	 */
-	public String lang(String name) {
+	public static String lang(String name) {
 		return getInput().getLang(name);
 	}
 
@@ -72,7 +72,7 @@ public class Pag {
 	 * @param echo
 	 * @return
 	 */
-	public String lang(String name, ServletRequest request) {
+	public static String lang(String name, ServletRequest request) {
 		return getInput(request).getLang(name);
 	}
 
@@ -80,7 +80,7 @@ public class Pag {
 	 * @param lang
 	 * @return
 	 */
-	public String getLang(String lang) {
+	public static String getLang(String lang) {
 		return getLang(lang, true);
 	}
 
@@ -88,7 +88,7 @@ public class Pag {
 	 * @param lang
 	 * @return
 	 */
-	public String getLang(String lang, boolean echo) {
+	public static String getLang(String lang, boolean echo) {
 		return getLang(HelperLang.getCaptionLang(lang), lang, echo);
 	}
 
@@ -98,7 +98,7 @@ public class Pag {
 	 * @param echo
 	 * @return
 	 */
-	public String getLang(String name, String lang, boolean echo) {
+	public static String getLang(String name, String lang, boolean echo) {
 		LangBundle.ME.setResourceLang(name, lang);
 		return getLangRequest(name, lang, echo);
 	}
@@ -109,7 +109,7 @@ public class Pag {
 	 * @param echo
 	 * @return
 	 */
-	protected String getLangRequest(String name, String lang, boolean echo) {
+	protected static String getLangRequest(String name, String lang, boolean echo) {
 		if (LangBundle.ME.isI18n()) {
 			name = "Pag.lang(" + KernelString.transferred(name) + ")";
 			return echo ? IRender.ME.echo(name) : name;
@@ -123,10 +123,17 @@ public class Pag {
 	public static final JSiteConfigure CONFIGURE = JConfigureUtils.getConfigure(JSiteConfigure.class);
 
 	/**
+	 * @return
+	 */
+	public static JConfigureBase configure() {
+		return CONFIGURE;
+	}
+
+	/**
 	 * @param name
 	 * @return
 	 */
-	public JConfigureBase configure(String name) {
+	public static JConfigureBase configure(String name) {
 		return (JConfigureBase) JConfigureSupply.ME.create(name);
 	}
 
@@ -144,7 +151,7 @@ public class Pag {
 	 * @return
 	 * @throws IOException
 	 */
-	public String getInclude(String include, Object... renders) throws IOException {
+	public static String getInclude(String include, Object... renders) throws IOException {
 		return getInclude(include, include, renders);
 	}
 
@@ -155,7 +162,7 @@ public class Pag {
 	 * @return
 	 * @throws IOException
 	 */
-	public String getInclude(String include, String generate, Object... renders) throws IOException {
+	public static String getInclude(String include, String generate, Object... renders) throws IOException {
 		RenderUtils.generate(include, generate, renders);
 		return IRender.ME.include(include);
 	}

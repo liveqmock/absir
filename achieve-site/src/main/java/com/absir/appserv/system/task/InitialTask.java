@@ -75,7 +75,7 @@ public class InitialTask {
 			user.setUsername(username);
 			user.setSalt(Integer.toHexString(password.hashCode()));
 			user.setPassword(PasswordCrudFactory.getPasswordEncrypt(password, user.getSalt()));
-			user.setEnable(true);
+			user.setActivation(true);
 			user.setUserType(JeUserType.USER_ADMIN);
 			if (user.getUserRoles() == null) {
 				user.setUserRoles(new HashSet<JUserRole>());

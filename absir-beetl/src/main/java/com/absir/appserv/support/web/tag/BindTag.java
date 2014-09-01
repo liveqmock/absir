@@ -16,7 +16,7 @@ import com.absir.appserv.support.web.value.BaTag;
  *
  */
 @BaTag
-public class VarTag extends Tag {
+public class BindTag extends Tag {
 
 	/*
 	 * (non-Javadoc)

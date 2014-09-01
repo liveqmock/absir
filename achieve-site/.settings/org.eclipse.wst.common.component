@@ -25,13 +25,7 @@
         <dependent-module archiveName="absir-hibernate-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-hibernate/absir-hibernate">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="absir-beetl-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-beetl/absir-beetl">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="absir-beetlDeveloper-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-beetlDeveloper/absir-beetlDeveloper">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="absir-developerImpl-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-developerImpl/absir-developerImpl">
+        <dependent-module archiveName="absir-webit-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-webit/absir-webit">
             <dependency-type>uses</dependency-type>
         </dependent-module>
 		<property name="context-root" value="achieve-site"/>

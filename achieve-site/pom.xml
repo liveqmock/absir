@@ -25,12 +25,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.absir</groupId>
-			<artifactId>absir-beetl</artifactId>
-			<version>${com.absir.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.absir</groupId>
-			<artifactId>absir-beetlDeveloper</artifactId>
+			<artifactId>absir-webit</artifactId>
 			<version>${com.absir.version}</version>
 		</dependency>
 		<dependency>

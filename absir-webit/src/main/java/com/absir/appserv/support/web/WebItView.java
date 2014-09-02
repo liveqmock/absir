@@ -273,4 +273,15 @@ public class WebItView extends ServerDiyView {
 			e.printStackTrace();
 		}
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.appserv.support.developer.IRenderSuffix#getSuffix()
+	 */
+	@Override
+	public String getSuffix() {
+		// TODO Auto-generated method stub
+		return engineManager.getEngine().getSuffix();
+	}
 }

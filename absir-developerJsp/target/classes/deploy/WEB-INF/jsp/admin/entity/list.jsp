@@ -19,7 +19,7 @@
 			<div class="searchBar">
 				<div class="searchFormContent">
 					<%
-						RenderUtils.generate("bean/search/" + request.getAttribute("entityName") + ".jsp", "search.jsp", pageContext, request, response);
+						RenderUtils.include("bean/search/" + request.getAttribute("entityName") + ".jsp", "search.jsp", pageContext, request, response);
 					%>
 				</div>
 				<div class="subBar">
@@ -60,7 +60,7 @@
 		</div>
 		<table class="table" width="100%">
 			<%
-				RenderUtils.generate("bean/list/" + request.getAttribute("entityName") + ".jsp", pageContext, request, response);
+				RenderUtils.include("bean/list/" + request.getAttribute("entityName") + ".jsp", pageContext, request, response);
 			%>
 		</table>
 	</div>

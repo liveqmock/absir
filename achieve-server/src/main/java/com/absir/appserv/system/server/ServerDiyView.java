@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.absir.appserv.support.developer.IDeveloper;
 import com.absir.appserv.support.developer.IRender;
+import com.absir.appserv.support.developer.IRenderSuffix;
 import com.absir.appserv.system.asset.Asset_diy;
 import com.absir.appserv.system.helper.HelperInput;
 import com.absir.bean.basis.Environment;
@@ -31,7 +32,7 @@ import com.absir.servlet.InputRequest;
  * @author absir
  *
  */
-public abstract class ServerDiyView extends ReturnedResolverView implements IRender {
+public abstract class ServerDiyView extends ReturnedResolverView implements IRender, IRenderSuffix {
 
 	/** diyView */
 	@Value("developer.diy.view")

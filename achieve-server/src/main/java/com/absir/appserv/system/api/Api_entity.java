@@ -374,7 +374,7 @@ public class Api_entity extends ApiServer {
 	 * @return
 	 */
 	public Map<String, Object> changedId(String entityName, long updateTime, int pageSize, int pageIndex, Input input) {
-		Map<String, Object> modelMap = changed(entityName, updateTime, pageIndex, pageSize, input);
+		Map<String, Object> modelMap = changed(entityName, updateTime, pageSize, pageIndex, input);
 		List<IBase> entities = (List<IBase>) modelMap.get("entities");
 		int size = entities.size();
 		if (size > 0 && entities.get(0) instanceof IBase) {

@@ -56,9 +56,15 @@ public class DeveloperUtils {
 	 */
 	private static String getSuffix() {
 		IRenderSuffix renderSuffix = BeanFactoryUtils.get(IRenderSuffix.class);
+		if (renderSuffix == null) {
+			if (IRender.ME != null && IRender.ME instanceof IRenderSuffix) {
+				renderSuffix = (IRenderSuffix) IRender.ME;
+			}
+		}
+
 		String suffix = renderSuffix == null ? null : renderSuffix.getSuffix();
 		if (KernelString.isEmpty(suffix)) {
-			suffix = ".html";
+			suffix = ".dev";
 		}
 
 		return suffix;

@@ -24,6 +24,7 @@ import org.beetl.core.resource.WebAppResourceLoader;
 import org.beetl.ext.web.WebVariableScope;
 
 import com.absir.appserv.feature.menu.MenuContextUtils;
+import com.absir.appserv.support.developer.IRenderSuffix;
 import com.absir.appserv.system.server.ServerDiyView;
 import com.absir.bean.basis.Base;
 import com.absir.bean.core.BeanFactoryUtils;
@@ -39,7 +40,7 @@ import com.absir.servlet.InputRequest;
  */
 @Base(order = -1)
 @Bean
-public class WebBeetlView extends ServerDiyView {
+public class WebBeetlView extends ServerDiyView implements IRenderSuffix {
 
 	/** ME */
 	public static final WebBeetlView ME = BeanFactoryUtils.get(WebBeetlView.class);
@@ -311,5 +312,16 @@ public class WebBeetlView extends ServerDiyView {
 	 */
 	protected static void handleBeetlException(BeetlException ex) {
 		throw ex;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.appserv.support.developer.IRenderSuffix#getSuffix()
+	 */
+	@Override
+	public String getSuffix() {
+		// TODO Auto-generated method stub
+		return suffix;
 	}
 }

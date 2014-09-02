@@ -8,7 +8,7 @@
 package com.absir.appserv.resource;
 
 import java.io.File;
-import java.io.IOException;
+import java.io.FileInputStream;
 
 import org.hibernate.Session;
 
@@ -19,7 +19,8 @@ import com.absir.appserv.system.dao.utils.QueryDaoUtils;
 import com.absir.appserv.system.helper.HelperEncrypt;
 import com.absir.bean.basis.Base;
 import com.absir.bean.inject.value.Bean;
-import com.absir.core.helper.HelperFile;
+import com.absir.context.core.ContextUtils;
+import com.absir.core.kernel.KernelObject;
 
 /**
  * @author absir
@@ -98,18 +99,20 @@ public class ResourceProcessorDefault implements ResourceProcessor {
 
 		// 文件已经扫瞄
 		resource.setScanned(true);
-		if (resource.getUpdateTime() < resourceFile.lastModified()) {
-			resource.setUpdateTime(resourceFile.lastModified());
-			try {
-				resource.setFileMd5(HelperEncrypt.encryptionMD5(HelperFile.readFileToByteArray(resourceFile)));
+		String md5 = null;
+		try {
+			md5 = HelperEncrypt.encryptionMD5(new FileInputStream(resourceFile));
 
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				// e.printStackTrace();
-			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
-		session.merge(resource);
-		session.flush();
+		if (md5 != null && !KernelObject.equals(md5, resource.getFileMd5())) {
+			resource.setUpdateTime(ContextUtils.getContextTime());
+			resource.setFileMd5(md5);
+			session.merge(resource);
+			session.flush();
+		}
 	}
 }

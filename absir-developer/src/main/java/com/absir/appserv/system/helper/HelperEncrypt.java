@@ -7,6 +7,7 @@
  */
 package com.absir.appserv.system.helper;
 
+import java.io.InputStream;
 import java.security.MessageDigest;
 
 import javax.crypto.Cipher;
@@ -79,6 +80,28 @@ public class HelperEncrypt {
 
 	/**
 	 * @param algorithm
+	 * @param inputStream
+	 * @param secrets
+	 * @return
+	 */
+	public static String encryption(String algorithm, InputStream inputStream, byte[] secrets) {
+		try {
+			MessageDigest mdInst = MessageDigest.getInstance(algorithm);
+			byte[] inBuffer = new byte[256];
+			int len = 0;
+			while ((len = inputStream.read(inBuffer)) > 0) {
+				mdInst.update(inBuffer, 0, len);
+			}
+			byte[] outBuffer = mdInst.digest();
+			return hexDigit(outBuffer, secrets);
+
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	/**
+	 * @param algorithm
 	 * @param string
 	 * @return
 	 */
@@ -103,6 +126,14 @@ public class HelperEncrypt {
 	 */
 	public static String encryptionMD5(byte[] inBuffer) {
 		return encryption("MD5", inBuffer, null);
+	}
+
+	/**
+	 * @param inputStream
+	 * @return
+	 */
+	public static String encryptionMD5(InputStream inputStream) {
+		return encryption("MD5", inputStream, null);
 	}
 
 	/**

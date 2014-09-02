@@ -384,6 +384,14 @@ public class EntityField extends DBField {
 				DynaBinder.mapTo((Map) valueFieldMap, valueField);
 			}
 		}
+
+		// property allow
+		if (property.getAllow() < 0) {
+			types.add("null");
+
+		} else if (property.getAllow() > 0) {
+			types.add("none");
+		}
 	}
 
 	/**

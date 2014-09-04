@@ -160,7 +160,7 @@ public class WebJetbrickSupply implements IMethodSupport<ConfigureFound> {
 			@Override
 			public String findName(Object found) {
 				// TODO Auto-generated method stub
-				return ((BaFunction) found).name();
+				return ((BaMethod) found).name();
 			}
 
 			@Override
@@ -200,7 +200,7 @@ public class WebJetbrickSupply implements IMethodSupport<ConfigureFound> {
 			@Override
 			public String findName(Object found) {
 				// TODO Auto-generated method stub
-				return ((BaFunction) found).name();
+				return ((BaTag) found).name();
 			}
 
 			@Override

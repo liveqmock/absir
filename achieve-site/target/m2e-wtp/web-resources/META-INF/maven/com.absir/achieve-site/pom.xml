@@ -25,7 +25,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.absir</groupId>
-			<artifactId>absir-webit</artifactId>
+			<artifactId>absir-jetbrick</artifactId>
 			<version>${com.absir.version}</version>
 		</dependency>
 		<dependency>

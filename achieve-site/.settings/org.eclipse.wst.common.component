@@ -16,6 +16,9 @@
         <dependent-module archiveName="absir-context-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-context/absir-context">
             <dependency-type>uses</dependency-type>
         </dependent-module>
+        <dependent-module archiveName="absir-core-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-core/absir-core">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <dependent-module archiveName="absir-aop-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-aop/absir-aop">
             <dependency-type>uses</dependency-type>
         </dependent-module>
@@ -28,7 +31,7 @@
         <dependent-module archiveName="absir-source-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-source/absir-source">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="absir-webit-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-webit/absir-webit">
+        <dependent-module archiveName="absir-jetbrick-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-jetbrick/absir-jetbrick">
             <dependency-type>uses</dependency-type>
         </dependent-module>
 		<property name="context-root" value="achieve-site"/>

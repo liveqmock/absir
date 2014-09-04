@@ -93,6 +93,10 @@ public class BinderUtils {
 			}
 		}
 
+		if (dataObject == null && length == 0) {
+			dataObject = propertyMap;
+		}
+
 		return dataObject;
 	}
 

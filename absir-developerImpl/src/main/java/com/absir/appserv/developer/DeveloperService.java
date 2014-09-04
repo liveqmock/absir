@@ -221,7 +221,7 @@ public class DeveloperService implements IDeveloper, IDeploy {
 				if (parameter != null) {
 					boolean diy = DynaBinder.to(parameter, boolean.class);
 					DeveloperUtils.diy(request, diy);
-					return diy ? 1 : 2;
+					return !diy ? 1 : 2;
 				}
 			}
 		}

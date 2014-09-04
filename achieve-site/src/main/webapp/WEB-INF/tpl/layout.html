@@ -4,10 +4,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<%
-	var jui = SITE_ROUTE + "/static/jui/";
-	var locale = Pag.locale();
-%>
+#set(jui = SITE_ROUTE + "/static/jui/")
+#set(locale = @Pag.locale())
 <link href="${jui}themes/css/bootstrap.min.css" rel="stylesheet" media="screen"/>
 <link href="${jui}themes/css/oneplus.css" rel="stylesheet" media="screen"/>
 <link href="${jui}themes/css/FA/css/font-awesome.min.css" rel="stylesheet" media="screen" />
@@ -30,7 +28,7 @@
 <link rel="icon" href="${SITE_ROUTE}/favicon.ico">
 <link rel="apple-touch-icon-precomposed" href="${SITE_ROUTE}/apple-touch-icon-precomposed.png">
 <title>${page_title}</title>
-${page_header!}</head>
+${page_header}</head>
 <body>
-${layoutContent}</body>
-${page_footer!}</html>
+${bodyContent}</body>
+${page_footer}</html>

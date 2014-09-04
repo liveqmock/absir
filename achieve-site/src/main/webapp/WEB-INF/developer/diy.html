@@ -1435,6 +1435,8 @@
 </div>
 <script type="text/javascript">
     ab_l_view = "${diy_view}";
+    ab_l_scripts = '${diy_expression}'.split(",");
+    ab_l_includes = '${diy_include}'.split(",");
     ab_l_refresh = function (view, restore) {
         $.ajax({
             url: "${SITE_ROUTE}/asset/diy/body/" + view,

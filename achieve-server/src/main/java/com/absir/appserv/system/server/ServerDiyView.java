@@ -23,6 +23,7 @@ import com.absir.bean.inject.value.Inject;
 import com.absir.bean.inject.value.InjectOrder;
 import com.absir.bean.inject.value.Value;
 import com.absir.core.helper.HelperFile;
+import com.absir.server.in.InModel;
 import com.absir.server.in.Input;
 import com.absir.server.on.OnPut;
 import com.absir.server.route.returned.ReturnedResolverView;
@@ -105,20 +106,20 @@ public abstract class ServerDiyView extends ReturnedResolverView implements IRen
 		Object render = getRender(view, input);
 		if (IDeveloper.ME != null) {
 			diy = IDeveloper.ME.diy(request);
-			if (diy == 1 || BeanFactoryUtils.getEnvironment() != Environment.PRODUCT) {
+			if (diy == 1) {
+				Asset_diy.authentication(input);
+				InModel inModel = input.getModel();
+				inModel.put("diy_url", HelperInput.getRequestUrl(request));
+				inModel.put("diy_view", view);
+				inModel.put("diy_restore", getDiyRestore(view));
+				inModel.put("diy_expression", diyExpression);
+				inModel.put("diy_include", diyInclude);
+				view = diyView;
+
+			} else if (diy == 2 || BeanFactoryUtils.getEnvironment() != Environment.PRODUCT) {
 				renders = getRenders(render, input);
 				IDeveloper.ME.generate(view, view, renders);
 			}
-		}
-
-		if (diy == 2) {
-			Asset_diy.authentication(input);
-			input.getModel().put("diy_url", HelperInput.getRequestUrl(request));
-			input.getModel().put("diy_view", view);
-			input.getModel().put("diy_restore", getDiyRestore(view));
-			input.getModel().put("diy_expression", diyExpression);
-			input.getModel().put("diy_include", diyInclude);
-			view = diyView;
 		}
 
 		renderView(view, renders, input);

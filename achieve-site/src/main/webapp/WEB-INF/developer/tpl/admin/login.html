@@ -1,28 +1,28 @@
-\#tag @layout("/WEB-INF/beetl/layout.html",{page_title:'登录页面'})
+\#tag layout("/WEB-INF/tpl/layout.html")
 <div class="container-fluid">
 	<div class="row">
 		<section>
 			<div class="login-text">
 				<h1>
-					欢迎登录ThinkOX
+					欢迎登录Think1O123X
 				</h1>
 			</div>
 			<div class="login-form-inbox">
 				<form class="login-form" method="post">
 					<div class="form-group">
-						<label>${Pag.getLang("用户名")}:</label><input class="form-control x319 in" name="username" type="text">
+						 <label>${@Pag.getLang("用户名")}:</label><input class="form-control x319 in" name="username" type="text">
 					</div>
 					<div class="form-group">
-						<label>${Pag.getLang("密码")}:</label><input class="form-control x319 in" name="password" type="text">
+						 <label>${@Pag.getLang("密码")}:</label><input class="form-control x319 in" name="password" type="text">
 					</div>
 					<div class="form-group">
-						<label>${Pag.getLang("验证码")}:</label><input class="form-control x319 in" name="verifycode" type="text"><img alt="" class="m" src="\${SITE_ROUTE}/asset/verify">
+						 <label>${@Pag.getLang("验证码")}:</label><input class="form-control x319 in" name="verifycode" type="text"><img alt="" class="m" src="\${SITE_ROUTE}/asset/verify">
 					</div>
 					<div class="form-group">
-						<label class="m"><input id="remeber" type="checkbox" value="true">${Pag.getLang("记住账号")}</label>
+						 <label class="m"><input id="remeber" type="checkbox" value="true">${@Pag.getLang("记住账号")}</label>
 					</div>
 					<div class="form-group space">
-						<input class="btn btn-primary btn-lg" id="login_ok" type="submit" value="${Pag.getLang('登录')}"><input class="btn btn-default btn-lg" type="reset" value="${Pag.getLang('重置')}">
+						<input class="btn btn-primary btn-lg" id="login_ok" type="submit" value="${@Pag.getLang('登录')}"><input class="btn btn-default btn-lg" type="reset" value="${@Pag.getLang('重置')}">
 					</div>
 				</form>
 			</div>

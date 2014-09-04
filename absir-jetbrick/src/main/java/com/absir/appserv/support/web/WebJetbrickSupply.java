@@ -11,6 +11,7 @@ import java.io.File;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.servlet.ServletContext;
 
@@ -19,6 +20,7 @@ import jetbrick.template.JetEngine;
 import jetbrick.template.JetGlobalVariables;
 import jetbrick.template.JetTemplate;
 import jetbrick.template.VariableResolverBean;
+import jetbrick.template.resource.Resource;
 import jetbrick.template.runtime.JetTagContext;
 import jetbrick.template.web.JetWebEngineLoader;
 
@@ -36,8 +38,6 @@ import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.IMethodSupport;
 import com.absir.bean.inject.InjectInvoker;
 import com.absir.bean.inject.value.Bean;
-import com.absir.binder.BinderUtils;
-import com.absir.core.dyna.DynaBinder;
 import com.absir.core.helper.HelperFileName;
 import com.absir.core.kernel.KernelObject;
 import com.absir.core.kernel.KernelString;
@@ -47,6 +47,7 @@ import com.absir.servlet.InDispathFilter;
  * @author absir
  *
  */
+@SuppressWarnings("unchecked")
 @Basis
 @Bean
 public class WebJetbrickSupply implements IMethodSupport<ConfigureFound> {
@@ -77,9 +78,9 @@ public class WebJetbrickSupply implements IMethodSupport<ConfigureFound> {
 				engine = JetWebEngineLoader.getJetEngine();
 			}
 
-			Map<String, Object> configMap = new HashMap<String, Object>();
-			BeanConfigImpl.readDirProperties(null, configMap, new File(BeanFactoryUtils.getBeanConfig().getClassPath("jetbrick-template.props")), null);
-			DynaBinder.INSTANCE.mapBind(BinderUtils.getDataMap(configMap), engine.getConfig());
+			Properties configProperties = new Properties();
+			BeanConfigImpl.readProperties(null, (Map<String, Object>) (Object) configProperties, new File(BeanFactoryUtils.getBeanConfig().getClassPath("jetbrick.properties")), null);
+			engine.getConfig().load(configProperties);
 			JetGlobalVariables globalVariables = engine.getGlobalVariables();
 			if (globalVariables == null) {
 				KernelObject.declaredSet(engine, "globalVariables", new WebGlobalVariables() {
@@ -133,7 +134,17 @@ public class WebJetbrickSupply implements IMethodSupport<ConfigureFound> {
 	public static String getResourceLoaderRoot() {
 		if (resourceLoaderRoot == null) {
 			try {
-				resourceLoaderRoot = HelperFileName.getFullPathNoEndSeparator(getEngine().getResource("/").toString() + "/");
+				Resource resource = getEngine().getResource("/");
+				Object file = KernelObject.declaredGet(resource, "file");
+				if (file != null && file instanceof File) {
+					resourceLoaderRoot = ((File) file).getPath();
+				}
+
+				if (resourceLoaderRoot == null) {
+					resourceLoaderRoot = resource.getAbsolutePath();
+				}
+
+				resourceLoaderRoot = HelperFileName.getFullPathNoEndSeparator(resourceLoaderRoot + "/");
 
 			} catch (Exception e) {
 				// TODO Auto-generated catch block

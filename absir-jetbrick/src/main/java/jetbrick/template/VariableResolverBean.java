@@ -27,6 +27,14 @@ import com.absir.core.kernel.KernelObject;
 @SuppressWarnings("unchecked")
 public class VariableResolverBean {
 
+	/**
+	 * @param engine
+	 * @param config
+	 */
+	public static void load(JetEngine engine, JetConfig config) {
+		engine.load(config);
+	}
+
 	/** variableResolver */
 	private VariableResolver variableResolver;
 

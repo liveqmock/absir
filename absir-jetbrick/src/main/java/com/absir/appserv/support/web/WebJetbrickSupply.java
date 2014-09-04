@@ -81,6 +81,7 @@ public class WebJetbrickSupply implements IMethodSupport<ConfigureFound> {
 			Properties configProperties = new Properties();
 			BeanConfigImpl.readProperties(null, (Map<String, Object>) (Object) configProperties, new File(BeanFactoryUtils.getBeanConfig().getClassPath("jetbrick.properties")), null);
 			engine.getConfig().load(configProperties);
+			VariableResolverBean.load(engine, engine.getConfig());
 			JetGlobalVariables globalVariables = engine.getGlobalVariables();
 			if (globalVariables == null) {
 				KernelObject.declaredSet(engine, "globalVariables", new WebGlobalVariables() {

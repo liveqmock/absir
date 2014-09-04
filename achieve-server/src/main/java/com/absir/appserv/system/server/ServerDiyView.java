@@ -169,6 +169,7 @@ public abstract class ServerDiyView extends ReturnedResolverView implements IRen
 	 * @param view
 	 * @param renders
 	 * @param input
+	 * @throws Exception
 	 */
-	protected abstract void renderView(String view, Object[] renders, InputRequest input);
+	protected abstract void renderView(String view, Object[] renders, InputRequest input) throws Exception;
 }

@@ -46,6 +46,7 @@
 		<module>absir-beetl</module>
 		<module>absir-beetlDeveloper</module>
 		<module>absir-webit</module>
+		<module>absir-jetbrick</module>
 	</modules>
 	<dependencies>
 		<dependency>

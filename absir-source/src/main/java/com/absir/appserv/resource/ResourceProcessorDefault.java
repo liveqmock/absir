@@ -111,8 +111,9 @@ public class ResourceProcessorDefault implements ResourceProcessor {
 		if (md5 != null && !KernelObject.equals(md5, resource.getFileMd5())) {
 			resource.setUpdateTime(ContextUtils.getContextTime());
 			resource.setFileMd5(md5);
-			session.merge(resource);
-			session.flush();
 		}
+
+		session.merge(resource);
+		session.flush();
 	}
 }

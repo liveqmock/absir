@@ -10,12 +10,10 @@ package com.absir.appserv.support.web;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import jetbrick.template.JetContext;
 import jetbrick.template.JetTemplate;
 import jetbrick.template.runtime.JetPageContext;
 import jetbrick.template.web.JetWebContext;
 
-import com.absir.appserv.feature.menu.MenuContextUtils;
 import com.absir.appserv.system.server.ServerDiyView;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Value;
@@ -42,6 +40,17 @@ public class WebJetbrickView extends ServerDiyView {
 	/** prefix */
 	@Value("web.view.prefix")
 	private String prefix = "/WEB-INF/tpl/";
+
+	/** suffix */
+	@Value("web.view.suffix")
+	private String suffix = ".html";
+
+	/**
+	 * @return
+	 */
+	protected String diyExpression() {
+		return "#";
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -142,7 +151,7 @@ public class WebJetbrickView extends ServerDiyView {
 	@Override
 	public String getSuffix() {
 		// TODO Auto-generated method stub
-		return "";
+		return suffix;
 	}
 
 	/*
@@ -194,11 +203,8 @@ public class WebJetbrickView extends ServerDiyView {
 	@Override
 	protected void renderView(String view, Object[] renders, InputRequest input) throws Exception {
 		// TODO Auto-generated method stub
-		JetPageContext context = (JetPageContext) renders[0];
-		JetContext jetContext = context.getContext();
-		jetContext.put("APP_NAME", MenuContextUtils.getAppName());
-		jetContext.put("SITE_ROUTE", MenuContextUtils.getSiteRoute());
-		jetContext.put("ADMIN_ROUTE", MenuContextUtils.getAdminRoute());
-		context.getEngine().getTemplate(view).render(jetContext, input.getResponse().getOutputStream());
+		JetPageContext context = renders == null ? new WebJetbrickContext(new JetWebContext(input.getRequest(), input.getResponse(), input.getModel()), WebJetbrickSupply.getEngine())
+				: (JetPageContext) renders[0];
+		context.getEngine().getTemplate(view).render(context.getContext(), input.getResponse().getOutputStream());
 	}
 }

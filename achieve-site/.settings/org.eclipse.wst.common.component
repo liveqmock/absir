@@ -34,6 +34,12 @@
         <dependent-module archiveName="absir-jetbrick-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-jetbrick/absir-jetbrick">
             <dependency-type>uses</dependency-type>
         </dependent-module>
+        <dependent-module archiveName="absir-jetbrickDeveloper-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-jetbrickDeveloper/absir-jetbrickDeveloper">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="absir-developerImpl-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-developerImpl/absir-developerImpl">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
 		<property name="context-root" value="achieve-site"/>
         <property name="java-output-path" value="/achieve-site/target/classes"/>
 	</wb-module>

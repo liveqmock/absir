@@ -346,21 +346,27 @@ public class WebJetbrickSupply implements IMethodSupport<ConfigureFound> {
 		}
 	}
 
+	@BaTag(name = "_layout")
+	public static void _layout(JetTagContext ctx, String file) {
+		_layout(ctx, file, null);
+	}
+
 	/**
 	 * @param ctx
 	 * @param file
 	 * @param parameters
 	 */
-	@BaTag(name = "@layout")
-	public static void layout(JetTagContext ctx, String file, Map<String, Object> parameters) {
+	@BaTag(name = "_layout")
+	public static void _layout(JetTagContext ctx, String file, Map<String, Object> parameters) {
 		JetContext context;
 		if (parameters == null || parameters.size() == 0) {
 			context = ctx.getContext();
+
 		} else {
 			context = new JetContext(ctx.getContext(), parameters);
 		}
-		ctx.getContext().put("bodyContent", new TagWrapper(ctx));
 
+		ctx.getContext().put("bodyContent", new TagWrapper(ctx));
 		file = ctx.getPageContext().getAbsolutionName(file);
 		JetTemplate template = ctx.getEngine().getTemplate(file);
 		template.render(context, ctx.getWriter());

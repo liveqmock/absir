@@ -125,7 +125,7 @@ public class Pag {
 	/**
 	 * @return
 	 */
-	public static JConfigureBase configure() {
+	public static JSiteConfigure configure() {
 		return CONFIGURE;
 	}
 
@@ -141,7 +141,7 @@ public class Pag {
 	 * @param cls
 	 * @return
 	 */
-	public JConfigureBase getConfigure(Class<? extends JConfigureBase> cls) {
+	public <T extends JConfigureBase> T getConfigure(Class<T> cls) {
 		return JConfigureUtils.getConfigure(cls);
 	}
 

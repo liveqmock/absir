@@ -52,17 +52,17 @@ public abstract class SecurityService implements ISecurityService, ISecurity, IG
 	private Map<String, SecurityManager> securityManagerMap;
 
 	/** SECURITY_USER_NAME */
-	private static final String SECURITY_USER_NAME = SecurityService.class.getName() + "@SECURITY_USER_NAME";
+	private static final String SECURITY_USER_NAME = "USER";
 
 	/** SECURITY_CONTEXT_NAME */
-	private static final String SECURITY_CONTEXT_NAME = SecurityService.class.getName() + "@SECURITY_CONTEXT_NAME";
+	private static final String SECURITY_CONTEXT_NAME = "SECURITY";
 
 	/**
 	 * @param input
 	 * @return
 	 */
 	public JiUserBase getUserBase(Input input) {
-		Object user = input.getAttribute(SECURITY_USER_NAME);
+		Object user = input.getModel().get(SECURITY_USER_NAME);
 		return user == null || !(user instanceof JiUserBase) ? null : (JiUserBase) user;
 	}
 
@@ -71,7 +71,7 @@ public abstract class SecurityService implements ISecurityService, ISecurity, IG
 	 * @param input
 	 */
 	public void setUserBase(JiUserBase userBase, Input input) {
-		input.setAttribute(SECURITY_USER_NAME, userBase);
+		input.getModel().put(SECURITY_USER_NAME, userBase);
 	}
 
 	/**
@@ -79,7 +79,7 @@ public abstract class SecurityService implements ISecurityService, ISecurity, IG
 	 * @return
 	 */
 	public SecurityContext getSecurityContext(Input input) {
-		Object securityContext = input.getAttribute(SECURITY_CONTEXT_NAME);
+		Object securityContext = input.getModel().get(SECURITY_CONTEXT_NAME);
 		return securityContext == null || !(securityContext instanceof SecurityContext) ? null : (SecurityContext) securityContext;
 	}
 
@@ -88,7 +88,7 @@ public abstract class SecurityService implements ISecurityService, ISecurity, IG
 	 * @param input
 	 */
 	public void setSecurityContext(SecurityContext securityContext, Input input) {
-		input.setAttribute(SECURITY_CONTEXT_NAME, securityContext);
+		input.getModel().put(SECURITY_CONTEXT_NAME, securityContext);
 	}
 
 	/**

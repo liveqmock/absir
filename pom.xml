@@ -48,6 +48,7 @@
 		<module>absir-webit</module>
 		<module>absir-jetbrick</module>
 		<module>absir-jetbrickDeveloper</module>
+		<module>absir-tiny</module>
 	</modules>
 	<dependencies>
 		<dependency>

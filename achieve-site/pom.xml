@@ -10,7 +10,7 @@
 	</parent>
 	<artifactId>achieve-site</artifactId>
 	<packaging>war</packaging>
-	<name>achieve-site Maven Dtyx</name>
+	<name>achieve-site Maven site</name>
 	<url>http://maven.apache.org</url>
 	<dependencies>
 		<dependency>
@@ -21,11 +21,6 @@
 		<dependency>
 			<groupId>com.absir</groupId>
 			<artifactId>absir-source</artifactId>
-			<version>${com.absir.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.absir</groupId>
-			<artifactId>absir-jetbrick</artifactId>
 			<version>${com.absir.version}</version>
 		</dependency>
 		<dependency>

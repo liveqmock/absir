@@ -32,7 +32,7 @@ function MainMenuClick(event, treeId, treeNode) {
 </script>
 <body scroll="no">
     <!--[if lte IE 7]>
-        <div id="errorie"><div>您还在使用老掉牙的IE，正常使用系统前请升级您的浏览器到 IE8以上版本 <a target="_blank" href="http://windows.microsoft.com/zh-cn/internet-explorer/ie-8-worldwide-languages">点击升级</a>&nbsp;&nbsp;强烈建议您更改换浏览器：<a href="http://down.tech.sina.com.cn/content/40975.html" target="_blank">谷歌 Chrome</a></div></div>
+        <div id="errorie">IE too lower!</div>
     <![endif]-->
     <div id="layout">
         <div id="header">
@@ -40,7 +40,7 @@ function MainMenuClick(event, treeId, treeNode) {
                 <a class="logo" href="\${ADMIN_ROUTE}" target=_blank><img src="\${jui}images/logo.png" height="50" /></a>
                 <ul class="topnav">
                     <li>\${now().format("yyyy-MM-dd")}&nbsp;<span id="clock"></span></li>
-                    <li>${@Pag.getLang("当前用户：")}\${USER.class}</li>
+                    <li>${@Pag.getLang("当前用户：")}\${USER.name}</li>
                     <li><a href="changepwd.html" target="dialog" mask="true" rel="changepwd_page" width="400" height="260">${@Pag.getLang("修改密码")}</a></li>
                     <li><a href="\${SITE_ROUTE}" target="_blank">${@Pag.getLang("网站首页")}</a></li>
                     <li><a href="login.html">退出</a></li>

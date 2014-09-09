@@ -1,34 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
-	<wb-module deploy-name="achieve-site">
-		<wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
-		<wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
-		<wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
-		<wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
+    <wb-module deploy-name="achieve-site">
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
+        <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/test/java"/>
         <dependent-module archiveName="achieve-server-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/achieve-server/achieve-server">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="absir-developer-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-developer/absir-developer">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="absir-server-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-server/absir-server">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="absir-context-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-context/absir-context">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="absir-core-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-core/absir-core">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="absir-aop-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-aop/absir-aop">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="absir-bean-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-bean/absir-bean">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="absir-hibernate-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-hibernate/absir-hibernate">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="absir-source-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-source/absir-source">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="absir-jetbrick-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-jetbrick/absir-jetbrick">
@@ -37,13 +16,7 @@
         <dependent-module archiveName="jetbrick-template-1.2.11-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/jetbrick-template/jetbrick-template">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="absir-jetbrickDeveloper-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-jetbrickDeveloper/absir-jetbrickDeveloper">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="absir-developerImpl-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-developerImpl/absir-developerImpl">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-		<property name="context-root" value="achieve-site"/>
+        <property name="context-root" value="achieve-site"/>
         <property name="java-output-path" value="/achieve-site/target/classes"/>
-	</wb-module>
+    </wb-module>
 </project-modules>

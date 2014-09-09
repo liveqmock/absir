@@ -70,13 +70,36 @@ public class DeveloperUtils {
 		return suffix;
 	}
 
+	/** DEVELOPER */
+	private static final String DEVELOPER = "developer/";
+
+	/** DEVELOPER_LENGTH */
+	private static final int DEVELOPER_LENGTH = DEVELOPER.length();
+
+	/**
+	 * @param generaterPath
+	 * @return
+	 */
+	public static String getGeneraterPath(String generaterPath) {
+		int prefix = generaterPath.indexOf("/", 1) + 1;
+		if (generaterPath.startsWith(DEVELOPER, prefix)) {
+			return generaterPath.substring(0, prefix) + generaterPath.substring(prefix + DEVELOPER_LENGTH);
+		}
+
+		return generaterPath;
+	}
+
 	/**
 	 * @param includePath
 	 * @return
 	 */
 	public static String getDeveloperPath(String includePath) {
-		int prefix = includePath.indexOf("/", 1);
-		return includePath.substring(0, prefix) + "/developer" + includePath.substring(prefix);
+		int prefix = includePath.indexOf("/", 1) + 1;
+		if (includePath.startsWith(DEVELOPER, prefix)) {
+			return includePath;
+		}
+
+		return includePath.substring(0, prefix) + DEVELOPER + includePath.substring(prefix);
 	}
 
 	/**
@@ -140,6 +163,7 @@ public class DeveloperUtils {
 				}
 			}
 
+			filePath = getGeneraterPath(filePath);
 			File file = new File(IRender.ME.getRealPath(filePath));
 			EntityModel entityModel = joEntity == null ? null : ModelFactory.getModelEntity((JoEntity) joEntity);
 			// DIY生成

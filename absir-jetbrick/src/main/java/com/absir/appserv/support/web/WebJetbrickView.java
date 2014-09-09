@@ -52,6 +52,13 @@ public class WebJetbrickView extends ServerDiyView {
 		return "#";
 	}
 
+	/**
+	 * @return
+	 */
+	protected String diyInclude() {
+		return echo("@_include(\",\")");
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 

@@ -8,6 +8,7 @@
 package com.absir.appserv.support.web;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +24,9 @@ import jetbrick.template.VariableResolverBean;
 import jetbrick.template.parser.DynamicResolver;
 import jetbrick.template.parser.code.SegmentCode;
 import jetbrick.template.resource.Resource;
+import jetbrick.template.runtime.JetPageContext;
 import jetbrick.template.runtime.JetTagContext;
+import jetbrick.template.web.JetWebContext;
 import jetbrick.template.web.JetWebEngineLoader;
 
 import com.absir.appserv.developer.Pag;
@@ -357,7 +360,34 @@ public class WebJetbrickSupply implements IMethodSupport<ConfigureFound> {
 		}
 	}
 
-	@BaTag(name = "_layout")
+	/**
+	 * @param ctx
+	 * @param include
+	 * @return
+	 * @throws IOException
+	 */
+	@BaFunction
+	public static String _include(JetPageContext ctx, String include) throws IOException {
+		return _include(ctx, include, include);
+	}
+
+	/**
+	 * @param ctx
+	 * @param include
+	 * @param generate
+	 * @return
+	 * @throws IOException
+	 */
+	@BaFunction
+	public static String _include(JetPageContext ctx, String include, String generate) throws IOException {
+		return Pag.getInclude(include, generate, ctx, ctx.getContext().get(JetWebContext.REQUEST));
+	}
+
+	/**
+	 * @param ctx
+	 * @param file
+	 */
+	@BaTag
 	public static void _layout(JetTagContext ctx, String file) {
 		_layout(ctx, file, null);
 	}
@@ -367,7 +397,7 @@ public class WebJetbrickSupply implements IMethodSupport<ConfigureFound> {
 	 * @param file
 	 * @param parameters
 	 */
-	@BaTag(name = "_layout")
+	@BaTag
 	public static void _layout(JetTagContext ctx, String file, Map<String, Object> parameters) {
 		JetContext context;
 		if (parameters == null || parameters.size() == 0) {

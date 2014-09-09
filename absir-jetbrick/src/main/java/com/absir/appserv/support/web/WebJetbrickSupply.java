@@ -20,6 +20,8 @@ import jetbrick.template.JetEngine;
 import jetbrick.template.JetGlobalVariables;
 import jetbrick.template.JetTemplate;
 import jetbrick.template.VariableResolverBean;
+import jetbrick.template.parser.DynamicResolver;
+import jetbrick.template.parser.code.SegmentCode;
 import jetbrick.template.resource.Resource;
 import jetbrick.template.runtime.JetTagContext;
 import jetbrick.template.web.JetWebEngineLoader;
@@ -112,6 +114,15 @@ public class WebJetbrickSupply implements IMethodSupport<ConfigureFound> {
 				webGlobalVariables.register("ADMIN_ROUTE", MenuContextUtils.getAdminRoute());
 			}
 
+			getVariableResolverBean().getVariableResolver().setDynamicResolver(new DynamicResolver() {
+
+				@Override
+				public String getDynamicMember(Class<?> beanClass, String name, boolean isSafeCall, SegmentCode code) {
+					// TODO Auto-generated method stub
+					return "com.absir.core.kernel.KernelObject.getter(" + code.toString() + ", \"" + name + "\")";
+				}
+			});
+			getVariableResolverBean().getVariableResolver().addImportClass(KernelObject.class.getName());
 			getVariableResolverBean().getVariableResolver().addImportPackage(Pag.class.getPackage().getName());
 		}
 

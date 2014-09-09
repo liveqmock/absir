@@ -42,9 +42,9 @@ public class JPlatformUser extends JbBean implements JiUserBase, Serializable, J
 	@JaEdit(groups = { JaEdit.GROUP_SUGGEST })
 	private String username;
 
-	@JaLang("锁定用户")
+	@JaLang("禁用")
 	@JaEdit(groups = { JaEdit.GROUP_SUGGEST })
-	private boolean locked;
+	private boolean disabled;
 
 	@JaLang("服务区")
 	@JaEdit(groups = { JaEdit.GROUP_SUGGEST })
@@ -88,18 +88,18 @@ public class JPlatformUser extends JbBean implements JiUserBase, Serializable, J
 	}
 
 	/**
-	 * @return the locked
+	 * @return the disabled
 	 */
-	public boolean isLocked() {
-		return locked;
+	public boolean isDisabled() {
+		return disabled;
 	}
 
 	/**
-	 * @param locked
-	 *            the locked to set
+	 * @param disabled
+	 *            the disabled to set
 	 */
-	public void setLocked(boolean locked) {
-		this.locked = locked;
+	public void setDisabled(boolean disabled) {
+		this.disabled = disabled;
 	}
 
 	/**
@@ -178,17 +178,6 @@ public class JPlatformUser extends JbBean implements JiUserBase, Serializable, J
 	public boolean isActivation() {
 		// TODO Auto-generated method stub
 		return true;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.absir.appserv.system.bean.proxy.JiUserBase#isExpired()
-	 */
-	@Override
-	public boolean isDisabled() {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 	/*

@@ -49,6 +49,8 @@
 		<module>absir-jetbrick</module>
 		<module>absir-jetbrickDeveloper</module>
 		<module>absir-tiny</module>
+		<module>absir-template</module>
+		<module>absir-qq</module>
 	</modules>
 	<dependencies>
 		<dependency>

@@ -52,7 +52,7 @@ public abstract class KernelString {
 	 * @return
 	 */
 	public static boolean capitalize(char chr) {
-		return chr >= 'a' && chr <= 'z';
+		return chr >= 'A' && chr <= 'Z';
 	}
 
 	/**
@@ -60,7 +60,7 @@ public abstract class KernelString {
 	 * @return
 	 */
 	public static boolean unCapitalize(char chr) {
-		return chr >= 'A' && chr <= 'Z';
+		return chr >= 'a' && chr <= 'z';
 	}
 
 	/**
@@ -68,17 +68,18 @@ public abstract class KernelString {
 	 * @return
 	 */
 	public static String capitalize(String string) {
-		if (unCapitalize(string.charAt(0))) {
+		char chr = string.charAt(0);
+		if (capitalize(chr)) {
 			return string;
 
 		} else if (string.length() > 1) {
-			if (unCapitalize(string.charAt(1))) {
+			if (capitalize(string.charAt(1))) {
 				return string;
 			}
 		}
 
 		char[] data = string.toCharArray();
-		data[0] = Character.toUpperCase(data[0]);
+		data[0] = Character.toUpperCase(chr);
 		return new String(data);
 	}
 
@@ -87,12 +88,18 @@ public abstract class KernelString {
 	 * @return
 	 */
 	public static String unCapitalize(String string) {
-		if (capitalize(string.charAt(0))) {
+		char chr = string.charAt(0);
+		if (unCapitalize(chr)) {
 			return string;
+
+		} else if (string.length() > 1) {
+			if (capitalize(string.charAt(1))) {
+				return string;
+			}
 		}
 
 		char[] data = string.toCharArray();
-		data[0] = Character.toLowerCase(data[0]);
+		data[0] = Character.toLowerCase(chr);
 		return new String(data);
 	}
 

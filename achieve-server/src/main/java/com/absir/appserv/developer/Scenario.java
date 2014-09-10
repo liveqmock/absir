@@ -8,11 +8,14 @@
 package com.absir.appserv.developer;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import javax.servlet.ServletRequest;
 
+import com.absir.core.kernel.KernelLang.CallbackTemplate;
 import com.absir.orm.value.JoEntity;
 
 /**
@@ -125,5 +128,32 @@ public class Scenario {
 	 */
 	public static JoEntity popJoEntity(ServletRequest request) {
 		return (JoEntity) pop(JOENTITY, request);
+	}
+
+	/** SCENARIO_NAMES */
+	private static final String SCENARIO_NAMES = Scenario.class.getName() + "@SCENARIO_NAMES";
+
+	/**
+	 * @param request
+	 * @param name
+	 * @param callbackTemplate
+	 */
+	public static void nameCallback(ServletRequest request, String name, CallbackTemplate<Set<Object>> callbackTemplate) {
+		Object names = request.getAttribute(SCENARIO_NAMES);
+		Set<Object> scenarioNames = null;
+		if (names == null || !(names instanceof Set)) {
+			scenarioNames = new HashSet<Object>();
+			request.setAttribute(SCENARIO_NAMES, scenarioNames);
+
+		} else {
+			if (((Set<Object>) names).contains(name)) {
+				return;
+			}
+
+			scenarioNames = (Set<Object>) names;
+		}
+
+		scenarioNames.add(name);
+		callbackTemplate.doWith(scenarioNames);
 	}
 }

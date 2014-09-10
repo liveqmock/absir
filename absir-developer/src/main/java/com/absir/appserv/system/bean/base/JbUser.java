@@ -28,9 +28,11 @@ public class JbUser extends JbBean {
 	private boolean developer;
 
 	@JaLang("激活")
+	@JaEdit(groups = { JaEdit.GROUP_SUGGEST })
 	private boolean activation;
 
 	@JaLang("禁用")
+	@JaEdit(groups = { JaEdit.GROUP_SUGGEST })
 	private boolean disabled;
 
 	/**

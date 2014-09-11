@@ -145,7 +145,7 @@ public class AdviceMethodDefine extends AopMethodDefineAbstract<AopMethodInterce
 		// TODO Auto-generated method stub
 		List<IMethodAdvice> advices = new ArrayList<IMethodAdvice>();
 		for (IMethodAdvice advice : methodAdvices) {
-			if (advice.matching(method)) {
+			if (advice.matching(beanType, method)) {
 				advices.add(advice);
 			}
 		}

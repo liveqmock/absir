@@ -29,9 +29,10 @@ public interface IMethodSupport<T> {
 	/**
 	 * @param inject
 	 * @param method
+	 * @param beanMethod
 	 * @param beanObject
 	 * @return
 	 */
-	public InjectInvoker getInjectInvoker(T inject, Method method, Object beanObject);
+	public InjectInvoker getInjectInvoker(T inject, Method method, Method beanMethod, Object beanObject);
 
 }

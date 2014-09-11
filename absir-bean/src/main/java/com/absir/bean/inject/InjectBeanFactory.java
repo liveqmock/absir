@@ -178,7 +178,7 @@ public class InjectBeanFactory implements IBeanFactorySupport, IBeanDefineSupply
 		 * lang.reflect.Method)
 		 */
 		@Override
-		public InjectInvoker getInjectInvoker(Object[] injects, Method method, Object beanObject) {
+		public InjectInvoker getInjectInvoker(Object[] injects, Method method, Method beanMethod, Object beanObject) {
 			// TODO Auto-generated method stub
 			int length = methodInjects.length;
 			boolean required = (Boolean) injects[length];
@@ -186,8 +186,8 @@ public class InjectBeanFactory implements IBeanFactorySupport, IBeanDefineSupply
 			String value = inject == null ? null : inject.value();
 			InjectType type = inject == null ? required ? InjectType.Required : InjectType.Selectable : inject.type();
 			InjectOrder injectOrder = (InjectOrder) injects[length + 2];
-			InjectMethod injectMethod = inject == null || injectOrder == null || injectOrder.value() == 0 ? new InjectMethod(method, value, type) : new InjectMethodOrder(method, value, type,
-					injectOrder.value());
+			InjectMethod injectMethod = inject == null || injectOrder == null || injectOrder.value() == 0 ? new InjectMethod(method, beanMethod, value, type) : new InjectMethodOrder(method,
+					beanMethod, value, type, injectOrder.value());
 			for (int i = 0; i < length; i++) {
 				Object inj = injects[i];
 				if (inj != null) {
@@ -616,16 +616,17 @@ public class InjectBeanFactory implements IBeanFactorySupport, IBeanDefineSupply
 										Object inject = methodSupport.getInject(beanScope, beanDefine, method);
 										if (inject != null) {
 											if (beanMethod == null) {
+												method = getBeanMethod(beanType, method);
+												if (method == null) {
+													break;
+												}
+
 												beanMethod = getBeanMethod(beanProxy.getClass(), method);
 												if (beanMethod == null) {
-													getBeanMethod(beanType, method);
+													beanMethod = method;
 
 												} else {
 													proxy = true;
-												}
-
-												if (beanMethod == null) {
-													break;
 												}
 											}
 
@@ -639,7 +640,7 @@ public class InjectBeanFactory implements IBeanFactorySupport, IBeanDefineSupply
 												}
 											}
 
-											InjectInvoker injectInvoker = methodSupport.getInjectInvoker(inject, beanMethod, proxy ? beanProxy : beanObject);
+											InjectInvoker injectInvoker = methodSupport.getInjectInvoker(inject, method, beanMethod, proxy ? beanProxy : beanObject);
 											if (injectInvoker != null) {
 												if (proxy) {
 													pInvokerScope.add(injectInvoker);
@@ -783,7 +784,7 @@ public class InjectBeanFactory implements IBeanFactorySupport, IBeanDefineSupply
 			for (IMethodSupport methodSupport : methodSupports) {
 				Object inject = methodSupport.getInject(BeanScope.SINGLETON, beanDefine, method);
 				if (inject != null) {
-					InjectInvoker injectInvoker = methodSupport.getInjectInvoker(inject, method, injectAdapter);
+					InjectInvoker injectInvoker = methodSupport.getInjectInvoker(inject, method, method, injectAdapter);
 					if (injectInvoker != null) {
 						injectInvoker.invoke(beanFactory, beanObject);
 						if (injectInvoker instanceof InjectInvokerObserver) {

@@ -316,10 +316,10 @@ public class WebJetbrickSupply implements IMethodSupport<ConfigureFound> {
 	 * 
 	 * @see
 	 * com.absir.bean.inject.IMethodSupport#getInjectInvoker(java.lang.Object,
-	 * java.lang.reflect.Method, java.lang.Object)
+	 * java.lang.reflect.Method, java.lang.reflect.Method, java.lang.Object)
 	 */
 	@Override
-	public InjectInvoker getInjectInvoker(ConfigureFound inject, Method method, Object beanObject) {
+	public InjectInvoker getInjectInvoker(ConfigureFound inject, Method method, Method beanMethod, Object beanObject) {
 		// TODO Auto-generated method stub
 		inject.process(beanObject, method);
 		return null;

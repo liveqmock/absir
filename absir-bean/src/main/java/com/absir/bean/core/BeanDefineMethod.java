@@ -203,7 +203,7 @@ public class BeanDefineMethod extends BeanDefineAbstractor {
 			throw new CauseRuntimeException(e);
 		}
 
-		return getBeanObject(beanObject, method, getParameters(beanFactory, method.getParameterTypes(), paramNames, required, invoke));
+		return getBeanObject(beanObject, method, getParameters(beanFactory, method.getParameterTypes(), paramNames, required ? method : null, invoke));
 	}
 
 	/**
@@ -214,7 +214,7 @@ public class BeanDefineMethod extends BeanDefineAbstractor {
 	 * @return
 	 */
 	public static Object getBeanObject(BeanFactory beanFactory, Object beanObject, Method method, Class<?>[] parameterTypes, String[] paramNames, boolean required, boolean invoke) {
-		return getBeanObject(beanObject, method, getParameters(beanFactory, method.getParameterTypes(), paramNames, required, invoke));
+		return getBeanObject(beanObject, method, getParameters(beanFactory, method.getParameterTypes(), paramNames, required ? method : null, invoke));
 	}
 
 	/**
@@ -225,7 +225,7 @@ public class BeanDefineMethod extends BeanDefineAbstractor {
 	 * @param required
 	 * @return
 	 */
-	public static Object[] getParameters(BeanFactory beanFactory, Class<?>[] parameterTypes, String[] paramNames, boolean required, boolean invoke) {
+	public static Object[] getParameters(BeanFactory beanFactory, Class<?>[] parameterTypes, String[] paramNames, Object required, boolean invoke) {
 		int length = paramNames.length;
 		if (length == 0) {
 			return KernelLang.NULL_OBJECTS;
@@ -235,8 +235,8 @@ public class BeanDefineMethod extends BeanDefineAbstractor {
 		for (int i = 0; i < length; i++) {
 			Object parameter = beanFactory.getBeanObject(paramNames[i], parameterTypes[i], false);
 			if (parameter == null) {
-				if (required) {
-					throw new RuntimeException("Can not inject method parameters [" + paramNames[i] + "] class = " + parameterTypes[i]);
+				if (required != null) {
+					throw new RuntimeException("Can not inject " + required + " parameters [" + paramNames[i] + "] class = " + parameterTypes[i]);
 				}
 
 			} else {

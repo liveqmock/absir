@@ -29,6 +29,9 @@ public class InjectMethod extends InjectInvokerObserver {
 	/** method */
 	Method method;
 
+	/** beanMethod */
+	Method beanMethod;
+
 	/** paramNames */
 	String[] paramNames;
 
@@ -40,12 +43,14 @@ public class InjectMethod extends InjectInvokerObserver {
 
 	/**
 	 * @param method
-	 * @param value
+	 * @param beanMethod
+	 * @param injectName
 	 * @param injectType
 	 */
-	public InjectMethod(Method method, String injectName, InjectType injectType) {
+	public InjectMethod(Method method, Method beanMethod, String injectName, InjectType injectType) {
 		super(injectType);
 		this.method = method;
+		this.beanMethod = beanMethod;
 		Annotation[][] parameterAnnotations = method.getParameterAnnotations();
 		this.paramNames = BeanDefineDiscover.paramterNames(method, parameterAnnotations);
 		int length = parameterAnnotations.length;
@@ -100,7 +105,7 @@ public class InjectMethod extends InjectInvokerObserver {
 		}
 
 		if (valueNames == null) {
-			return BeanDefineMethod.getParameters(beanFactory, parameterTypes, paramNames, injectType == InjectType.Required, injectType == InjectType.ObServed);
+			return BeanDefineMethod.getParameters(beanFactory, parameterTypes, paramNames, injectType == InjectType.Required ? method : null, injectType == InjectType.ObServed);
 
 		} else {
 			boolean required = injectType == InjectType.Required;
@@ -146,7 +151,7 @@ public class InjectMethod extends InjectInvokerObserver {
 	@Override
 	protected void invokeImpl(Object beanObject, Object parameter) {
 		// TODO Auto-generated method stub
-		BeanDefineMethod.getBeanObject(beanObject, method, (Object[]) parameter);
+		BeanDefineMethod.getBeanObject(beanObject, beanMethod, (Object[]) parameter);
 	}
 
 	/**

@@ -22,11 +22,13 @@ public class InjectMethodOrder extends InjectMethod {
 
 	/**
 	 * @param method
+	 * @param beanMethod
 	 * @param injectName
 	 * @param injectType
+	 * @param order
 	 */
-	public InjectMethodOrder(Method method, String injectName, InjectType injectType, int order) {
-		super(method, injectName, injectType);
+	public InjectMethodOrder(Method method, Method beanMethod, String injectName, InjectType injectType, int order) {
+		super(method, beanMethod, injectName, injectType);
 		// TODO Auto-generated constructor stub
 		this.order = order;
 	}

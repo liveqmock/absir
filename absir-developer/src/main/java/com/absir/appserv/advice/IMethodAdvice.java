@@ -18,10 +18,11 @@ import com.absir.core.kernel.KernelList.Orderable;
 public interface IMethodAdvice extends Orderable {
 
 	/**
+	 * @param beanType
 	 * @param method
 	 * @return
 	 */
-	public boolean matching(Method method);
+	public boolean matching(Class<?> beanType, Method method);
 
 	/**
 	 * @param invoker

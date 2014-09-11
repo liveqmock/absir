@@ -15,5 +15,8 @@ import java.util.Collection;
  */
 public interface JiTree<T> {
 
+	/**
+	 * @return
+	 */
 	public Collection<T> getChildren();
 }

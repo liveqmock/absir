@@ -20,6 +20,7 @@ import com.absir.appserv.crud.ICrudSupply;
 import com.absir.appserv.jdbc.JdbcCondition;
 import com.absir.appserv.jdbc.JdbcPage;
 import com.absir.appserv.system.bean.base.JbBean;
+import com.absir.appserv.system.bean.proxy.JiSub;
 import com.absir.appserv.system.bean.proxy.JiTree;
 import com.absir.appserv.system.bean.value.JaCrud.Crud;
 import com.absir.appserv.system.dao.BeanDao;
@@ -476,14 +477,21 @@ public class BeanServiceBase implements BeanService, ICrudSupply {
 	@Override
 	public Object get(String entityName, Serializable id, JdbcCondition jdbcCondition) {
 		// TODO Auto-generated method stub
+		Object entity;
 		if (jdbcCondition == null) {
-			return BeanDao.get(getSession(), entityName, id);
+			entity = BeanDao.get(getSession(), entityName, id);
 
 		} else {
 			jdbcCondition.getConditions().add(0, JdbcCondition.ALIAS + "." + getIdentifierName(entityName) + " IN (?)");
 			jdbcCondition.getConditions().add(1, id);
-			return QueryDaoUtils.selectQuery(getSession(), entityName, jdbcCondition);
+			entity = QueryDaoUtils.selectQuery(getSession(), entityName, jdbcCondition);
 		}
+
+		if (entity != null && entity instanceof JiSub) {
+			((JiSub) entity).getSub();
+		}
+
+		return entity;
 	}
 
 	/*

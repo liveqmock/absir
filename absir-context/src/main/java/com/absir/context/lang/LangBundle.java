@@ -77,8 +77,8 @@ public class LangBundle {
 			String[] locales = locale.split("_");
 			locale = locales[0];
 			int length = locales.length;
-			String country = length > 1 ? locales[1] : null;
-			String variant = length > 2 ? locales[2] : null;
+			String country = length > 1 ? locales[1] : "";
+			String variant = length > 2 ? locales[2] : "";
 			return new Locale(locale, country, variant);
 		}
 

@@ -8,11 +8,13 @@
 package com.absir.system.test.lang;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.script.ScriptException;
 
 import org.junit.Test;
 
+import com.absir.core.dyna.DynaBinder;
 import com.absir.system.test.AbstractTest;
 
 /**
@@ -158,16 +160,7 @@ public class TestMethod extends AbstractTest {
 
 	@Test
 	public void main() throws IOException, ScriptException, NoSuchMethodException {
-		String name = "/2/";
-		int pos = name.indexOf('/', 1) + 1;
-		if (name.startsWith("abc", pos)) {
-			System.out.print(name);
-		}
-
-		name = "/2/abc";
-		pos = name.indexOf('/', 1) + 1;
-		if (name.startsWith("abc", pos)) {
-			System.out.print(name);
-		}
+		System.out.println(DynaBinder.to("name", List.class));
+		System.out.println(DynaBinder.to("name", String[].class));
 	}
 }

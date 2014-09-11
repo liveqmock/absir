@@ -59,10 +59,10 @@ public class SessionFactoryBoost {
 
 	/**
 	 * @param configuration
+	 * @param locale
 	 */
-	public void beforeBuildConfiguration(Configuration configuration) {
-		EntityBoost.boost(configuration, this);
-
+	public void beforeBuildConfiguration(Configuration configuration, boolean locale) {
+		EntityBoost.boost(configuration, this, locale);
 	}
 
 	/**
@@ -106,10 +106,11 @@ public class SessionFactoryBoost {
 		for (Entry<String, PersistentClass> entry : classes.entrySet()) {
 			PersistentClass persistentClass = entry.getValue();
 			sessionFactoryBean.getEntityNameMapJpaEntityName().put(persistentClass.getEntityName(), persistentClass.getJpaEntityName());
-			sessionFactoryBean.getJpaEntityNameMapEntityClassFactory().put(persistentClass.getJpaEntityName(),
-					new ObjectEntry<Class<?>, SessionFactory>(persistentClass.getMappedClass(), sessionFactory));
+			Class<?> mappedClass = persistentClass.getMappedClass();
+			if (mappedClass != null) {
+				sessionFactoryBean.getJpaEntityNameMapEntityClassFactory().put(persistentClass.getJpaEntityName(), new ObjectEntry<Class<?>, SessionFactory>(mappedClass, sessionFactory));
+			}
 		}
-
 	}
 
 	/**
@@ -159,18 +160,5 @@ public class SessionFactoryBoost {
 
 		classMetadata = Collections.unmodifiableMap(classMetadata);
 		KernelObject.declaredSet(sessionFactory, "classMetadata", classMetadata);
-		// Map<String, EntityPersister> entityPersisters = new HashMap<String,
-		// EntityPersister>();
-		// for (Entry<String, EntityPersister> entry :
-		// sessionFactory.getEntityPersisters().entrySet()) {
-		// entityPersisters.put(entry.getKey(), entry.getValue());
-		// String jpaEntityName =
-		// SessionFactoryUtils.getJpaEntityName(entry.getKey());
-		// entityPersisters.put(jpaEntityName, entry.getValue());
-		// }
-		//
-		// entityPersisters = Collections.unmodifiableMap(entityPersisters);
-		// KernelObject.declaredSet(sessionFactory, "entityPersisters",
-		// entityPersisters);
 	}
 }

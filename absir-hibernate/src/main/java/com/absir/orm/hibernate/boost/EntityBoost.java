@@ -57,8 +57,9 @@ public class EntityBoost {
 	/**
 	 * @param configuration
 	 * @param sessionFactoryBoost
+	 * @param locale
 	 */
-	public static void boost(Configuration configuration, SessionFactoryBoost sessionFactoryBoost) {
+	public static void boost(Configuration configuration, SessionFactoryBoost sessionFactoryBoost, boolean locale) {
 		Map<String, PersistentClass> classes = (Map<String, PersistentClass>) KernelObject.declaredGet(configuration, "classes");
 		boostEntityTable(classes);
 		Map<String, Table> tables = (Map<String, Table>) KernelObject.declaredGet(configuration, "tables");
@@ -74,12 +75,17 @@ public class EntityBoost {
 		Map<String, List<org.hibernate.mapping.Index>> tableIndexs = new HashMap<String, List<org.hibernate.mapping.Index>>();
 		for (Iterator<Entry<String, PersistentClass>> iterator = classes.entrySet().iterator(); iterator.hasNext();) {
 			PersistentClass persistentClass = iterator.next().getValue();
+			Class<?> mappedClass = persistentClass.getMappedClass();
+			if (mappedClass == null) {
+				continue;
+			}
+
 			String tableName = persistentClass.getTable().getName();
 			int tableType = 0;
-			if (persistentClass.getMappedClass().getAnnotation(JaTable.class) != null) {
+			if (mappedClass.getAnnotation(JaTable.class) != null) {
 				tableType = 1;
 
-			} else if (persistentClass.getMappedClass().getAnnotation(JaSubTable.class) != null) {
+			} else if (mappedClass.getAnnotation(JaSubTable.class) != null) {
 				tableType = 2;
 			}
 
@@ -267,9 +273,14 @@ public class EntityBoost {
 		List<ImplementPersistent> implementPersistents = new ArrayList<ImplementPersistent>();
 		for (Entry<String, PersistentClass> entry : classes.entrySet()) {
 			PersistentClass persistentClass = entry.getValue();
-			if (persistentClass.getMappedClass().getPackage().getAnnotation(JaProxy.class) != null) {
+			Class<?> mappedClass = persistentClass.getMappedClass();
+			if (mappedClass == null) {
+				continue;
+			}
+
+			if (mappedClass.getPackage().getAnnotation(JaProxy.class) != null) {
 				try {
-					Class implementClass = Class.forName(KernelClass.parentName(persistentClass.getMappedClass()));
+					Class implementClass = Class.forName(KernelClass.parentName(mappedClass));
 					implementPersistents.add(new ImplementPersistent(implementClass, persistentClass));
 
 				} catch (MappingException e) {

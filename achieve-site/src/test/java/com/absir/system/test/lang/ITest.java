@@ -12,7 +12,7 @@ package com.absir.system.test.lang;
  *
  */
 public interface ITest {
-	
+
 	public static String name = TestLoader.getName();
 
 }

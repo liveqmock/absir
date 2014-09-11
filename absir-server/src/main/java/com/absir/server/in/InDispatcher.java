@@ -104,7 +104,7 @@ public abstract class InDispatcher<T, R> implements IDispatcher<T> {
 	@Override
 	public OnPut onPut(Input input, Object routeBean) {
 		// TODO Auto-generated method stub
-		return new OnPut();
+		return new OnPut(input);
 	}
 
 	/*

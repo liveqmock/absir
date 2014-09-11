@@ -307,8 +307,8 @@ public abstract class QueryDaoUtils {
 	 * @param conditions
 	 * @return
 	 */
-	public static Object selectQuery(Session session, String table, Object[] conditions) {
-		return selectQuery(session, table, null, conditions);
+	public static Object select(Session session, String table, Object[] conditions) {
+		return select(session, table, null, conditions);
 	}
 
 	/**
@@ -318,7 +318,7 @@ public abstract class QueryDaoUtils {
 	 * @param conditions
 	 * @return
 	 */
-	public static Object selectQuery(Session session, String table, String args, Object[] conditions) {
+	public static Object select(Session session, String table, String args, Object[] conditions) {
 		List list = selectQuery(session, table, args, conditions, 0, 1);
 		if (list.size() > 0) {
 			return list.get(0);

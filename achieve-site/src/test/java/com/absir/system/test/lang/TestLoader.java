@@ -34,9 +34,8 @@ public class TestLoader extends AbstractTest {
 			KernelClass.forName(cls.getName());
 		}
 
+		// HelperFileName.concat(basePath, fullFilenameToAdd);
 
-		//HelperFileName.concat(basePath, fullFilenameToAdd);
-		
 		// KernelClass.forName(ITest.class.getName());
 		T t = new T();
 		System.out.println(t);

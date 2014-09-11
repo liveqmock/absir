@@ -61,18 +61,17 @@ public class OnPut {
 	private Throwable returnThrowable;
 
 	/**
+	 * @param input
+	 */
+	public OnPut(Input input) {
+		this.input = input;
+	}
+
+	/**
 	 * @return the input
 	 */
 	public Input getInput() {
 		return input;
-	}
-
-	/**
-	 * @param input
-	 *            the input to set
-	 */
-	public void setInput(Input input) {
-		this.input = input;
 	}
 
 	/**

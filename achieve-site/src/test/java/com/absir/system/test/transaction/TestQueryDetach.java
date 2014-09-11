@@ -7,6 +7,7 @@
  */
 package com.absir.system.test.transaction;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
@@ -59,7 +60,7 @@ public class TestQueryDetach extends AbstractTestInject {
 
 		@DataQuery("SELECT o.id FROM JPlayer o WHERE o.id IN :p0")
 		protected abstract Long[] getPlayerIds(long[] playerIds);
-		
+
 		@DataQuery("SELECT o FROM JUser o WHERE o.username LIKE :p0")
 		protected abstract JUser findByUsername(String username);
 
@@ -136,78 +137,32 @@ public class TestQueryDetach extends AbstractTestInject {
 			Session session = BeanDao.getSession();
 			session.close();
 		}
+
+		@Transaction
+		public void test4(Map<String, Object> locale) {
+			// locale.put("name", "2");
+			locale.put("id", "3323234");
+			locale.put("_33", "123");
+
+			BeanDao.getSession().merge("JLocale", locale);
+		}
+
+		@SuppressWarnings("unchecked")
+		@Transaction
+		public Map<String, Object> test5() throws IOException {
+			Map<String, Object> locale = (Map<String, Object>) QueryDaoUtils.select(BeanDao.getSession(), "JLocale", null);
+			return locale;
+		}
 	}
 
 	@Test
 	public void test() throws InterruptedException {
-		System.out.println( TestService.ME.getPlayerIds(new long[]{1,2,3}));
-		TestService.ME.test();
-		
-		Thread.sleep(3000);
+		try {
+			TestService.ME.test4(TestService.ME.test5());
 
-		for (Object obj : TestService.ME.showProcesslist()) {
-			System.out.println(HelperJson.encodeNull(obj));
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
 		}
-
-		System.out.println("连接数量1:" + TestService.ME.showProcesslist().size());
-		for (int i = 0; i < 100; i++) {
-			try {
-				TestService.ME.testError();
-			} catch (Exception e) {
-				// TODO: handle exception
-			}
-
-		}
-
-		int size = TestService.ME.showProcesslist().size();
-		System.out.println("开连接数量2:" + size);
-
-		for (int i = 0; i < 5; i++) {
-			try {
-				TestService.ME.testError2();
-				// TestAsync.ME.test();
-
-			} catch (Exception e) {
-				// TODO: handle exception
-			}
-		}
-
-		// System.out.println("连接数量3:" +
-		// TestService.ME.showProcesslist().size());
-
-		Thread.sleep(20000);
-		System.out.println("连接数量4:" + TestService.ME.showProcesslist().size());
-
-		for (int i = 0; i < 10; i++) {
-			Thread.sleep(1000);
-			System.out.println("连接数量" + (i + 5) + ":" + TestService.ME.showProcesslist().size());
-		}
-
-		// // 测试1
-		// System.out.println("测试1");
-		// TestService.ME.test1();
-		// // 测试2
-		// System.out.println("测试2");
-		// TestService.ME.test2();
-		// // 测试3
-		// System.out.println("测试3");
-		// TestService.ME.test3();
-		// System.out.println("测试4");
-		// TestService.ME.test3();
-
-		// TestService.ME.test();
-		/*
-		 * SessionFactory sessionFactory =
-		 * SessionFactoryUtils.get().getSessionFactory(); Session session =
-		 * sessionFactory.openSession(); session.setFlushMode(FlushMode.AUTO);
-		 * try { JUser user = new JUser(); user.setUsername("dssdsddd1444");
-		 * session.persist(user);
-		 * 
-		 * } finally {
-		 * 
-		 * session.beginTransaction().commit();
-		 * 
-		 * session.flush(); session.close(); }
-		 */
 	}
 }

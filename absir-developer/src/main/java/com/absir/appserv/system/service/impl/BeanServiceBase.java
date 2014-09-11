@@ -137,7 +137,7 @@ public class BeanServiceBase implements BeanService, ICrudSupply {
 	@Override
 	public <T> T find(Class<T> entityClass, Object... conditions) {
 		// TODO Auto-generated method stub
-		return (T) QueryDaoUtils.selectQuery(getSession(), SessionFactoryUtils.getJpaEntityName(entityClass), conditions);
+		return (T) QueryDaoUtils.select(getSession(), SessionFactoryUtils.getJpaEntityName(entityClass), conditions);
 	}
 
 	/*
@@ -149,7 +149,7 @@ public class BeanServiceBase implements BeanService, ICrudSupply {
 	@Override
 	public <T> T find(String entityName, Class<T> entityClass, Object... conditions) {
 		// TODO Auto-generated method stub
-		return (T) QueryDaoUtils.selectQuery(getSession(), entityName, conditions);
+		return (T) QueryDaoUtils.select(getSession(), entityName, conditions);
 	}
 
 	/*

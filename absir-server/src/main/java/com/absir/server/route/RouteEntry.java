@@ -276,7 +276,6 @@ public class RouteEntry {
 
 		Object routeBean = routeAction.getRouteEntity().getRouteBean(input);
 		OnPut onPut = dispatcher.onPut(input, routeBean);
-		onPut.setInput(input);
 		try {
 			onPut.open();
 			invoke(routeBean, onPut, routeEntry);

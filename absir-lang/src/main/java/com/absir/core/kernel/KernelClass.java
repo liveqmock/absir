@@ -465,6 +465,44 @@ public abstract class KernelClass {
 	}
 
 	/**
+	 * @param type
+	 * @param force
+	 * @return
+	 */
+	public static Type[] argumentTypes(Type type, boolean force) {
+		while (type != null) {
+			Type[] types = typeArguments(type);
+			if (types == null || types.length <= 0) {
+				Class cls = rawClass(type);
+				for (Type interfaceType : cls.getGenericInterfaces()) {
+					types = typeArguments(interfaceType);
+					if (types != null && types.length > 0) {
+						break;
+					}
+				}
+
+				if (types == null || types.length <= 0) {
+					if (!(force || isArgumentClass(cls))) {
+						break;
+					}
+
+					if (cls.isArray()) {
+						return new Class[] { cls.getComponentType() };
+
+					} else {
+						type = cls.getGenericSuperclass();
+						continue;
+					}
+				}
+			}
+
+			return types;
+		}
+
+		return null;
+	}
+
+	/**
 	 * @param cls
 	 * @param typeVariable
 	 * @return

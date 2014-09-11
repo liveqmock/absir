@@ -12,7 +12,7 @@ package com.absir.system.test.lang;
  *
  */
 public abstract class ATest {
-	
+
 	public static String name = TestLoader.getName();
 
 }

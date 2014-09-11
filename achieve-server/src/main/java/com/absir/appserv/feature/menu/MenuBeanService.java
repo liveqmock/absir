@@ -182,7 +182,7 @@ public class MenuBeanService {
 		for (MenuBeanRoot beanRoot : menuBeanRoot.getChildren().values()) {
 			String url = beanRoot.getMenuBean().getRef();
 			if (KernelObject.equals("MENU", beanRoot.getMenuBean().getUrlType()) && !KernelString.isEmpty(url)) {
-				JMenuPermission menuPermission = (JMenuPermission) QueryDaoUtils.selectQuery(session, "JMenuPermission", new Object[] { "o.id", url });
+				JMenuPermission menuPermission = (JMenuPermission) QueryDaoUtils.select(session, "JMenuPermission", new Object[] { "o.id", url });
 				if (menuPermission == null) {
 					menuPermission = new JMenuPermission();
 					menuPermission.setId(url);
@@ -268,7 +268,7 @@ public class MenuBeanService {
 
 		for (MenuBeanRoot beanRoot : menuBeanRoot.getChildren().values()) {
 			JMenu menuBean = beanRoot.getMenuBean();
-			JMenu menu = (JMenu) QueryDaoUtils.selectQuery(session, "JMenu", KernelString.isEmpty(menuBean.getUrl()) ? new Object[] { "o.parent", parent, "o.name", menuBean.getName() }
+			JMenu menu = (JMenu) QueryDaoUtils.select(session, "JMenu", KernelString.isEmpty(menuBean.getUrl()) ? new Object[] { "o.parent", parent, "o.name", menuBean.getName() }
 					: new Object[] { "o.parent", parent, "o.url", menuBean.getUrl() });
 			if (menu == null) {
 				menu = menuBean;

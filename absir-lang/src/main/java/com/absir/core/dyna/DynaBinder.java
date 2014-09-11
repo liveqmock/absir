@@ -14,6 +14,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -170,7 +171,7 @@ public class DynaBinder {
 	 * @return
 	 */
 	public <T> T bind(Object obj, String name, Type toType, T toObject) {
-		if (toType == null) {
+		if (toType == null || toType instanceof TypeVariable) {
 			return (T) obj;
 		}
 
@@ -284,23 +285,35 @@ public class DynaBinder {
 			if (dynas[0]) {
 				return toObject;
 			}
-
-		} else if (obj instanceof Map) {
-			return mapBind((Map) obj, name, toClass);
-
-		} else if (toClass.isArray()) {
-			return (T) bindArray(obj, name, toClass, toClass.getComponentType());
 		}
 
 		if (toObject == null) {
-			toObject = bindConvert(obj, name, toClass);
+			if (toClass.isArray()) {
+				toObject = (T) bindArray(obj, name, toClass, toClass.getComponentType());
+
+			} else if (Collection.class.isAssignableFrom(toClass)) {
+				Type[] types = KernelClass.argumentTypes(toClass, true);
+				int length = types.length;
+				toObject = (T) bindCollection(obj, name, (Class<? extends Collection>) toClass, length > 0 ? types[0] : null, null);
+
+			} else if (Map.class.isAssignableFrom(toClass)) {
+				Type[] types = KernelClass.argumentTypes(toClass, true);
+				int length = types.length;
+				toObject = (T) bindMap(obj, name, null, (Class<? extends Map>) toClass, length > 0 ? types[0] : null, length > 1 ? types[1] : null, null);
+
+			} else if (obj instanceof Map) {
+				toObject = mapBind((Map) obj, name, toClass);
+			}
+
+			if (toObject == null) {
+				toObject = bindConvert(obj, name, toClass);
+				if (toObject == null) {
+					toObject = nullTo(toClass, obj);
+				}
+			}
 		}
 
-		if (toObject != null) {
-			return toObject;
-		}
-
-		return nullTo(toClass, obj);
+		return toObject;
 	}
 
 	/**

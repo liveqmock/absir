@@ -82,7 +82,7 @@ public class ReadWriteTest extends AbstractTestInject {
 		}
 
 		public void insert() {
-			JQuestionCategory category = (JQuestionCategory) QueryDaoUtils.selectQuery(BeanDao.getSession(), "JQuestionCategory", new Object[] { "o.name", categoryName });
+			JQuestionCategory category = (JQuestionCategory) QueryDaoUtils.select(BeanDao.getSession(), "JQuestionCategory", new Object[] { "o.name", categoryName });
 			if (category == null) {
 				category = new JQuestionCategory();
 				category.setName(categoryName);
@@ -145,8 +145,8 @@ public class ReadWriteTest extends AbstractTestInject {
 	public void test() throws InterruptedException {
 		TransactionUtils.open(BeanService.TRANSACTION_READ_WRITE, null, null);
 		// export();
-		//importQuestions();
-		
+		// importQuestions();
+
 		export();
 		TransactionUtils.close(BeanService.TRANSACTION_READ_WRITE, null, null, null);
 	}

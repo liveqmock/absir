@@ -29,6 +29,7 @@ import com.absir.bean.core.BeanFactoryImpl;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Inject;
+import com.absir.context.lang.LangBundle;
 import com.absir.core.kernel.KernelArray;
 import com.absir.core.kernel.KernelLang;
 import com.absir.orm.hibernate.boost.EntityAssoc;
@@ -108,6 +109,10 @@ public class SessionFactoryScanner implements IBeanDefineSupply, IBeanDefineScan
 			for (int i = 0; i < size; i++) {
 				String name = names.get(i);
 				ConfigurationBoost configurationBoost = configurationBoosts.get(i);
+				if (name == KernelLang.NULL_STRING && LangBundle.ME.isI18n()) {
+					configurationBoost.boostLocale();
+				}
+
 				Properties properties = configurationBoost.getProperties();
 				for (Entry<Object, Object> entry : properties.entrySet()) {
 					Object value = entry.getValue();

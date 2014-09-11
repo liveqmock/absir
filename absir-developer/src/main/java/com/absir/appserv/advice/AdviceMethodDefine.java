@@ -50,33 +50,45 @@ public class AdviceMethodDefine extends AopMethodDefineAbstract<AopMethodInterce
 		 * net.sf.cglib.proxy.MethodProxy)
 		 */
 		@Override
-		public Object before(final Object proxy, Iterator<AopInterceptor> iterator, final IMethodAdvice[] interceptor, AopProxyHandler proxyHandler, final Method method, final Object[] args,
-				MethodProxy methodProxy) throws Throwable {
+		public Object before(final Object proxy, final Iterator<AopInterceptor> iterator, final IMethodAdvice[] interceptor, final AopProxyHandler proxyHandler, final Method method,
+				final Object[] args, final MethodProxy methodProxy) throws Throwable {
 			// TODO Auto-generated method stub
-			AdviceInvoker adviceInvoker = new AdviceInvoker(interceptor) {
+			AdviceInvoker adviceInvoker = new AdviceInvoker() {
+
+				/** index */
+				private int index = 0;
+
+				/** length */
+				private int length = interceptor.length;
 
 				@Override
-				public Object invoke() throws Throwable {
+				public Object invoke(Object value) throws Throwable {
 					// TODO Auto-generated method stub
-					Object value;
-					while (true) {
+					Throwable ex = null;
+					if (index < length) {
 						try {
-							value = before(interceptor, proxy, method, args);
+							value = interceptor[index++].before(this, proxy, method, args);
 							if (value == AopProxyHandler.VOID) {
-								value = invoke();
+								value = invoke(value);
 							}
+
+						} catch (Throwable e) {
+							ex = e;
 
 						} finally {
 							// TODO: handle exception
+							value = interceptor[--index].after(proxy, value, method, args, ex);
 						}
+
+					} else {
+						value = proxyHandler.invoke(proxyHandler, iterator, method, args, methodProxy);
 					}
 
-					// return value;
+					return value;
 				}
-
 			};
 
-			return adviceInvoker.invoke();
+			return adviceInvoker.invoke(null);
 		}
 
 		/*

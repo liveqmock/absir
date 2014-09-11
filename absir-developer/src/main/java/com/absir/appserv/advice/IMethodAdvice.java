@@ -24,13 +24,14 @@ public interface IMethodAdvice extends Orderable {
 	public boolean matching(Method method);
 
 	/**
+	 * @param invoker
 	 * @param proxy
 	 * @param method
 	 * @param args
 	 * @return
 	 * @throws Throwable
 	 */
-	public Object before(Object proxy, Method method, Object[] args) throws Throwable;
+	public Object before(AdviceInvoker invoker, Object proxy, Method method, Object[] args) throws Throwable;
 
 	/**
 	 * @param proxy

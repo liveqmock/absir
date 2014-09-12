@@ -11,6 +11,7 @@ import java.io.File;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import net.sf.cglib.proxy.MethodProxy;
@@ -40,6 +41,18 @@ import com.absir.server.on.OnPut;
 @Base(order = -1)
 @Bean
 public class LangBundleImpl extends LangBundle implements AopMethodDefine<LangIterceptor, Entry<String, Class<?>>, Boolean> {
+
+	/** entityMapLangInterceptors */
+	private static Map<String, Map<Method, Entry<String, Class<?>>>> entityMapLangInterceptors;
+
+	/**
+	 * @param entityName
+	 * @param entityClass
+	 * @return
+	 */
+	public static Map<Method, Entry<String, Class<?>>> getLangInterceptor(String entityName, Class<?> entityClass) {
+		return null;
+	}
 
 	/**
 	 * @param langBase

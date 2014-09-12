@@ -7,8 +7,6 @@
  */
 package com.absir.appserv.lang;
 
-import java.util.Locale;
-
 import com.absir.appserv.system.bean.value.JaEdit;
 import com.absir.appserv.system.bean.value.JeEditable;
 
@@ -24,14 +22,14 @@ public interface ILangBase {
 	 * @param type
 	 * @return
 	 */
-	public <T> T getLang(String fieldName, Locale locale, Class<T> type);
+	public <T> T getLang(String fieldName, Integer locale, Class<T> type);
 
 	/**
 	 * @param fieldName
 	 * @param locale
 	 * @param value
 	 */
-	public void setLang(String fieldName, Locale locale, Object value);
+	public void setLang(String fieldName, Integer locale, Object value);
 
 	/**
 	 * @param value

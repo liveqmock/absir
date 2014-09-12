@@ -25,6 +25,7 @@ import com.absir.bean.inject.value.Value;
 import com.absir.context.core.ContextUtils;
 import com.absir.context.schedule.cron.CronFixDelayRunable;
 import com.absir.core.dyna.DynaBinder;
+import com.absir.core.kernel.KernelMap;
 import com.absir.core.kernel.KernelString;
 
 /**
@@ -55,6 +56,9 @@ public class LangBundle {
 
 	/** local */
 	protected Locale locale;
+
+	/** localeCode */
+	protected Integer localeCode;
 
 	/** codeMaplocale */
 	protected Map<Integer, Locale> codeMaplocale;
@@ -111,13 +115,15 @@ public class LangBundle {
 				codeMaplocale = null;
 
 			} else {
-				if (codeMaplocale.containsValue(locale)) {
+				localeCode = KernelMap.getKey(codeMaplocale, locale);
+				if (localeCode == null) {
+					localeCode = 0;
+					codeMaplocale.put(localeCode, locale);
+
+				} else {
 					if (codeMaplocale.size() == 1) {
 						codeMaplocale = null;
 					}
-
-				} else {
-					codeMaplocale.put(0, locale);
 				}
 			}
 		}
@@ -201,6 +207,21 @@ public class LangBundle {
 		}
 
 		return locale;
+	}
+
+	/**
+	 * @return
+	 */
+	public Integer getLocaleCode() {
+		return localeCode;
+	}
+
+	/**
+	 * @param code
+	 * @return
+	 */
+	public boolean isLocaleCode(Integer code) {
+		return code == null || code == 0 || code.equals(localeCode);
 	}
 
 	/**

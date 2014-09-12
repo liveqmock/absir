@@ -23,7 +23,7 @@ public abstract class ContextBean<ID extends Serializable> extends Context<ID> i
 	/**
 	 * @return
 	 */
-	
+
 	public final boolean isExpiration() {
 		return expirationTime == -1;
 	}

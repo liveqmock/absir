@@ -47,6 +47,9 @@ public abstract class Input extends Bean<Serializable> implements IAttributes {
 	/** locale */
 	private Locale locale;
 
+	/** localCode */
+	private Integer localCode;
+
 	/** resourceBundle */
 	protected Map<String, String> resourceBundle;
 
@@ -97,8 +100,20 @@ public abstract class Input extends Bean<Serializable> implements IAttributes {
 	public void setLocale(Locale value) {
 		if (value != locale) {
 			locale = value;
+			localCode = null;
 			resourceBundle = null;
 		}
+	}
+
+	/**
+	 * @return
+	 */
+	public Integer getLocalCode() {
+		if (localCode == null) {
+			localCode = LangBundle.ME.getLocaleCode(getLocale());
+		}
+
+		return localCode;
 	}
 
 	/**

@@ -13,9 +13,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.absir.aop.AopBeanDefine;
+import com.absir.appserv.lang.LangBundleImpl;
 import com.absir.appserv.system.bean.JConfigure;
 import com.absir.appserv.system.helper.HelperAccessor;
 import com.absir.appserv.system.service.BeanService;
+import com.absir.core.kernel.KernelClass;
 import com.absir.core.kernel.KernelObject;
 import com.absir.core.kernel.KernelString;
 
@@ -51,7 +53,8 @@ public abstract class JConfigureUtils {
 				if (configure == null) {
 					Class<? extends JConfigureBase> configureClass = Configure_Class_Map_Class.get(cls);
 					if (configureClass == null) {
-						configure = AopBeanDefine.instanceBeanObject(cls);
+						configure = KernelClass.newInstance(cls);
+						configure = LangBundleImpl.ME.getLangProxy(cls.getSimpleName(), configure);
 						try {
 							initConfigure(configure);
 

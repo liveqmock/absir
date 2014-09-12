@@ -15,11 +15,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.absir.appserv.dyna.DynaBinderUtils;
-import com.absir.appserv.lang.ILangBase;
-import com.absir.appserv.lang.LangBundleImpl;
 import com.absir.appserv.system.bean.JConfigure;
 import com.absir.appserv.system.service.BeanService;
-import com.absir.core.kernel.KernelObject;
 import com.absir.core.kernel.KernelReflect;
 import com.absir.orm.hibernate.SessionFactoryUtils;
 
@@ -27,31 +24,10 @@ import com.absir.orm.hibernate.SessionFactoryUtils;
  * @author absir
  * 
  */
-@SuppressWarnings("unchecked")
-public class JConfigureBase implements ILangBase {
+public class JConfigureBase {
 
 	/** fieldMapConfigure */
 	protected transient Map<Field, JConfigure> fieldMapConfigure = new HashMap<Field, JConfigure>();
-
-	/** fieldMapConfigureLang */
-	protected transient Map<String, JConfigureLang> fieldMapConfigureLang = new HashMap<String, JConfigureLang>();
-
-	/**
-	 * @author absir
-	 *
-	 */
-	protected static class JConfigureLang {
-
-		/** type */
-		public Class<?> type;
-
-		/** value */
-		public Object value;
-
-		/** configure */
-		public JConfigure configure;
-
-	}
 
 	/**
 	 * @param id
@@ -86,87 +62,12 @@ public class JConfigureBase implements ILangBase {
 	}
 
 	/**
-	 * @param fieldName
-	 * @param locale
-	 * @param type
-	 * @return
-	 */
-	protected JConfigureLang getConfigureLang(String fieldName, Locale locale, Class<?> type) {
-		String fieldKey = getFieldKey(fieldName, locale);
-		JConfigureLang configureLang = fieldMapConfigureLang.get(fieldKey);
-		if (configureLang == null) {
-			configureLang = new JConfigureLang();
-			String id = getIdentitier(fieldKey);
-			JConfigure configure = BeanService.ME.get(JConfigure.class, id);
-			if (configure == null) {
-				configure = new JConfigure();
-				configure.setId(id);
-				configureLang.value = KernelObject.declaredGet(this, fieldName);
-
-			} else {
-				configureLang.value = configure.getValue();
-			}
-
-			configureLang.configure = configure;
-		}
-
-		if (type != null && configureLang.type == null) {
-			configureLang.type = type;
-			configureLang.value = DynaBinderUtils.to(configureLang.value, type);
-		}
-
-		return configureLang;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.absir.appserv.lang.ILangBase#getLang(java.lang.String,
-	 * java.util.Locale, java.lang.Class)
-	 */
-	@Override
-	public <T> T getLang(String fieldName, Locale locale, Class<T> type) {
-		// TODO Auto-generated method stub
-		return (T) getConfigureLang(fieldName, locale, type).value;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.absir.appserv.lang.ILangBase#setLang(java.lang.String,
-	 * java.util.Locale, java.lang.Object)
-	 */
-	@Override
-	public void setLang(String fieldName, Locale locale, Object value) {
-		// TODO Auto-generated method stub
-		JConfigureLang configureLang = getConfigureLang(fieldName, locale, null);
-		configureLang.value = DynaBinderUtils.to(value, configureLang.type);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.absir.appserv.lang.ILangBase#setLangEntity(java.lang.String)
-	 */
-	@Override
-	public void setLangEntity(String value) {
-		// TODO Auto-generated method stub
-		LangBundleImpl.setLangEntity(this, value);
-	}
-
-	/**
 	 * 
 	 */
 	public final void merge() {
 		for (Entry<Field, JConfigure> entry : fieldMapConfigure.entrySet()) {
 			JConfigure configure = entry.getValue();
 			configure.setValue(DynaBinderUtils.to(KernelReflect.get(this, entry.getKey()), String.class));
-			mergeConfigure(configure);
-		}
-
-		for (JConfigureLang configureLang : fieldMapConfigureLang.values()) {
-			JConfigure configure = configureLang.configure;
-			configure.setValue(DynaBinderUtils.to(configureLang.value, String.class));
 			mergeConfigure(configure);
 		}
 	}

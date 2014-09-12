@@ -9,6 +9,7 @@ package com.absir.appserv.configure;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -17,6 +18,7 @@ import java.util.Map.Entry;
 import com.absir.appserv.dyna.DynaBinderUtils;
 import com.absir.appserv.system.bean.JConfigure;
 import com.absir.appserv.system.service.BeanService;
+import com.absir.core.base.IBase;
 import com.absir.core.kernel.KernelReflect;
 import com.absir.orm.hibernate.SessionFactoryUtils;
 
@@ -24,17 +26,28 @@ import com.absir.orm.hibernate.SessionFactoryUtils;
  * @author absir
  * 
  */
-public class JConfigureBase {
+public class JConfigureBase implements IBase<Serializable> {
 
 	/** fieldMapConfigure */
 	protected transient Map<Field, JConfigure> fieldMapConfigure = new HashMap<Field, JConfigure>();
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.core.base.IBase#getId()
+	 */
+	@Override
+	public Serializable getId() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 
 	/**
 	 * @param id
 	 * @return
 	 */
-	protected String getIdentitier(String id) {
-		return getClass().getName() + '*' + id;
+	protected String getIdentitier() {
+		return getClass().getName() + "@" + getId();
 	}
 
 	/**
@@ -68,14 +81,15 @@ public class JConfigureBase {
 		for (Entry<Field, JConfigure> entry : fieldMapConfigure.entrySet()) {
 			JConfigure configure = entry.getValue();
 			configure.setValue(DynaBinderUtils.to(KernelReflect.get(this, entry.getKey()), String.class));
-			mergeConfigure(configure);
 		}
+
+		mergeConfigures(fieldMapConfigure.values());
 	}
 
 	/**
 	 * @param configure
 	 */
-	protected void mergeConfigure(JConfigure configure) {
-		BeanService.ME.merge(configure);
+	protected void mergeConfigures(Collection<JConfigure> configures) {
+		BeanService.ME.mergers(configures);
 	}
 }

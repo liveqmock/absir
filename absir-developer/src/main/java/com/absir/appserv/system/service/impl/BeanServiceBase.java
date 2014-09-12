@@ -8,6 +8,7 @@
 package com.absir.appserv.system.service.impl;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -375,6 +376,62 @@ public class BeanServiceBase implements BeanService, ICrudSupply {
 					}
 				}
 			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.appserv.system.service.BeanService#list(java.lang.String,
+	 * java.lang.String, int, int, java.lang.Object[])
+	 */
+	@Override
+	public List list(String entityName, String queue, int firstResult, int maxResults, Object... conditions) {
+		// TODO Auto-generated method stub
+		return QueryDaoUtils.selectQuery(getSession(), entityName, conditions, firstResult, maxResults);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.appserv.system.service.BeanService#list(java.lang.String,
+	 * java.lang.String, com.absir.appserv.jdbc.JdbcPage, java.lang.Object[])
+	 */
+	@Override
+	public List list(String entityName, String queue, JdbcPage jdbcPage, Object... conditions) {
+		// TODO Auto-generated method stub
+		return QueryDaoUtils.selectQuery(getSession(), entityName, conditions, jdbcPage);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.system.service.BeanService#mergers(java.util.Collection
+	 * )
+	 */
+	@Override
+	public void mergers(Collection<?> entities) {
+		// TODO Auto-generated method stub
+		Session session = getSession();
+		for (Object entity : entities) {
+			session.merge(entity);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.system.service.BeanService#mergers(java.lang.String,
+	 * java.util.Collection)
+	 */
+	@Override
+	public void mergers(String entityName, Collection<?> entities) {
+		// TODO Auto-generated method stub
+		Session session = getSession();
+		for (Object entity : entities) {
+			session.merge(entityName, entity);
 		}
 	}
 

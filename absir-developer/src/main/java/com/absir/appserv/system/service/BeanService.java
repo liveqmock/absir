@@ -8,12 +8,14 @@
 package com.absir.appserv.system.service;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
+import com.absir.appserv.jdbc.JdbcPage;
 import com.absir.appserv.system.service.impl.BeanServiceBase;
 import com.absir.appserv.system.service.impl.BeanServiceImpl;
 import com.absir.bean.core.BeanFactoryUtils;
@@ -242,4 +244,38 @@ public interface BeanService {
 	 */
 	@Transaction(readOnly = true)
 	public Set<Serializable> getSearchIds(String entityName, Object... ids);
+
+	/**
+	 * @param entityName
+	 * @param queue
+	 * @param firstResult
+	 * @param maxResults
+	 * @param conditions
+	 * @return
+	 */
+	@Transaction(readOnly = true)
+	public List list(String entityName, String queue, int firstResult, int maxResults, Object... conditions);
+
+	/**
+	 * @param entityName
+	 * @param queue
+	 * @param jdbcPage
+	 * @param conditions
+	 * @return
+	 */
+	@Transaction(readOnly = true)
+	public List list(String entityName, String queue, JdbcPage jdbcPage, Object... conditions);
+
+	/**
+	 * @param entities
+	 */
+	@Transaction
+	public void mergers(Collection<?> entities);
+
+	/**
+	 * @param entityName
+	 * @param entities
+	 */
+	@Transaction
+	public void mergers(String entityName, Collection<?> entities);
 }

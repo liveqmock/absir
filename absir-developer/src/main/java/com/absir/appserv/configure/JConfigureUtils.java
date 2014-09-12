@@ -10,6 +10,7 @@ package com.absir.appserv.configure;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.absir.aop.AopBeanDefine;
@@ -79,12 +80,18 @@ public abstract class JConfigureUtils {
 	 * @param configureBase
 	 */
 	private static void initConfigure(final JConfigureBase configureBase) {
+		String identitier = configureBase.getIdentitier();
+		Map<String, JConfigure> configureMap = new HashMap<String, JConfigure>();
+		for (JConfigure configure : (List<JConfigure>) BeanService.ME.list("JConfigure", null, 0, 0, "o.id", identitier)) {
+			configureMap.put(configure.getName(), configure);
+		}
+
 		for (Field field : HelperAccessor.getFields(configureBase.getClass())) {
-			String id = configureBase.getIdentitier(field.getName());
-			JConfigure configure = BeanService.ME.get(JConfigure.class, id);
+			JConfigure configure = configureMap.get(field.getName());
 			if (configure == null) {
 				configure = new JConfigure();
-				configure.setId(id);
+				configure.setId(identitier);
+				configure.setName(field.getName());
 
 			} else {
 				KernelObject.declaredSetter(configureBase, field, configureBase.set(configure.getValue(), field));

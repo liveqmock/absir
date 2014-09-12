@@ -9,8 +9,8 @@ package com.absir.appserv.system.bean;
 
 import java.io.Serializable;
 
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 
 import com.absir.appserv.system.bean.base.JbBase;
 
@@ -22,8 +22,11 @@ import com.absir.appserv.system.bean.base.JbBase;
 public class JConfigure extends JbBase {
 
 	/** id */
-	@Id
+	@EmbeddedId
 	private String id;
+
+	@EmbeddedId
+	private String name;
 
 	/** value */
 	private String value;
@@ -45,6 +48,21 @@ public class JConfigure extends JbBase {
 	 */
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @param name
+	 *            the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	/**

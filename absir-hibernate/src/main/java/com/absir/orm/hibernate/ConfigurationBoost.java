@@ -91,7 +91,7 @@ public class ConfigurationBoost extends Configuration {
 		stringBuilder.append("<class entity-name=\"JLocale\">\r\n");
 		stringBuilder.append("<composite-id mapped=\"true\">\r\n");
 		stringBuilder.append("<key-property name=\"entity\" type=\"java.lang.String\" length=\"63\"></key-property>\r\n");
-		stringBuilder.append("<key-property name=\"primary\" type=\"java.lang.String\" length=\"255\"></key-property>\r\n");
+		stringBuilder.append("<key-property name=\"id\" type=\"java.lang.String\" length=\"255\"></key-property>\r\n");
 		stringBuilder.append("<key-property name=\"name\" type=\"java.lang.String\" length=\"63\"></key-property>\r\n");
 		stringBuilder.append("<generator class=\"assigned\"></generator>\r\n");
 		stringBuilder.append("</composite-id>\r\n");

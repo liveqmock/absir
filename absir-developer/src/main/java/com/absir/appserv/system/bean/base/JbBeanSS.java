@@ -7,6 +7,7 @@
  */
 package com.absir.appserv.system.bean.base;
 
+import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
 import com.absir.appserv.system.bean.JEmbedSS;
@@ -20,6 +21,7 @@ import com.absir.appserv.system.bean.value.JaLang;
 public class JbBeanSS extends JbBase {
 
 	@JaLang("编号")
+	@Id
 	private JEmbedSS id;
 
 	/**

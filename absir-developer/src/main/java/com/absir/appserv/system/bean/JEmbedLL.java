@@ -28,7 +28,23 @@ public class JEmbedLL implements Serializable {
 
 	/** mid */
 	@JaLang("关联")
-	private long mid;
+	private Long mid;
+
+	/**
+	 * 
+	 */
+	public JEmbedLL() {
+
+	}
+
+	/**
+	 * @param eid
+	 * @param mid
+	 */
+	public JEmbedLL(Long eid, long mid) {
+		this.eid = eid;
+		this.mid = mid;
+	}
 
 	/**
 	 * @return the eid
@@ -48,7 +64,7 @@ public class JEmbedLL implements Serializable {
 	/**
 	 * @return the mid
 	 */
-	public long getMid() {
+	public Long getMid() {
 		return mid;
 	}
 
@@ -56,7 +72,7 @@ public class JEmbedLL implements Serializable {
 	 * @param mid
 	 *            the mid to set
 	 */
-	public void setMid(long mid) {
+	public void setMid(Long mid) {
 		this.mid = mid;
 	}
 
@@ -67,7 +83,7 @@ public class JEmbedLL implements Serializable {
 	 */
 	@Override
 	public int hashCode() {
-		return KernelObject.hashCode(eid) + (int) mid;
+		return KernelObject.hashCode(eid) + KernelObject.hashCode(mid);
 	}
 
 	/*

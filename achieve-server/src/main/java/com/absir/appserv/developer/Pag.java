@@ -22,6 +22,8 @@ import com.absir.appserv.support.developer.IRender;
 import com.absir.appserv.support.developer.RenderUtils;
 import com.absir.appserv.system.configure.JSiteConfigure;
 import com.absir.appserv.system.helper.HelperLang;
+import com.absir.bean.core.BeanFactoryUtils;
+import com.absir.bean.inject.value.Inject;
 import com.absir.context.lang.LangBundle;
 import com.absir.core.dyna.DynaBinder;
 import com.absir.core.kernel.KernelCollection;
@@ -35,6 +37,7 @@ import com.absir.servlet.InDispathFilter;
  * @author absir
  *
  */
+@Inject
 public class Pag {
 
 	/**
@@ -104,6 +107,22 @@ public class Pag {
 	}
 
 	/**
+	 * @author absir
+	 *
+	 */
+	public static interface IPagLang {
+
+		/**
+		 * @param transferredName
+		 * @return
+		 */
+		public String getPagLang(String transferredName);
+	}
+
+	/** PAG_LANG */
+	private static final IPagLang PAG_LANG = BeanFactoryUtils.get(IPagLang.class);
+
+	/**
 	 * @param name
 	 * @param lang
 	 * @param echo
@@ -111,7 +130,8 @@ public class Pag {
 	 */
 	protected static String getLangRequest(String name, String lang, boolean echo) {
 		if (LangBundle.ME.isI18n()) {
-			name = "Pag.lang(" + KernelString.transferred(name) + ")";
+			name = KernelString.transferred(name);
+			name = PAG_LANG == null ? "Pag.lang(" + name + ")" : PAG_LANG.getPagLang(name);
 			return echo ? IRender.ME.echo(name) : name;
 
 		} else {

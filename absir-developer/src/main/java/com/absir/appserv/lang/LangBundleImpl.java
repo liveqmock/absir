@@ -29,6 +29,7 @@ import com.absir.appserv.support.Developer;
 import com.absir.appserv.system.bean.value.JaCrud.Crud;
 import com.absir.bean.basis.Base;
 import com.absir.bean.core.BeanConfigImpl;
+import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.IMethodEntry;
 import com.absir.bean.inject.InjectBeanFactory;
 import com.absir.bean.inject.value.Bean;
@@ -51,7 +52,7 @@ import com.absir.server.on.OnPut;
 public class LangBundleImpl extends LangBundle implements IMethodEntry<Entry<String, Class<?>>> {
 
 	/** ME */
-	public static final LangBundleImpl ME = (LangBundleImpl) LangBundle.ME;
+	public static final LangBundleImpl ME = BeanFactoryUtils.get(LangBundleImpl.class);
 
 	/** langInterfaces */
 	private Set<Class<?>> langInterfaces = new HashSet<Class<?>>();
@@ -60,10 +61,10 @@ public class LangBundleImpl extends LangBundle implements IMethodEntry<Entry<Str
 	private Map<Method, LangEntryImpl> methodMapLangEntryImpl = new HashMap<Method, LangEntryImpl>();
 
 	/** entityMapLangInterceptors */
-	private Map<String, Map<Method, Entry<String, Class<?>>>> entityMapLangInterceptors;
+	private Map<String, Map<Method, Entry<String, Class<?>>>> entityMapLangInterceptors = new HashMap<String, Map<Method, Entry<String, Class<?>>>>();
 
 	/** entityClassMapLangInterceptors */
-	private Map<Class<?>, Map<Method, Entry<String, Class<?>>>> entityClassMapLangInterceptors;
+	private Map<Class<?>, Map<Method, Entry<String, Class<?>>>> entityClassMapLangInterceptors = new HashMap<Class<?>, Map<Method, Entry<String, Class<?>>>>();
 
 	/**
 	 * @param langBase

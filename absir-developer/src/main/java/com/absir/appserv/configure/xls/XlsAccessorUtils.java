@@ -496,9 +496,7 @@ public class XlsAccessorUtils {
 				}
 
 				if (updateTimeValue != null) {
-					JEmbedSS embedSS = new JEmbedSS();
-					embedSS.setEid(updateEid);
-					embedSS.setMid(KernelDyna.to(id, String.class));
+					JEmbedSS embedSS = new JEmbedSS(updateEid, KernelDyna.to(id, String.class));
 					JUpdateXls updateXls = BeanService.ME.get(JUpdateXls.class, embedSS);
 					String serialize = HelperJson.encodeNull(bean);
 					if (updateXls == null) {

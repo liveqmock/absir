@@ -16,6 +16,7 @@ import java.util.Map;
 import com.absir.aop.AopBeanDefine;
 import com.absir.appserv.lang.LangBundleImpl;
 import com.absir.appserv.system.bean.JConfigure;
+import com.absir.appserv.system.bean.JEmbedSS;
 import com.absir.appserv.system.helper.HelperAccessor;
 import com.absir.appserv.system.service.BeanService;
 import com.absir.core.kernel.KernelClass;
@@ -82,16 +83,15 @@ public abstract class JConfigureUtils {
 	private static void initConfigure(final JConfigureBase configureBase) {
 		String identitier = configureBase.getIdentitier();
 		Map<String, JConfigure> configureMap = new HashMap<String, JConfigure>();
-		for (JConfigure configure : (List<JConfigure>) BeanService.ME.list("JConfigure", null, 0, 0, "o.id", identitier)) {
-			configureMap.put(configure.getName(), configure);
+		for (JConfigure configure : (List<JConfigure>) BeanService.ME.list("JConfigure", null, 0, 0, "o.id.eid", identitier)) {
+			configureMap.put(configure.getId().getMid(), configure);
 		}
 
 		for (Field field : HelperAccessor.getFields(configureBase.getClass())) {
 			JConfigure configure = configureMap.get(field.getName());
 			if (configure == null) {
 				configure = new JConfigure();
-				configure.setId(identitier);
-				configure.setName(field.getName());
+				configure.setId(new JEmbedSS(identitier, field.getName()));
 
 			} else {
 				KernelObject.declaredSetter(configureBase, field, configureBase.set(configure.getValue(), field));

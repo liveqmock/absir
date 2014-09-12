@@ -268,8 +268,8 @@ public class MenuBeanService {
 
 		for (MenuBeanRoot beanRoot : menuBeanRoot.getChildren().values()) {
 			JMenu menuBean = beanRoot.getMenuBean();
-			JMenu menu = (JMenu) QueryDaoUtils.select(session, "JMenu", KernelString.isEmpty(menuBean.getUrl()) ? new Object[] { "o.parent", parent, "o.name", menuBean.getName() }
-					: new Object[] { "o.parent", parent, "o.url", menuBean.getUrl() });
+			JMenu menu = (JMenu) QueryDaoUtils.select(session, "JMenu", KernelString.isEmpty(menuBean.getUrl()) ? new Object[] { "o.parent", parent, "o.name", menuBean.getName() } : new Object[] {
+					"o.parent", parent, "o.url", menuBean.getUrl() });
 			if (menu == null) {
 				menu = menuBean;
 				menu.setParent(parent);

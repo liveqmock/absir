@@ -14,6 +14,7 @@ import jetbrick.template.JetTemplate;
 import jetbrick.template.runtime.JetPageContext;
 import jetbrick.template.web.JetWebContext;
 
+import com.absir.appserv.developer.Pag.IPagLang;
 import com.absir.appserv.system.server.ServerDiyView;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Value;
@@ -24,7 +25,7 @@ import com.absir.servlet.InputRequest;
  *
  */
 @Bean
-public class WebJetbrickView extends ServerDiyView {
+public class WebJetbrickView extends ServerDiyView implements IPagLang {
 
 	/**
 	 * 获取文件完整路径
@@ -213,5 +214,17 @@ public class WebJetbrickView extends ServerDiyView {
 		JetPageContext context = renders == null ? new WebJetbrickContext(new JetWebContext(input.getRequest(), input.getResponse(), input.getModel()), WebJetbrickSupply.getEngine())
 				: (JetPageContext) renders[0];
 		context.getEngine().getTemplate(view).render(context.getContext(), input.getResponse().getOutputStream());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.developer.Pag.IPagLang#getPagLang(java.lang.String)
+	 */
+	@Override
+	public String getPagLang(String transferredName) {
+		// TODO Auto-generated method stub
+		return "@Pag.lang(" + transferredName + ")";
 	}
 }

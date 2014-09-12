@@ -15,6 +15,7 @@ import java.util.Stack;
 
 import javax.servlet.ServletRequest;
 
+import com.absir.bean.inject.value.Inject;
 import com.absir.core.kernel.KernelLang.CallbackTemplate;
 import com.absir.orm.value.JoEntity;
 
@@ -23,6 +24,7 @@ import com.absir.orm.value.JoEntity;
  *
  */
 @SuppressWarnings("unchecked")
+@Inject
 public class Scenario {
 
 	/** DeveloperScenarioStacks */

@@ -31,6 +31,22 @@ public class JEmbedLS implements Serializable {
 	private String mid;
 
 	/**
+	 * 
+	 */
+	public JEmbedLS() {
+
+	}
+
+	/**
+	 * @param eid
+	 * @param mid
+	 */
+	public JEmbedLS(Long eid, String mid) {
+		this.eid = eid;
+		this.mid = mid;
+	}
+
+	/**
 	 * @return the eid
 	 */
 	public Long getEid() {

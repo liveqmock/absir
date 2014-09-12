@@ -35,6 +35,6 @@ public interface ILangBase {
 	 * @param value
 	 */
 	@JaEdit(editable = JeEditable.DISABLE)
-	public void setLangEntity(String value);
+	public void setLangValues(String[] values);
 
 }

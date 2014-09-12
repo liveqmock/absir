@@ -249,7 +249,7 @@ public class LangBundle {
 			}
 		}
 
-		return code;
+		return code == 0 ? localeCode : code;
 	}
 
 	/**

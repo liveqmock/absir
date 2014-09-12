@@ -201,4 +201,44 @@ public class DynaBinderUtils extends DynaBinder {
 
 		return DynaBinder.INSTANCE.bind(obj, null, toType);
 	}
+
+	/**
+	 * @param map
+	 * @param name
+	 * @param toClass
+	 * @return
+	 */
+	public static <T> T getMapValue(Map map, Object name, Class<T> toClass) {
+		Object obj = map.get(name);
+		if (obj != null) {
+			T toObject = to(obj, toClass);
+			if (toObject != obj) {
+				map.put(name, toObject);
+			}
+
+			return toObject;
+		}
+
+		return null;
+	}
+
+	/**
+	 * @param map
+	 * @param name
+	 * @param toClass
+	 * @return
+	 */
+	public static Object getMapValue(Map map, Object name, Type toType) {
+		Object obj = map.get(name);
+		if (obj != null) {
+			Object toObject = to(obj, toType);
+			if (toObject != obj) {
+				map.put(name, toObject);
+			}
+
+			return toObject;
+		}
+
+		return null;
+	}
 }

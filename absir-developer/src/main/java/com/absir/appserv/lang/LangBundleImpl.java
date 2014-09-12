@@ -27,7 +27,9 @@ import com.absir.appserv.crud.value.ICrudBean;
 import com.absir.appserv.dyna.DynaBinderUtils;
 import com.absir.appserv.lang.value.Langs;
 import com.absir.appserv.support.Developer;
+import com.absir.appserv.system.bean.JEmbedSL;
 import com.absir.appserv.system.bean.value.JaCrud.Crud;
+import com.absir.appserv.system.service.BeanService;
 import com.absir.bean.basis.Base;
 import com.absir.bean.core.BeanConfigImpl;
 import com.absir.bean.core.BeanFactoryUtils;
@@ -52,6 +54,9 @@ import com.absir.server.on.OnPut;
 @Bean
 public class LangBundleImpl extends LangBundle implements IMethodEntry<Entry<String, Class<?>>> {
 
+	/** entityMapIdMapNameMapValue */
+	private static Map<String, Map<String, Map<String, Map<String, Object>>>> entityMapIdMapNameMapValue = new HashMap<String, Map<String, Map<String, Map<String, Object>>>>();
+
 	/** ME */
 	public static final LangBundleImpl ME = BeanFactoryUtils.get(LangBundleImpl.class);
 
@@ -67,18 +72,36 @@ public class LangBundleImpl extends LangBundle implements IMethodEntry<Entry<Str
 	/** entityClassMapLangInterceptors */
 	private Map<Class<?>, Map<Method, Entry<String, Class<?>>>> entityClassMapLangInterceptors = new HashMap<Class<?>, Map<Method, Entry<String, Class<?>>>>();
 
-	/** entityMapNameMapValue */
-	private Map<String, Map<String, Map<String, Object>>> entityMapNameMapValue = new HashMap<String, Map<String, Map<String, Object>>>();
+	/**
+	 * @param entityName
+	 * @param id
+	 * @return
+	 */
+	public static Map<String, Map<String, Object>> getLangNameMapValue(String entityName, String id) {
+		Map<String, Map<String, Map<String, Object>>> idMapNameMapValue = entityMapIdMapNameMapValue.get(entityName);
+		if (idMapNameMapValue == null) {
+			idMapNameMapValue = new HashMap<String, Map<String, Map<String, Object>>>();
+			entityMapIdMapNameMapValue.put(entityName, idMapNameMapValue);
+		}
+
+		Map<String, Map<String, Object>> nameMapValue = idMapNameMapValue.get(id);
+		if (nameMapValue == null) {
+			nameMapValue = new HashMap<String, Map<String, Object>>();
+			for (Map<String, Object> value : (List<Map<String, Object>>) BeanService.ME.list("JLocale", null, 0, 0, "o.entity", entityName, "o.id", id)) {
+				nameMapValue.put((String) value.get("name"), value);
+			}
+
+			idMapNameMapValue.put(id, nameMapValue);
+		}
+
+		return nameMapValue;
+	}
 
 	/**
-	 * @param langBase
-	 * @param value
+	 * @param entityName
 	 */
-	public static void setLangEntity(ILangBase langBase, String value) {
-		String[] langs = value.split(",", 3);
-		if (langs.length == 3) {
-			langBase.setLang(langs[0], DynaBinder.to(langs[1], int.class), langs[2]);
-		}
+	public static void clearLangNameMapValue(String entityName) {
+		entityMapIdMapNameMapValue.remove(entityName);
 	}
 
 	/**
@@ -133,24 +156,30 @@ public class LangBundleImpl extends LangBundle implements IMethodEntry<Entry<Str
 	 * @author absir
 	 *
 	 */
-	protected static class LangIterceptor implements AopInterceptor<Entry<String, Class<?>>>, ILangBase, ICrudBean {
+	protected static class LangIterceptor implements AopInterceptor<Entry<String, Class<?>>> {
 
 		/** entityName */
 		private String entityName;
 
-		/** primary */
-		private String primary;
+		/** id */
+		private String id;
 
 		/** langInterceptors */
 		private Map<Method, Entry<String, Class<?>>> langInterceptors;
+
+		/** nameMapValue */
+		private Map<String, Map<String, Object>> nameMapValue;
+
+		/** nameLocaleMapValue */
+		private Map<JEmbedSL, Object> nameLocaleMapValue;
 
 		/**
 		 * @param entityName
 		 * @param langInterceptors
 		 */
-		public LangIterceptor(String entityName, String primary, Map<Method, Entry<String, Class<?>>> langInterceptors) {
+		public LangIterceptor(String entityName, String id, Map<Method, Entry<String, Class<?>>> langInterceptors) {
 			this.entityName = entityName;
-			this.primary = primary;
+			this.id = id;
 			this.langInterceptors = langInterceptors;
 		}
 
@@ -219,52 +248,93 @@ public class LangBundleImpl extends LangBundle implements IMethodEntry<Entry<Str
 			return returnValue;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see com.absir.appserv.lang.ILangBase#getLang(java.lang.String,
-		 * java.lang.Integer, java.lang.Class)
+		/**
+		 * @return the nameMapValue
 		 */
-		@Override
-		public <T> T getLang(String fieldName, Integer locale, Class<T> type) {
-			// TODO Auto-generated method stub
-			return null;
+		public Map<String, Map<String, Object>> getNameMapValue() {
+			if (nameMapValue == null) {
+				nameMapValue = getLangNameMapValue(entityName, id);
+			}
+
+			return nameMapValue;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see com.absir.appserv.lang.ILangBase#setLang(java.lang.String,
-		 * java.lang.Integer, java.lang.Object)
+		/**
+		 * @param nameMapValue
+		 *            the nameMapValue to set
 		 */
-		@Override
-		public void setLang(String fieldName, Integer locale, Object value) {
-			// TODO Auto-generated method stub
-
+		public void setNameMapValue(Map<String, Map<String, Object>> nameMapValue) {
+			this.nameMapValue = nameMapValue;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see com.absir.appserv.lang.ILangBase#setLangEntity(java.lang.String)
+		/**
+		 * @param fieldName
+		 * @param locale
+		 * @param type
+		 * @return
 		 */
-		@Override
-		public void setLangEntity(String value) {
+		public Object getLang(String fieldName, Integer locale, Class<?> type) {
 			// TODO Auto-generated method stub
+			if (ME.isLocaleCode(locale)) {
+				return AopProxyHandler.VOID;
+			}
 
+			Object value = null;
+			if (nameLocaleMapValue == null) {
+				value = DynaBinderUtils.getMapValue(nameLocaleMapValue, new JEmbedSL(fieldName, (long) locale), type);
+				if (value != null) {
+					return value;
+				}
+			}
+
+			Map<String, Object> valueLocale = getNameMapValue().get(fieldName);
+			if (valueLocale != null) {
+				value = DynaBinderUtils.getMapValue(valueLocale, "_" + locale, type);
+			}
+
+			return value == null ? AopProxyHandler.VOID : value;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * com.absir.appserv.crud.value.ICrudBean#proccessCrud(com.absir.appserv
-		 * .system.bean.value.JaCrud.Crud)
+		/**
+		 * @param fieldName
+		 * @param locale
+		 * @param value
+		 * @return
 		 */
-		@Override
+		public Object setLang(String fieldName, Integer locale, Object value) {
+			// TODO Auto-generated method stub
+			if (ME.isLocaleCode(locale)) {
+				return AopProxyHandler.VOID;
+
+			} else {
+				if (nameLocaleMapValue == null) {
+					nameLocaleMapValue = new HashMap<JEmbedSL, Object>();
+				}
+
+				nameLocaleMapValue.put(new JEmbedSL(fieldName, (long) locale), value);
+				return null;
+			}
+		}
+
+		/**
+		 * @param values
+		 */
+		public void setLangValues(String[] values) {
+			// TODO Auto-generated method stub
+			for (String value : values) {
+				String[] langs = value.split(",", 3);
+				if (langs.length == 3) {
+					setLang(langs[0], DynaBinder.to(langs[1], Integer.class), langs[2]);
+				}
+			}
+		}
+
+		/**
+		 * @param crud
+		 */
 		public void proccessCrud(Crud crud) {
 			// TODO Auto-generated method stub
-
+			
 		}
 	}
 
@@ -303,8 +373,7 @@ public class LangBundleImpl extends LangBundle implements IMethodEntry<Entry<Str
 					@Override
 					public Object invoke(LangIterceptor iterceptor, Object entity, Object[] args) {
 						// TODO Auto-generated method stub
-						iterceptor.setLang((String) args[0], (Integer) args[1], args[2]);
-						return null;
+						return iterceptor.setLang((String) args[0], (Integer) args[1], args[2]);
 					}
 
 					@Override
@@ -315,8 +384,14 @@ public class LangBundleImpl extends LangBundle implements IMethodEntry<Entry<Str
 							@Override
 							public Object invoke(LangIterceptor iterceptor, Object entity, Object[] args) {
 								// TODO Auto-generated method stub
-								((ILangBase) entity).setLang((String) args[0], (Integer) args[1], args[2]);
-								return null;
+								Integer locale = (Integer) args[1];
+								if (ME.isLocaleCode(locale)) {
+									return AopProxyHandler.VOID;
+
+								} else {
+									((ILangBase) entity).setLang((String) args[0], (Integer) args[1], args[2]);
+									return null;
+								}
 							}
 						};
 					}
@@ -328,7 +403,7 @@ public class LangBundleImpl extends LangBundle implements IMethodEntry<Entry<Str
 					@Override
 					public Object invoke(LangIterceptor iterceptor, Object entity, Object[] args) {
 						// TODO Auto-generated method stub
-						iterceptor.setLangEntity((String) args[0]);
+						iterceptor.setLangValues((String[]) args[0]);
 						return null;
 					}
 
@@ -340,7 +415,7 @@ public class LangBundleImpl extends LangBundle implements IMethodEntry<Entry<Str
 							@Override
 							public Object invoke(LangIterceptor iterceptor, Object entity, Object[] args) {
 								// TODO Auto-generated method stub
-								((ILangBase) entity).setLangEntity((String) args[0]);
+								((ILangBase) entity).setLangValues((String[]) args[0]);
 								return null;
 							}
 						};
@@ -477,12 +552,12 @@ public class LangBundleImpl extends LangBundle implements IMethodEntry<Entry<Str
 
 	/**
 	 * @param entityName
-	 * @param primary
+	 * @param id
 	 * @param langInterceptors
 	 * @return
 	 */
-	protected LangIterceptor getLangIterceptor(String entityName, String primary, Map<Method, Entry<String, Class<?>>> langInterceptors) {
-		return new LangIterceptor(entityName, primary, langInterceptors);
+	protected LangIterceptor getLangIterceptor(String entityName, String id, Map<Method, Entry<String, Class<?>>> langInterceptors) {
+		return new LangIterceptor(entityName, id, langInterceptors);
 	}
 
 	/*

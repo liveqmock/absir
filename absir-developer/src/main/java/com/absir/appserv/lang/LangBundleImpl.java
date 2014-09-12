@@ -42,6 +42,7 @@ import com.absir.core.base.IBase;
 import com.absir.core.dyna.DynaBinder;
 import com.absir.core.kernel.KernelLang;
 import com.absir.core.kernel.KernelLang.ObjectEntry;
+import com.absir.core.kernel.KernelReflect;
 import com.absir.core.kernel.KernelString;
 import com.absir.server.on.OnPut;
 
@@ -330,11 +331,34 @@ public class LangBundleImpl extends LangBundle implements IMethodEntry<Entry<Str
 		}
 
 		/**
+		 * @param entity
 		 * @param crud
 		 */
-		public void proccessCrud(Crud crud) {
+		public void proccessCrud(Object entity, Crud crud) {
 			// TODO Auto-generated method stub
-			
+			if (crud == Crud.CREATE || crud == Crud.UPDATE) {
+				if (nameMapValue == null && crud == Crud.CREATE) {
+					getNameMapValue();
+				}
+
+				Map<String, Map<String, Object>> mapValue = new HashMap<String, Map<String, Object>>();
+				if (nameMapValue != null) {
+					for (Entry<Method, Entry<String, Class<?>>> methodEntry : langInterceptors.entrySet()) {
+						Entry<String, Class<?>> entry = methodEntry.getValue();
+						if (!nameMapValue.containsKey(entry.getKey())) {
+							Map<String, Object> value = new HashMap<String, Object>();
+							value.put("entityName", entityName);
+							value.put("id", id);
+							value.put("name", entry.getKey());
+							value.put("_" + ME.getLocaleCode(), DynaBinderUtils.to(KernelReflect.invoke(entity, methodEntry.getKey()), String.class));
+						}
+					}
+				}
+
+				if (!mapValue.isEmpty()) {
+					BeanService.ME.mergers(mapValue.values());
+				}
+			}
 		}
 	}
 
@@ -436,7 +460,7 @@ public class LangBundleImpl extends LangBundle implements IMethodEntry<Entry<Str
 					@Override
 					public Object invoke(LangIterceptor iterceptor, Object entity, Object[] args) {
 						// TODO Auto-generated method stub
-						iterceptor.proccessCrud((Crud) args[0]);
+						iterceptor.proccessCrud(entity, (Crud) args[0]);
 						return null;
 					}
 

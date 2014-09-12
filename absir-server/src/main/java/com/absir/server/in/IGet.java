@@ -7,8 +7,6 @@
  */
 package com.absir.server.in;
 
-import java.util.Locale;
-
 /**
  * @author absir
  *
@@ -19,5 +17,5 @@ public interface IGet {
 	 * @param input
 	 * @return
 	 */
-	public Locale getLocale(Input input);
+	public Integer getLocaleCode(Input input);
 }

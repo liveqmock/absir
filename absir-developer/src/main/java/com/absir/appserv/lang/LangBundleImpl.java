@@ -12,6 +12,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -65,6 +66,9 @@ public class LangBundleImpl extends LangBundle implements IMethodEntry<Entry<Str
 
 	/** entityClassMapLangInterceptors */
 	private Map<Class<?>, Map<Method, Entry<String, Class<?>>>> entityClassMapLangInterceptors = new HashMap<Class<?>, Map<Method, Entry<String, Class<?>>>>();
+
+	/** entityMapNameMapValue */
+	private Map<String, Map<String, Map<String, Object>>> entityMapNameMapValue = new HashMap<String, Map<String, Map<String, Object>>>();
 
 	/**
 	 * @param langBase
@@ -424,6 +428,51 @@ public class LangBundleImpl extends LangBundle implements IMethodEntry<Entry<Str
 		}
 
 		return entity;
+	}
+
+	/**
+	 * @param entityName
+	 * @param entity
+	 * @return
+	 */
+	public <T> Iterator<T> getLangProxy(final String entityName, final Iterator<T> entityIterator) {
+		if (isI18n()) {
+			return new Iterator<T>() {
+
+				@Override
+				public boolean hasNext() {
+					// TODO Auto-generated method stub
+					return entityIterator.hasNext();
+				}
+
+				@Override
+				public T next() {
+					// TODO Auto-generated method stub
+					return getLangProxy(entityName, entityIterator.next());
+				}
+
+				@Override
+				public void remove() {
+					// TODO Auto-generated method stub
+					entityIterator.remove();
+				}
+			};
+		}
+
+		return entityIterator;
+	}
+
+	/**
+	 * @param entityName
+	 * @param entities
+	 * @return
+	 */
+	public <T> List<T> getLangProxy(final String entityName, List<T> entities) {
+		if (isI18n() && !entities.isEmpty()) {
+
+		}
+
+		return entities;
 	}
 
 	/**

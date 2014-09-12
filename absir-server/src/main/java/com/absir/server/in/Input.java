@@ -81,28 +81,10 @@ public abstract class Input extends Bean<Serializable> implements IAttributes {
 	 */
 	public Locale getLocale() {
 		if (locale == null) {
-			if (GET != null) {
-				locale = GET.getLocale(this);
-			}
-
-			if (locale == null) {
-				locale = LangBundle.ME.getLocale();
-			}
+			locale = LangBundle.ME.getLocale(getLocalCode());
 		}
 
 		return locale;
-	}
-
-	/**
-	 * @param locale
-	 *            the locale to set
-	 */
-	public void setLocale(Locale value) {
-		if (value != locale) {
-			locale = value;
-			localCode = null;
-			resourceBundle = null;
-		}
 	}
 
 	/**
@@ -110,10 +92,25 @@ public abstract class Input extends Bean<Serializable> implements IAttributes {
 	 */
 	public Integer getLocalCode() {
 		if (localCode == null) {
-			localCode = LangBundle.ME.getLocaleCode(getLocale());
+			localCode = GET.getLocaleCode(this);
+			if (localCode == null) {
+				localCode = 0;
+			}
 		}
 
 		return localCode;
+	}
+
+	/**
+	 * @param code
+	 */
+	public void setLocaleCode(Integer code) {
+		locale = LangBundle.ME.getLocale(code);
+		if (locale == LangBundle.ME.getLocale()) {
+			code = 0;
+		}
+
+		localCode = code;
 	}
 
 	/**

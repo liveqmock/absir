@@ -7,7 +7,6 @@
  */
 package com.absir.appserv.system.service;
 
-import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.ServletRequest;
@@ -340,10 +339,10 @@ public abstract class SecurityService implements ISecurityService, ISecurity, IG
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.absir.server.in.IGet#getLocale(com.absir.server.in.Input)
+	 * @see com.absir.server.in.IGet#getLocaleCode(com.absir.server.in.Input)
 	 */
 	@Override
-	public Locale getLocale(Input input) {
+	public Integer getLocaleCode(Input input) {
 		// TODO Auto-generated method stub
 		Integer locale = getSession("locale", Integer.class, input);
 		if (locale == null && input instanceof InputRequest) {
@@ -353,6 +352,6 @@ public abstract class SecurityService implements ISecurityService, ISecurity, IG
 			}
 		}
 
-		return LangBundle.ME.getLocale(locale);
+		return locale;
 	}
 }

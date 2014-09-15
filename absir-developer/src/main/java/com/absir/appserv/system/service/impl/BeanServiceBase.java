@@ -438,6 +438,32 @@ public class BeanServiceBase implements BeanService, ICrudSupply {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see
+	 * com.absir.appserv.system.service.BeanService#selectQuery(java.lang.String
+	 * , java.lang.Object[])
+	 */
+	@Override
+	public List selectQuery(String queryString, Object... parameters) {
+		// TODO Auto-generated method stub
+		return QueryDaoUtils.createQueryArray(getSession(), queryString, parameters).list();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.system.service.BeanService#excute(java.lang.String,
+	 * java.lang.Object[])
+	 */
+	@Override
+	public int executeUpdate(String queryString, Object... parameters) {
+		// TODO Auto-generated method stub
+		return QueryDaoUtils.createQueryArray(getSession(), queryString, parameters).executeUpdate();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.absir.appserv.crud.ICrudSupply#getEntityNameMapClass()
 	 */
 	@Override

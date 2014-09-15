@@ -22,6 +22,7 @@ import javax.persistence.OneToOne;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.cfg.AnnotatedClassType;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.metadata.ClassMetadata;
 
@@ -51,11 +52,29 @@ public abstract class SessionFactoryUtils {
 	/** sessionFactoryBean */
 	private static SessionFactoryBean sessionFactoryBean = BeanFactoryUtils.get(SessionFactoryBean.class);
 
+	/** classTypes */
+	private static Map<Class<?>, AnnotatedClassType> classTypes = new HashMap<Class<?>, AnnotatedClassType>();
+
 	/**
 	 * @return the sessionFactoryBean
 	 */
 	public static SessionFactoryBean get() {
 		return sessionFactoryBean;
+	}
+
+	/**
+	 * @return the classTypes
+	 */
+	public static Map<Class<?>, AnnotatedClassType> getClassTypes() {
+		return classTypes;
+	}
+
+	/**
+	 * @param classTypes
+	 *            the classTypes to set
+	 */
+	protected static void setClassTypes(Map<Class<?>, AnnotatedClassType> classTypes) {
+		SessionFactoryUtils.classTypes = classTypes;
 	}
 
 	/**

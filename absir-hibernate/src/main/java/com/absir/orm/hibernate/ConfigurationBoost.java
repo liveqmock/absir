@@ -13,6 +13,7 @@ import java.util.Properties;
 
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
+import org.hibernate.cfg.AnnotatedClassType;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Settings;
 import org.hibernate.cfg.SettingsFactory;
@@ -30,7 +31,7 @@ import com.absir.core.kernel.KernelObject;
  * @author absir
  * 
  */
-@SuppressWarnings("serial")
+@SuppressWarnings({ "serial", "unchecked" })
 public class ConfigurationBoost extends Configuration {
 
 	/** sessionFactoryBoost */
@@ -130,6 +131,7 @@ public class ConfigurationBoost extends Configuration {
 	public SessionFactory buildSessionFactory(ServiceRegistry serviceRegistry) throws HibernateException {
 		SessionFactory sessionFactory = super.buildSessionFactory(serviceRegistry);
 		sessionFactoryBoost.afterBuildConfiguration(this, (SessionFactoryImpl) sessionFactory);
+		SessionFactoryUtils.getClassTypes().putAll((Map<? extends Class<?>, ? extends AnnotatedClassType>) KernelObject.declaredGet(this, "classTypes"));
 		return sessionFactory;
 	}
 }

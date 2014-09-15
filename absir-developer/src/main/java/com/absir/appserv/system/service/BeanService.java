@@ -278,4 +278,20 @@ public interface BeanService {
 	 */
 	@Transaction
 	public void mergers(String entityName, Collection<?> entities);
+
+	/**
+	 * @param queryString
+	 * @param parameters
+	 * @return
+	 */
+	@Transaction(readOnly = true)
+	public List selectQuery(String queryString, Object... parameters);
+
+	/**
+	 * @param queryString
+	 * @param parameters
+	 * @return
+	 */
+	@Transaction
+	public int executeUpdate(String queryString, Object... parameters);
 }

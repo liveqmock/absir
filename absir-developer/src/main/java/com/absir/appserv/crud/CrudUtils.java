@@ -26,6 +26,7 @@ import com.absir.bean.basis.Configure;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.core.kernel.KernelArray;
 import com.absir.core.kernel.KernelLang;
+import com.absir.core.kernel.KernelLang.ObjectEntry;
 import com.absir.core.kernel.KernelLang.PropertyFilter;
 import com.absir.core.util.UtilAccessor;
 import com.absir.core.util.UtilAccessor.Accessor;
@@ -48,6 +49,60 @@ public abstract class CrudUtils {
 
 	/** Jo_Entity_Map_Crud_Fields */
 	private static final Map<String, String[]> Jo_Entity_Map_Crud_Fields = new HashMap<String, String[]>();
+
+	/**
+	 * @param joEntity
+	 * @param entity
+	 * @param filter
+	 * @return
+	 */
+	public static Map<String, Object> crudRecord(JoEntity joEntity, Object entity, PropertyFilter filter) {
+		if (entity == null) {
+			return null;
+		}
+
+		CrudEntity crudEntity = getCrudEntity(joEntity);
+		if (crudEntity == null) {
+			return null;
+		}
+
+		Map<String, Object> record = new HashMap<String, Object>();
+
+		return record;
+	}
+
+	/**
+	 * @param entity
+	 * @param crudEntity
+	 * @param filterRecord
+	 */
+	protected static void crudRecord(Object entity, CrudEntity crudEntity, ObjectEntry<PropertyFilter, Map<String, Object>> filterRecord) {
+		if (crudEntity != null) {
+			PropertyFilter filter = filterRecord.getKey();
+			Map<String, Object> record = filterRecord.getValue();
+			String propertyPath = filter.getPropertyPath();
+			Iterator<CrudPropertyReference> rIterator = crudEntity.getCrudPropertyReferencesIterator();
+			if (rIterator != null) {
+				while (rIterator.hasNext()) {
+					CrudPropertyReference crudPropertyReference = rIterator.next();
+					if (filterRecord.getKey().isMatchPath(propertyPath, crudPropertyReference.getCrudProperty().getName())) {
+						record.put(filter.getPropertyPath(), crudPropertyReference.getCrudProperty().get(entity));
+						crudRecord(entity, crudEntity, filterRecord);
+					}
+				}
+			}
+
+			Iterator<CrudProperty> pIterator = crudEntity.getCrudPropertiesIterator();
+			if (pIterator != null) {
+				while (pIterator.hasNext()) {
+					CrudProperty crudProperty = pIterator.next();
+					if (filter.isMatchPath(propertyPath, crudProperty.getName())) {
+						record.put(filter.getPropertyPath(), crudProperty.get(entity));
+					}
+				}
+			}
+		}
+	}
 
 	/**
 	 * @param crud
@@ -98,12 +153,13 @@ public abstract class CrudUtils {
 	 */
 	protected static void crud(Object entity, CrudEntity crudEntity, CrudInvoker crudInvoker) {
 		if (crudEntity != null) {
-			String propertyPath = crudInvoker.filter.getPropertyPath();
+			PropertyFilter filter = crudInvoker.filter;
+			String propertyPath = filter.getPropertyPath();
 			Iterator<CrudPropertyReference> rIterator = crudEntity.getCrudPropertyReferencesIterator();
 			if (rIterator != null) {
 				while (rIterator.hasNext()) {
 					CrudPropertyReference crudPropertyReference = rIterator.next();
-					if (crudInvoker.filter.isMatchPath(propertyPath, crudPropertyReference.getCrudProperty().getName())) {
+					if (filter.isMatchPath(propertyPath, crudPropertyReference.getCrudProperty().getName())) {
 						crudPropertyReference.crud(entity, crudInvoker);
 					}
 				}
@@ -113,8 +169,7 @@ public abstract class CrudUtils {
 			if (pIterator != null) {
 				while (pIterator.hasNext()) {
 					CrudProperty crudProperty = pIterator.next();
-					if (crudInvoker.isSupport(crudProperty) && KernelArray.contain(crudProperty.getjCrud().getCruds(), crudInvoker.crud)
-							&& crudInvoker.filter.isMatchPath(propertyPath, crudProperty.getName())) {
+					if (crudInvoker.isSupport(crudProperty) && KernelArray.contain(crudProperty.getjCrud().getCruds(), crudInvoker.crud) && filter.isMatchPath(propertyPath, crudProperty.getName())) {
 						crudInvoker.crudInvoke(crudProperty, entity);
 					}
 				}
@@ -445,6 +500,22 @@ public abstract class CrudUtils {
 		}
 
 		return crudEntity;
+	}
+
+	/**
+	 * @param joEntity
+	 * @param name
+	 * @return
+	 */
+	public static CrudPropertyReference getCrudPropertyReference(JoEntity joEntity, String name) {
+		CrudEntity crudEntity = getCrudEntity(joEntity);
+		for (CrudPropertyReference crudPropertyReference : crudEntity.crudPropertyReferences) {
+			if (crudPropertyReference.getCrudProperty().getName().equals(name)) {
+				return crudPropertyReference;
+			}
+		}
+
+		return null;
 	}
 
 	/**

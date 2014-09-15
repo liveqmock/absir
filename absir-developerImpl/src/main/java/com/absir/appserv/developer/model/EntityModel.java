@@ -19,6 +19,8 @@ import com.absir.appserv.support.developer.IModel;
 import com.absir.appserv.support.developer.JCrud;
 import com.absir.appserv.system.bean.value.JaCrud;
 import com.absir.appserv.system.bean.value.JaEdit;
+import com.absir.appserv.system.crud.BeanCrudFactory;
+import com.absir.core.kernel.KernelLang;
 import com.absir.core.kernel.KernelList;
 import com.absir.orm.value.JoEntity;
 
@@ -139,6 +141,20 @@ public class EntityModel implements IModel {
 		}
 
 		jCruds.add(new JCrud(jaCrud));
+	}
+
+	/** beanJaCruded */
+	private boolean beanJaCruded;
+
+	/**
+	 * 
+	 */
+	public void addBeanJaCrud() {
+		if (!beanJaCruded) {
+			beanJaCruded = true;
+			JCrud beanCrud = new JCrud();
+			beanCrud.setJaCrud(null, BeanCrudFactory.class, KernelLang.NULL_OBJECTS, JaCrud.ALL);
+		}
 	}
 
 	/**

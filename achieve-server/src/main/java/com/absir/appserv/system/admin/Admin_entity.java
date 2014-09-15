@@ -9,7 +9,9 @@ package com.absir.appserv.system.admin;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -39,7 +41,6 @@ import com.absir.binder.BinderData;
 import com.absir.binder.BinderResult;
 import com.absir.binder.BinderUtils;
 import com.absir.core.kernel.KernelLang.PropertyFilter;
-import com.absir.core.util.UtilAccessor;
 import com.absir.orm.value.JoEntity;
 import com.absir.server.exception.ServerException;
 import com.absir.server.exception.ServerStatus;
@@ -256,17 +257,20 @@ public class Admin_entity extends AdminServer {
 			crudSupply.evict(entity);
 		}
 
-		String[] subtables = input.getParams("!subtables");
-		if (subtables != null) {
-			for (String subtable : subtables) {
-				UtilAccessor.set(entity, subtable, null);
-			}
-		}
-
 		BinderData binderData = input.getBinderData();
 		BinderResult binderResult = binderData.getBinderResult();
-		binderResult.setValidation(true);
 		binderResult.setPropertyFilter(filter);
+		String[] subtables = input.getParams("!subtables");
+		if (subtables != null) {
+			Map<String, Object> subtableMap = new HashMap<String, Object>();
+			for (String subtable : subtables) {
+				subtableMap.put(subtable, null);
+			}
+
+			binderData.mapBind(subtableMap, entity);
+		}
+
+		binderResult.setValidation(true);
 		binderData.mapBind(BinderUtils.getDataMap(input.getParamMap()), entity);
 		JoEntity joEntity = (JoEntity) input.getAttribute("joEntity");
 		CrudContextUtils.crud(id == null ? Crud.CREATE : Crud.UPDATE, joEntity, entity, user, filter, binderResult, input);

@@ -34,6 +34,7 @@ import javax.persistence.Transient;
 import com.absir.appserv.crud.ICrudSupply;
 import com.absir.appserv.developer.editor.EditorObject;
 import com.absir.appserv.developer.editor.EditorSupply;
+import com.absir.appserv.lang.value.Langs;
 import com.absir.appserv.support.developer.IField;
 import com.absir.appserv.support.developer.JCrud;
 import com.absir.appserv.system.bean.value.JaCrud;
@@ -46,6 +47,7 @@ import com.absir.appserv.system.helper.HelperLang;
 import com.absir.appserv.system.helper.HelperString;
 import com.absir.appserv.system.service.CrudService;
 import com.absir.binder.BinderUtils;
+import com.absir.context.lang.LangBundle;
 import com.absir.core.base.IBase;
 import com.absir.core.dyna.DynaBinder;
 import com.absir.core.kernel.KernelArray;
@@ -566,6 +568,10 @@ public class EntityField extends DBField {
 						entityField.editable = JeEditable.LOCKED;
 						entityModel.addGroupField("none", entityField);
 					}
+				}
+
+				if (LangBundle.ME.isI18n() && property.getAccessor().getAnnotation(Langs.class, true) != null) {
+					entityModel.addBeanJaCrud();
 				}
 			}
 		}

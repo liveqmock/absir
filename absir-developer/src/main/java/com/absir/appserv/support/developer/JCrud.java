@@ -37,7 +37,6 @@ public class JCrud implements Serializable {
 	 * 
 	 */
 	public JCrud() {
-
 	}
 
 	/**
@@ -52,11 +51,21 @@ public class JCrud implements Serializable {
 	 */
 	public void setJaCrud(JaCrud crud) {
 		if (crud != null) {
-			value = crud.value();
-			factory = crud.factory();
-			parameters = KernelArray.toArray(crud.parameters());
-			cruds = crud.cruds();
+			setJaCrud(crud.value(), crud.factory(), KernelArray.toArray(crud.parameters()), crud.cruds());
 		}
+	}
+
+	/**
+	 * @param value
+	 * @param factory
+	 * @param parameters
+	 * @param cruds
+	 */
+	public void setJaCrud(String value, Class<?> factory, Object[] parameters, JaCrud.Crud[] cruds) {
+		this.value = value;
+		this.factory = factory;
+		this.parameters = parameters;
+		this.cruds = cruds;
 	}
 
 	/**

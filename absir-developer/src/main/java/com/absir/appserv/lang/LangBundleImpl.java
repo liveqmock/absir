@@ -41,6 +41,7 @@ import com.absir.bean.inject.value.Stopping;
 import com.absir.context.lang.LangBundle;
 import com.absir.core.base.IBase;
 import com.absir.core.dyna.DynaBinder;
+import com.absir.core.kernel.KernelClass;
 import com.absir.core.kernel.KernelLang;
 import com.absir.core.kernel.KernelLang.ObjectEntry;
 import com.absir.core.kernel.KernelReflect;
@@ -100,6 +101,18 @@ public class LangBundleImpl extends LangBundle implements IMethodEntry<Entry<Str
 		}
 
 		return nameMapValue;
+	}
+
+	/**
+	 * @param entityName
+	 * @param id
+	 */
+	protected static void deleteLangMapValue(String entityName, String id) {
+		BeanService.ME.executeUpdate("DELETE FROM JLocale o WHERE o.entity = ?, o.id = ?", entityName, id);
+		Map<String, Map<String, Map<String, Object>>> idMapNameMapValue = entityMapIdMapNameMapValue.get(entityName);
+		if (idMapNameMapValue != null) {
+			idMapNameMapValue.remove(id);
+		}
 	}
 
 	/**
@@ -403,7 +416,7 @@ public class LangBundleImpl extends LangBundle implements IMethodEntry<Entry<Str
 				}
 
 			} else if (crud == Crud.DELETE) {
-				BeanService.ME.executeUpdate("DELETE FROM JLocale o WHERE o.entity = ?, o.id = ?", entityName, id);
+				deleteLangMapValue(entityName, id);
 			}
 		}
 	}
@@ -533,6 +546,21 @@ public class LangBundleImpl extends LangBundle implements IMethodEntry<Entry<Str
 			}
 		}
 
+		methodLangEmbededs.add(new LangEmbeded() {
+
+			@Override
+			public Object invoke(LangIterceptor iterceptor, Object entity, Method method, Object[] args) {
+				// TODO Auto-generated method stub
+
+				return null;
+			}
+
+			@Override
+			public Class<?> componentType(Method method) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+		});
 	}
 
 	/**
@@ -661,8 +689,15 @@ public class LangBundleImpl extends LangBundle implements IMethodEntry<Entry<Str
 		// TODO Auto-generated method stub
 		LangEntryImpl langEntryImpl = methodMapLangEntryImpl.get(method);
 		if (langEntryImpl == null) {
-			if (method.getParameterTypes().length == 0 && method.getName().startsWith("get") && method.getAnnotation(Langs.class) != null) {
-				return new ObjectEntry<String, Class<?>>(KernelString.unCapitalize(method.getName().substring(3)), method.getReturnType());
+			if (method.getParameterTypes().length == 0 && method.getName().startsWith("get")) {
+				if (method.getAnnotation(Langs.class) != null) {
+					return new ObjectEntry<String, Class<?>>(KernelString.unCapitalize(method.getName().substring(3)), method.getReturnType());
+				}
+
+				if (!KernelClass.isBasicClass(method.getReturnType())) {
+					// CrudPropertyReference crudPropertyReference =
+					// CrudUtils.getCrudPropertyReference(joEntity, name);
+				}
 			}
 
 		} else {

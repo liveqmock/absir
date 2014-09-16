@@ -250,18 +250,57 @@ public class BeanConfigImpl implements BeanConfig {
 			try {
 				HelperFile.doWithReadLine(propertyFile, new CallbackBreak<String>() {
 
+					/** blockBuilder */
+					private StringBuilder blockBuilder;
+
+					/** blockAppending */
+					private int blockAppending;
+
 					@Override
 					public void doWith(String template) throws BreakException {
 						// TODO Auto-generated method stub
 						int length = template.length();
-						if (length <= 2 || template.charAt(0) == '#') {
+						if (length < 1) {
+							return;
+						}
+
+						char chr = template.charAt(0);
+						if (blockBuilder == null) {
+							if (chr == '#') {
+								return;
+
+							} else if (chr == '{') {
+								blockBuilder = new StringBuilder();
+								blockAppending = 1;
+								return;
+							}
+
+						} else if (blockAppending > 0) {
+							if (chr == '}' && template.trim().length() == 1) {
+								blockAppending = 0;
+
+							} else {
+								if (blockAppending > 1) {
+									blockBuilder.append("\r\n");
+
+								} else {
+									blockAppending = 2;
+								}
+
+								blockBuilder.append(beanConfig == null ? template : beanConfig.getExpression(template));
+							}
+
+							return;
+						}
+
+						if (length < 3) {
 							return;
 						}
 
 						int index = template.indexOf('=');
 						if (index > 0 && index < length) {
-							char chr = template.charAt(index - 1);
 							String name;
+							chr = template.charAt(index - 1);
 							if (chr == '.' || chr == '#' || chr == '+') {
 								if (index < 1) {
 									return;
@@ -281,6 +320,18 @@ public class BeanConfigImpl implements BeanConfig {
 
 							template = template.substring(index + 1);
 							if (beanConfig == null) {
+								template = KernelString.unTransferred(template);
+								if (blockBuilder != null) {
+									if (template.length() > 0) {
+										blockBuilder.append("\r\n");
+										blockBuilder.append(template);
+									}
+
+									template = blockBuilder.toString();
+									blockBuilder = null;
+									blockAppending = 0;
+								}
+
 								configMap.put(name, template);
 
 							} else {
@@ -310,6 +361,19 @@ public class BeanConfigImpl implements BeanConfig {
 
 								if (environments == null || KernelArray.contain(environments, beanConfig.getEnvironment().name())) {
 									template = beanConfig.getExpression(KernelString.unTransferred(template));
+									if (blockBuilder != null) {
+										if (template.length() > 0) {
+											if (template.length() > 0) {
+												blockBuilder.append("\r\n");
+												blockBuilder.append(template);
+											}
+										}
+
+										template = blockBuilder.toString();
+										blockBuilder = null;
+										blockAppending = 0;
+									}
+
 									CallbackTemplate<String> callbackTemplate = chr == 0 ? beanConfigTemplates == null ? null : beanConfigTemplates.get(name) : null;
 									if (callbackTemplate == null) {
 										Object value = template;
@@ -348,6 +412,10 @@ public class BeanConfigImpl implements BeanConfig {
 									} else {
 										callbackTemplate.doWith(template);
 									}
+
+								} else if (blockBuilder != null) {
+									blockBuilder = null;
+									blockAppending = 0;
 								}
 							}
 						}

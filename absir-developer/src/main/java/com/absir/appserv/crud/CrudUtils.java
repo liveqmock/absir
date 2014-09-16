@@ -525,9 +525,11 @@ public abstract class CrudUtils {
 	 */
 	public static CrudPropertyReference getCrudPropertyReference(JoEntity joEntity, String name) {
 		CrudEntity crudEntity = getCrudEntity(joEntity);
-		for (CrudPropertyReference crudPropertyReference : crudEntity.crudPropertyReferences) {
-			if (crudPropertyReference.getCrudProperty().getName().equals(name)) {
-				return crudPropertyReference;
+		if (crudEntity.crudPropertyReferences != null) {
+			for (CrudPropertyReference crudPropertyReference : crudEntity.crudPropertyReferences) {
+				if (crudPropertyReference.getCrudProperty().getName().equals(name)) {
+					return crudPropertyReference;
+				}
 			}
 		}
 

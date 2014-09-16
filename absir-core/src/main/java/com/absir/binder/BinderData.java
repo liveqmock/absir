@@ -13,8 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.absir.bean.basis.Configure;
-import com.absir.bean.inject.value.Inject;
+import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.core.dyna.DynaBinder;
 import com.absir.core.kernel.KernelDyna;
 import com.absir.core.kernel.KernelLang.BreakException;
@@ -29,16 +28,13 @@ import com.absir.validator.ValidatorSupply;
  * 
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
-@Configure
 public class BinderData extends DynaBinder {
 
 	/** binderSupply */
-	@Inject
-	protected static BinderSupply binderSupply;
+	protected static BinderSupply binderSupply = BeanFactoryUtils.get(BinderSupply.class);
 
 	/** validatorSupply */
-	@Inject
-	protected static ValidatorSupply validatorSupply;
+	protected static ValidatorSupply validatorSupply = BeanFactoryUtils.get(ValidatorSupply.class);
 
 	/** binderResult */
 	private BinderResult binderResult = new BinderResult();

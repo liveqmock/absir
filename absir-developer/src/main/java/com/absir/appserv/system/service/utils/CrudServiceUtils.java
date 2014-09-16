@@ -9,6 +9,7 @@ package com.absir.appserv.system.service.utils;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 import com.absir.appserv.crud.ICrudSupply;
 import com.absir.appserv.dyna.DynaBinderUtils;
@@ -91,13 +92,14 @@ public abstract class CrudServiceUtils {
 
 	/**
 	 * @param entityName
+	 * @param crudRecord
 	 * @param entity
 	 * @param create
-	 * @param filter
 	 * @param user
+	 * @param filter
 	 */
-	public static void merge(String entityName, Object entity, boolean create, JiUserBase user, PropertyFilter filter) {
-		CrudService.ME.merge(entityName, entity, CrudService.ME.getCrudSupply(entityName), create, user, filter);
+	public static void merge(String entityName, Map<String, Object> crudRecord, Object entity, boolean create, JiUserBase user, PropertyFilter filter) {
+		CrudService.ME.merge(entityName, crudRecord, entity, CrudService.ME.getCrudSupply(entityName), create, user, filter);
 	}
 
 	/**

@@ -7,6 +7,7 @@
  */
 package com.absir.appserv.crud;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -22,11 +23,11 @@ import com.absir.appserv.support.developer.IModel;
 import com.absir.appserv.support.developer.JCrudField;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.bean.value.JaCrud;
+import com.absir.appserv.system.bean.value.JaCrud.Crud;
 import com.absir.bean.basis.Configure;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.core.kernel.KernelArray;
 import com.absir.core.kernel.KernelLang;
-import com.absir.core.kernel.KernelLang.ObjectEntry;
 import com.absir.core.kernel.KernelLang.PropertyFilter;
 import com.absir.core.util.UtilAccessor;
 import com.absir.core.util.UtilAccessor.Accessor;
@@ -67,41 +68,27 @@ public abstract class CrudUtils {
 		}
 
 		Map<String, Object> record = new HashMap<String, Object>();
-
-		return record;
-	}
-
-	/**
-	 * @param entity
-	 * @param crudEntity
-	 * @param filterRecord
-	 */
-	protected static void crudRecord(Object entity, CrudEntity crudEntity, ObjectEntry<PropertyFilter, Map<String, Object>> filterRecord) {
-		if (crudEntity != null) {
-			PropertyFilter filter = filterRecord.getKey();
-			Map<String, Object> record = filterRecord.getValue();
-			String propertyPath = filter.getPropertyPath();
-			Iterator<CrudPropertyReference> rIterator = crudEntity.getCrudPropertyReferencesIterator();
-			if (rIterator != null) {
-				while (rIterator.hasNext()) {
-					CrudPropertyReference crudPropertyReference = rIterator.next();
-					if (filterRecord.getKey().isMatchPath(propertyPath, crudPropertyReference.getCrudProperty().getName())) {
-						record.put(filter.getPropertyPath(), crudPropertyReference.getCrudProperty().get(entity));
-						crudRecord(entity, crudEntity, filterRecord);
-					}
-				}
-			}
-
-			Iterator<CrudProperty> pIterator = crudEntity.getCrudPropertiesIterator();
-			if (pIterator != null) {
-				while (pIterator.hasNext()) {
-					CrudProperty crudProperty = pIterator.next();
-					if (filter.isMatchPath(propertyPath, crudProperty.getName())) {
-						record.put(filter.getPropertyPath(), crudProperty.get(entity));
-					}
+		String propertyPath = filter.getPropertyPath();
+		Iterator<CrudPropertyReference> rIterator = crudEntity.getCrudPropertyReferencesIterator();
+		if (rIterator != null) {
+			while (rIterator.hasNext()) {
+				CrudPropertyReference crudPropertyReference = rIterator.next();
+				if (filter.isMatchPath(propertyPath, crudPropertyReference.getCrudProperty().getName())) {
+					record.put(filter.getPropertyPath(), crudPropertyReference.getCrudProperty().get(entity));
 				}
 			}
 		}
+
+		Iterator<CrudProperty> pIterator = crudEntity.getCrudPropertiesIterator();
+		if (pIterator != null) {
+			while (pIterator.hasNext()) {
+				CrudProperty crudProperty = pIterator.next();
+				if (filter.isMatchPath(propertyPath, crudProperty.getName())) {
+					record.put(filter.getPropertyPath(), crudProperty.get(entity));
+				}
+			}
+		}
+		return record;
 	}
 
 	/**
@@ -112,7 +99,7 @@ public abstract class CrudUtils {
 	 * @param group
 	 * @param user
 	 */
-	public static void crud(JaCrud.Crud crud, JoEntity joEntity, Object entity, PropertyFilter filter, final JiUserBase user) {
+	public static void crud(JaCrud.Crud crud, Map<String, Object> crudRecord, JoEntity joEntity, Object entity, PropertyFilter filter, final JiUserBase user) {
 		CrudEntity crudEntity = getCrudEntity(joEntity);
 		if (crudEntity == null) {
 			return;
@@ -125,7 +112,7 @@ public abstract class CrudUtils {
 			filter = filter.newly();
 		}
 
-		crud(entity, crudEntity, new CrudInvoker(crud, filter, crudEntity, entity) {
+		crud(entity, crudEntity, new CrudInvoker(crud, crudRecord, filter, crudEntity, entity) {
 
 			@Override
 			public boolean isSupport(CrudProperty crudProperty) {
@@ -156,11 +143,26 @@ public abstract class CrudUtils {
 			PropertyFilter filter = crudInvoker.filter;
 			String propertyPath = filter.getPropertyPath();
 			Iterator<CrudPropertyReference> rIterator = crudEntity.getCrudPropertyReferencesIterator();
+			List<Object[]> updateRecords = null;
 			if (rIterator != null) {
 				while (rIterator.hasNext()) {
 					CrudPropertyReference crudPropertyReference = rIterator.next();
-					if (filter.isMatchPath(propertyPath, crudPropertyReference.getCrudProperty().getName())) {
+					CrudProperty crudProperty = crudPropertyReference.getCrudProperty();
+					if (filter.isMatchPath(propertyPath, crudProperty.getName())) {
 						crudPropertyReference.crud(entity, crudInvoker);
+						if (crudInvoker.crud == Crud.UPDATE && entity == crudInvoker.getRoot() && crudInvoker.getCrudRecord() != null) {
+							Object record = crudProperty.get(entity);
+							if (record != null) {
+								Object property = crudProperty.get(entity);
+								if (record != property) {
+									if (updateRecords == null) {
+										updateRecords = new ArrayList<Object[]>();
+									}
+
+									updateRecords.add(new Object[] { filter.getPropertyPath(), crudPropertyReference, record, property });
+								}
+							}
+						}
 					}
 				}
 			}
@@ -173,6 +175,20 @@ public abstract class CrudUtils {
 						crudInvoker.crudInvoke(crudProperty, entity);
 					}
 				}
+			}
+
+			if (updateRecords != null) {
+				crudInvoker.crud = Crud.DELETE;
+				for (Object[] update : updateRecords) {
+					crudInvoker.filter.setPropertyPath((String) update[0]);
+					CrudPropertyReference crudPropertyReference = (CrudPropertyReference) update[1];
+					CrudProperty crudProperty = crudPropertyReference.getCrudProperty();
+					crudProperty.set(entity, update[2]);
+					crudPropertyReference.crud(entity, crudInvoker);
+					crudProperty.set(entity, update[3]);
+				}
+
+				crudInvoker.crud = Crud.UPDATE;
 			}
 		}
 	}

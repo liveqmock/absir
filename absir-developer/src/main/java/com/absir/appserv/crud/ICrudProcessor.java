@@ -18,8 +18,8 @@ public interface ICrudProcessor {
 	/**
 	 * @param crudProperty
 	 * @param entity
-	 * @param crudHandler
+	 * @param handler
 	 * @param user
 	 */
-	public void crud(CrudProperty crudProperty, Object entity, CrudHandler crudHandler, JiUserBase user);
+	public void crud(CrudProperty crudProperty, Object entity, CrudHandler handler, JiUserBase user);
 }

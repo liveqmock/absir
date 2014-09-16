@@ -61,6 +61,9 @@ public class UploadCrudFactory implements ICrudFactory {
 	/** uploadPath */
 	private static String uploadPath;
 
+	/** RECORD */
+	public static final String RECORD = "UPLOAD@";
+
 	/** LOGGER */
 	private static final Logger LOGGER = LoggerFactory.getLogger(UploadCrudFactory.class);
 
@@ -250,10 +253,20 @@ public class UploadCrudFactory implements ICrudFactory {
 		@Override
 		public void crud(CrudProperty crudProperty, Object entity, CrudHandler handler, JiUserBase user, FileItem requestBody) {
 			// TODO Auto-generated method stub
-			if (requestBody != null) {
+			if (requestBody == null) {
+				if (handler.getCrudRecord() != null) {
+					String uploadFile = (String) crudProperty.get(entity);
+					if (KernelString.isEmpty(uploadFile)) {
+						handler.getCrudRecord().put(RECORD + uploadFile, Boolean.TRUE);
+					}
+				}
+
+			} else {
 				String uploadFile = (String) crudProperty.get(entity);
 				if (!KernelString.isEmpty(uploadFile)) {
-					HelperFile.deleteQuietly(new File(uploadPath + uploadFile));
+					if (handler.getCrudRecord() == null || !handler.getCrudRecord().containsKey(RECORD + uploadFile)) {
+						HelperFile.deleteQuietly(new File(uploadPath + uploadFile));
+					}
 				}
 
 				InputStream uploadStream = null;
@@ -286,7 +299,7 @@ public class UploadCrudFactory implements ICrudFactory {
 								if (id == null) {
 									JoEntity joEntity = handler.getCrudEntity().getJoEntity();
 									if (joEntity != null && joEntity.getEntityName() != null) {
-										CrudServiceUtils.merge(joEntity.getEntityName(), handler.getRoot(), handler.getCrud() == Crud.CREATE, user, null);
+										CrudServiceUtils.merge(joEntity.getEntityName(), handler.getCrudRecord(), handler.getRoot(), handler.getCrud() == Crud.CREATE, user, null);
 									}
 								}
 

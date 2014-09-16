@@ -86,7 +86,7 @@ public class ReadWriteTest extends AbstractTestInject {
 			if (category == null) {
 				category = new JQuestionCategory();
 				category.setName(categoryName);
-				CrudServiceUtils.merge("JQuestionCategory", category, true, null, null);
+				CrudServiceUtils.merge("JQuestionCategory", null, category, true, null, null);
 			}
 
 			JQuestion question = new JQuestion();
@@ -100,7 +100,7 @@ public class ReadWriteTest extends AbstractTestInject {
 			question.setChoiceC(choiceC);
 			question.setChoiceD(choiceD);
 			question.setDifficult(1.0f);
-			CrudServiceUtils.merge("JQuestion", question, true, null, null);
+			CrudServiceUtils.merge("JQuestion", null, question, true, null, null);
 		}
 	}
 

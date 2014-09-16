@@ -9,6 +9,7 @@ package com.absir.appserv.system.service;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 import com.absir.appserv.crud.ICrudSupply;
 import com.absir.appserv.jdbc.JdbcCondition;
@@ -36,13 +37,14 @@ public interface CrudService {
 
 	/**
 	 * @param entityName
+	 * @param crudRecord
 	 * @param entity
 	 * @param crudSupply
 	 * @param create
 	 * @param user
 	 * @param filter
 	 */
-	public void merge(String entityName, Object entity, ICrudSupply crudSupply, boolean create, JiUserBase user, PropertyFilter filter);
+	public void merge(String entityName, Map<String, Object> crudRecord, Object entity, ICrudSupply crudSupply, boolean create, JiUserBase user, PropertyFilter filter);
 
 	/**
 	 * @param entityName

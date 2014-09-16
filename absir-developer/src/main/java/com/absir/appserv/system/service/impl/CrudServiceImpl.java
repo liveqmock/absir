@@ -71,14 +71,14 @@ public class CrudServiceImpl implements CrudService {
 	 * (non-Javadoc)
 	 * 
 	 * @see com.absir.appserv.system.service.CrudService#merge(java.lang.String,
-	 * java.lang.Object, com.absir.appserv.crud.ICrudSupply, boolean,
-	 * com.absir.appserv.system.bean.proxy.JiUserBase,
+	 * java.util.Map, java.lang.Object, com.absir.appserv.crud.ICrudSupply,
+	 * boolean, com.absir.appserv.system.bean.proxy.JiUserBase,
 	 * com.absir.core.kernel.KernelLang.PropertyFilter)
 	 */
 	@Override
-	public void merge(String entityName, Object entity, ICrudSupply crudSupply, boolean create, JiUserBase user, PropertyFilter filter) {
+	public void merge(String entityName, Map<String, Object> crudRecord, Object entity, ICrudSupply crudSupply, boolean create, JiUserBase user, PropertyFilter filter) {
 		// TODO Auto-generated method stub
-		CrudUtils.crud(create ? Crud.CREATE : Crud.UPDATE, new JoEntity(entityName, entity.getClass()), entity, filter, user);
+		CrudUtils.crud(create ? Crud.CREATE : Crud.UPDATE, crudRecord, new JoEntity(entityName, entity.getClass()), entity, filter, user);
 		crudSupply.mergeEntity(entityName, entity, create);
 	}
 
@@ -99,7 +99,7 @@ public class CrudServiceImpl implements CrudService {
 			return null;
 		}
 
-		CrudUtils.crud(Crud.DELETE, new JoEntity(entityName, entity.getClass()), entity, null, user);
+		CrudUtils.crud(Crud.DELETE, null, new JoEntity(entityName, entity.getClass()), entity, null, user);
 		crudSupply.deleteEntity(entityName, entity);
 		return entity;
 	}
@@ -123,7 +123,7 @@ public class CrudServiceImpl implements CrudService {
 					joEntity = new JoEntity(entityName, entity.getClass());
 				}
 
-				CrudUtils.crud(Crud.DELETE, new JoEntity(entityName, entity.getClass()), entity, null, user);
+				CrudUtils.crud(Crud.DELETE, null, new JoEntity(entityName, entity.getClass()), entity, null, user);
 				crudSupply.deleteEntity(entityName, entity);
 			}
 		}

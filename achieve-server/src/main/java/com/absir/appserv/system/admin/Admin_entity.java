@@ -21,6 +21,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import com.absir.appserv.configure.xls.XlsUtils;
 import com.absir.appserv.crud.CrudContextUtils;
 import com.absir.appserv.crud.CrudSupply;
+import com.absir.appserv.crud.CrudUtils;
 import com.absir.appserv.crud.ICrudSupply;
 import com.absir.appserv.dyna.DynaBinderUtils;
 import com.absir.appserv.feature.transaction.TransactionIntercepter;
@@ -180,7 +181,7 @@ public class Admin_entity extends AdminServer {
 		binderResult.setValidation(true);
 		binderResult.setPropertyFilter(filter);
 		binderData.mapBind(BinderUtils.getDataMap(input.getParamMap()), entity);
-		CrudContextUtils.crud(Crud.CREATE, joEntity, entity, user, filter);
+		CrudContextUtils.crud(Crud.CREATE, null, joEntity, entity, user, filter);
 		model.put("entity", entity);
 	}
 
@@ -257,6 +258,8 @@ public class Admin_entity extends AdminServer {
 			crudSupply.evict(entity);
 		}
 
+		boolean create = id == null;
+		Map<String, Object> crudRecord = create ? null : CrudUtils.crudRecord(new JoEntity(entityName, entity.getClass()), entity, filter);
 		BinderData binderData = input.getBinderData();
 		BinderResult binderResult = binderData.getBinderResult();
 		binderResult.setPropertyFilter(filter);
@@ -273,7 +276,7 @@ public class Admin_entity extends AdminServer {
 		binderResult.setValidation(true);
 		binderData.mapBind(BinderUtils.getDataMap(input.getParamMap()), entity);
 		JoEntity joEntity = (JoEntity) input.getAttribute("joEntity");
-		CrudContextUtils.crud(id == null ? Crud.CREATE : Crud.UPDATE, joEntity, entity, user, filter, binderResult, input);
+		CrudContextUtils.crud(create ? Crud.CREATE : Crud.UPDATE, crudRecord, joEntity, entity, user, filter, binderResult, input);
 		InModel model = input.getModel();
 		model.put("entity", entity);
 		if (binderResult.hashErrors()) {
@@ -282,7 +285,7 @@ public class Admin_entity extends AdminServer {
 		}
 
 		crudSupply.mergeEntity(entityName, entity, id == null);
-		if (id == null) {
+		if (create) {
 			model.put("create", true);
 			model.put("id", crudSupply.getIdentifier(entityName, entity));
 		}

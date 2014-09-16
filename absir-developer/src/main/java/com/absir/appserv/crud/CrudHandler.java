@@ -25,6 +25,9 @@ public abstract class CrudHandler {
 	/** crud */
 	protected JaCrud.Crud crud;
 
+	/** crudRecord */
+	protected Map<String, Object> crudRecord;
+
 	/** filter */
 	protected PropertyFilter filter;
 
@@ -52,7 +55,7 @@ public abstract class CrudHandler {
 	 * @param crudEntity
 	 * @param root
 	 */
-	public CrudHandler(JaCrud.Crud crud, PropertyFilter filter, CrudEntity crudEntity, Object root) {
+	public CrudHandler(JaCrud.Crud crud, Map<String, Object> crudRecord, PropertyFilter filter, CrudEntity crudEntity, Object root) {
 		this.crud = crud;
 		this.filter = filter;
 		this.crudEntity = crudEntity;
@@ -64,6 +67,13 @@ public abstract class CrudHandler {
 	 */
 	public JaCrud.Crud getCrud() {
 		return crud;
+	}
+
+	/**
+	 * @return the crudRecord
+	 */
+	public Map<String, Object> getCrudRecord() {
+		return crudRecord;
 	}
 
 	/**
@@ -147,8 +157,8 @@ public abstract class CrudHandler {
 		 * @param crudEntity
 		 * @param root
 		 */
-		public CrudInvoker(Crud crud, PropertyFilter filter, CrudEntity crudEntity, Object root) {
-			super(crud, filter, crudEntity, root);
+		public CrudInvoker(Crud crud, Map<String, Object> crudRecord, PropertyFilter filter, CrudEntity crudEntity, Object root) {
+			super(crud, crudRecord, filter, crudEntity, root);
 			// TODO Auto-generated constructor stub
 		}
 

@@ -11,6 +11,9 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hibernate.proxy.HibernateProxy;
+
+import com.absir.aop.AopProxy;
 import com.absir.core.kernel.KernelObject;
 import com.absir.core.util.UtilAbsir;
 import com.absir.orm.hibernate.SessionFactoryUtils;
@@ -34,6 +37,10 @@ public class JoEntity implements Serializable {
 	 */
 	public JoEntity(String entityName, Class<?> entityClass) {
 		if (entityName == null) {
+			while (AopProxy.class.isAssignableFrom(entityClass) || HibernateProxy.class.isAssignableFrom(entityClass)) {
+				entityClass = entityClass.getSuperclass();
+			}
+
 			entityName = SessionFactoryUtils.getEntityNameNull(entityClass);
 
 		} else if (entityClass == null) {

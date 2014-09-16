@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.absir.appserv.crud.CrudUtils;
 import com.absir.appserv.crud.ICrudSupply;
 import com.absir.appserv.dyna.DynaBinderUtils;
 import com.absir.appserv.jdbc.JdbcCondition;
@@ -33,6 +34,7 @@ import com.absir.core.dyna.DynaBinder;
 import com.absir.core.kernel.KernelClass;
 import com.absir.core.kernel.KernelLang.PropertyFilter;
 import com.absir.orm.hibernate.SessionFactoryUtils;
+import com.absir.orm.value.JoEntity;
 import com.absir.server.exception.ServerException;
 import com.absir.server.exception.ServerStatus;
 
@@ -142,6 +144,7 @@ public class EntityService {
 			entityObject = BinderUtils.getEntityMap(entityObject);
 		}
 
+		Map<String, Object> crudRecord = create ? null : CrudUtils.crudRecord(new JoEntity(entityName, entity.getClass()), entity, filter);
 		BinderData binderData = new BinderData();
 		BinderResult binderResult = binderData.getBinderResult();
 		binderResult.setValidation(true);
@@ -151,7 +154,7 @@ public class EntityService {
 			throw new ServerException(ServerStatus.NO_PARAM, "bind entity " + entityName + " from " + entityObject + ", has errors = " + binderResult.getPropertyErrors());
 		}
 
-		CrudService.ME.merge(entityName, entity, crudSupply, create, user, filter);
+		CrudService.ME.merge(entityName, crudRecord, entity, crudSupply, create, user, filter);
 		return entity;
 	}
 

@@ -83,7 +83,7 @@ public class InitialTask {
 
 			user.getUserRoles().add(userRole);
 			user.setDeveloper(developer);
-			CrudServiceUtils.merge("JUser", user, true, null, null);
+			CrudServiceUtils.merge("JUser", null, user, true, null, null);
 		}
 	}
 }

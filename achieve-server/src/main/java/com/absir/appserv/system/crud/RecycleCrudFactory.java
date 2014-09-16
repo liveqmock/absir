@@ -29,7 +29,7 @@ public class RecycleCrudFactory implements ICrudFactory {
 	private static final ICrudProcessor RECYCLE_PROCESSOR = new ICrudProcessor() {
 
 		@Override
-		public void crud(CrudProperty crudProperty, Object entity, CrudHandler crudHandler, JiUserBase user) {
+		public void crud(CrudProperty crudProperty, Object entity, CrudHandler handler, JiUserBase user) {
 			// TODO Auto-generated method stub
 			String recycleName = crudProperty.getCrudEntity().getJoEntity().getEntityName() + "Recycle";
 			Class<?> recycleClass = SessionFactoryUtils.getEntityClass(recycleName);
@@ -39,7 +39,7 @@ public class RecycleCrudFactory implements ICrudFactory {
 					KernelObject.copy(entity, recycle);
 				}
 
-				CrudServiceUtils.merge(recycleName, recycle, true, user, null);
+				CrudServiceUtils.merge(recycleName, handler.getCrudRecord(), recycle, true, user, null);
 			}
 		}
 	};

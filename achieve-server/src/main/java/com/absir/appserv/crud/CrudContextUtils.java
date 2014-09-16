@@ -84,6 +84,7 @@ public abstract class CrudContextUtils extends CrudUtils {
 
 	/**
 	 * @param crud
+	 * @param crudRecord
 	 * @param joEntity
 	 * @param entity
 	 * @param user
@@ -91,7 +92,8 @@ public abstract class CrudContextUtils extends CrudUtils {
 	 * @param errors
 	 * @param input
 	 */
-	public static void crud(JaCrud.Crud crud, JoEntity joEntity, Object entity, final JiUserBase user, PropertyFilter filter, final PropertyErrors errors, final Input input) {
+	public static void crud(JaCrud.Crud crud, Map<String, Object> crudRecord, JoEntity joEntity, Object entity, final JiUserBase user, PropertyFilter filter, final PropertyErrors errors,
+			final Input input) {
 		CrudEntity crudEntity = getCrudEntity(joEntity);
 		if (crudEntity == null) {
 			return;
@@ -109,7 +111,7 @@ public abstract class CrudContextUtils extends CrudUtils {
 			final List<Object> entities = new ArrayList<Object>();
 			final List<CrudProperty> crudProperties = new ArrayList<CrudProperty>();
 			final List requestBodies = new ArrayList<Object>();
-			final CrudInvoker crudInvoker = new CrudInvoker(crud, filter, crudEntity, entity) {
+			final CrudInvoker crudInvoker = new CrudInvoker(crud, crudRecord, filter, crudEntity, entity) {
 
 				@Override
 				public boolean isSupport(CrudProperty crudProperty) {
@@ -140,7 +142,7 @@ public abstract class CrudContextUtils extends CrudUtils {
 		}
 
 		crudFilter.setPropertyPath("");
-		crud(entity, crudEntity, new CrudInvoker(crud, crudFilter, crudEntity, entity) {
+		crud(entity, crudEntity, new CrudInvoker(crud, crudRecord, crudFilter, crudEntity, entity) {
 
 			@Override
 			public boolean isSupport(CrudProperty crudProperty) {
@@ -163,12 +165,13 @@ public abstract class CrudContextUtils extends CrudUtils {
 
 	/**
 	 * @param crud
+	 * @param crudRecord
 	 * @param joEntity
 	 * @param entity
 	 * @param user
 	 * @param filter
 	 */
-	public static void crud(JaCrud.Crud crud, JoEntity joEntity, Object entity, JiUserBase user, PropertyFilter filter) {
-		crud(crud, joEntity, entity, user, filter, null, null);
+	public static void crud(JaCrud.Crud crud, Map<String, Object> crudRecord, JoEntity joEntity, Object entity, JiUserBase user, PropertyFilter filter) {
+		crud(crud, crudRecord, joEntity, entity, user, filter, null, null);
 	}
 }

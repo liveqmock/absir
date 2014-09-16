@@ -60,7 +60,7 @@ public class admin_user extends AdminServer {
 			return "admin/failed.ajax";
 		}
 
-		CrudServiceUtils.merge("JUser", user, false, user, null);
+		CrudServiceUtils.merge("JUser", null, user, false, user, null);
 		return "admin/successed.ajax";
 	}
 }

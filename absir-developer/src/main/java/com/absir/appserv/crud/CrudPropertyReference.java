@@ -33,6 +33,20 @@ public abstract class CrudPropertyReference {
 	}
 
 	/**
+	 * @return the cruds
+	 */
+	public Crud[] getCruds() {
+		return cruds;
+	}
+
+	/**
+	 * @return the valueCrudEntity
+	 */
+	public CrudEntity getValueCrudEntity() {
+		return valueCrudEntity;
+	}
+
+	/**
 	 * @param entity
 	 * @param crudInvoker
 	 */

@@ -50,16 +50,11 @@ public class CrudServiceImpl implements CrudService {
 	public ICrudSupply getCrudSupply(String entityName) {
 		// TODO Auto-generated method stub
 		ICrudSupply crudSupply = entityNameMapCrudSupply.get(entityName);
-		if (crudSupply == null) {
-			synchronized (this) {
-				crudSupply = entityNameMapCrudSupply.get(entityName);
-				if (crudSupply == null && crudSupplies != null) {
-					for (ICrudSupply supply : crudSupplies) {
-						if (supply.getEntityClass(entityName) != null) {
-							crudSupply = supply;
-							entityNameMapCrudSupply.put(entityName, crudSupply);
-						}
-					}
+		if (crudSupply == null && crudSupplies != null) {
+			for (ICrudSupply supply : crudSupplies) {
+				if (supply.getEntityClass(entityName) != null) {
+					crudSupply = supply;
+					entityNameMapCrudSupply.put(entityName, crudSupply);
 				}
 			}
 		}

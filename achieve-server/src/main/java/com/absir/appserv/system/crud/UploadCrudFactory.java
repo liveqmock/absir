@@ -22,6 +22,7 @@ import com.absir.appserv.crud.CrudProperty;
 import com.absir.appserv.crud.ICrudFactory;
 import com.absir.appserv.crud.ICrudProcessor;
 import com.absir.appserv.crud.ICrudProcessorInput;
+import com.absir.appserv.dyna.DynaBinderUtils;
 import com.absir.appserv.support.developer.JCrudField;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.bean.value.JaCrud.Crud;
@@ -122,6 +123,9 @@ public class UploadCrudFactory implements ICrudFactory {
 
 		/** ruleName */
 		private String ruleName;
+
+		/** ided */
+		private boolean ided;
 
 		/**
 		 * @param parameters
@@ -281,6 +285,7 @@ public class UploadCrudFactory implements ICrudFactory {
 								UploadRule uploadRule = accessor.getAnnotation(UploadRule.class, false);
 								if (uploadRule != null) {
 									multipartUploader.ruleName = uploadRule.value();
+									multipartUploader.ided = multipartUploader.ruleName.contains(":id");
 								}
 							}
 
@@ -294,7 +299,7 @@ public class UploadCrudFactory implements ICrudFactory {
 
 						} else {
 							String identity = "";
-							if (entity instanceof IBase) {
+							if (multipartUploader.ided && entity instanceof IBase) {
 								Serializable id = ((IBase<?>) entity).getId();
 								if (id == null) {
 									JoEntity joEntity = handler.getCrudEntity().getJoEntity();
@@ -305,7 +310,7 @@ public class UploadCrudFactory implements ICrudFactory {
 
 								id = ((IBase<?>) entity).getId();
 								if (id != null) {
-									identity = id.toString();
+									identity = DynaBinderUtils.getParamFromValue(id);
 								}
 							}
 

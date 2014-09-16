@@ -27,6 +27,7 @@ import com.absir.appserv.system.bean.value.JaCrud.Crud;
 import com.absir.appserv.system.dao.BeanDao;
 import com.absir.appserv.system.dao.utils.QueryDaoUtils;
 import com.absir.appserv.system.service.BeanService;
+import com.absir.core.base.IBase;
 import com.absir.core.kernel.KernelClass;
 import com.absir.core.kernel.KernelDyna;
 import com.absir.orm.hibernate.SessionFactoryUtils;
@@ -625,7 +626,7 @@ public class BeanServiceBase implements BeanService, ICrudSupply {
 	@Override
 	public void mergeEntity(String entityName, Object entity, boolean create) {
 		// TODO Auto-generated method stub
-		if (create) {
+		if (create && !(entity instanceof IBase || ((IBase) entity).getId() != null)) {
 			persist(entityName, entity);
 
 		} else {

@@ -58,9 +58,9 @@ public class HelperBase {
 	 */
 	public static Serializable[] getBaseIds(Collection<? extends IBase> bases) {
 		Serializable[] ids = new Serializable[bases.size()];
-		int i = -1;
+		int i = 0;
 		for (IBase base : bases) {
-			ids[++i] = base.getId();
+			ids[i++] = base.getId();
 		}
 
 		return ids;

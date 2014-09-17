@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletRequest;
 
 import jetbrick.template.JetContext;
 import jetbrick.template.JetEngine;
@@ -30,11 +31,15 @@ import jetbrick.template.web.JetWebContext;
 import jetbrick.template.web.JetWebEngineLoader;
 
 import com.absir.appserv.developer.Pag;
+import com.absir.appserv.developer.Scenario;
 import com.absir.appserv.feature.menu.MenuContextUtils;
 import com.absir.appserv.support.web.WebJetbrickSupply.ConfigureFound;
 import com.absir.appserv.support.web.value.BaFunction;
 import com.absir.appserv.support.web.value.BaMethod;
 import com.absir.appserv.support.web.value.BaTag;
+import com.absir.appserv.system.bean.JEmbedLL;
+import com.absir.appserv.system.bean.proxy.JiUserBase;
+import com.absir.appserv.system.helper.HelperString;
 import com.absir.bean.basis.Basis;
 import com.absir.bean.basis.BeanDefine;
 import com.absir.bean.basis.BeanScope;
@@ -43,9 +48,12 @@ import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.IMethodSupport;
 import com.absir.bean.inject.InjectInvoker;
 import com.absir.bean.inject.value.Bean;
+import com.absir.bean.inject.value.Value;
 import com.absir.core.helper.HelperFileName;
 import com.absir.core.kernel.KernelObject;
 import com.absir.core.kernel.KernelString;
+import com.absir.core.util.UtilAccessor;
+import com.absir.core.util.UtilAccessor.Accessor;
 import com.absir.servlet.InDispathFilter;
 
 /**
@@ -122,10 +130,12 @@ public class WebJetbrickSupply implements IMethodSupport<ConfigureFound> {
 				@Override
 				public String getDynamicMember(Class<?> beanClass, String name, boolean isSafeCall, SegmentCode code) {
 					// TODO Auto-generated method stub
-					return "com.absir.core.kernel.KernelObject.getter(" + code.toString() + ", \"" + name + "\")";
+					return "com.absir.appserv.support.web.WebJetbrickSupply.getter(" + code.toString() + ", \"" + name + "\")";
 				}
 			});
 			getVariableResolverBean().getVariableResolver().addImportClass(KernelObject.class.getName());
+			getVariableResolverBean().getVariableResolver().addImportPackage(JiUserBase.class.getPackage().getName());
+			getVariableResolverBean().getVariableResolver().addImportPackage(JEmbedLL.class.getPackage().getName());
 			getVariableResolverBean().getVariableResolver().addImportPackage(Pag.class.getPackage().getName());
 		}
 
@@ -361,6 +371,34 @@ public class WebJetbrickSupply implements IMethodSupport<ConfigureFound> {
 	}
 
 	/**
+	 * @param obj
+	 * @param name
+	 * @return
+	 */
+	public Object getter(Object obj, String name) {
+		Accessor accessor = UtilAccessor.getAccessorObj(obj, name);
+		return accessor == null ? null : accessor.get(obj);
+	}
+
+	/** highlightSpan */
+	@Value(value = "<span ${web.view.highlight}>")
+	private static String highlightSpan = "<span class=\"highlight\">";
+
+	/**
+	 * @param obj
+	 * @param highlight
+	 * @return
+	 */
+	@BaMethod
+	public static Object highlight(Object obj, String highlight) {
+		if (obj != null) {
+			return HelperString.replace(obj.toString(), highlight, "<span>" + highlight + "</span>");
+		}
+
+		return obj;
+	}
+
+	/**
 	 * @param ctx
 	 * @param include
 	 * @return
@@ -381,6 +419,20 @@ public class WebJetbrickSupply implements IMethodSupport<ConfigureFound> {
 	@BaFunction
 	public static String _include(JetPageContext ctx, String include, String generate) throws IOException {
 		return Pag.getInclude(include, generate, ctx, ctx.getContext().get(JetWebContext.REQUEST));
+	}
+
+	/**
+	 * @param ctx
+	 * @param name
+	 */
+	@BaTag
+	public static void _name(JetTagContext ctx, String name) {
+		Object request = ctx.getContext().get(JetWebContext.REQUEST);
+		if (request != null && request instanceof ServletRequest) {
+			if (Scenario.requestName((ServletRequest) request, name)) {
+				ctx.writeBodyContent();
+			}
+		}
 	}
 
 	/**

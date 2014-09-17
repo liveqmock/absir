@@ -20,6 +20,7 @@ import com.absir.appserv.jdbc.JdbcCondition;
 import com.absir.appserv.jdbc.JdbcPage;
 import com.absir.appserv.system.bean.value.JaCrud.Crud;
 import com.absir.appserv.system.bean.value.JaName;
+import com.absir.appserv.system.helper.HelperCondition;
 import com.absir.appserv.system.helper.HelperQuery;
 import com.absir.bean.basis.BeanDefine;
 import com.absir.bean.config.IBeanDefineSupply;
@@ -269,7 +270,7 @@ public abstract class CrudSupply<T> implements ICrudSupply, IBeanDefineSupply {
 	@Override
 	public List list(String entityName, JdbcCondition jdbcCondition, String queue, int firstResult, int maxResults) {
 		// TODO Auto-generated method stub
-		return list(list(entityName, jdbcCondition, queue), firstResult, maxResults);
+		return list(list(entityName, jdbcCondition, HelperCondition.orderQueue(getEntityClass(entityName), queue)), firstResult, maxResults);
 	}
 
 	/*

@@ -16,7 +16,6 @@ import java.util.Stack;
 import javax.servlet.ServletRequest;
 
 import com.absir.bean.inject.value.Inject;
-import com.absir.core.kernel.KernelLang.CallbackTemplate;
 import com.absir.orm.value.JoEntity;
 
 /**
@@ -138,9 +137,9 @@ public class Scenario {
 	/**
 	 * @param request
 	 * @param name
-	 * @param callbackTemplate
+	 * @return
 	 */
-	public static void nameCallback(ServletRequest request, String name, CallbackTemplate<Set<Object>> callbackTemplate) {
+	public static boolean requestName(ServletRequest request, String name) {
 		Object names = request.getAttribute(SCENARIO_NAMES);
 		Set<Object> scenarioNames = null;
 		if (names == null || !(names instanceof Set)) {
@@ -149,13 +148,13 @@ public class Scenario {
 
 		} else {
 			if (((Set<Object>) names).contains(name)) {
-				return;
+				return false;
 			}
 
 			scenarioNames = (Set<Object>) names;
 		}
 
 		scenarioNames.add(name);
-		callbackTemplate.doWith(scenarioNames);
+		return true;
 	}
 }

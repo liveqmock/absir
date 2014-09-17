@@ -10,8 +10,10 @@ package com.absir.appserv.system.helper;
 import java.util.List;
 
 import com.absir.appserv.jdbc.JdbcCondition;
+import com.absir.appserv.system.bean.proxy.JiSort;
 import com.absir.core.kernel.KernelArray;
 import com.absir.core.kernel.KernelLang;
+import com.absir.core.kernel.KernelString;
 
 /**
  * @author absir
@@ -70,6 +72,24 @@ public class HelperCondition {
 			}
 
 			queue = queryBuilder.toString();
+		}
+
+		return queue;
+	}
+
+	/**
+	 * @param entityClass
+	 * @param queue
+	 * @return
+	 */
+	public static String orderQueue(Class<?> entityClass, String queue) {
+		if (entityClass != null && JiSort.class.isAssignableFrom(entityClass)) {
+			if (KernelString.isEmpty(queue)) {
+				queue = "ORDER BY o.sort";
+
+			} else {
+				queue += ", o.sort";
+			}
 		}
 
 		return queue;

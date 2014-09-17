@@ -9,7 +9,8 @@ package com.absir.system.test.lang;
 
 import org.junit.Test;
 
-import com.absir.core.kernel.KernelClass;
+import com.absir.aop.AopProxyUtils;
+import com.absir.appserv.system.bean.JUser;
 import com.absir.system.test.AbstractTest;
 
 /**
@@ -30,16 +31,9 @@ public class TestLoader extends AbstractTest {
 
 	@Test
 	public void test() {
-		for (Class<?> cls : T.class.getInterfaces()) {
-			KernelClass.forName(cls.getName());
-		}
-
-		// HelperFileName.concat(basePath, fullFilenameToAdd);
-
-		// KernelClass.forName(ITest.class.getName());
-		T t = new T();
-		System.out.println(t);
-		System.out.println(ATest.name);
-		System.out.println(ITest.name);
+		System.out.println(AopProxyUtils.getProxy(new JUser(), false, false).getClass());
+		System.out.println(AopProxyUtils.getProxy(new JUser(), false, false).getClass());
+		System.out.println(AopProxyUtils.getProxy(new JUser(), true, false).getClass());
+		System.out.println(AopProxyUtils.getProxy(new JUser(), true, false).getClass());
 	}
 }

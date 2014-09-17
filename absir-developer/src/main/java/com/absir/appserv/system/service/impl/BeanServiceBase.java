@@ -27,6 +27,7 @@ import com.absir.appserv.system.bean.proxy.JiTree;
 import com.absir.appserv.system.bean.value.JaCrud.Crud;
 import com.absir.appserv.system.dao.BeanDao;
 import com.absir.appserv.system.dao.utils.QueryDaoUtils;
+import com.absir.appserv.system.helper.HelperCondition;
 import com.absir.appserv.system.service.BeanService;
 import com.absir.core.base.IBase;
 import com.absir.core.kernel.KernelClass;
@@ -589,7 +590,8 @@ public class BeanServiceBase implements BeanService, ICrudSupply {
 	@Override
 	public List list(String entityName, JdbcCondition jdbcCondition, String queue, int firstResult, int maxResults) {
 		// TODO Auto-generated method stub
-		return LangBundleImpl.ME.getLangProxy(entityName, QueryDaoUtils.selectQuery(getSession(), entityName, jdbcCondition, queue, firstResult, maxResults));
+		return LangBundleImpl.ME.getLangProxy(entityName,
+				QueryDaoUtils.selectQuery(getSession(), entityName, jdbcCondition, HelperCondition.orderQueue(getEntityClass(entityName), queue), firstResult, maxResults));
 	}
 
 	/*
@@ -603,7 +605,7 @@ public class BeanServiceBase implements BeanService, ICrudSupply {
 	@Override
 	public List list(String entityName, JdbcCondition jdbcCondition, String queue, JdbcPage jdbcPage) {
 		// TODO Auto-generated method stub
-		return LangBundleImpl.ME.getLangProxy(entityName, QueryDaoUtils.selectQuery(getSession(), entityName, jdbcCondition, queue, jdbcPage));
+		return LangBundleImpl.ME.getLangProxy(entityName, QueryDaoUtils.selectQuery(getSession(), entityName, jdbcCondition, HelperCondition.orderQueue(getEntityClass(entityName), queue), jdbcPage));
 	}
 
 	/*

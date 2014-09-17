@@ -42,6 +42,7 @@ import com.absir.appserv.system.bean.value.JaCrud.Crud;
 import com.absir.appserv.system.bean.value.JaEdit;
 import com.absir.appserv.system.bean.value.JaEmbedd;
 import com.absir.appserv.system.bean.value.JeEditable;
+import com.absir.appserv.system.crud.BeanCrudFactory;
 import com.absir.appserv.system.helper.HelperJson;
 import com.absir.appserv.system.helper.HelperLang;
 import com.absir.appserv.system.helper.HelperString;
@@ -53,6 +54,7 @@ import com.absir.core.dyna.DynaBinder;
 import com.absir.core.kernel.KernelArray;
 import com.absir.core.kernel.KernelClass;
 import com.absir.core.kernel.KernelCollection;
+import com.absir.core.kernel.KernelLang;
 import com.absir.core.kernel.KernelObject;
 import com.absir.core.kernel.KernelString;
 import com.absir.core.util.UtilAccessor.Accessor;
@@ -187,7 +189,6 @@ public class EntityField extends DBField {
 				valueField.crudField.setType(componentClasses[1]);
 				this.valueField = valueField;
 				if (!valueField.typeFieldType(componentClasses[1]) && KernelClass.isCustomClass(componentClasses[1])) {
-					// crudField.setCruds(JaCrud.ALL);
 					referenceCrud = true;
 				}
 
@@ -456,12 +457,11 @@ public class EntityField extends DBField {
 	}
 
 	/**
-	 * @param joEntity
-	 * @param property
 	 * @param validators
 	 * @param fieldScope
+	 * @param entityModel
 	 */
-	public void addEntityFieldScope(List<Validator> validators, Collection<IField> fieldScope) {
+	public void addEntityFieldScope(List<Validator> validators, Collection<IField> fieldScope, EntityModel entityModel) {
 		// set validators
 		if (validators != null) {
 			Object validatorObject = metas.get("validators");
@@ -490,7 +490,7 @@ public class EntityField extends DBField {
 		}
 
 		if (embedd && editable != JeEditable.LOCKED) {
-			addEntityFieldScope(crudField.getName(), crudField.getJoEntity(), fieldScope, null);
+			addEntityFieldScope(crudField.getName(), crudField.getJoEntity(), fieldScope, entityModel);
 
 		} else {
 			fieldScope.add(this);
@@ -532,18 +532,18 @@ public class EntityField extends DBField {
 			}
 
 			EntityField entityField = null;
+			boolean primary = false;
 			if (entityModel != null && (property.getAccessor().getAnnotation(Id.class, true) != null || (identifierName != null && identifierName.equals(fieldName)))) {
 				entityField = new EntityField(fieldName, property, editorObject, joEntity);
 				if ((entityField.getType() == Object.class || entityField.getType() == Serializable.class) && IBase.class.isAssignableFrom(joEntity.getEntityClass()) && fieldName.equals("id")) {
 					entityField.getCrudField().setType(KernelClass.argumentClass(joEntity.getEntityClass()));
 				}
 
+				primary = true;
 				entityModel.setPrimary(entityField);
-				entityField.addEntityFieldScope(validatorSupply.getPropertyObject(propertyData), entityModel.getPrimaries());
 
 			} else if (!isMappedByField(property, editorObject)) {
 				entityField = new EntityField(fieldName, property, editorObject, joEntity);
-				entityField.addEntityFieldScope(validatorSupply.getPropertyObject(propertyData), fieldScope);
 			}
 
 			if (entityModel != null) {
@@ -552,6 +552,22 @@ public class EntityField extends DBField {
 				}
 
 				if (entityField != null) {
+					if (name == null) {
+						entityModel.addCrudField(entityField);
+
+					} else {
+						if (name.indexOf('.') < 0) {
+							IField curdField = entityModel.getCrudField();
+							if (curdField.getCrudField().getjCrud() == null) {
+								if (LangBundle.ME.isI18n() && property.getAccessor().getAnnotation(Langs.class, true) != null) {
+									JCrud jCrud = new JCrud();
+									jCrud.setJaCrud(null, BeanCrudFactory.class, KernelLang.NULL_OBJECTS, JaCrud.ALL);
+									curdField.getCrudField().setjCrud(jCrud);
+								}
+							}
+						}
+					}
+
 					if (entityField.getEditable() == JeEditable.ENABLE) {
 						entityModel.addGroupField("editable", entityField);
 
@@ -569,10 +585,10 @@ public class EntityField extends DBField {
 						entityModel.addGroupField("none", entityField);
 					}
 				}
+			}
 
-				if (LangBundle.ME.isI18n() && property.getAccessor().getAnnotation(Langs.class, true) != null) {
-					entityModel.addBeanJaCrud();
-				}
+			if (entityField != null) {
+				entityField.addEntityFieldScope(validatorSupply.getPropertyObject(propertyData), primary ? entityModel.getPrimaries() : fieldScope, entityModel);
 			}
 		}
 	}

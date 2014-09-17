@@ -13,6 +13,7 @@ import java.util.Map;
 import com.absir.appserv.system.bean.value.JaCrud;
 import com.absir.appserv.system.bean.value.JaCrud.Crud;
 import com.absir.appserv.system.dao.BeanDao;
+import com.absir.core.kernel.KernelArray;
 import com.absir.core.kernel.KernelLang.PropertyFilter;
 import com.absir.core.kernel.KernelObject;
 
@@ -163,10 +164,26 @@ public abstract class CrudHandler {
 		}
 
 		/**
+		 * @param crud
 		 * @param crudProperty
 		 * @return
 		 */
-		public abstract boolean isSupport(CrudProperty crudProperty);
+		public boolean isSupport(Crud crud, CrudProperty crudProperty) {
+			if (filter.allow(crudProperty.getInclude(), crudProperty.getExclude()) && isSupport(crudProperty)) {
+				Crud[] cruds = crudProperty.getjCrud().getCruds();
+				if (cruds == JaCrud.ALL || KernelArray.contain(cruds, crud)) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		/**
+		 * @param crudProperty
+		 * @return
+		 */
+		protected abstract boolean isSupport(CrudProperty crudProperty);
 
 		/**
 		 * @param crudProperty

@@ -122,6 +122,7 @@ public class JCrudField implements Serializable {
 	 * @return the cruds
 	 */
 	public Crud[] getCruds() {
+
 		return cruds;
 	}
 

@@ -60,6 +60,9 @@ public class EntityModel implements IModel {
 	/** groups */
 	private Map<String, List<IField>> groups = new HashMap<String, List<IField>>();
 
+	/** crudCruds */
+	private List<IField> crudFields = new ArrayList<IField>();
+
 	/**
 	 * @return the joEntity
 	 */
@@ -294,6 +297,31 @@ public class EntityModel implements IModel {
 				}
 			}
 		}
+	}
+
+	/**
+	 * @return the crudFields
+	 */
+	public List<IField> getCrudFields() {
+		return crudFields;
+	}
+
+	/** crudField */
+	private IField crudField;
+
+	/**
+	 * @param field
+	 */
+	public void addCrudField(IField field) {
+		crudField = field;
+		crudFields.add(field);
+	}
+
+	/**
+	 * @return
+	 */
+	public IField getCrudField() {
+		return crudField;
 	}
 
 	/**

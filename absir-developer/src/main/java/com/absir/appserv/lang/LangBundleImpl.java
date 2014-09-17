@@ -25,9 +25,8 @@ import com.absir.aop.AopInterceptor;
 import com.absir.aop.AopProxy;
 import com.absir.aop.AopProxyHandler;
 import com.absir.aop.AopProxyUtils;
-import com.absir.appserv.crud.CrudEntity;
 import com.absir.appserv.crud.CrudHandler;
-import com.absir.appserv.crud.CrudPropertyReference;
+import com.absir.appserv.crud.CrudProperty;
 import com.absir.appserv.crud.CrudUtils;
 import com.absir.appserv.crud.value.ICrudBean;
 import com.absir.appserv.dyna.DynaBinderUtils;
@@ -35,6 +34,7 @@ import com.absir.appserv.lang.value.Langs;
 import com.absir.appserv.support.Developer;
 import com.absir.appserv.system.bean.JEmbedSL;
 import com.absir.appserv.system.bean.value.JaCrud.Crud;
+import com.absir.appserv.system.crud.BeanCrudFactory;
 import com.absir.appserv.system.helper.HelperBase;
 import com.absir.appserv.system.service.BeanService;
 import com.absir.appserv.system.service.CrudService;
@@ -54,6 +54,8 @@ import com.absir.core.kernel.KernelLang;
 import com.absir.core.kernel.KernelLang.ObjectEntry;
 import com.absir.core.kernel.KernelReflect;
 import com.absir.core.kernel.KernelString;
+import com.absir.core.util.UtilAccessor;
+import com.absir.core.util.UtilAccessor.Accessor;
 import com.absir.orm.value.JoEntity;
 import com.absir.server.on.OnPut;
 
@@ -248,6 +250,17 @@ public class LangBundleImpl extends LangBundle {
 	 */
 	protected static abstract class LangEmbeded extends LangEntry {
 
+		/** accessor */
+		protected Accessor accessor;
+
+		/**
+		 * @param beanType
+		 * @param property
+		 */
+		public LangEmbeded(Class<?> beanType, String property) {
+			accessor = UtilAccessor.getAccessorProperty(beanType, property);
+		}
+
 		/*
 		 * (non-Javadoc)
 		 * 
@@ -263,7 +276,16 @@ public class LangBundleImpl extends LangBundle {
 				Object[] args, MethodProxy methodProxy) throws Throwable {
 			// TODO Auto-generated method stub
 			Object value = proxyHandler.invoke(proxyHandler, iterator, method, args, methodProxy);
-			return value == null ? null : langProxy(langIterceptor, value);
+			if (value != null) {
+				if (langIterceptor.embed(method)) {
+					value = langProxy(langIterceptor, value);
+					if (accessor != null && accessor.set(proxyHandler.getBeanObject(), value)) {
+						langIterceptor.setEmbed(method);
+					}
+				}
+			}
+
+			return value;
 		}
 
 		/**
@@ -285,6 +307,9 @@ public class LangBundleImpl extends LangBundle {
 
 		/** id */
 		private String id;
+
+		/** embededs */
+		private Set<Method> embededs;
 
 		/** langInterceptors */
 		private Map<Method, Entry<String, Class<?>>> langInterceptors;
@@ -314,6 +339,25 @@ public class LangBundleImpl extends LangBundle {
 		public Class<?> getInterface() {
 			// TODO Auto-generated method stub
 			return null;
+		}
+
+		/**
+		 * @param embed
+		 * @return
+		 */
+		public boolean embed(Method method) {
+			return embededs == null || !embededs.contains(method);
+		}
+
+		/**
+		 * @param method
+		 */
+		public void setEmbed(Method method) {
+			if (embededs == null) {
+				embededs = new HashSet<Method>();
+			}
+
+			embededs.add(method);
 		}
 
 		/*
@@ -397,10 +441,6 @@ public class LangBundleImpl extends LangBundle {
 		 */
 		public Object getLang(String fieldName, Integer locale, Class<?> type) {
 			// TODO Auto-generated method stub
-			if (ME.isLocaleCode(locale)) {
-				return AopProxyHandler.VOID;
-			}
-
 			Object value = null;
 			if (nameLocaleMapValue != null) {
 				value = DynaBinderUtils.getMapValue(nameLocaleMapValue, new JEmbedSL(fieldName, (long) locale), type);
@@ -414,28 +454,21 @@ public class LangBundleImpl extends LangBundle {
 				value = DynaBinderUtils.getMapValue(valueLocale, "_" + locale, type);
 			}
 
-			return value == null ? AopProxyHandler.VOID : value;
+			return value;
 		}
 
 		/**
 		 * @param fieldName
 		 * @param locale
 		 * @param value
-		 * @return
 		 */
-		public Object setLang(String fieldName, Integer locale, Object value) {
+		public void setLang(String fieldName, Integer locale, Object value) {
 			// TODO Auto-generated method stub
-			if (ME.isLocaleCode(locale)) {
-				return AopProxyHandler.VOID;
-
-			} else {
-				if (nameLocaleMapValue == null) {
-					nameLocaleMapValue = new HashMap<JEmbedSL, Object>();
-				}
-
-				nameLocaleMapValue.put(new JEmbedSL(fieldName, (long) locale), value);
-				return null;
+			if (nameLocaleMapValue == null) {
+				nameLocaleMapValue = new HashMap<JEmbedSL, Object>();
 			}
+
+			nameLocaleMapValue.put(new JEmbedSL(fieldName, (long) locale), value);
 		}
 
 		/**
@@ -554,7 +587,8 @@ public class LangBundleImpl extends LangBundle {
 					public Object invoke(LangIterceptor iterceptor, Object proxy, Iterator<AopInterceptor> iterator, Entry<String, Class<?>> interceptor, AopProxyHandler proxyHandler, Method method,
 							Object[] args, MethodProxy methodProxy) {
 						// TODO Auto-generated method stub
-						return iterceptor.setLang((String) args[0], (Integer) args[1], args[2]);
+						iterceptor.setLang((String) args[0], (Integer) args[1], args[2]);
+						return null;
 					}
 
 					@Override
@@ -566,14 +600,8 @@ public class LangBundleImpl extends LangBundle {
 							public Object invoke(LangIterceptor iterceptor, Object proxy, Iterator<AopInterceptor> iterator, Entry<String, Class<?>> interceptor, AopProxyHandler proxyHandler,
 									Method method, Object[] args, MethodProxy methodProxy) {
 								// TODO Auto-generated method stub
-								Integer locale = (Integer) args[1];
-								if (ME.isLocaleCode(locale)) {
-									return AopProxyHandler.VOID;
-
-								} else {
-									((ILangBase) proxyHandler.getBeanObject()).setLang((String) args[0], (Integer) args[1], args[2]);
-									return null;
-								}
+								((ILangBase) proxyHandler.getBeanObject()).setLang((String) args[0], (Integer) args[1], args[2]);
+								return null;
 							}
 						};
 					}
@@ -683,15 +711,15 @@ public class LangBundleImpl extends LangBundle {
 
 								Class<?> returnType = method.getReturnType();
 								if (!KernelClass.isBasicClass(returnType)) {
-									CrudPropertyReference crudPropertyReference = CrudUtils.getCrudPropertyReference(new JoEntity(entityName, entityClass), method.getName().substring(3));
-									if (crudPropertyReference != null) {
-										CrudEntity valueEntity = crudPropertyReference.getValueCrudEntity();
-										if (valueEntity != null) {
-											final JoEntity joEntity = valueEntity.getJoEntity();
+									String property = KernelString.unCapitalize(method.getName().substring(3));
+									CrudProperty crudProperty = CrudUtils.getCrudProperty(new JoEntity(entityName, entityClass), property);
+									if (crudProperty != null && crudProperty.getCrudProcessor() != null && crudProperty.getCrudProcessor() instanceof BeanCrudFactory.Proccessor) {
+										final JoEntity joEntity = crudProperty.getValueEntity();
+										if (joEntity != null) {
 											if (joEntity != null && KernelClass.isCustomClass(joEntity.getEntityClass())) {
 												final boolean ided = CrudService.ME.getCrudSupply(joEntity.getEntityName()) != null && IBase.class.isAssignableFrom(joEntity.getEntityClass());
 												if (returnType.isArray()) {
-													return new LangEmbeded() {
+													return new LangEmbeded(beanType, property) {
 
 														@Override
 														public Object langProxy(LangIterceptor langIterceptor, Object value) {
@@ -719,7 +747,7 @@ public class LangBundleImpl extends LangBundle {
 													};
 
 												} else if (Collection.class.isAssignableFrom(returnType)) {
-													return new LangEmbeded() {
+													return new LangEmbeded(beanType, property) {
 
 														@Override
 														public Object langProxy(LangIterceptor langIterceptor, Object value) {
@@ -746,7 +774,7 @@ public class LangBundleImpl extends LangBundle {
 													};
 
 												} else if (Map.class.isAssignableFrom(returnType)) {
-													return new LangEmbeded() {
+													return new LangEmbeded(beanType, property) {
 
 														@Override
 														public Object langProxy(LangIterceptor langIterceptor, Object value) {
@@ -773,7 +801,7 @@ public class LangBundleImpl extends LangBundle {
 													};
 
 												} else {
-													return new LangEmbeded() {
+													return new LangEmbeded(beanType, property) {
 
 														@Override
 														public Object langProxy(LangIterceptor langIterceptor, Object value) {
@@ -782,7 +810,6 @@ public class LangBundleImpl extends LangBundle {
 															// method stub
 															return ME.getLangProxy(entityName, joEntity, value, ided ? ((IBase) value).getId() : langIterceptor.entityName + "@" + langIterceptor.id);
 														}
-
 													};
 												}
 											}

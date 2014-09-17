@@ -64,7 +64,7 @@ public interface IDeveloper {
 	 * @param group
 	 * @return
 	 */
-	public String[] getCrudFields(JoEntity joEntity, String group);
+	public String[] getGroupFields(JoEntity joEntity, String group);
 
 	/**
 	 * @param render

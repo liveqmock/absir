@@ -9,6 +9,7 @@ package com.absir.appserv.crud;
 
 import com.absir.appserv.support.developer.JCrud;
 import com.absir.core.util.UtilAccessor.Accessor;
+import com.absir.orm.value.JoEntity;
 
 /**
  * @author absir
@@ -30,6 +31,12 @@ public abstract class CrudProperty {
 
 	/** crudEntity */
 	protected CrudEntity crudEntity;
+
+	/** keyEntity */
+	protected JoEntity keyEntity;
+
+	/** valueEntity */
+	protected JoEntity valueEntity;
 
 	/** crudProcessor */
 	protected ICrudProcessor crudProcessor;
@@ -91,5 +98,26 @@ public abstract class CrudProperty {
 	 */
 	public CrudEntity getCrudEntity() {
 		return crudEntity;
+	}
+
+	/**
+	 * @return the keyEntity
+	 */
+	public JoEntity getKeyEntity() {
+		return keyEntity;
+	}
+
+	/**
+	 * @return the valueEntity
+	 */
+	public JoEntity getValueEntity() {
+		return valueEntity;
+	}
+
+	/**
+	 * @return the crudProcessor
+	 */
+	public ICrudProcessor getCrudProcessor() {
+		return crudProcessor;
 	}
 }

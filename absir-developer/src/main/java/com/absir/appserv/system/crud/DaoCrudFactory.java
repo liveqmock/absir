@@ -25,7 +25,7 @@ import com.absir.orm.value.JoEntity;
 public class DaoCrudFactory implements ICrudFactory {
 
 	/** DAO_PROCESSOR */
-	private final ICrudProcessor DAO_PROCESSOR = new ICrudProcessor() {
+	private static final ICrudProcessor DAO_PROCESSOR = new ICrudProcessor() {
 
 		@Override
 		public void crud(CrudProperty crudProperty, Object entity, CrudHandler crudHandler, JiUserBase user) {

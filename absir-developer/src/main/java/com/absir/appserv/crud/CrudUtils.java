@@ -171,7 +171,7 @@ public abstract class CrudUtils {
 			if (pIterator != null) {
 				while (pIterator.hasNext()) {
 					CrudProperty crudProperty = pIterator.next();
-					if (crudInvoker.isSupport(crudProperty) && KernelArray.contain(crudProperty.getjCrud().getCruds(), crudInvoker.crud) && filter.isMatchPath(propertyPath, crudProperty.getName())) {
+					if (crudInvoker.isSupport(crudInvoker.crud, crudProperty) && filter.isMatchPath(propertyPath, crudProperty.getName())) {
 						crudInvoker.crudInvoke(crudProperty, entity);
 					}
 				}
@@ -227,9 +227,10 @@ public abstract class CrudUtils {
 
 	/**
 	 * @param joEntity
+	 * @param group
 	 * @return
 	 */
-	public static String[] getCrudFields(JoEntity joEntity, String group) {
+	public static String[] getGroupFields(JoEntity joEntity, String group) {
 		String crudFieldsKey = joEntity.getEntityName() + joEntity.getClass() + "/" + group;
 		String[] fields = Jo_Entity_Map_Crud_Fields.get(crudFieldsKey);
 		if (fields == null) {
@@ -241,10 +242,8 @@ public abstract class CrudUtils {
 						fields = (String[]) Developer.getRuntime(runtimeName);
 
 					} else {
-						fields = IDeveloper.ME.getCrudFields(joEntity, group);
-						// if (fields != null) {
+						fields = IDeveloper.ME.getGroupFields(joEntity, group);
 						Developer.setRuntime(runtimeName, fields);
-						// }
 					}
 
 					if (fields == null) {
@@ -523,6 +522,24 @@ public abstract class CrudUtils {
 	 * @param name
 	 * @return
 	 */
+	public static CrudProperty getCrudProperty(JoEntity joEntity, String name) {
+		CrudEntity crudEntity = getCrudEntity(joEntity);
+		if (crudEntity.crudProperties != null) {
+			for (CrudProperty crudProperty : crudEntity.crudProperties) {
+				if (crudProperty.getName().equals(name)) {
+					return crudProperty;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * @param joEntity
+	 * @param name
+	 * @return
+	 */
 	public static CrudPropertyReference getCrudPropertyReference(JoEntity joEntity, String name) {
 		CrudEntity crudEntity = getCrudEntity(joEntity);
 		if (crudEntity.crudPropertyReferences != null) {
@@ -578,7 +595,7 @@ public abstract class CrudUtils {
 	 */
 	private static void addCrudEntityProperty(JoEntity joEntity, CrudEntity crudEntity, JCrudField crudField, Class<?> entityClass) {
 		ICrudProcessor crudProcessor = getCrudProcessor(joEntity, crudField);
-		if (crudProcessor == null) {
+		if (crudProcessor == null && crudField.getJoEntity() == null && crudField.getKeyJoEntity() == null) {
 			return;
 		}
 
@@ -608,7 +625,10 @@ public abstract class CrudUtils {
 		crudProperty.include = crudField.getInclude();
 		crudProperty.exclude = crudField.getExclude();
 		crudProperty.jCrud = crudField.getjCrud();
-		if (crudProperty.jCrud != null) {
+		crudProperty.keyEntity = crudField.getKeyJoEntity();
+		crudProperty.valueEntity = crudField.getJoEntity();
+
+		if (crudProcessor != null && crudProperty.jCrud != null) {
 			crudEntity.addCrudProperty(crudProperty);
 		}
 

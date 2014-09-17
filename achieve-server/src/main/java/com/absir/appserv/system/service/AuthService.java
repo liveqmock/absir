@@ -240,7 +240,7 @@ public class AuthService {
 			throw new ServerException(ServerStatus.ON_DENIED);
 		}
 
-		String[] fields = CrudUtils.getCrudFields(joEntity, "option");
+		String[] fields = CrudUtils.getGroupFields(joEntity, "option");
 		Map<String, JeVote> fieldVotes = null;
 		if (fields == null || fields.length == 0) {
 			// 无过滤字段
@@ -281,7 +281,7 @@ public class AuthService {
 		}
 
 		// 锁定字段
-		String[] lockeds = CrudUtils.getCrudFields(joEntity, "locked");
+		String[] lockeds = CrudUtils.getGroupFields(joEntity, "locked");
 		if (lockeds == null || lockeds.length == 0) {
 			if (fieldVotes == null) {
 				return null;

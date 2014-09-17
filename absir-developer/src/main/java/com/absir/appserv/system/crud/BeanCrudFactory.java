@@ -22,9 +22,20 @@ import com.absir.orm.value.JoEntity;
  */
 public class BeanCrudFactory implements ICrudFactory {
 
-	/** BEAN_PROCESSOR */
-	private final ICrudProcessor BEAN_PROCESSOR = new ICrudProcessor() {
+	/**
+	 * @author absir
+	 *
+	 */
+	public static class Proccessor implements ICrudProcessor {
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * com.absir.appserv.crud.ICrudProcessor#crud(com.absir.appserv.crud
+		 * .CrudProperty, java.lang.Object, com.absir.appserv.crud.CrudHandler,
+		 * com.absir.appserv.system.bean.proxy.JiUserBase)
+		 */
 		@Override
 		public void crud(CrudProperty crudProperty, Object entity, CrudHandler crudHandler, JiUserBase user) {
 			// TODO Auto-generated method stub
@@ -32,7 +43,10 @@ public class BeanCrudFactory implements ICrudFactory {
 				((ICrudBean) entity).proccessCrud(crudHandler.getCrud(), crudHandler);
 			}
 		}
-	};
+	}
+
+	/** BEAN_PROCESSOR */
+	private final ICrudProcessor BEAN_PROCESSOR = new Proccessor();
 
 	/*
 	 * (non-Javadoc)

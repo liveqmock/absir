@@ -32,6 +32,12 @@ public class JoEntity implements Serializable {
 	private Class<?> entityClass;
 
 	/**
+	 * 
+	 */
+	public JoEntity() {
+	}
+
+	/**
 	 * @param entityName
 	 * @param entityClass
 	 */
@@ -60,10 +66,26 @@ public class JoEntity implements Serializable {
 	}
 
 	/**
+	 * @param entityName
+	 *            the entityName to set
+	 */
+	protected void setEntityName(String entityName) {
+		this.entityName = entityName;
+	}
+
+	/**
 	 * @return the entityClass
 	 */
 	public Class<?> getEntityClass() {
 		return entityClass;
+	}
+
+	/**
+	 * @param entityClass
+	 *            the entityClass to set
+	 */
+	protected void setEntityClass(Class<?> entityClass) {
+		this.entityClass = entityClass;
 	}
 
 	/** Jo_Entity_Map_Token */

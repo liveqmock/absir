@@ -152,8 +152,8 @@ public class DeveloperService implements IDeveloper, IDeploy {
 		}
 
 		List<JCrudField> crudFields = new ArrayList<JCrudField>();
-		for (IField field : entityModel.getFields()) {
-			if (field.getName().indexOf(".") < 0 && (field.getCrudField().getjCrud() != null || field.getCrudField().getCruds() != null)) {
+		for (IField field : entityModel.getCrudFields()) {
+			if (field.getCrudField().getjCrud() != null || field.getCrudField().getCruds() != null) {
 				crudFields.add(field.getCrudField());
 			}
 		}
@@ -173,11 +173,11 @@ public class DeveloperService implements IDeveloper, IDeploy {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * com.absir.appserv.crud.CrudUtils.ICrudDeveloper#getCrudFields(com.absir
+	 * com.absir.appserv.crud.CrudUtils.ICrudDeveloper#getGroupFields(com.absir
 	 * .appserv.support.entity.value.JoEntity, java.lang.String)
 	 */
 	@Override
-	public String[] getCrudFields(JoEntity joEntity, String group) {
+	public String[] getGroupFields(JoEntity joEntity, String group) {
 		// TODO Auto-generated method stub
 		EntityModel entityModel = ModelFactory.getModelEntity(joEntity);
 		if (entityModel == null) {

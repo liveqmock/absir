@@ -7,6 +7,8 @@
  */
 package com.absir.system.test.aop;
 
+import javax.persistence.Embeddable;
+
 import org.junit.Test;
 
 import com.absir.appserv.crud.CrudHandler;
@@ -14,8 +16,8 @@ import com.absir.appserv.crud.value.ICrudBean;
 import com.absir.appserv.lang.ILangBase;
 import com.absir.appserv.lang.LangBundleImpl;
 import com.absir.appserv.lang.value.Langs;
-import com.absir.appserv.system.bean.base.JbBean;
 import com.absir.appserv.system.bean.value.JaCrud.Crud;
+import com.absir.core.base.IBase;
 import com.absir.system.test.AbstractTestInject;
 
 /**
@@ -24,7 +26,8 @@ import com.absir.system.test.AbstractTestInject;
  */
 public class LangTest extends AbstractTestInject {
 
-	public static class LangBean extends JbBean {
+	@Embeddable
+	public static class LangEmbed {
 
 		public String name;
 
@@ -35,23 +38,40 @@ public class LangTest extends AbstractTestInject {
 		public String getName() {
 			return name;
 		}
+	}
 
-		/**
-		 * @param name
-		 *            the name to set
+	public static class LangBean extends LangEmbed implements IBase<Long> {
+
+		public Long id;
+
+		public LangEmbed langEmbed = new LangEmbed();
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see com.absir.core.base.IBase#getId()
 		 */
-		public void setName(String name) {
-			this.name = name;
+		@Override
+		public Long getId() {
+			// TODO Auto-generated method stub
+			return id;
 		}
 
+		/**
+		 * @return the langEmbed
+		 */
+		public LangEmbed getLangEmbed() {
+			return langEmbed;
+		}
 	}
 
 	@Test
 	public void test() throws Throwable {
 		try {
 			LangBean langBean = new LangBean();
-			langBean.setId(3L);
+			langBean.id = 3L;
 			langBean.name = "测试";
+			langBean.getLangEmbed().name = "测试子";
 			langBean = LangBundleImpl.ME.getLangProxy("LangBean", langBean);
 
 			CrudHandler crudHandler = new CrudHandler(null, null, null, null, langBean) {
@@ -59,23 +79,28 @@ public class LangTest extends AbstractTestInject {
 			((ICrudBean) langBean).proccessCrud(Crud.CREATE, crudHandler);
 
 			((ILangBase) langBean).setLang("name", 33, "test");
-			((ICrudBean) langBean).proccessCrud(Crud.UPDATE, crudHandler);
+			((ILangBase) langBean.getLangEmbed()).setLang("name", 33, "test123333");
+			((ICrudBean) langBean).proccessCrud(Crud.CREATE, crudHandler);
+			((ICrudBean) langBean.getLangEmbed()).proccessCrud(Crud.CREATE, crudHandler);
 
-			System.out.println(((ILangBase) langBean).getLang("name", 33, String.class));
+			ILangBase langBase = (ILangBase) langBean.getLangEmbed();
+			System.out.println(langBase.getLang("name", 33, String.class));
 
 			langBean = new LangBean();
-			langBean.setId(1L);
+			langBean.id = 3L;
 			langBean.name = "测试";
+			langBean.name = "测试子";
 			langBean = LangBundleImpl.ME.getLangProxy("LangBean", langBean);
 
 			System.out.println(langBean.getName());
+			System.out.println(langBean.getLangEmbed().getName());
 			System.out.println(((ILangBase) langBean).getLang("name", 33, String.class));
+			langBase = (ILangBase) langBean.getLangEmbed();
+			System.out.println(langBase.getLang("name", 33, String.class));
 
 		} catch (Throwable e) {
 			// TODO: handle exception
 			e.printStackTrace();
 		}
-
 	}
-
 }

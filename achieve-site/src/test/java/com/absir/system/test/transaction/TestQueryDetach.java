@@ -9,6 +9,7 @@ package com.absir.system.test.transaction;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -141,10 +142,14 @@ public class TestQueryDetach extends AbstractTestInject {
 		@Transaction
 		public void test4(Map<String, Object> locale) {
 			// locale.put("name", "2");
-			locale.put("id", "3323234");
+			locale = new HashMap<String, Object>();
+			locale.put("entity", "TTT444");
+			locale.put("name", "name");
+			locale.put("id", "sss123333333");
 			locale.put("_33", "123");
 
-			BeanDao.getSession().merge("JLocale", locale);
+			BeanDao.getSession().saveOrUpdate("JLocale", locale);
+			//BeanDao.getSession().merge("JLocale", locale);
 		}
 
 		@SuppressWarnings("unchecked")

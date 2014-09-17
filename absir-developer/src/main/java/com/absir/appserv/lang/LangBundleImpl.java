@@ -402,7 +402,7 @@ public class LangBundleImpl extends LangBundle {
 			}
 
 			Object value = null;
-			if (nameLocaleMapValue == null) {
+			if (nameLocaleMapValue != null) {
 				value = DynaBinderUtils.getMapValue(nameLocaleMapValue, new JEmbedSL(fieldName, (long) locale), type);
 				if (value != null) {
 					return value;
@@ -464,7 +464,7 @@ public class LangBundleImpl extends LangBundle {
 				handler.getCrudRecord().put(RECORD + entityName + "@" + id, Boolean.TRUE);
 			}
 
-			value.put("entityName", entityName);
+			value.put("entity", entityName);
 			value.put("id", id);
 			value.put("name", name);
 			return value;
@@ -486,7 +486,7 @@ public class LangBundleImpl extends LangBundle {
 				if (nameMapValue != null) {
 					for (Entry<Method, Entry<String, Class<?>>> methodEntry : langInterceptors.entrySet()) {
 						Entry<String, Class<?>> entry = methodEntry.getValue();
-						if (!nameMapValue.containsKey(entry.getKey())) {
+						if (entry.getKey() != null && !nameMapValue.containsKey(entry.getKey())) {
 							Map<String, Object> value = getMapValue(mapValue, entry.getKey(), handler);
 							value.put("_" + ME.getLocaleCode(), DynaBinderUtils.to(KernelReflect.invoke(entity, methodEntry.getKey()), String.class));
 						}
@@ -505,7 +505,7 @@ public class LangBundleImpl extends LangBundle {
 				}
 
 				if (!mapValue.isEmpty()) {
-					BeanService.ME.mergers(mapValue.values());
+					BeanService.ME.mergers("JLocale", mapValue.values());
 				}
 
 			} else if (crud == Crud.DELETE) {
@@ -669,7 +669,6 @@ public class LangBundleImpl extends LangBundle {
 			if (langInterceptors == null) {
 				langInterceptors = new HashMap<Method, Map.Entry<String, Class<?>>>();
 				final Map<Method, Entry<String, Class<?>>> interceptor = langInterceptors;
-				entityMapLangInterceptors.put(entityName, langInterceptors);
 				InjectBeanFactory.getInstance().getMethodEntries(entityClass, new IMethodEntry<Entry<String, Class<?>>>() {
 
 					@Override
@@ -714,7 +713,7 @@ public class LangBundleImpl extends LangBundle {
 																}
 															}
 
-															return ME.getLangProxy(joEntity, entities, ids);
+															return ME.getLangProxy(entityName, joEntity, entities, ids);
 														}
 
 													};
@@ -742,7 +741,7 @@ public class LangBundleImpl extends LangBundle {
 																}
 															}
 
-															return ME.getLangProxy(joEntity, entities, ids);
+															return ME.getLangProxy(entityName, joEntity, entities, ids);
 														}
 													};
 
@@ -769,7 +768,7 @@ public class LangBundleImpl extends LangBundle {
 																}
 															}
 
-															return ME.getLangProxy(joEntity, entities, ids);
+															return ME.getLangProxy(entityName, joEntity, entities, ids);
 														}
 													};
 
@@ -781,7 +780,7 @@ public class LangBundleImpl extends LangBundle {
 															// TODO
 															// Auto-generated
 															// method stub
-															return ME.getLangProxy(joEntity, value, ided ? ((IBase) value).getId() : langIterceptor.entityName + "@" + langIterceptor.id);
+															return ME.getLangProxy(entityName, joEntity, value, ided ? ((IBase) value).getId() : langIterceptor.entityName + "@" + langIterceptor.id);
 														}
 
 													};
@@ -814,6 +813,9 @@ public class LangBundleImpl extends LangBundle {
 					// 执行接口方法
 					langInterceptors.putAll(methodMapLangEntryImpl);
 				}
+
+				// 最后设置
+				entityMapLangInterceptors.put(entityName, langInterceptors);
 			}
 
 			if ((Object) langInterceptors == KernelLang.NULL_MAP) {
@@ -865,7 +867,7 @@ public class LangBundleImpl extends LangBundle {
 		if (isI18n() && !entities.isEmpty()) {
 			Object entity = entities.get(0);
 			if (entity instanceof IBase) {
-				return (List<T>) getLangProxy(new JoEntity(entityName, entity.getClass()), entities, HelperBase.getBaseIds((Collection<? extends IBase>) entities));
+				return (List<T>) getLangProxy(entityName, new JoEntity(entityName, entity.getClass()), entities, HelperBase.getBaseIds((Collection<? extends IBase>) entities));
 			}
 		}
 
@@ -905,17 +907,18 @@ public class LangBundleImpl extends LangBundle {
 	}
 
 	/**
+	 * @param entityName
 	 * @param joEntity
 	 * @param entity
 	 * @param id
 	 * @return
 	 */
-	public <T> T getLangProxy(JoEntity joEntity, T entity, Object id) {
+	public <T> T getLangProxy(String entityName, JoEntity joEntity, T entity, Object id) {
 		if (isI18n()) {
 			Map<Method, Entry<String, Class<?>>> langInterceptors = getLangInterceptors(joEntity.getEntityName(), joEntity.getEntityClass());
 			if (langInterceptors != null) {
 				AopProxy proxy = AopProxyUtils.getProxy(entity, langInterfaces, false, true);
-				proxy.getAopInterceptors().add(getLangIterceptor(joEntity.getEntityName(), DynaBinderUtils.getParamFromValue(id), langInterceptors));
+				proxy.getAopInterceptors().add(getLangIterceptor(joEntity.getEntityName() == null ? entityName : joEntity.getEntityName(), DynaBinderUtils.getParamFromValue(id), langInterceptors));
 				return (T) proxy;
 			}
 		}
@@ -924,6 +927,7 @@ public class LangBundleImpl extends LangBundle {
 	}
 
 	/**
+	 * @param entityName
 	 * @param joEntity
 	 * @param entity
 	 * @param id
@@ -931,21 +935,22 @@ public class LangBundleImpl extends LangBundle {
 	 * @param nameMapValue
 	 * @return
 	 */
-	protected <T> T getLangProxy(JoEntity joEntity, T entity, String id, Map<Method, Entry<String, Class<?>>> langInterceptors, Map<String, Map<String, Object>> nameMapValue) {
+	protected <T> T getLangProxy(String entityName, JoEntity joEntity, T entity, String id, Map<Method, Entry<String, Class<?>>> langInterceptors, Map<String, Map<String, Object>> nameMapValue) {
 		AopProxy proxy = AopProxyUtils.getProxy(entity, langInterfaces, false, true);
-		LangIterceptor langIterceptor = getLangIterceptor(joEntity.getEntityName(), DynaBinderUtils.getParamFromValue(id), langInterceptors);
+		LangIterceptor langIterceptor = getLangIterceptor(joEntity.getEntityName() == null ? entityName : joEntity.getEntityName(), DynaBinderUtils.getParamFromValue(id), langInterceptors);
 		langIterceptor.nameMapValue = nameMapValue;
 		proxy.getAopInterceptors().add(langIterceptor);
 		return (T) proxy;
 	}
 
 	/**
+	 * @param entityName
 	 * @param joEntity
 	 * @param entities
 	 * @param ids
 	 * @return
 	 */
-	public <T> T[] getLangProxy(JoEntity joEntity, T[] entities, Object[] ids) {
+	public <T> T[] getLangProxy(String entityName, JoEntity joEntity, T[] entities, Object[] ids) {
 		if (isI18n() && entities.length > 0) {
 			Map<Method, Entry<String, Class<?>>> langInterceptors = getLangInterceptors(joEntity.getEntityName(), joEntity.getEntityClass());
 			if (langInterceptors != null) {
@@ -961,7 +966,7 @@ public class LangBundleImpl extends LangBundle {
 
 					}
 
-					entities[i] = getLangProxy(joEntity, entities[i], id, langInterceptors, nameMapValue);
+					entities[i] = getLangProxy(entityName, joEntity, entities[i], id, langInterceptors, nameMapValue);
 				}
 
 				if (!finds.isEmpty()) {
@@ -973,7 +978,7 @@ public class LangBundleImpl extends LangBundle {
 							nameMapValue = createLangNameMapValue(joEntity.getEntityName(), id);
 						}
 
-						entities[i] = getLangProxy(joEntity, entities[i], id, langInterceptors, nameMapValue);
+						entities[i] = getLangProxy(entityName, joEntity, entities[i], id, langInterceptors, nameMapValue);
 					}
 				}
 			}
@@ -983,16 +988,17 @@ public class LangBundleImpl extends LangBundle {
 	}
 
 	/**
+	 * @param entityName
 	 * @param joEntity
 	 * @param entities
 	 * @param ids
 	 * @return
 	 */
-	public <T> Collection<T> getLangProxy(JoEntity joEntity, Collection<T> entities, Object[] ids) {
+	public <T> Collection<T> getLangProxy(String entityName, JoEntity joEntity, Collection<T> entities, Object[] ids) {
 		if (isI18n() && !entities.isEmpty()) {
 			Map<Method, Entry<String, Class<?>>> langInterceptors = getLangInterceptors(joEntity.getEntityName(), joEntity.getEntityClass());
 			if (langInterceptors != null) {
-				List<T> list = getLangProxyList(joEntity, entities, ids, langInterceptors);
+				List<T> list = getLangProxyList(entityName, joEntity, entities, ids, langInterceptors);
 				entities.clear();
 				entities.addAll(list);
 			}
@@ -1002,13 +1008,14 @@ public class LangBundleImpl extends LangBundle {
 	}
 
 	/**
+	 * @param entityName
 	 * @param joEntity
 	 * @param entities
 	 * @param ids
 	 * @param langInterceptors
 	 * @return
 	 */
-	protected <T> List<T> getLangProxyList(JoEntity joEntity, Collection<T> entities, Object[] ids, Map<Method, Entry<String, Class<?>>> langInterceptors) {
+	protected <T> List<T> getLangProxyList(String entityName, JoEntity joEntity, Collection<T> entities, Object[] ids, Map<Method, Entry<String, Class<?>>> langInterceptors) {
 		List<T> list = new ArrayList<T>(entities);
 		List<Integer> is = new ArrayList<Integer>();
 		List<String> finds = new ArrayList<String>();
@@ -1022,7 +1029,7 @@ public class LangBundleImpl extends LangBundle {
 
 			}
 
-			list.set(i, getLangProxy(joEntity, list.get(i), id, langInterceptors, nameMapValue));
+			list.set(i, getLangProxy(entityName, joEntity, list.get(i), id, langInterceptors, nameMapValue));
 		}
 
 		if (!finds.isEmpty()) {
@@ -1034,7 +1041,7 @@ public class LangBundleImpl extends LangBundle {
 					nameMapValue = createLangNameMapValue(joEntity.getEntityName(), id);
 				}
 
-				list.set(i, getLangProxy(joEntity, list.get(i), id, langInterceptors, nameMapValue));
+				list.set(i, getLangProxy(entityName, joEntity, list.get(i), id, langInterceptors, nameMapValue));
 			}
 		}
 
@@ -1042,17 +1049,18 @@ public class LangBundleImpl extends LangBundle {
 	}
 
 	/**
+	 * @param entityName
 	 * @param joEntity
 	 * @param entityMap
 	 * @param ids
 	 * @return
 	 */
-	public <K, V> Map<K, V> getLangProxy(JoEntity joEntity, Map<K, V> entityMap, Object[] ids) {
+	public <K, V> Map<K, V> getLangProxy(String entityName, JoEntity joEntity, Map<K, V> entityMap, Object[] ids) {
 		if (isI18n() && !entityMap.isEmpty()) {
 			Map<Method, Entry<String, Class<?>>> langInterceptors = getLangInterceptors(joEntity.getEntityName(), joEntity.getEntityClass());
 			if (langInterceptors != null) {
 				if (langInterceptors != null) {
-					List<V> list = getLangProxyList(joEntity, entityMap.values(), ids, langInterceptors);
+					List<V> list = getLangProxyList(entityName, joEntity, entityMap.values(), ids, langInterceptors);
 					int i = 0;
 					for (Entry<K, V> entry : entityMap.entrySet()) {
 						entry.setValue(list.get(i++));

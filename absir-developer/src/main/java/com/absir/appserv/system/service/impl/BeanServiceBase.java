@@ -214,7 +214,8 @@ public class BeanServiceBase implements BeanService, ICrudSupply {
 	@Override
 	public <T> T merge(T entity) {
 		// TODO Auto-generated method stub
-		return (T) getSession().merge(entity);
+		getSession().saveOrUpdate(entity);
+		return entity;
 	}
 
 	/*
@@ -226,7 +227,8 @@ public class BeanServiceBase implements BeanService, ICrudSupply {
 	@Override
 	public <T> T merge(String entityName, T entity) {
 		// TODO Auto-generated method stub
-		return (T) getSession().merge(entityName, entity);
+		getSession().saveOrUpdate(entityName, entity);
+		return entity;
 	}
 
 	/*
@@ -418,7 +420,7 @@ public class BeanServiceBase implements BeanService, ICrudSupply {
 		// TODO Auto-generated method stub
 		Session session = getSession();
 		for (Object entity : entities) {
-			session.merge(entity);
+			session.saveOrUpdate(entity);
 		}
 	}
 
@@ -434,7 +436,7 @@ public class BeanServiceBase implements BeanService, ICrudSupply {
 		// TODO Auto-generated method stub
 		Session session = getSession();
 		for (Object entity : entities) {
-			session.merge(entityName, entity);
+			session.saveOrUpdate(entityName, entity);
 		}
 	}
 

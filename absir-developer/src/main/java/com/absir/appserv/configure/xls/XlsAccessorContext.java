@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
 
+import com.absir.appserv.lang.LangBundleImpl;
 import com.absir.core.kernel.KernelClass;
 import com.absir.core.kernel.KernelLang.ObjectTemplate;
 
@@ -21,6 +22,8 @@ import com.absir.core.kernel.KernelLang.ObjectTemplate;
  */
 @SuppressWarnings("unchecked")
 public class XlsAccessorContext extends XlsAccessorBean {
+
+	protected String beanName;
 
 	/** isXlsBean */
 	private boolean isXlsBean;
@@ -35,7 +38,7 @@ public class XlsAccessorContext extends XlsAccessorBean {
 	public XlsAccessorContext(Class<?> beanClass, XlsBase xlsBase) {
 		super(null, beanClass);
 		// TODO Auto-generated constructor stub
-		this.beanClass = beanClass;
+		beanName = beanClass.getSimpleName();
 		accessors = getXlsAccessors(beanClass, xlsBase);
 		if (XlsBase.class.isAssignableFrom(beanClass)) {
 			if (XlsBean.class.isAssignableFrom(beanClass)) {
@@ -87,6 +90,7 @@ public class XlsAccessorContext extends XlsAccessorBean {
 			bean = KernelClass.newInstance(beanClass);
 			if (bean instanceof XlsBase) {
 				((XlsBase) bean).id = id;
+				bean = LangBundleImpl.ME.getLangProxy(beanName, bean);
 			}
 		}
 

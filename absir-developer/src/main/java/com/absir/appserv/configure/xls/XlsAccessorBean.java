@@ -44,6 +44,7 @@ public class XlsAccessorBean extends XlsAccessor {
 	 */
 	public XlsAccessorBean(Field field, Class<?> beanClass) {
 		super(field, beanClass);
+		this.beanClass = beanClass;
 	}
 
 	/**
@@ -54,7 +55,6 @@ public class XlsAccessorBean extends XlsAccessor {
 	public XlsAccessorBean(Field field, Class<?> beanClass, XlsBase xlsBase) {
 		super(field, beanClass);
 		// TODO Auto-generated constructor stub
-		this.beanClass = beanClass;
 		if (!xlsBase.is(beanClass)) {
 			XaReferenced xaReferenced = field.getAnnotation(XaReferenced.class);
 			if (xaReferenced == null || xaReferenced.value()) {

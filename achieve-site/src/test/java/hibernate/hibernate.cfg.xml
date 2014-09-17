@@ -20,7 +20,7 @@
 		<property name="dialect">org.hibernate.dialect.MySQLDialect</property>
 		<property name="current_session_context_class">com.absir.orm.hibernate.transaction.JSessionContext</property>
 		<!-- 向标准输出设备输出hibernate为我们生成的SQL语句。 -->
-		<property name="show_sql">false</property>
+		<property name="show_sql">${database.show}</property>
 		<!-- 自动创建数据库 -->
 		<property name="hbm2ddl.auto">update</property>
 		<!-- 指定要用到的映射文件，就是我们刚才创建的。<mapping resource="" /> -->

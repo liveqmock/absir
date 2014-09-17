@@ -29,7 +29,7 @@ public class BeanCrudFactory implements ICrudFactory {
 		public void crud(CrudProperty crudProperty, Object entity, CrudHandler crudHandler, JiUserBase user) {
 			// TODO Auto-generated method stub
 			if (crudHandler.getRoot() != entity && entity instanceof ICrudBean) {
-				((ICrudBean) entity).proccessCrud(crudHandler.getCrud());
+				((ICrudBean) entity).proccessCrud(crudHandler.getCrud(), crudHandler);
 			}
 		}
 	};

@@ -49,6 +49,7 @@ import com.absir.appserv.client.service.utils.FightServiceUtils;
 import com.absir.appserv.configure.JConfigureUtils;
 import com.absir.appserv.configure.xls.XlsDao;
 import com.absir.appserv.configure.xls.XlsUtils;
+import com.absir.appserv.crud.CrudHandler;
 import com.absir.appserv.crud.value.ICrudBean;
 import com.absir.appserv.feature.menu.value.MaEntity;
 import com.absir.appserv.feature.menu.value.MaMenu;
@@ -1083,11 +1084,11 @@ public class PlayerContext extends ContextBean<Long> implements ICrudBean {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * com.absir.appserv.system.crud.value.ICrudBean#proccessCrud(com.absir.
-	 * appserv.system.bean.value.JaCrud.Crud)
+	 * com.absir.appserv.crud.value.ICrudBean#proccessCrud(com.absir.appserv
+	 * .system.bean.value.JaCrud.Crud, com.absir.appserv.crud.CrudHandler)
 	 */
 	@Override
-	public synchronized void proccessCrud(Crud crud) {
+	public synchronized void proccessCrud(Crud crud, CrudHandler crudHandler) {
 		// TODO Auto-generated method stub
 		if (crud == Crud.UPDATE) {
 			SocketService.writeByteObject(this, SocketService.CALLBACK_MODIFY, "");

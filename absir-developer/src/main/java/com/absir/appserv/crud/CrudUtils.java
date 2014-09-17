@@ -112,7 +112,7 @@ public abstract class CrudUtils {
 			filter = filter.newly();
 		}
 
-		crud(entity, crudEntity, new CrudInvoker(crud, crudRecord, filter, crudEntity, entity) {
+		CrudInvoker crudInvoker = new CrudInvoker(crud, crudRecord, filter, crudEntity, entity) {
 
 			@Override
 			public boolean isSupport(CrudProperty crudProperty) {
@@ -125,11 +125,11 @@ public abstract class CrudUtils {
 				// TODO Auto-generated method stub
 				crudProperty.crudProcessor.crud(crudProperty, entity, this, user);
 			}
+		};
 
-		});
-
+		crud(entity, crudEntity, crudInvoker);
 		if (entity instanceof ICrudBean) {
-			((ICrudBean) entity).proccessCrud(crud);
+			((ICrudBean) entity).proccessCrud(crud, crudInvoker);
 		}
 	}
 

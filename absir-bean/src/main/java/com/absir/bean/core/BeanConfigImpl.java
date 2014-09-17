@@ -269,14 +269,14 @@ public class BeanConfigImpl implements BeanConfig {
 							if (chr == '#') {
 								return;
 
-							} else if (chr == '{') {
+							} else if (chr == '{' && length == 2 && template.charAt(1) == '"') {
 								blockBuilder = new StringBuilder();
 								blockAppending = 1;
 								return;
 							}
 
 						} else if (blockAppending > 0) {
-							if (chr == '}' && template.trim().length() == 1) {
+							if (chr == '"' && length == 2 && template.charAt(1) == '}') {
 								blockAppending = 0;
 
 							} else {

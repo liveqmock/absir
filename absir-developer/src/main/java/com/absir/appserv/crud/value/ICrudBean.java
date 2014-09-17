@@ -7,6 +7,7 @@
  */
 package com.absir.appserv.crud.value;
 
+import com.absir.appserv.crud.CrudHandler;
 import com.absir.appserv.system.bean.value.JaCrud.Crud;
 
 /**
@@ -17,6 +18,7 @@ public interface ICrudBean {
 
 	/**
 	 * @param crud
+	 * @param handler
 	 */
-	public void proccessCrud(Crud crud);
+	public void proccessCrud(Crud crud, CrudHandler handler);
 }

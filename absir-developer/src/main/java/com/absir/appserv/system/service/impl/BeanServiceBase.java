@@ -20,6 +20,7 @@ import org.hibernate.SessionFactory;
 import com.absir.appserv.crud.ICrudSupply;
 import com.absir.appserv.jdbc.JdbcCondition;
 import com.absir.appserv.jdbc.JdbcPage;
+import com.absir.appserv.lang.LangBundleImpl;
 import com.absir.appserv.system.bean.base.JbBean;
 import com.absir.appserv.system.bean.proxy.JiSub;
 import com.absir.appserv.system.bean.proxy.JiTree;
@@ -575,7 +576,7 @@ public class BeanServiceBase implements BeanService, ICrudSupply {
 			((JiSub) entity).getSub();
 		}
 
-		return entity;
+		return LangBundleImpl.ME.getLangProxy(entityName, entity);
 	}
 
 	/*
@@ -588,7 +589,7 @@ public class BeanServiceBase implements BeanService, ICrudSupply {
 	@Override
 	public List list(String entityName, JdbcCondition jdbcCondition, String queue, int firstResult, int maxResults) {
 		// TODO Auto-generated method stub
-		return QueryDaoUtils.selectQuery(getSession(), entityName, jdbcCondition, queue, firstResult, maxResults);
+		return LangBundleImpl.ME.getLangProxy(entityName, QueryDaoUtils.selectQuery(getSession(), entityName, jdbcCondition, queue, firstResult, maxResults));
 	}
 
 	/*
@@ -602,7 +603,7 @@ public class BeanServiceBase implements BeanService, ICrudSupply {
 	@Override
 	public List list(String entityName, JdbcCondition jdbcCondition, String queue, JdbcPage jdbcPage) {
 		// TODO Auto-generated method stub
-		return QueryDaoUtils.selectQuery(getSession(), entityName, jdbcCondition, queue, jdbcPage);
+		return LangBundleImpl.ME.getLangProxy(entityName, QueryDaoUtils.selectQuery(getSession(), entityName, jdbcCondition, queue, jdbcPage));
 	}
 
 	/*
@@ -613,7 +614,7 @@ public class BeanServiceBase implements BeanService, ICrudSupply {
 	@Override
 	public Object create(String entityName) {
 		// TODO Auto-generated method stub
-		return KernelClass.newInstance(getEntityClass(entityName));
+		return LangBundleImpl.ME.getLangProxy(entityName, KernelClass.newInstance(getEntityClass(entityName)));
 	}
 
 	/*

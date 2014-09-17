@@ -26,6 +26,7 @@ import com.absir.aop.AopProxy;
 import com.absir.aop.AopProxyHandler;
 import com.absir.aop.AopProxyUtils;
 import com.absir.appserv.crud.CrudEntity;
+import com.absir.appserv.crud.CrudHandler;
 import com.absir.appserv.crud.CrudPropertyReference;
 import com.absir.appserv.crud.CrudUtils;
 import com.absir.appserv.crud.value.ICrudBean;
@@ -70,6 +71,9 @@ public class LangBundleImpl extends LangBundle {
 
 	/** ME */
 	public static final LangBundleImpl ME = BeanFactoryUtils.get(LangBundleImpl.class);
+
+	/** RECORD */
+	public static final String RECORD = "LOCALE@";
 
 	/** langInterfaces */
 	private Set<Class<?>> langInterfaces = new HashSet<Class<?>>();
@@ -448,10 +452,30 @@ public class LangBundleImpl extends LangBundle {
 		}
 
 		/**
+		 * @param mapValue
+		 * @param name
+		 * @param handler
+		 * @return
+		 */
+		protected Map<String, Object> getMapValue(Map<String, Map<String, Object>> mapValue, String name, CrudHandler handler) {
+			Map<String, Object> value = new HashMap<String, Object>();
+			mapValue.put(name, value);
+			if (handler.getCrudRecord() != null) {
+				handler.getCrudRecord().put(RECORD + entityName + "@" + id, Boolean.TRUE);
+			}
+
+			value.put("entityName", entityName);
+			value.put("id", id);
+			value.put("name", name);
+			return value;
+		}
+
+		/**
 		 * @param entity
 		 * @param crud
+		 * @param handler
 		 */
-		public void proccessCrud(Object entity, Crud crud) {
+		public void proccessCrud(Object entity, Crud crud, CrudHandler handler) {
 			// TODO Auto-generated method stub
 			if (crud == Crud.CREATE || crud == Crud.UPDATE) {
 				if (nameMapValue == null && crud == Crud.CREATE) {
@@ -463,11 +487,7 @@ public class LangBundleImpl extends LangBundle {
 					for (Entry<Method, Entry<String, Class<?>>> methodEntry : langInterceptors.entrySet()) {
 						Entry<String, Class<?>> entry = methodEntry.getValue();
 						if (!nameMapValue.containsKey(entry.getKey())) {
-							Map<String, Object> value = new HashMap<String, Object>();
-							mapValue.put(entry.getKey(), value);
-							value.put("entityName", entityName);
-							value.put("id", id);
-							value.put("name", entry.getKey());
+							Map<String, Object> value = getMapValue(mapValue, entry.getKey(), handler);
 							value.put("_" + ME.getLocaleCode(), DynaBinderUtils.to(KernelReflect.invoke(entity, methodEntry.getKey()), String.class));
 						}
 					}
@@ -476,11 +496,7 @@ public class LangBundleImpl extends LangBundle {
 						for (Entry<JEmbedSL, Object> entry : nameLocaleMapValue.entrySet()) {
 							Map<String, Object> value = mapValue.get(entry.getKey().getEid());
 							if (value == null) {
-								value = new HashMap<String, Object>();
-								mapValue.put(entry.getKey().getEid(), value);
-								value.put("entityName", entityName);
-								value.put("id", id);
-								value.put("name", entry.getKey().getEid());
+								value = getMapValue(mapValue, entry.getKey().getEid(), handler);
 							}
 
 							value.put("_" + entry.getKey().getMid(), DynaBinderUtils.to(entry.getValue(), String.class));
@@ -493,7 +509,9 @@ public class LangBundleImpl extends LangBundle {
 				}
 
 			} else if (crud == Crud.DELETE) {
-				deleteLangMapValue(entityName, id);
+				if (handler.getCrudRecord() == null || !handler.getCrudRecord().containsKey(RECORD + entityName + "@" + id)) {
+					deleteLangMapValue(entityName, id);
+				}
 			}
 		}
 	}
@@ -603,7 +621,7 @@ public class LangBundleImpl extends LangBundle {
 					public Object invoke(LangIterceptor iterceptor, Object proxy, Iterator<AopInterceptor> iterator, Entry<String, Class<?>> interceptor, AopProxyHandler proxyHandler, Method method,
 							Object[] args, MethodProxy methodProxy) {
 						// TODO Auto-generated method stub
-						iterceptor.proccessCrud(proxyHandler.getBeanObject(), (Crud) args[0]);
+						iterceptor.proccessCrud(proxyHandler.getBeanObject(), (Crud) args[0], (CrudHandler) args[1]);
 						return null;
 					}
 
@@ -616,7 +634,7 @@ public class LangBundleImpl extends LangBundle {
 							public Object invoke(LangIterceptor iterceptor, Object proxy, Iterator<AopInterceptor> iterator, Entry<String, Class<?>> interceptor, AopProxyHandler proxyHandler,
 									Method method, Object[] args, MethodProxy methodProxy) {
 								// TODO Auto-generated method stub
-								((ICrudBean) proxyHandler.getBeanObject()).proccessCrud((Crud) args[0]);
+								((ICrudBean) proxyHandler.getBeanObject()).proccessCrud((Crud) args[0], (CrudHandler) args[1]);
 								invoke(iterceptor, proxy, iterator, interceptor, proxyHandler, method, args, methodProxy);
 								return null;
 							}
@@ -836,6 +854,22 @@ public class LangBundleImpl extends LangBundle {
 		}
 
 		return entity;
+	}
+
+	/**
+	 * @param entityName
+	 * @param entities
+	 * @return
+	 */
+	public <T> List<T> getLangProxy(final String entityName, final List<T> entities) {
+		if (isI18n() && !entities.isEmpty()) {
+			Object entity = entities.get(0);
+			if (entity instanceof IBase) {
+				return (List<T>) getLangProxy(new JoEntity(entityName, entity.getClass()), entities, HelperBase.getBaseIds((Collection<? extends IBase>) entities));
+			}
+		}
+
+		return entities;
 	}
 
 	/**

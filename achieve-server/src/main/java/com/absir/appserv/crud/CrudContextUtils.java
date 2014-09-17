@@ -142,7 +142,7 @@ public abstract class CrudContextUtils extends CrudUtils {
 		}
 
 		crudFilter.setPropertyPath("");
-		crud(entity, crudEntity, new CrudInvoker(crud, crudRecord, crudFilter, crudEntity, entity) {
+		CrudInvoker crudInvoker = new CrudInvoker(crud, crudRecord, crudFilter, crudEntity, entity) {
 
 			@Override
 			public boolean isSupport(CrudProperty crudProperty) {
@@ -155,11 +155,11 @@ public abstract class CrudContextUtils extends CrudUtils {
 				// TODO Auto-generated method stub
 				crudProperty.crudProcessor.crud(crudProperty, entity, this, user);
 			}
+		};
 
-		});
-
+		crud(entity, crudEntity, crudInvoker);
 		if (entity instanceof ICrudBean) {
-			((ICrudBean) entity).proccessCrud(crud);
+			((ICrudBean) entity).proccessCrud(crud, crudInvoker);
 		}
 	}
 

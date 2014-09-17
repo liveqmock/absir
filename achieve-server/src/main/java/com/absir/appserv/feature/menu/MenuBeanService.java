@@ -15,6 +15,7 @@ import java.util.Map;
 import org.hibernate.Session;
 
 import com.absir.appserv.feature.menu.value.MeUrlType;
+import com.absir.appserv.lang.LangBundleImpl;
 import com.absir.appserv.system.bean.JMaMenu;
 import com.absir.appserv.system.bean.JMenu;
 import com.absir.appserv.system.bean.JMenuCite;
@@ -119,7 +120,7 @@ public class MenuBeanService {
 			depth = 1;
 		}
 
-		return getMenuBeans(menuCite.getMenu(), user, depth);
+		return getMenuBeans(LangBundleImpl.ME.getLangProxy("JMenu", menuCite.getMenu()), user, depth);
 	}
 
 	/**

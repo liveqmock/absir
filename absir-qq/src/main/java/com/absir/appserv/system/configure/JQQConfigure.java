@@ -20,13 +20,10 @@ import com.absir.appserv.system.bean.value.JaLang;
 public class JQQConfigure extends JConfigureBase {
 
 	@JaLang("APPID")
-	private String appid;
+	private String appid = "1101844941";
 
 	@JaLang("Product Key")
-	private String appkey;
-
-	@JaLang("Product Secret")
-	private String appSecret;
+	private String appkey = "IxmQA1o4DTkSeNJk";
 
 	@JaLang("沙盒测试")
 	private boolean sandbox;
@@ -59,21 +56,6 @@ public class JQQConfigure extends JConfigureBase {
 	 */
 	public void setAppkey(String appkey) {
 		this.appkey = appkey;
-	}
-
-	/**
-	 * @return the appSecret
-	 */
-	public String getAppSecret() {
-		return appSecret;
-	}
-
-	/**
-	 * @param appSecret
-	 *            the appSecret to set
-	 */
-	public void setAppSecret(String appSecret) {
-		this.appSecret = appSecret;
 	}
 
 	/**

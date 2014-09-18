@@ -6,12 +6,12 @@
 		<artifactId>parent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>absir-qq</artifactId>
+	<artifactId>absir-open</artifactId>
 	<version>${com.absir.version}</version>
 	<dependencies>
 		<dependency>
 			<groupId>com.absir</groupId>
-			<artifactId>absir-open</artifactId>
+			<artifactId>achieve-server</artifactId>
 			<version>${com.absir.version}</version>
 		</dependency>
 		<!-- Servlet -->
@@ -20,6 +20,16 @@
 			<artifactId>servlet-api</artifactId>
 			<version>2.5</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>jaxen</groupId>
+			<artifactId>jaxen</artifactId>
+			<version>1.1.4</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+			<version>3.1</version>
 		</dependency>
 	</dependencies>
 </project>

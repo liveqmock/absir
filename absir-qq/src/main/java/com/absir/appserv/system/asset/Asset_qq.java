@@ -7,6 +7,8 @@
  */
 package com.absir.appserv.system.asset;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.absir.appserv.system.bean.JPayTrade;
 import com.absir.appserv.system.bean.value.JePayStatus;
 import com.absir.appserv.system.service.BeanService;
@@ -29,40 +31,42 @@ public class Asset_qq extends AssetServer {
 	private QQService duoKuService;
 
 	/**
-	 * @param orderid
-	 * @param amount
-	 * @param result
-	 * @param cardtype
-	 * @param timetamp
-	 * @param client_secret
+	 * @param billno
+	 * @param amt
+	 * @param token
+	 * @param appmeta
+	 * @param sig
 	 * @return
 	 */
 	@Body
-	public String notify(@Param String orderid, @Param float amount, final @Param int result, @Param String cardtype, @Param long timetamp, @Param String client_secret) {
-		final JPayTrade payTrade = BeanService.ME.get(JPayTrade.class, orderid);
+	public String notify(@Param String billno, @Param float amt, final @Param String token, @Param String appmeta, @Param String sig, HttpServletRequest request) {
+		final JPayTrade payTrade = BeanService.ME.get(JPayTrade.class, billno);
 		if (payTrade != null) {
 			if (payTrade.getStatus() != null) {
 				// 订单重复通知,且上次通知无异常
 				return "ERROR_REPEAT";
 			}
 
-			if ((int) Math.floor(amount) != payTrade.getAmount()) {
+			if ((int) Math.floor(amt) != payTrade.getAmount()) {
 				// 订单用户信息不匹配
 				return "ERROR_USER";
 			}
 
 			// 平台信息
 			payTrade.setPlatform(QQService.PLAT_FORM_NAME);
-			payTrade.setPlatformData(cardtype);
+			payTrade.setPlatformData(sig);
 			// 通知回调
-			ContextUtils.getThreadPoolExecutor().execute(new Runnable() {
+			String sign = QQService.sign(request);
+			if (sign != null && sign.equals(sign)) {
+				ContextUtils.getThreadPoolExecutor().execute(new Runnable() {
 
-				@Override
-				public void run() {
-					// TODO Auto-generated method stub
-					PayUtils.notify(duoKuService, payTrade, result == 1 ? JePayStatus.PAYED : JePayStatus.ERROR);
-				}
-			});
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						PayUtils.notify(duoKuService, payTrade, JePayStatus.PAYED);
+					}
+				});
+			}
 
 			return "SUCCESS";
 		}

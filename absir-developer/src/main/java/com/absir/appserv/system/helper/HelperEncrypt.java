@@ -167,8 +167,9 @@ public class HelperEncrypt {
 		StringBuffer sb = new StringBuffer(32);
 		sb.append(secrect);
 		while (sb.length() < 32) {
-			sb.append("0");
+			sb.append('0');
 		}
+
 		if (sb.length() > 32) {
 			sb.setLength(32);
 		}

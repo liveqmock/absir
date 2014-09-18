@@ -40,6 +40,9 @@
         <dependent-module archiveName="absir-developerImpl-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-developerImpl/absir-developerImpl">
             <dependency-type>uses</dependency-type>
         </dependent-module>
+        <dependent-module archiveName="absir-open-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-open/absir-open">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <dependent-module archiveName="absir-duoku-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-duoku/absir-duoku">
             <dependency-type>uses</dependency-type>
         </dependent-module>

@@ -108,15 +108,15 @@ public abstract class PayUtils {
 	 * @return
 	 */
 	public static Object notify(IPayInterface payInterface, JPayTrade payTrade, JePayStatus payStatus) {
-		if (payStatus == JePayStatus.PAYED || payStatus == JePayStatus.COMPLETE) {
-			if (payTrade.getStatus() != JePayStatus.COMPLETE) {
+		if (payStatus != JePayStatus.COMPLETE) {
+			if (payStatus == JePayStatus.PAYED) {
 				return proccess(payTrade);
-			}
 
-		} else if (payTrade.getStatus() == null) {
-			payTrade.setStatus(payStatus);
-			BeanService.ME.merge(payTrade);
-			return Boolean.TRUE;
+			} else if (payTrade.getStatus() == null) {
+				payTrade.setStatus(payStatus);
+				BeanService.ME.merge(payTrade);
+				return Boolean.TRUE;
+			}
 		}
 
 		return null;

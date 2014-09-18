@@ -99,7 +99,7 @@ public class HelperClient {
 				}
 			}
 
-			return type == null ? (T) HelperIO.toString(urlConnection.getInputStream()) : openConnectionJson(urlConnection, type);
+			return type == null || type.isAssignableFrom(String.class) ? (T) HelperIO.toString(urlConnection.getInputStream()) : openConnectionJson(urlConnection, type);
 
 		} catch (Throwable e) {
 			if (BeanFactoryUtils.getEnvironment() == Environment.DEVELOP) {

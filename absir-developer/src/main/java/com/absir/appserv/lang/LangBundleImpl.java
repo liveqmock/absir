@@ -45,11 +45,14 @@ import com.absir.bean.inject.IMethodEntry;
 import com.absir.bean.inject.InjectBeanFactory;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Stopping;
+import com.absir.binder.BinderData;
+import com.absir.binder.IBinder;
 import com.absir.context.lang.LangBundle;
 import com.absir.core.base.IBase;
 import com.absir.core.dyna.DynaBinder;
 import com.absir.core.kernel.KernelClass;
 import com.absir.core.kernel.KernelCollection;
+import com.absir.core.kernel.KernelDyna;
 import com.absir.core.kernel.KernelLang;
 import com.absir.core.kernel.KernelLang.ObjectEntry;
 import com.absir.core.kernel.KernelReflect;
@@ -57,6 +60,7 @@ import com.absir.core.kernel.KernelString;
 import com.absir.core.util.UtilAccessor;
 import com.absir.core.util.UtilAccessor.Accessor;
 import com.absir.orm.value.JoEntity;
+import com.absir.property.PropertyData;
 import com.absir.server.on.OnPut;
 
 /**
@@ -360,6 +364,15 @@ public class LangBundleImpl extends LangBundle {
 			embededs.add(method);
 		}
 
+		/**
+		 * @param method
+		 */
+		public void removeEmbed(Method method) {
+			if (embededs != null) {
+				embededs.remove(method);
+			}
+		}
+
 		/*
 		 * (non-Javadoc)
 		 * 
@@ -547,6 +560,22 @@ public class LangBundleImpl extends LangBundle {
 				}
 			}
 		}
+
+		/**
+		 * @param entity
+		 * @param name
+		 * @param value
+		 * @param propertyData
+		 * @param binderData
+		 */
+		public void bind(Object entity, String name, Object value, PropertyData propertyData, BinderData binderData) {
+			if (entity instanceof ILangBase) {
+				String[] args = value.toString().split(".", 2);
+				if (args.length == 2) {
+					((ILangBase) entity).setLang(name, KernelDyna.toInteger(args[0], 0), args[1]);
+				}
+			}
+		}
 	}
 
 	/**
@@ -640,6 +669,42 @@ public class LangBundleImpl extends LangBundle {
 			}
 		}
 
+		for (Method method : IBinder.class.getMethods()) {
+			LangEntryImpl langEntryImpl = null;
+			if ("bind".equals(method.getName())) {
+				langEntryImpl = new LangEntryImpl() {
+
+					@Override
+					public Object invoke(LangIterceptor iterceptor, Object proxy, Iterator<AopInterceptor> iterator, Entry<String, Class<?>> interceptor, AopProxyHandler proxyHandler, Method method,
+							Object[] args, MethodProxy methodProxy) {
+						// TODO Auto-generated method stub
+						iterceptor.proccessCrud(proxyHandler.getBeanObject(), (Crud) args[0], (CrudHandler) args[1]);
+						return null;
+					}
+
+					@Override
+					public LangEntry generateLangEnry() {
+						// TODO Auto-generated method stub
+						return new LangEntry() {
+
+							@Override
+							public Object invoke(LangIterceptor iterceptor, Object proxy, Iterator<AopInterceptor> iterator, Entry<String, Class<?>> interceptor, AopProxyHandler proxyHandler,
+									Method method, Object[] args, MethodProxy methodProxy) {
+								// TODO Auto-generated method stub
+								((IBinder) proxyHandler.getBeanObject()).bind((String) args[0], (Object) args[1], (PropertyData) args[2], (BinderData) args[3]);
+								invoke(iterceptor, proxy, iterator, interceptor, proxyHandler, method, args, methodProxy);
+								return null;
+							}
+						};
+					}
+				};
+			}
+
+			if (langEntryImpl != null) {
+				methodMapLangEntryImpl.put(method, langEntryImpl);
+			}
+		}
+
 		for (Method method : ICrudBean.class.getMethods()) {
 			LangEntryImpl langEntryImpl = null;
 			if ("proccessCrud".equals(method.getName())) {
@@ -682,6 +747,7 @@ public class LangBundleImpl extends LangBundle {
 	 */
 	public LangBundleImpl() {
 		langInterfaces.add(ILangBase.class);
+		langInterfaces.add(IBinder.class);
 		langInterfaces.add(ICrudBean.class);
 		InitLangBundleImpl(methodMapLangEntryImpl);
 	}
@@ -827,12 +893,27 @@ public class LangBundleImpl extends LangBundle {
 					}
 
 					@Override
-					public void setMethodEntry(Entry<String, Class<?>> define, Class<?> beanType, Method beanMethod, Method method) {
+					public void setMethodEntry(Entry<String, Class<?>> define, Class<?> beanType, final Method beanMethod, Method method) {
 						// TODO Auto-generated method stub
 						interceptor.put(beanMethod, define);
-					}
+						if (define instanceof LangEmbeded) {
+							LangEmbeded langEmbeded = (LangEmbeded) define;
+							if (langEmbeded.accessor != null && langEmbeded.accessor.getSetter() != null) {
+								interceptor.put(langEmbeded.accessor.getSetter(), new LangEntry() {
 
+									@Override
+									public Object invoke(LangIterceptor iterceptor, Object proxy, Iterator<AopInterceptor> iterator, Entry<String, Class<?>> interceptor, AopProxyHandler proxyHandler,
+											Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
+										// TODO Auto-generated method stub
+										iterceptor.removeEmbed(beanMethod);
+										return AopProxyHandler.VOID;
+									}
+								});
+							}
+						}
+					}
 				});
+
 				if (langInterceptors.isEmpty()) {
 					langInterceptors = (Map<Method, Entry<String, Class<?>>>) (Object) KernelLang.NULL_MAP;
 

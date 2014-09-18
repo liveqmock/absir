@@ -56,7 +56,7 @@ public class DynaBinderUtils extends DynaBinder {
 				for (Entry<String, PropertyData> entry : propertyHolder.getNameMapPropertyData().entrySet()) {
 					PropertyData propertyData = entry.getValue();
 					if (propertyData.getProperty().getAllow() == 0) {
-						propertyData.getProperty().getAccessor().set(paramValue, binderSupply.bindValue(propertyData, params[index++], null, DynaBinder.INSTANCE));
+						propertyData.getProperty().getAccessor().set(paramValue, binderSupply.bindValue(propertyData, params[index++], null, DynaBinder.INSTANCE, null));
 					}
 				}
 			}
@@ -77,7 +77,7 @@ public class DynaBinderUtils extends DynaBinder {
 			for (Entry<String, PropertyData> entry : propertyHolder.getNameMapPropertyData().entrySet()) {
 				PropertyData propertyData = entry.getValue();
 				if (propertyData.getProperty().getAllow() == 0) {
-					Object param = binderSupply.bindValue(propertyData, propertyData.getProperty().getAccessor().get(paramValue), String.class, null);
+					Object param = binderSupply.bindValue(propertyData, propertyData.getProperty().getAccessor().get(paramValue), String.class, null, null);
 					params.add(param == null ? "" : params);
 				}
 			}

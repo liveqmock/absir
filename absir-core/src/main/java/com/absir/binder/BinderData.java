@@ -214,6 +214,12 @@ public class BinderData extends DynaBinder {
 						}
 
 						bindValue(value, propertyData, property, toObject);
+						if (toObject instanceof IBinder) {
+							value = map.get(name + ":");
+							if (value == null) {
+								((IBinder) toObject).bind(name, value, propertyData, this);
+							}
+						}
 					}
 				}
 
@@ -229,7 +235,7 @@ public class BinderData extends DynaBinder {
 	 * @param toObject
 	 */
 	protected void bindValue(Object value, PropertyData propertyData, Property property, Object toObject) {
-		value = binderSupply.bindValue(propertyData, value, null, this);
+		value = binderSupply.bindValue(propertyData, value, null, this, property.getAccessor().get(toObject));
 		try {
 			property.getAccessor().set(toObject, value);
 

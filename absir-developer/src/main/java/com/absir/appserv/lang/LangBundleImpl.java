@@ -194,6 +194,18 @@ public class LangBundleImpl extends LangBundle {
 
 	/**
 	 * @param entityName
+	 * @param mapValues
+	 */
+	protected static void mergeLangMapValue(String entityName, String id, Map<String, Map<String, Object>> nameMapValue) {
+		BeanService.ME.mergers("JLocale", nameMapValue.values());
+		Map<String, Map<String, Map<String, Object>>> idMapNameMapValue = entityMapIdMapNameMapValue.get(entityName);
+		if (idMapNameMapValue != null) {
+			idMapNameMapValue.put(id, nameMapValue);
+		}
+	}
+
+	/**
+	 * @param entityName
 	 */
 	public static void clearLangNameMapValue(String entityName) {
 		entityMapIdMapNameMapValue.remove(entityName);
@@ -416,7 +428,7 @@ public class LangBundleImpl extends LangBundle {
 
 				} else {
 					if (parent != null && parent.id != null) {
-						id = parent.id + "@" + nameId;
+						id = parent.id + "." + nameId;
 						nameId = null;
 					}
 				}
@@ -642,7 +654,7 @@ public class LangBundleImpl extends LangBundle {
 			}
 
 			if (!mapValue.isEmpty()) {
-				BeanService.ME.mergers("JLocale", mapValue.values());
+				mergeLangMapValue(entityName, id, mapValue);
 			}
 		}
 
@@ -837,7 +849,7 @@ public class LangBundleImpl extends LangBundle {
 	 * @return
 	 */
 	protected Map<Method, LangEntry> getLangInterceptors(JoEntity joEntity) {
-		return getLangInterceptors(joEntity.getEntityName() == null ? joEntity.getEntityClass().getName() : joEntity.getEntityName(), joEntity.getClass());
+		return getLangInterceptors(joEntity.getEntityName() == null ? joEntity.getEntityClass().getName() : joEntity.getEntityName(), joEntity.getEntityClass());
 	}
 
 	/**
@@ -869,11 +881,12 @@ public class LangBundleImpl extends LangBundle {
 									CrudProperty crudProperty = CrudUtils.getCrudProperty(new JoEntity(entityName, entityClass), property);
 									if (crudProperty != null && crudProperty.getCrudProcessor() != null && crudProperty.getCrudProcessor() instanceof BeanCrudFactory.Proccessor) {
 										final JoEntity joEntity = crudProperty.getValueEntity();
-										if (joEntity != null && joEntity.getEntityName() != null) {
+										if (joEntity != null && joEntity.getClass() != null) {
 											if (KernelClass.isCustomClass(joEntity.getEntityClass())) {
 												final Map<Method, LangEntry> langInterceptors = getLangInterceptors(joEntity);
 												if (langInterceptors != null) {
-													final boolean embed = CrudService.ME.getCrudSupply(joEntity.getEntityName()) == null || !IBase.class.isAssignableFrom(joEntity.getEntityClass());
+													final boolean embed = joEntity.getEntityName() == null || CrudService.ME.getCrudSupply(joEntity.getEntityName()) == null
+															|| !IBase.class.isAssignableFrom(joEntity.getEntityClass());
 													if (returnType.isArray()) {
 														return new LangEmbeded(beanType, property) {
 
@@ -954,7 +967,7 @@ public class LangBundleImpl extends LangBundle {
 																// TODO
 																// Auto-generated
 																// method stub
-																return ME.getLangProxy(langIterceptor, joEntity, value, embed ? name + "@" : null, langInterceptors, null, null);
+																return ME.getLangProxy(langIterceptor, joEntity, value, embed ? name : null, langInterceptors, null, null);
 															}
 														};
 													}

@@ -88,6 +88,7 @@ public abstract class CrudUtils {
 				}
 			}
 		}
+
 		return record;
 	}
 
@@ -127,10 +128,11 @@ public abstract class CrudUtils {
 			}
 		};
 
-		crud(entity, crudEntity, crudInvoker);
 		if (entity instanceof ICrudBean) {
 			((ICrudBean) entity).proccessCrud(crud, crudInvoker);
 		}
+
+		crud(entity, crudEntity, crudInvoker);
 	}
 
 	/**

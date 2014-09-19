@@ -156,10 +156,11 @@ public abstract class CrudContextUtils extends CrudUtils {
 			}
 		};
 
-		crud(entity, crudEntity, crudInvoker);
 		if (entity instanceof ICrudBean) {
 			((ICrudBean) entity).proccessCrud(crud, crudInvoker);
 		}
+
+		crud(entity, crudEntity, crudInvoker);
 	}
 
 	/**

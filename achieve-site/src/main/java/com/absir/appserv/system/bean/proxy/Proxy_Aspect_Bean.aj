@@ -7,6 +7,7 @@
  */
 package com.absir.appserv.system.bean.proxy;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -125,11 +126,17 @@ public privileged aspect Proxy_Aspect_Bean {
 	}
 
 	public Object JpMeta.getMetaMap(String key) {
-		return this.metaMap.get(key);
+		Map<String, String> metaMap = this.metaMap;
+		return metaMap == null ? null : metaMap.get(key);
 	}
 
 	public void JpMeta.setMetaMap(String key, String value) {
-		this.metaMap.put(key, value);
+		Map<String, String> metaMap = this.metaMap;
+		if (metaMap == null) {
+			metaMap = new HashMap<String, String>();
+		}
+
+		metaMap.put(key, value);
 	}
 
 	/**

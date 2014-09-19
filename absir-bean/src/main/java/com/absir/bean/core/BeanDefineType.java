@@ -13,7 +13,6 @@ import com.absir.bean.basis.Basis;
 import com.absir.bean.basis.BeanFactory;
 import com.absir.bean.basis.BeanScope;
 import com.absir.bean.basis.BeanType;
-import com.absir.core.kernel.KernelLang.CauseRuntimeException;
 import com.absir.core.kernel.KernelString;
 
 /**
@@ -199,7 +198,7 @@ public class BeanDefineType extends BeanDefineAbstractor {
 			return constructor.newInstance(parameters);
 
 		} catch (Exception e) {
-			throw new CauseRuntimeException(e);
+			throw new RuntimeException("Can not instance from " + constructor, e);
 		}
 	}
 }

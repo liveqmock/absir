@@ -22,9 +22,9 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.github.subchen.absir</groupId>
+			<groupId>com.github.subchen</groupId>
 			<artifactId>jetbrick-template</artifactId>
-			<version>1.2.11-SNAPSHOT</version>
+			<version>1.2.11</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.antlr</groupId>

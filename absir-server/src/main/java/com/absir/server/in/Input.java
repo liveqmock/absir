@@ -39,7 +39,7 @@ import com.absir.server.route.returned.ReturnedResolver;
 public abstract class Input extends Bean<Serializable> implements IAttributes {
 
 	/** GET */
-	public final IGet GET = BeanFactoryUtils.get(IGet.class);
+	public final static IGet GET = BeanFactoryUtils.get(IGet.class);
 
 	/** model */
 	private InModel model;
@@ -92,7 +92,7 @@ public abstract class Input extends Bean<Serializable> implements IAttributes {
 	 */
 	public Integer getLocalCode() {
 		if (localCode == null) {
-			localCode = GET.getLocaleCode(this);
+			localCode = GET == null ? null : GET.getLocaleCode(this);
 			if (localCode == null) {
 				localCode = 0;
 			}

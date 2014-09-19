@@ -482,7 +482,7 @@ public abstract class PlayerService {
 	/**
 	 * 更新玩家在线天数
 	 */
-	@Schedule(cron = "0 24 * * *")
+	@Schedule(cron = "0 0 0 * * *")
 	protected static void updateOnlines() {
 		long contextTime = ContextUtils.getContextTime();
 		for (PlayerContext playerContext : PlayerContext.PLAYER_CONTEXT_MAP.values()) {

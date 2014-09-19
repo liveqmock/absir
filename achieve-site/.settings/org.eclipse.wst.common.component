@@ -34,9 +34,6 @@
         <dependent-module archiveName="absir-jetbrick-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-jetbrick/absir-jetbrick">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="jetbrick-template-1.2.11-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/jetbrick-template/jetbrick-template">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
         <dependent-module archiveName="absir-developerImpl-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-developerImpl/absir-developerImpl">
             <dependency-type>uses</dependency-type>
         </dependent-module>

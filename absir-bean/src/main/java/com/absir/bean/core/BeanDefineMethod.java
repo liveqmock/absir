@@ -13,7 +13,6 @@ import com.absir.bean.basis.BeanDefine;
 import com.absir.bean.basis.BeanFactory;
 import com.absir.bean.basis.BeanScope;
 import com.absir.core.kernel.KernelLang;
-import com.absir.core.kernel.KernelLang.CauseRuntimeException;
 import com.absir.core.kernel.KernelString;
 
 /**
@@ -194,13 +193,13 @@ public class BeanDefineMethod extends BeanDefineAbstractor {
 	 * @return
 	 */
 	public static Object getBeanObject(BeanFactory beanFactory, Object beanObject, Method method, String[] paramNames, boolean required, boolean invoke) {
-		try {
-			if (paramNames == null) {
+		if (paramNames == null) {
+			try {
 				return method.invoke(beanObject);
-			}
 
-		} catch (Exception e) {
-			throw new CauseRuntimeException(e);
+			} catch (Exception e) {
+				throw new RuntimeException("Can not inject " + beanObject + '.' + method, e);
+			}
 		}
 
 		return getBeanObject(beanObject, method, getParameters(beanFactory, method.getParameterTypes(), paramNames, required ? method : null, invoke));
@@ -259,7 +258,7 @@ public class BeanDefineMethod extends BeanDefineAbstractor {
 			return parameters == null ? null : parameters == KernelLang.NULL_OBJECTS ? method.invoke(beanObject) : method.invoke(beanObject, parameters);
 
 		} catch (Exception e) {
-			throw new CauseRuntimeException(e);
+			throw new RuntimeException("Can not inject " + beanObject + '.' + method + '[' + KernelString.implode(parameters, ',') + ']', e);
 		}
 	}
 }

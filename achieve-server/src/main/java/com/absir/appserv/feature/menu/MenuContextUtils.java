@@ -28,8 +28,8 @@ import com.absir.appserv.system.admin.AdminServer;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.helper.HelperLang;
 import com.absir.appserv.system.service.utils.SecurityServiceUtils;
-import com.absir.bean.basis.Configure;
 import com.absir.bean.core.BeanFactoryUtils;
+import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Inject;
 import com.absir.bean.inject.value.InjectType;
 import com.absir.bean.inject.value.Value;
@@ -47,50 +47,128 @@ import com.absir.server.route.RouteMatcher;
  * @author absir
  * 
  */
-@Configure
+@Inject
 public abstract class MenuContextUtils {
 
-	/** App_Name */
-	@Value(value = "app.name")
-	private static String App_Name;
+	/** CONTEXT */
+	protected static final MenuContext CONTEXT = BeanFactoryUtils.get(MenuContext.class);
 
-	/** Site_Route */
-	@Value(value = "site.route")
-	private static String Site_Route;
+	/**
+	 * @author absir
+	 *
+	 */
+	@Bean
+	protected static class MenuContext {
+		/** App_Name */
+		@Value(value = "app.name")
+		protected String App_Name;
 
-	/** Admin_Route */
-	private static String Admin_Route;
+		/** Site_Route */
+		@Value(value = "site.route")
+		protected String Site_Route;
 
-	/** menuBeanService */
-	@Inject
-	static MenuBeanService menuBeanService;
+		/** Admin_Route */
+		protected String Admin_Route;
+
+		/** menuBeanService */
+		@Inject
+		protected MenuBeanService menuBeanService;
+
+		/**
+		 * @param servletContext
+		 */
+		@Inject(type = InjectType.Selectable)
+		protected void setServletContext(ServletContext servletContext) {
+			// 全局链接参数
+			if (App_Name == null) {
+				App_Name = servletContext.getServletContextName();
+			}
+
+			if (Site_Route == null) {
+				Site_Route = servletContext.getContextPath();
+			}
+
+			Admin_Route = Site_Route + "/" + AdminServer.getRoute();
+			servletContext.setAttribute("app_name", App_Name);
+			servletContext.setAttribute("site_route", Site_Route);
+			servletContext.setAttribute("admin_route", Admin_Route);
+
+			if (Developer.isDeveloper()) {
+				// 初始化菜单
+				MenuBeanRoot menuBeanRoot = new MenuBeanRoot();
+				// 扫瞄后台菜单
+				proccessMenuRoot(menuBeanRoot, new FilterTemplate<RouteMatcher>() {
+
+					@Override
+					public boolean doWith(RouteMatcher template) throws BreakException {
+						// TODO Auto-generated method stub
+						return AdminServer.class.isAssignableFrom(template.getRouteAction().getRouteEntity().getRouteType());
+					}
+
+				});
+
+				// 添加扫瞄权限
+				menuBeanService.addMenuPermission(menuBeanRoot);
+
+				// 权限实体收集
+				List<String> entityNames = Developer.isDeveloper() ? new ArrayList<String>() : null;
+				// 实体CRUD菜单
+				Set<Object> entityClasses = new HashSet<Object>();
+				for (Entry<String, Entry<Class<?>, SessionFactory>> entry : SessionFactoryUtils.get().getJpaEntityNameMapEntityClassFactory().entrySet()) {
+					Class<?> entityClass = entry.getValue().getKey();
+					if (entityClasses.add(entityClass)) {
+						addMenuBeanRoot(menuBeanRoot, entry.getKey(), entityClass, "内容管理", "列表", "list", entityNames);
+					}
+				}
+
+				// 配置CRUD菜单
+				for (ICrudSupply crudSupply : BeanFactoryUtils.get().getBeanObjects(ICrudSupply.class)) {
+					Set<Entry<String, Class<?>>> entityNameMapClass = crudSupply.getEntityNameMapClass();
+					if (entityNameMapClass != null) {
+						MaSupply maSupply = KernelClass.fetchAnnotation(crudSupply.getClass(), MaSupply.class);
+						if (maSupply != null) {
+							for (Entry<String, Class<?>> entry : entityNameMapClass) {
+								addMenuBeanRoot(menuBeanRoot, entry.getKey(), entry.getValue(), maSupply.folder(), maSupply.name(), maSupply.method(), entityNames);
+							}
+						}
+					}
+				}
+
+				// 添加实体权限
+				menuBeanService.addEntityPermission(entityNames);
+
+				// 添加后台菜单
+				menuBeanService.addMenuBeanRoot(menuBeanRoot, "admin", "后台菜单", MeUrlType.ADMIN);
+			}
+		}
+	}
 
 	/**
 	 * @return
 	 */
 	public static MenuBeanService getService() {
-		return menuBeanService;
+		return CONTEXT.menuBeanService;
 	}
 
 	/**
 	 * @return the app_Name
 	 */
 	public static String getAppName() {
-		return App_Name;
+		return CONTEXT.App_Name;
 	}
 
 	/**
 	 * @return the site_Route
 	 */
 	public static String getSiteRoute() {
-		return Site_Route;
+		return CONTEXT.Site_Route;
 	}
 
 	/**
 	 * @return the admin_Route
 	 */
 	public static String getAdminRoute() {
-		return Admin_Route;
+		return CONTEXT.Admin_Route;
 	}
 
 	/**
@@ -107,7 +185,7 @@ public abstract class MenuContextUtils {
 	 * @return
 	 */
 	public static List<OMenuBean> getMenuBeans(String cite, JiUserBase user) {
-		return menuBeanService.getMenuBeans(cite, user, 3);
+		return CONTEXT.menuBeanService.getMenuBeans(cite, user, 3);
 	}
 
 	/**
@@ -122,74 +200,6 @@ public abstract class MenuContextUtils {
 
 		String route = urlType == null ? null : urlType.getRoute();
 		return route == null ? url : route + url;
-	}
-
-	/**
-	 * @param servletContext
-	 */
-	@Inject(type = InjectType.Selectable)
-	static void setServletContext(ServletContext servletContext) {
-		// 全局链接参数
-		if (App_Name == null) {
-			App_Name = servletContext.getServletContextName();
-		}
-
-		if (Site_Route == null) {
-			Site_Route = servletContext.getContextPath();
-		}
-
-		Admin_Route = Site_Route + "/" + AdminServer.getRoute();
-		servletContext.setAttribute("app_name", App_Name);
-		servletContext.setAttribute("site_route", Site_Route);
-		servletContext.setAttribute("admin_route", Admin_Route);
-
-		if (Developer.isDeveloper()) {
-			// 初始化菜单
-			MenuBeanRoot menuBeanRoot = new MenuBeanRoot();
-			// 扫瞄后台菜单
-			proccessMenuRoot(menuBeanRoot, new FilterTemplate<RouteMatcher>() {
-
-				@Override
-				public boolean doWith(RouteMatcher template) throws BreakException {
-					// TODO Auto-generated method stub
-					return AdminServer.class.isAssignableFrom(template.getRouteAction().getRouteEntity().getRouteType());
-				}
-
-			});
-
-			// 添加扫瞄权限
-			menuBeanService.addMenuPermission(menuBeanRoot);
-
-			// 权限实体收集
-			List<String> entityNames = Developer.isDeveloper() ? new ArrayList<String>() : null;
-			// 实体CRUD菜单
-			Set<Object> entityClasses = new HashSet<Object>();
-			for (Entry<String, Entry<Class<?>, SessionFactory>> entry : SessionFactoryUtils.get().getJpaEntityNameMapEntityClassFactory().entrySet()) {
-				Class<?> entityClass = entry.getValue().getKey();
-				if (entityClasses.add(entityClass)) {
-					addMenuBeanRoot(menuBeanRoot, entry.getKey(), entityClass, "内容管理", "列表", "list", entityNames);
-				}
-			}
-
-			// 配置CRUD菜单
-			for (ICrudSupply crudSupply : BeanFactoryUtils.get().getBeanObjects(ICrudSupply.class)) {
-				Set<Entry<String, Class<?>>> entityNameMapClass = crudSupply.getEntityNameMapClass();
-				if (entityNameMapClass != null) {
-					MaSupply maSupply = KernelClass.fetchAnnotation(crudSupply.getClass(), MaSupply.class);
-					if (maSupply != null) {
-						for (Entry<String, Class<?>> entry : entityNameMapClass) {
-							addMenuBeanRoot(menuBeanRoot, entry.getKey(), entry.getValue(), maSupply.folder(), maSupply.name(), maSupply.method(), entityNames);
-						}
-					}
-				}
-			}
-
-			// 添加实体权限
-			menuBeanService.addEntityPermission(entityNames);
-
-			// 添加后台菜单
-			menuBeanService.addMenuBeanRoot(menuBeanRoot, "admin", "后台菜单", MeUrlType.ADMIN);
-		}
 	}
 
 	/**

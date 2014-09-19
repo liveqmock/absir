@@ -191,7 +191,13 @@ public class InjectBeanFactory implements IBeanFactorySupport, IBeanDefineSupply
 			for (int i = 0; i < length; i++) {
 				Object inj = injects[i];
 				if (inj != null) {
-					methodInjects[i].setInjectMethod(inj, method, beanObject, injectMethod);
+					try {
+						methodInjects[i].setInjectMethod(inj, method, beanObject, injectMethod);
+
+					} catch (Throwable e) {
+						// TODO: handle exception
+						throw new RuntimeException("Can not inject " + methodInjects[i] + "=>" + beanObject + '.' + method, e);
+					}
 				}
 			}
 

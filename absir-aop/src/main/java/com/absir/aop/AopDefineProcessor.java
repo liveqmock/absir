@@ -70,9 +70,7 @@ public class AopDefineProcessor implements IBeanDefineSupply, IBeanDefineProcess
 			if (basic != null || bean != null) {
 				AopImplDefine beanDefine = new AopImplDefine(BeanDefineType.getBeanName(bean == null ? null : bean.value(), beanType), beanType, bean == null ? null : bean.scope(),
 						basic == null ? null : basic.value());
-				List<BeanDefine> beanDefines = new ArrayList<BeanDefine>();
-				beanDefines.add(beanDefine);
-				return beanDefines;
+				return InjectBeanFactory.getInstance().getBeanDefines(beanFactory, beanType, beanDefine);
 			}
 		}
 

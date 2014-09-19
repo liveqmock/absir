@@ -11,7 +11,6 @@ import java.lang.reflect.Field;
 
 import com.absir.bean.basis.BeanFactory;
 import com.absir.bean.inject.value.InjectType;
-import com.absir.core.kernel.KernelLang.CauseRuntimeException;
 import com.absir.core.kernel.KernelString;
 
 /**
@@ -71,7 +70,7 @@ public class InjectField extends InjectInvokerObserver {
 			field.set(beanObject, parameter);
 
 		} catch (Exception e) {
-			throw new CauseRuntimeException(e);
+			throw new RuntimeException("Can not inject " + beanObject + '.' + field + " : " + parameter, e);
 		}
 	}
 

@@ -19,6 +19,7 @@ import com.absir.aop.AopProxy;
 import com.absir.aop.AopProxyHandler;
 import com.absir.appserv.feature.menu.OMenuFactory.MenuAopInterceptor;
 import com.absir.appserv.feature.menu.value.MaFactory;
+import com.absir.appserv.feature.menu.value.MaPermission;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.service.AuthService;
 import com.absir.appserv.system.service.SecurityService;
@@ -96,7 +97,8 @@ public class OMenuFactory extends AopMethodDefineAbstract<MenuAopInterceptor, St
 	@Override
 	public String getAopInterceptor(String variable, Class<?> beanType) {
 		// TODO Auto-generated method stub
-		return null;
+		MaPermission maPermission = beanType.getAnnotation(MaPermission.class);
+		return maPermission == null ? null : maPermission.value();
 	}
 
 	/*
@@ -136,19 +138,20 @@ public class OMenuFactory extends AopMethodDefineAbstract<MenuAopInterceptor, St
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * com.absir.appserv.feature.menu.IMenuFactory#proccess(com.absir.appserv
-	 * .feature.menu.MenuBeanRoot, com.absir.server.route.RouteMatcher,
-	 * java.lang.String[])
+	 * com.absir.appserv.feature.menu.IMenuFactory#proccess(java.lang.String,
+	 * com.absir.appserv.feature.menu.MenuBeanRoot,
+	 * com.absir.server.route.RouteMatcher,
+	 * com.absir.appserv.feature.menu.value.MaFactory)
 	 */
 	@Override
-	public void proccess(MenuBeanRoot menuBeanRoot, RouteMatcher routeMatcher, MaFactory maFactory) {
+	public void proccess(String route, MenuBeanRoot menuBeanRoot, RouteMatcher routeMatcher, MaFactory maFactory) {
 		// TODO Auto-generated method stub
 		if (KernelArray.getAssignable(routeMatcher.getRouteAction().getRouteMethod().getParameterResolvers(), ParameterResolverPath.class) == null) {
 			String ref = null;
-			Object route = routeMatcher.getRouteAction().getRouteEntity().getRoute();
+			Object routeObject = routeMatcher.getRouteAction().getRouteEntity().getRoute();
 			Method method = routeMatcher.getRouteAction().getRouteMethod().getMethod();
-			if (route instanceof AopProxy) {
-				MenuAopInterceptor menuAopInterceptor = KernelCollection.getAssignable(((AopProxy) route).getAopInterceptors(), MenuAopInterceptor.class);
+			if (routeObject instanceof AopProxy) {
+				MenuAopInterceptor menuAopInterceptor = KernelCollection.getAssignable(((AopProxy) routeObject).getAopInterceptors(), MenuAopInterceptor.class);
 				if (menuAopInterceptor != null) {
 					ref = menuAopInterceptor.getMethodMapInterceptor().get(method);
 				}

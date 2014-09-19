@@ -17,10 +17,11 @@ import com.absir.server.route.RouteMatcher;
 public interface IMenuFactory {
 
 	/**
+	 * @param route
 	 * @param menuBeanRoot
 	 * @param routeMatcher
 	 * @param maFactory
 	 */
-	public void proccess(MenuBeanRoot menuBeanRoot, RouteMatcher routeMatcher, MaFactory maFactory);
+	public void proccess(String route, MenuBeanRoot menuBeanRoot, RouteMatcher routeMatcher, MaFactory maFactory);
 
 }

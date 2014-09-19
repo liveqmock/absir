@@ -97,7 +97,7 @@ public abstract class MenuContextUtils {
 				// 初始化菜单
 				MenuBeanRoot menuBeanRoot = new MenuBeanRoot();
 				// 扫瞄后台菜单
-				proccessMenuRoot(menuBeanRoot, new FilterTemplate<RouteMatcher>() {
+				proccessMenuRoot(Admin_Route, menuBeanRoot, new FilterTemplate<RouteMatcher>() {
 
 					@Override
 					public boolean doWith(RouteMatcher template) throws BreakException {
@@ -269,10 +269,11 @@ public abstract class MenuContextUtils {
 	/**
 	 * 处理收集链接
 	 * 
+	 * @param route
+	 * @param menuBeanRoot
 	 * @param filter
-	 * @return
 	 */
-	public static void proccessMenuRoot(MenuBeanRoot menuBeanRoot, FilterTemplate<RouteMatcher> filter) {
+	public static void proccessMenuRoot(String route, MenuBeanRoot menuBeanRoot, FilterTemplate<RouteMatcher> filter) {
 		try {
 			for (RouteMatcher routeMatcher : InDispatcher.getRouteAdapter().getRouteMatchers()) {
 				if (filter == null || filter.doWith(routeMatcher)) {
@@ -280,7 +281,7 @@ public abstract class MenuContextUtils {
 					if (maFactory != null) {
 						IMenuFactory menuFactory = BeanFactoryUtils.getRegisterBeanObject(maFactory.value(), IMenuFactory.class, maFactory.factory());
 						if (menuFactory != null) {
-							menuFactory.proccess(menuBeanRoot, routeMatcher, maFactory);
+							menuFactory.proccess(route, menuBeanRoot, routeMatcher, maFactory);
 						}
 					}
 				}

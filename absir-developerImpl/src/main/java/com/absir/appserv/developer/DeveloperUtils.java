@@ -18,6 +18,7 @@ import java.util.Set;
 
 import javax.servlet.ServletRequest;
 
+import com.absir.appserv.crud.CrudUtils;
 import com.absir.appserv.developer.model.EntityModel;
 import com.absir.appserv.developer.model.ModelFactory;
 import com.absir.appserv.support.DeveloperBreak;
@@ -158,7 +159,7 @@ public class DeveloperUtils {
 				value = request.getAttribute("entityClass");
 				Class<?> entityClass = value != null && value instanceof Class ? (Class<?>) value : null;
 				if (entityName != null || entityClass != null) {
-					joEntity = new JoEntity(entityName, entityClass);
+					joEntity = CrudUtils.newJoEntity(entityName, entityClass);
 					request.setAttribute("joEntity", joEntity);
 				}
 			}

@@ -13,6 +13,7 @@ import java.util.List;
 
 import javax.servlet.ServletRequest;
 
+import com.absir.appserv.crud.CrudUtils;
 import com.absir.appserv.developer.model.EntityModel;
 import com.absir.appserv.developer.model.ModelFactory;
 import com.absir.appserv.support.developer.IField;
@@ -31,7 +32,7 @@ public class DeveloperModel {
 	 * @return
 	 */
 	public static DeveloperModel forEntityName(String entityName, ServletRequest request) {
-		return forEntityNameClass(new JoEntity(entityName, null), request);
+		return forEntityNameClass(CrudUtils.newJoEntity(entityName, null), request);
 	}
 
 	/**
@@ -40,7 +41,7 @@ public class DeveloperModel {
 	 * @return
 	 */
 	public static DeveloperModel forEntityClass(Class<?> entityClass, ServletRequest request) {
-		return forEntityNameClass(new JoEntity(null, entityClass), request);
+		return forEntityNameClass(CrudUtils.newJoEntity(null, entityClass), request);
 	}
 
 	/**

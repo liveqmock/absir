@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.absir.appserv.crud.CrudUtils;
 import com.absir.appserv.support.Developer;
 import com.absir.appserv.system.bean.value.JaCrud;
 import com.absir.appserv.system.helper.HelperLang;
@@ -36,7 +37,7 @@ public class ModelFactory {
 	 * @return
 	 */
 	public static EntityModel getModelEntity(String entityName) {
-		return getModelEntity(new JoEntity(entityName, null));
+		return getModelEntity(CrudUtils.newJoEntity(entityName, null));
 	}
 
 	/**
@@ -44,7 +45,7 @@ public class ModelFactory {
 	 * @return
 	 */
 	public static EntityModel getModelEntity(Class<?> entityClass) {
-		return getModelEntity(new JoEntity(null, entityClass));
+		return getModelEntity(CrudUtils.newJoEntity(null, entityClass));
 	}
 
 	/**

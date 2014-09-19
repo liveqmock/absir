@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.hibernate.proxy.HibernateProxy;
+
+import com.absir.aop.AopProxy;
 import com.absir.appserv.crud.CrudHandler.CrudInvoker;
 import com.absir.appserv.crud.value.ICrudBean;
 import com.absir.appserv.support.Developer;
@@ -24,6 +27,7 @@ import com.absir.appserv.support.developer.JCrudField;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.bean.value.JaCrud;
 import com.absir.appserv.system.bean.value.JaCrud.Crud;
+import com.absir.appserv.system.service.CrudService;
 import com.absir.bean.basis.Configure;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.core.kernel.KernelArray;
@@ -32,6 +36,7 @@ import com.absir.core.kernel.KernelLang.PropertyFilter;
 import com.absir.core.util.UtilAccessor;
 import com.absir.core.util.UtilAccessor.Accessor;
 import com.absir.core.util.UtilRuntime;
+import com.absir.orm.hibernate.SessionFactoryUtils;
 import com.absir.orm.value.JoEntity;
 
 /**
@@ -50,6 +55,36 @@ public abstract class CrudUtils {
 
 	/** Jo_Entity_Map_Crud_Fields */
 	private static final Map<String, String[]> Jo_Entity_Map_Crud_Fields = new HashMap<String, String[]>();
+
+	/**
+	 * @param entityName
+	 * @param entityClass
+	 * @return
+	 */
+	public static JoEntity newJoEntity(String entityName, Class<?> entityClass) {
+		if (entityName == null) {
+			while (AopProxy.class.isAssignableFrom(entityClass) || HibernateProxy.class.isAssignableFrom(entityClass)) {
+				entityClass = entityClass.getSuperclass();
+			}
+
+			entityName = SessionFactoryUtils.getEntityNameNull(entityClass);
+			if (entityName == null) {
+				entityName = entityClass.getSimpleName();
+				ICrudSupply crudSupply = CrudService.ME.getCrudSupply(entityName);
+				if (crudSupply == null || crudSupply.getEntityClass(entityName) != entityClass) {
+					entityName = null;
+				}
+			}
+
+		} else if (entityClass == null) {
+			ICrudSupply crudSupply = CrudService.ME.getCrudSupply(entityName);
+			if (crudSupply != null) {
+				entityClass = crudSupply.getEntityClass(entityName);
+			}
+		}
+
+		return new JoEntity(entityName, entityClass);
+	}
 
 	/**
 	 * @param joEntity

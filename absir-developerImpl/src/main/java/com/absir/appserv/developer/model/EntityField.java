@@ -31,6 +31,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
+import com.absir.appserv.crud.CrudUtils;
 import com.absir.appserv.crud.ICrudSupply;
 import com.absir.appserv.developer.editor.EditorObject;
 import com.absir.appserv.developer.editor.EditorSupply;
@@ -167,17 +168,17 @@ public class EntityField extends DBField {
 				// 自动关联实体
 				valueEntityName = SessionFactoryUtils.getEntityNameNull(componentClasses[1]);
 				if (valueEntityName != null) {
-					crudField.setJoEntity(new JoEntity(valueEntityName, null));
+					crudField.setJoEntity(CrudUtils.newJoEntity(valueEntityName, null));
 
 				} else if (componentClasses[1] != null && KernelClass.isCustomClass(componentClasses[1])) {
-					crudField.setJoEntity(new JoEntity(null, componentClasses[1]));
+					crudField.setJoEntity(CrudUtils.newJoEntity(null, componentClasses[1]));
 				}
 
 				if (entityName != null) {
-					crudField.setKeyJoEntity(new JoEntity(entityName, null));
+					crudField.setKeyJoEntity(CrudUtils.newJoEntity(entityName, null));
 
 				} else if (componentClasses[0] != null && KernelClass.isCustomClass(componentClasses[0])) {
-					crudField.setKeyJoEntity(new JoEntity(null, componentClasses[0]));
+					crudField.setKeyJoEntity(CrudUtils.newJoEntity(null, componentClasses[0]));
 				}
 
 				if (!typeFieldType(componentClasses[0]) && KernelClass.isCustomClass(componentClasses[0])) {
@@ -197,10 +198,10 @@ public class EntityField extends DBField {
 			} else {
 				// 自动关联实体
 				if (entityName != null) {
-					crudField.setJoEntity(new JoEntity(entityName, null));
+					crudField.setJoEntity(CrudUtils.newJoEntity(entityName, null));
 
 				} else if (componentClasses[0] != null && KernelClass.isCustomClass(componentClasses[0])) {
-					crudField.setJoEntity(new JoEntity(null, componentClasses[0]));
+					crudField.setJoEntity(CrudUtils.newJoEntity(null, componentClasses[0]));
 				}
 
 				if (entityName == null) {

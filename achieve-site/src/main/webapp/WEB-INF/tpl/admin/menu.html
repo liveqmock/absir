@@ -1,0 +1,17 @@
+#for (IMenuBean adminBean : @Pag.menu("admin"))
+<div class="accordionHeader">
+	<h2><span>Folder</span>${adminBean.name}</h2>
+	<div class="accordionContent">
+	<ul class="tree treeFolder">
+	#for (IMenuBean menuBean : adminBean.getChildren())
+	<li><a ${menuBean.url ? '' : 'href="${menuBean.url}" ref="${menuBean.ref}"'}>${menuBean.name}</a>
+		<ul>
+			#for (IMenuBean menu : menuBean.getChildren())
+			<li><a href="${menu.url}" rel="${menu.ref}" target="navTab">${menu.ref}</a></li>
+			#end
+	</ul></li>
+	#end
+	</ul>
+</div>
+</div>
+#end

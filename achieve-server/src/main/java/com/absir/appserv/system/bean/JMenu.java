@@ -22,6 +22,7 @@ import com.absir.appserv.feature.menu.IMenuBean;
 import com.absir.appserv.feature.menu.value.MaEntity;
 import com.absir.appserv.feature.menu.value.MaMenu;
 import com.absir.appserv.feature.menu.value.MeUrlType;
+import com.absir.appserv.lang.value.Langs;
 import com.absir.appserv.system.bean.base.JbBean;
 import com.absir.appserv.system.bean.proxy.JiTree;
 import com.absir.appserv.system.bean.value.JaEdit;
@@ -37,33 +38,33 @@ import com.absir.appserv.system.bean.value.JaLang;
 @Entity
 public class JMenu extends JbBean implements IMenuBean, JiTree<JMenu> {
 
-	@JaLang("父级菜单")
+	@JaLang(value = "父级菜单", tag = "parentMenu")
 	@JaEdit(groups = JaEdit.GROUP_LIST)
 	@ManyToOne
 	private JMenu parent;
 
-	@JaLang("菜单名称")
+	@JaLang(value = "菜单名称", tag = "menuName")
 	private String name;
 
-	@JaLang("菜单类型")
+	@JaLang("类型")
 	@JaEdit(groups = JaEdit.GROUP_LIST)
 	private String type;
 
-	@JaLang("菜单排序")
+	@JaLang("排序")
 	@JaEdit(groups = JaEdit.GROUP_LIST)
 	private int ordinal;
 
-	@JaLang("菜单地址")
+	@JaLang("链接")
 	@JaEdit(groups = JaEdit.GROUP_LIST)
 	private String url;
 
-	@JaLang("菜单标注")
+	@JaLang("标注")
 	private String ref;
 
 	@JaLang("链接类型")
 	private MeUrlType urlType;
 
-	@JaLang("子级菜单")
+	@JaLang(value = "子级菜单", tag = "subMenu")
 	@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 	@OneToMany(mappedBy = "parent")
 	@OrderBy("ordinal")
@@ -87,6 +88,7 @@ public class JMenu extends JbBean implements IMenuBean, JiTree<JMenu> {
 	/**
 	 * @return the name
 	 */
+	@Langs
 	public String getName() {
 		return name;
 	}

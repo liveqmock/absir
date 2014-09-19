@@ -16,6 +16,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import com.absir.appserv.feature.menu.value.MaEntity;
 import com.absir.appserv.feature.menu.value.MaMenu;
 import com.absir.appserv.system.bean.base.JbBase;
+import com.absir.appserv.system.bean.value.JaEdit;
 import com.absir.appserv.system.bean.value.JaLang;
 import com.absir.appserv.system.bean.value.JaName;
 
@@ -28,16 +29,18 @@ import com.absir.appserv.system.bean.value.JaName;
 @Entity
 public class JMenuPermission extends JbBase {
 
-	@JaLang("访问链接")
+	@JaLang(value = "标识", tag = "identifie")
 	@Id
 	private String id;
 
-	@JaLang("授权角色")
+	@JaLang(value = "授权角色", tag = "allowUserRoles")
 	@JaName("JUserRole")
+	@JaEdit(groups = JaEdit.GROUP_SUGGEST)
 	private long allowIds[];
 
-	@JaLang("禁用角色")
+	@JaLang(value = "禁用角色", tag = "forbidUserRoles")
 	@JaName("JUserRole")
+	@JaEdit(groups = JaEdit.GROUP_SUGGEST)
 	private long forbidIds[];
 
 	/**

@@ -40,7 +40,17 @@ public class HelperLang {
 	 */
 	public static String getLangName(String lang, String tag, String name) {
 		if (!KernelString.isEmpty(tag)) {
-			name += '.' + tag;
+			int length = tag.length();
+			if (length > 1) {
+				if (tag.charAt(0) == '.') {
+					tag = lang + tag.substring(1);
+
+				} else if (tag.charAt(length - 1) == '.') {
+					tag = lang + tag.substring(0, length - 1);
+				}
+			}
+
+			name = tag;
 		}
 
 		if (lang != null) {

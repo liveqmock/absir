@@ -30,6 +30,7 @@ import jetbrick.template.web.JetWebEngineLoader;
 
 import com.absir.appserv.developer.Pag;
 import com.absir.appserv.developer.Scenario;
+import com.absir.appserv.feature.menu.IMenuBean;
 import com.absir.appserv.feature.menu.MenuContextUtils;
 import com.absir.appserv.support.web.WebJetbrickSupply.ConfigureFound;
 import com.absir.appserv.support.web.value.BaFunction;
@@ -136,6 +137,7 @@ public class WebJetbrickSupply implements IMethodSupport<ConfigureFound> {
 			// });
 
 			getVariableResolverBean().getVariableResolver().addImportClass(KernelObject.class.getName());
+			getVariableResolverBean().getVariableResolver().addImportClass(IMenuBean.class.getName());
 			getVariableResolverBean().getVariableResolver().addImportPackage(JiUserBase.class.getPackage().getName());
 			getVariableResolverBean().getVariableResolver().addImportPackage(JEmbedLL.class.getPackage().getName());
 			getVariableResolverBean().getVariableResolver().addImportPackage(Pag.class.getPackage().getName());

@@ -263,8 +263,11 @@ public class LangBundleImpl extends LangBundle {
 			OnPut onPut = OnPut.get();
 			if (onPut != null) {
 				Integer locale = onPut.getInput().getLocalCode();
-				if (ME.isLocaleCode(locale)) {
-					return ((ILangBase) proxy).getLang(getKey(), locale, getValue());
+				if (!ME.isLocaleCode(locale)) {
+					Object value = ((ILangBase) proxy).getLang(getKey(), locale, getValue());
+					if (value != null) {
+						return value;
+					}
 				}
 			}
 

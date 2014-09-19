@@ -10,6 +10,7 @@ package com.absir.appserv.developer;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -18,6 +19,8 @@ import javax.servlet.ServletRequest;
 import com.absir.appserv.configure.JConfigureBase;
 import com.absir.appserv.configure.JConfigureSupply;
 import com.absir.appserv.configure.JConfigureUtils;
+import com.absir.appserv.feature.menu.MenuContextUtils;
+import com.absir.appserv.feature.menu.OMenuBean;
 import com.absir.appserv.support.developer.IRender;
 import com.absir.appserv.support.developer.RenderUtils;
 import com.absir.appserv.system.configure.JSiteConfigure;
@@ -161,8 +164,16 @@ public class Pag {
 	 * @param cls
 	 * @return
 	 */
-	public <T extends JConfigureBase> T getConfigure(Class<T> cls) {
+	public static <T extends JConfigureBase> T getConfigure(Class<T> cls) {
 		return JConfigureUtils.getConfigure(cls);
+	}
+
+	/**
+	 * @param name
+	 * @return
+	 */
+	public static List<OMenuBean> menu(String name) {
+		return MenuContextUtils.getMenuBeans(name);
 	}
 
 	/**

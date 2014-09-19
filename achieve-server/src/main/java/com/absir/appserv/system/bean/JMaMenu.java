@@ -32,11 +32,11 @@ import com.absir.orm.value.JaNames;
 @Entity
 public class JMaMenu extends JbBase {
 
-	@JaLang("实体标识")
+	@JaLang(value = "标识", tag = "identifie")
 	@Id
 	private String id;
 
-	@JaLang("实体名称")
+	@JaLang("标题")
 	@JaEdit(groups = JaEdit.GROUP_LIST)
 	private String caption;
 

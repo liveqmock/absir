@@ -34,10 +34,10 @@ public class JPermission implements Serializable {
 	@JaLang("删除")
 	private JeVote deletable;
 
-	@JaLang("允许字段")
+	@JaLang(value = "允许字段", tag = "allowFields")
 	private String[] allows;
 
-	@JaLang("禁用字段")
+	@JaLang(value = "禁用字段", tag = "fobidFields")
 	private String[] forbiddens;
 
 	/**

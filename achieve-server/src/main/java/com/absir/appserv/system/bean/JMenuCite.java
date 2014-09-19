@@ -18,6 +18,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import com.absir.appserv.feature.menu.value.MaEntity;
 import com.absir.appserv.feature.menu.value.MaMenu;
 import com.absir.appserv.system.bean.base.JbBase;
+import com.absir.appserv.system.bean.value.JaEdit;
 import com.absir.appserv.system.bean.value.JaLang;
 
 /**
@@ -29,11 +30,12 @@ import com.absir.appserv.system.bean.value.JaLang;
 @Entity
 public class JMenuCite extends JbBase {
 
-	@JaLang("菜单ID")
+	@JaLang(value = "标识", tag = "identifie")
 	@Id
 	private String id;
 
-	@JaLang("根节点菜单")
+	@JaLang("菜单")
+	@JaEdit(groups = JaEdit.GROUP_LIST)
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	private JMenu menu;
 

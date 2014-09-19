@@ -22,7 +22,7 @@ import com.absir.appserv.system.bean.value.JaLang;
 public abstract class JbSession extends JbVerifier {
 
 	@JaEdit(groups = JaEdit.GROUP_LIST)
-	@JaLang("用户ID")
+	@JaLang("用户编号")
 	private Long userId;
 
 	@JaEdit(groups = JaEdit.GROUP_LIST)

@@ -96,6 +96,7 @@ public class ConfigurationBoost extends Configuration {
 		stringBuilder.append("<key-property name=\"name\" type=\"java.lang.String\" length=\"63\"></key-property>\r\n");
 		stringBuilder.append("<generator class=\"assigned\"></generator>\r\n");
 		stringBuilder.append("</composite-id>\r\n");
+		stringBuilder.append("<property name=\"relateId\" type=\"java.lang.String\" length=\"255\"/>\r\n");
 		Map<Integer, Locale> codeMaplocale = LangBundle.ME.getCodeMaplocale();
 		if (codeMaplocale != null) {
 			for (Integer code : codeMaplocale.keySet()) {

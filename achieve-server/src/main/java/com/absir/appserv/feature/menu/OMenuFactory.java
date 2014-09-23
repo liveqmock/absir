@@ -20,6 +20,7 @@ import com.absir.aop.AopProxyHandler;
 import com.absir.appserv.feature.menu.OMenuFactory.MenuAopInterceptor;
 import com.absir.appserv.feature.menu.value.MaFactory;
 import com.absir.appserv.feature.menu.value.MaPermission;
+import com.absir.appserv.lang.LangBundleImpl;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.service.AuthService;
 import com.absir.appserv.system.service.SecurityService;
@@ -110,17 +111,12 @@ public class OMenuFactory extends AopMethodDefineAbstract<MenuAopInterceptor, St
 	@Override
 	public String getAopInterceptor(String interceptor, String variable, Class<?> beanType, Method method) {
 		// TODO Auto-generated method stub
-		MaFactory maFactory = method.getAnnotation(MaFactory.class);
-		if (maFactory == null) {
-			return null;
+		MaPermission maPermission = method.getAnnotation(MaPermission.class);
+		if (maPermission != null) {
+			interceptor = maPermission.value();
 		}
 
-		String ref = maFactory.ref();
-		if (KernelString.isEmpty(ref)) {
-			ref = beanType.getSimpleName() + "@" + method.getName();
-		}
-
-		return ref;
+		return KernelString.isEmpty(interceptor) ? null : interceptor;
 	}
 
 	/*
@@ -157,8 +153,8 @@ public class OMenuFactory extends AopMethodDefineAbstract<MenuAopInterceptor, St
 				}
 			}
 
-			MenuContextUtils.addMenuBeanRoot(menuBeanRoot, "功能管理", ref, "/" + new String(routeMatcher.getMapping(), ContextUtils.getCharset()), method, routeMatcher.getRouteAction().getRouteEntity()
-					.getRouteType(), maFactory.parameters(), maFactory.parameterOrders());
+			MenuContextUtils.addMenuBeanRoot(menuBeanRoot, LangBundleImpl.ME.getunLang("功能管理", MenuBeanRoot.TAG), ref, "/" + new String(routeMatcher.getMapping(), ContextUtils.getCharset()), method,
+					routeMatcher.getRouteAction().getRouteEntity().getRouteType(), maFactory.parameters(), maFactory.parameterOrders());
 		}
 	}
 }

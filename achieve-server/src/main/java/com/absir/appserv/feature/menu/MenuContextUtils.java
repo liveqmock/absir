@@ -23,6 +23,7 @@ import com.absir.appserv.feature.menu.value.MaEntity;
 import com.absir.appserv.feature.menu.value.MaFactory;
 import com.absir.appserv.feature.menu.value.MaSupply;
 import com.absir.appserv.feature.menu.value.MeUrlType;
+import com.absir.appserv.lang.LangBundleImpl;
 import com.absir.appserv.support.Developer;
 import com.absir.appserv.system.admin.AdminServer;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
@@ -97,7 +98,7 @@ public abstract class MenuContextUtils {
 				// 初始化菜单
 				MenuBeanRoot menuBeanRoot = new MenuBeanRoot();
 				// 扫瞄后台菜单
-				proccessMenuRoot(Admin_Route, menuBeanRoot, new FilterTemplate<RouteMatcher>() {
+				proccessMenuRoot(AdminServer.getRoute(), menuBeanRoot, new FilterTemplate<RouteMatcher>() {
 
 					@Override
 					public boolean doWith(RouteMatcher template) throws BreakException {
@@ -117,7 +118,8 @@ public abstract class MenuContextUtils {
 				for (Entry<String, Entry<Class<?>, SessionFactory>> entry : SessionFactoryUtils.get().getJpaEntityNameMapEntityClassFactory().entrySet()) {
 					Class<?> entityClass = entry.getValue().getKey();
 					if (entityClasses.add(entityClass)) {
-						addMenuBeanRoot(menuBeanRoot, entry.getKey(), entityClass, "内容管理", "列表", "list", entityNames);
+						addMenuBeanRoot(menuBeanRoot, entry.getKey(), entityClass, LangBundleImpl.ME.getunLang("内容管理", MenuBeanRoot.TAG), LangBundleImpl.ME.getunLang("列表", MenuBeanRoot.TAG), "list",
+								entityNames);
 					}
 				}
 
@@ -138,7 +140,7 @@ public abstract class MenuContextUtils {
 				menuBeanService.addEntityPermission(entityNames);
 
 				// 添加后台菜单
-				menuBeanService.addMenuBeanRoot(menuBeanRoot, "admin", "后台菜单", MeUrlType.ADMIN);
+				menuBeanService.addMenuBeanRoot(menuBeanRoot, "admin", LangBundleImpl.ME.getunLang("后台菜单", MenuBeanRoot.TAG), MeUrlType.ADMIN);
 			}
 		}
 	}
@@ -251,7 +253,8 @@ public abstract class MenuContextUtils {
 				menuBeanRoot = menuBeanRoot.getChildrenRoot(maEntity.parent()[index], null);
 			}
 
-			entityCaption = KernelString.isEmpty(maEntity.name()) ? entityCaption : maEntity.name();
+			entityCaption = KernelString.isEmpty(maEntity.name()) ? entityCaption : LangBundleImpl.ME.getunLang(maEntity.name(), MenuBeanRoot.TAG);
+			option = LangBundleImpl.ME.getunLang(option, MenuBeanRoot.TAG);
 			menuBeanRoot.getChildrenRoot(maEntity.value(), entityCaption, suffix, 0, entityName, "/entity/" + option + "/" + entityName, "ENTITY");
 		}
 

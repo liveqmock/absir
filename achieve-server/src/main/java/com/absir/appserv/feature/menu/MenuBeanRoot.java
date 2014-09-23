@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.absir.appserv.feature.menu.value.MaMenu;
+import com.absir.appserv.lang.LangBundleImpl;
 import com.absir.appserv.system.bean.JMenu;
 import com.absir.core.kernel.KernelList;
 import com.absir.core.kernel.KernelString;
@@ -23,6 +24,9 @@ import com.absir.core.kernel.KernelString;
  * 
  */
 public class MenuBeanRoot {
+
+	/** TAG */
+	public static final String TAG = "MENU";
 
 	/** menuBean */
 	private JMenu menuBean;
@@ -179,7 +183,7 @@ public class MenuBeanRoot {
 		String caption = name;
 		if (maMenu != null) {
 			if (!KernelString.isEmpty(maMenu.value())) {
-				caption = maMenu.value();
+				caption = LangBundleImpl.ME.getunLang(maMenu.value(), TAG);
 				if (suffix != null) {
 					caption = caption.replace("?", suffix);
 				}

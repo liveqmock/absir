@@ -162,7 +162,7 @@ public class LangBundleImpl extends LangBundle {
 	 */
 	public static Map<String, Map<String, Map<String, Object>>> getLangNameMapValues(String entityName, List<String> ids) {
 		Map<String, Map<String, Map<String, Object>>> nameMapValues = new HashMap<String, Map<String, Map<String, Object>>>();
-		for (Map<String, Object> value : (List<Map<String, Object>>) BeanService.ME.selectQuery("SELECT o FROM JLocale o WHERE o.entity = ? AND o.id in ?", entityName,
+		for (Map<String, Object> value : (List<Map<String, Object>>) BeanService.ME.selectQuery("SELECT o FROM JLocale o WHERE o.entity = ? AND o.id IN (?)", entityName,
 				KernelCollection.toArray(ids, String.class))) {
 			String id = (String) value.get("id");
 			Map<String, Map<String, Object>> nameMapValue = nameMapValues.get(id);

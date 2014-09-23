@@ -92,6 +92,7 @@ public abstract class SearchServiceUtils {
 
 		List<Object> metasCondition = new ArrayList<Object>();
 		for (int i = 0; i <= last; i++) {
+			// just realize aop locale there
 			String propertyName = propertyNames[i];
 			if (!(filter == null || filter.isMatch(propertyName))) {
 				return;
@@ -107,6 +108,7 @@ public abstract class SearchServiceUtils {
 			}
 
 			if (i == last) {
+				// could find langs property?
 				if (expression) {
 					propertyName += HelperCondition.expression(KernelString.leftSubString(propertyExpression, expressionIndex));
 				}
@@ -118,6 +120,7 @@ public abstract class SearchServiceUtils {
 				break;
 			}
 
+			// ready add JLocale relateId
 			metasCondition.add(propertyName);
 			metasCondition.add(metas);
 		}
@@ -162,7 +165,7 @@ public abstract class SearchServiceUtils {
 		Class<?> fieldType = (Class<?>) metas[0];
 		if (String.class.isAssignableFrom(fieldType)) {
 			propertyValue = KernelDyna.to(propertyValue instanceof Object[] ? ((Object[]) propertyValue)[0] : propertyValue, String.class);
-			searchConditions.add(alias + '.' + (expression ? propertyName : propertyName + " LIKE ?"));
+			searchConditions.add(alias + '.' + (expression ? propertyName : (propertyName + " LIKE ?")));
 			searchConditions.add("%" + propertyValue + '%');
 
 		} else if (metas.length == 1) {

@@ -143,3 +143,20 @@ Caused by: java.lang.InterruptedException
 	at java.lang.Object.wait(Object.java:485)
 	at com.mchange.v2.c3p0.stmt.GooGooStatementCache.acquireStatement(GooGooStatementCache.java:573)
 	... 30 more
+2014-09-23 10:47:02,344-[HL] ERROR pool-1-thread-2 com.absir.async.AysncRunable - 
+java.lang.ExceptionInInitializerError
+	at com.absir.appserv.client.service.LotService.reload(LotService.java:101)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:597)
+	at com.absir.aop.AopProxyCglib.invoke(AopProxyCglib.java:48)
+	at com.absir.aop.AopProxyHandler.invoke(AopProxyHandler.java:157)
+	at com.absir.aop.AopProxyHandler.invoke(AopProxyHandler.java:141)
+	at com.absir.async.AysncRunableNotifier$1.run(AysncRunableNotifier.java:81)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:895)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:918)
+	at java.lang.Thread.run(Thread.java:695)
+Caused by: java.lang.NullPointerException
+	at com.absir.appserv.client.context.PlayerContext.<clinit>(PlayerContext.java:138)
+	... 12 more

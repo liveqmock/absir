@@ -153,8 +153,16 @@ public class OMenuFactory extends AopMethodDefineAbstract<MenuAopInterceptor, St
 				}
 			}
 
-			MenuContextUtils.addMenuBeanRoot(menuBeanRoot, LangBundleImpl.ME.getunLang("功能管理", MenuBeanRoot.TAG), ref, "/" + new String(routeMatcher.getMapping(), ContextUtils.getCharset()), method,
-					routeMatcher.getRouteAction().getRouteEntity().getRouteType(), maFactory.parameters(), maFactory.parameterOrders());
+			int offset = 0;
+			int length = routeMatcher.getMapping().length;
+			if (route != null) {
+				offset = route.length();
+				length -= offset;
+			}
+
+			MenuContextUtils.addMenuBeanRoot(menuBeanRoot, LangBundleImpl.ME.getunLang("功能管理", MenuBeanRoot.TAG), ref,
+					'/' + new String(routeMatcher.getMapping(), offset, length, ContextUtils.getCharset()), method, routeMatcher.getRouteAction().getRouteEntity().getRouteType(),
+					maFactory.parameters(), maFactory.parameterOrders());
 		}
 	}
 }

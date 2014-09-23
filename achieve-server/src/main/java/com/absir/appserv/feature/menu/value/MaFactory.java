@@ -35,11 +35,6 @@ public @interface MaFactory {
 	/**
 	 * @return
 	 */
-	String ref() default "";
-
-	/**
-	 * @return
-	 */
 	String[] parameters() default {};
 
 	/**

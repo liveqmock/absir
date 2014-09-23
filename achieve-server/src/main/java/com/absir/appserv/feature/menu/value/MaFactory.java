@@ -13,6 +13,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import com.absir.appserv.feature.menu.IMenuFactory;
+import com.absir.appserv.feature.menu.OMenuFactory;
 
 /**
  * @author absir
@@ -30,7 +31,7 @@ public @interface MaFactory {
 	/**
 	 * @return
 	 */
-	Class<? extends IMenuFactory> factory() default IMenuFactory.class;
+	Class<? extends IMenuFactory> factory() default OMenuFactory.class;
 
 	/**
 	 * @return

@@ -47,7 +47,7 @@ public class InDispathContext extends InDispathFilter {
 		}
 
 		beanProviderContext.started();
-		beanFactoryStoppings = beanProviderContext.getBeanFactoryStoppeds();
+		beanFactoryStoppings = beanProviderContext.getBeanFactoryStoppings();
 	}
 
 	/*

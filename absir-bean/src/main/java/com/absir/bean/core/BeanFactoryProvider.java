@@ -81,8 +81,8 @@ public class BeanFactoryProvider implements IBeanConfigProvider {
 	/** beanFactoryStarteds */
 	private List<IBeanFactoryStarted> beanFactoryStarteds = new ArrayList<IBeanFactoryStarted>();
 
-	/** beanFactoryStoppeds */
-	private List<IBeanFactoryStopping> beanFactoryStoppeds = new ArrayList<IBeanFactoryStopping>();
+	/** beanFactoryStoppings */
+	private List<IBeanFactoryStopping> beanFactoryStoppings = new ArrayList<IBeanFactoryStopping>();
 
 	/**
 	 * @param beanType
@@ -134,10 +134,10 @@ public class BeanFactoryProvider implements IBeanConfigProvider {
 	}
 
 	/**
-	 * @return the beanFactoryStoppeds
+	 * @return the beanFactoryStoppings
 	 */
-	public List<IBeanFactoryStopping> getBeanFactoryStoppeds() {
-		return beanFactoryStoppeds;
+	public List<IBeanFactoryStopping> getBeanFactoryStoppings() {
+		return beanFactoryStoppings;
 	}
 
 	/**
@@ -355,7 +355,7 @@ public class BeanFactoryProvider implements IBeanConfigProvider {
 			if (IBeanFactoryStopping.class.isAssignableFrom(beanDefine.getBeanType())) {
 				Object beanObject = beanDefine.getBeanObject(beanFactory);
 				beanDefineObjects.put(beanObject, beanDefine);
-				beanFactoryStoppeds.add((IBeanFactoryStopping) beanObject);
+				beanFactoryStoppings.add((IBeanFactoryStopping) beanObject);
 			}
 		}
 
@@ -368,7 +368,7 @@ public class BeanFactoryProvider implements IBeanConfigProvider {
 		KernelList.sortOrderable(beanDefineAwares);
 		KernelList.sortOrderable(beanSoftReferenceAwares);
 		KernelList.sortOrderable(beanFactoryStarteds);
-		KernelList.sortOrderable(beanFactoryStoppeds);
+		KernelList.sortOrderable(beanFactoryStoppings);
 
 		for (IBeanFactoryAware beanFactoryAware : beanFactoryAwares) {
 			beanFactoryAware.beforeRegister(beanFactory);
@@ -418,11 +418,11 @@ public class BeanFactoryProvider implements IBeanConfigProvider {
 	 */
 	public synchronized void stopping() {
 		BeanFactory beanFactory = BeanFactoryUtils.get();
-		for (IBeanFactoryStopping beanFactoryStopping : beanFactoryStoppeds) {
+		for (IBeanFactoryStopping beanFactoryStopping : beanFactoryStoppings) {
 			beanFactoryStopping.stopping(beanFactory);
 		}
 
-		beanFactoryStoppeds.clear();
+		beanFactoryStoppings.clear();
 	}
 
 	/**

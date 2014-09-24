@@ -83,7 +83,7 @@ value支持转义和变量,转移为\符号
 
 value${name} 为value拼接已经配置的name值
 
-###### g.语句块
+###### g.文本块
 {"
 
 "}
@@ -283,3 +283,4 @@ absir-aop提供了基础的`AopBeanDefine`的`IBeanDefineProcessor`处理类。A
 
 [回目录](#cn-title)
 
+还有好多功能要写 好多......

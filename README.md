@@ -1,10 +1,10 @@
 # Java全栈开发框架。
 
-项目地址 [http://git.oschina.net/absir/absir](http://git.oschina.net/absir/absir])
+项目地址 [https://github.com/absir/absir](https://github.com/absir/absir)
 
 项目作者 absir
 
-项目使用手册 [http://git.oschina.net/absir/absir/manual.md](http://git.oschina.net/absir/absir/manual.md])
+项目使用手册 [https://github.com/absir/absir/blob/master/manual.md#cn-title](https://github.com/absir/absir/blob/master/manual.md#cn-title)
 
 
 ## 项目构建

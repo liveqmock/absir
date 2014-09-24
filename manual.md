@@ -6,8 +6,8 @@
 
 * [命名和配置](#cn-name)
 * [基础模块](#cn-base)
-* [IOC启动](#cn-ioc)
-* [IOC功能核心](#cn-ioc-featrue)
+* [Ioc启动](#cn-ioc)
+* [Ioc功能核心](#cn-ioc-featrue)
 * [Aop功能核心](#cn-aop-featrue)
 
 
@@ -45,7 +45,7 @@ ICO的容器为BeanFactory，支持容器嵌套，BeanFactoryUtils类提供了�
 	
 **以下所有接口若有多个实现，按Orderable排序，小的先执行**
 
-###1.IOC入口
+###1.Ioc入口
 BeanFactoryProvider类，可传入Application级别对象(即程序生命周期中一直存在的对象)，在程序开始和介绍需要分表调用started和stopped入口。
 
 [回目录](#cn-title)
@@ -163,11 +163,11 @@ absir-developer模块中，可以通过XlsUtils获取XlsBase配置对象列表�
 [回目录](#cn-title)
 
 <a name="cn-ioc-featrue"></a>
-## IOC功能核心
+## Ioc功能核心
 
 #### 1.基础标签说明
 
-	`@Basis` IOC基础功能组件
+	`@Basis` Ioc基础功能组件
 
 	`@Base{order}` 可以覆盖生成对象 order决定生成覆盖顺序， 小的覆盖大的， 相同则子类覆盖父类
 
@@ -210,7 +210,7 @@ value为匹配名称 type 为匹配类型
 
 	**特殊接口 `IBeanDefineEager` 和 @Inject出现在类上效果一直，都是提前载入类标签**
 
-#### 2.功能模块的IOC实现
+#### 2.功能模块的Ioc实现
 IOC的基础功能模块需要添加添加@Basis标签同时至少实现下列功能接口中的一种
 
 	`IBeanTypeFilter` 过滤提供的IOC类
@@ -245,7 +245,7 @@ IOC的基础功能模块需要添加添加@Basis标签同时至少实现下列�
 
 	`IMethodDefine` 方法注入定义
 
-#### 3.IOC功能特色
+#### 3.Ioc功能特色
 
 ###### 1.支持静态属性，方法，注入和定义生产对象
 

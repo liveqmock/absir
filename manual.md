@@ -55,44 +55,45 @@ BeanFactoryProvider类，可传入Application级别对象(即程序生命周期�
 
 配置环境中有个3个重要的属性
 
-`environment`  环境参数 #DEVELOP|DEBUG|TEST|PRODUCT (影响配置文件读取和错误提示日志等)
+	`environment`  环境参数 #DEVELOP|DEBUG|TEST|PRODUCT (影响配置文件读取和错误提示日志等)
 
-`classPath` 类目录 于程序紧密相关的目录地址为主class目录或主jar目录
+	`classPath` 类目录 于程序紧密相关的目录地址为主class目录或主jar目录
 
-`resourcePath` 资源目录初始化等于classPath，可以通过配置文件设置
+	`resourcePath` 资源目录初始化等于classPath，可以通过配置文件设置
 
 **配置文件基本语法**
 
-###### a.#为单行注释
+A.#为单行注释
 
-###### b.name=value 简单指定
+B.name=value 简单指定
 
-###### c.name|TEST|PRODUCT=value 为指定在对应的environment下才生效
+C.name|TEST|PRODUCT=value 为指定在对应的environment下才生效
 
-###### d.name.=value name#=value name+=value 分别为指定name的value 做数组加 字符串加 和字符串加带换行符的运算
+D.name.=value name#=value name+=value 分别为指定name的value 做数组加 字符串加 和字符串加带换行符的运算
 
-###### e.c和d为配置语法可以任意组合搭配使用
+E.C和D为配置语法可以任意组合搭配使用
 
-###### f.`配置文件表达式`
+F.`配置文件表达式`
 
-value支持转义和变量,转移为\符号
-例如 
-" value dsd " 则为带左右空格的字符串
+	value支持转义和变量,转移为\符号
+	例如 
+	" value dsd " 则为带左右空格的字符串
 
-\" value 为 " value
+	\" value 为 " value
 
-value${name} 为value拼接已经配置的name值
+	value${name} 为value拼接已经配置的name值
 
-###### g.文本块
-{"
+G.文本块
+	
+	{"
 
-"}
+	"}
 
-name=value value为空则value为上一个语句块，否则为上一个语句块加换行符加value
+	name=value value为空则value为上一个语句块，否则为上一个语句块加换行符加value
 
-配置文件可以指定environment，resourcePath(即资源路径，可以指定任意目录可以将资源不放到class目录下)
+	配置文件可以指定environment，resourcePath(即资源路径，可以指定任意目录可以将资源不放到class目录下)
 
-###### h.可以扩展配置文件的特定的name
+H.可以扩展配置文件的特定的name
 参考在BeanFactoryProvider中已经实现扩展
 
 	environment 设置环境变量
@@ -148,9 +149,10 @@ absir-context模块中，即入口的BeanFactoryProvider为BeanFactoryProviderCo
 ##### 2.conf文件
 
 absir-developer模块中，可以为继承ConfigureBase类添加conf配置文件。
+
 通过ConfigureUtils获取ConfigureBase配置对象，可以自动加载为于classPath加conf/加类simpleName.conf里面的配置信息(路径规则可以通过子类复写)。
 
-配置文件读取语法和主配置文件一样
+配置文件读取语法和主配置文件一样。
 
 ##### 3.xls文件
 
@@ -165,15 +167,15 @@ absir-developer模块中，可以通过XlsUtils获取XlsBase配置对象列表�
 
 #### 1.基础标签说明
 
-`@Basis` IOC基础功能组件
+	`@Basis` IOC基础功能组件
 
-`@Base{order}` 可以覆盖生成对象 order决定生成覆盖顺序， 小的覆盖大的， 相同则子类覆盖父类
+	`@Base{order}` 可以覆盖生成对象 order决定生成覆盖顺序， 小的覆盖大的， 相同则子类覆盖父类
 
-`@Configure` 注入配置类，类中存在注入属性或生成对象的静态方法
+	`@Configure` 注入配置类，类中存在注入属性或生成对象的静态方法
 
-`@Bean` 生成对象 支持 class, constructor,method
+	`@Bean` 生成对象 支持 class, constructor,method
 
-`@Inject{value,type}` 
+	`@Inject{value,type}` 
 
 在类上则会执行Class类中静态方法
 value为匹配名称 type 为匹配类型
@@ -196,52 +198,52 @@ value为匹配名称 type 为匹配类型
 在属性上则注入属性 支持单一对象,数组,列表,字典。
 在方法上则执行注入方法
 
-`@Value{value,defaultValue}` 从配置文件中注入或方法参数， value可配置name,defaultValue为无配置信息时默认值, 支持配置文件表达式。
+	`@Value{value,defaultValue}` 从配置文件中注入或方法参数， value可配置name,defaultValue为无配置信息时默认值, 支持配置文件表达式。
 
-`@Orders` 注入的数组或列表字段需要强制排序， 实现Orderable的为 order值 否则为0
+	`@Orders` 注入的数组或列表字段需要强制排序， 实现Orderable的为 order值 否则为0
 
-`@InjectOrder` @Inject注入方法，调用排序， order小的先调用
+	`@InjectOrder` @Inject注入方法，调用排序， order小的先调用
 
-`@Started` 程序开始调用
+	`@Started` 程序开始调用
 
-`@Stopping` 程序关闭调用
+	`@Stopping` 程序关闭调用
 
-**特殊接口 `IBeanDefineEager` 和 @Inject出现在类上效果一直，都是提前载入类标签**
+	**特殊接口 `IBeanDefineEager` 和 @Inject出现在类上效果一直，都是提前载入类标签**
 
 #### 2.功能模块的IOC实现
 IOC的基础功能模块需要添加添加@Basis标签同时至少实现下列功能接口中的一种
 
-`IBeanTypeFilter` 过滤提供的IOC类
+	`IBeanTypeFilter` 过滤提供的IOC类
 
-`IBeanFactoryAware` BeanFactory生成前后通知
+	`IBeanFactoryAware` BeanFactory生成前后通知
 
-`IBeanDefineSupply` 发现并提供BeanDefine定义 （扫描包）
+	`IBeanDefineSupply` 发现并提供BeanDefine定义 （扫描包）
 
-`IBeanDefineProcessor` 再处理得到的BeanDefine （AOP等）
+	`IBeanDefineProcessor` 再处理得到的BeanDefine （AOP等）
 
-`IBeanDefineAware` 对BeanDefine注册和移除通知
+	`IBeanDefineAware` 对BeanDefine注册和移除通知
 
-`IBeanObjectProcessor` 生成完的对象再加工（注入属性等）
+	`IBeanObjectProcessor` 生成完的对象再加工（注入属性等）
 
-`IBeanSoftReferenceAware` 软引用对象的注册和移除通知
+	`IBeanSoftReferenceAware` 软引用对象的注册和移除通知
 
-`IBeanFactoryStarted` 程序启动在BeanFacotry的映射通知
+	`IBeanFactoryStarted` 程序启动在BeanFacotry的映射通知
 
-`IBeanFactoryStopping` 程序关闭在BeanFacotry的映射通知
+	`IBeanFactoryStopping` 程序关闭在BeanFacotry的映射通知
 
-**`InjectBeanFactory`组织功能模块**
+	**`InjectBeanFactory`组织功能模块**
 
 需要添加添加@Bean标签同时至少实现下列功能接口中的一种
 
-`ITypeSupport` 类注入支持
+	`ITypeSupport` 类注入支持
 
-`IFieldSupport` 属性注入支持
+	`IFieldSupport` 属性注入支持
 
-`IMethodEntry` 方法扫描定义
+	`IMethodEntry` 方法扫描定义
 
-`IMethodSupport` 方法注入支持
+	`IMethodSupport` 方法注入支持
 
-`IMethodDefine` 方法注入定义
+	`IMethodDefine` 方法注入定义
 
 #### 3.IOC功能特色
 
@@ -261,25 +263,25 @@ absir-aop提供了基础的`AopBeanDefine`的`IBeanDefineProcessor`处理类。A
 
 标签说明
 
-`@Proxy{jdk, impl}` 代理模式为jdk还是为cglib
+	`@Proxy{jdk, impl}` 代理模式为jdk还是为cglib
 
-`@Impl{value}` 代理对象实现对象类（通过IOC容器获取）
+	`@Impl{value}` 代理对象实现对象类（通过IOC容器获取）
 
 ### 2.Aop的具体功能应用
 
-`@Aync{timeout, notifier}` 异步执行, timeout 异步超时时间， notifier通知执行(采取最后通知机制，避免并发执行)
+	`@Aync{timeout, notifier}` 异步执行, timeout 异步超时时间， notifier通知执行(采取最后通知机制，避免并发执行)
 
-`@Transaction` 事务执行，执行前后开启提交事务，具体参数参考
+	`@Transaction` 事务执行，执行前后开启提交事务，具体参数参考
 
-`@DataCache` 缓存执行返回
+	`@DataCache` 缓存执行返回
 
-`@DataSession` 配置查询语句session获取name
+	`@DataSession` 配置查询语句session获取name
 
-`@DataQuery` 配置查询语句
+	`@DataQuery` 配置查询语句
 
-`IMethodAdvice` 方法Aop执行点（拦截任意生成对象方法，包括jar包中的生成对象）
+	`IMethodAdvice` 方法Aop执行点（拦截任意生成对象方法，包括jar包中的生成对象）
 
-几个抽象现实类 `MethodBefore` `MethodAfter` `MethodRound` `MethodReturn` `MethodRound` 
+	几个抽象现实类 `MethodBefore` `MethodAfter` `MethodRound` `MethodReturn` `MethodRound` 
 
 [回目录](#cn-title)
 

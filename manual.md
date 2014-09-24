@@ -1,7 +1,7 @@
 <a name="cn-title"></a>
 # achieve-server
 
-[http://git.oschina.net/absir/absir](http://git.oschina.net/absir/absir "achieve-server")
+[https://github.com/absir/absir](https://github.com/absir/absir "achieve-server")
 
 
 * [命名和配置](#cn-name)

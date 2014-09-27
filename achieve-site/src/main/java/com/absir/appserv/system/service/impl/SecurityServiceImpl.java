@@ -8,6 +8,7 @@
 package com.absir.appserv.system.service.impl;
 
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.hibernate.Session;
@@ -30,7 +31,9 @@ import com.absir.bean.inject.value.Bean;
 import com.absir.context.core.ContextUtils;
 import com.absir.context.schedule.value.Schedule;
 import com.absir.core.kernel.KernelObject;
+import com.absir.orm.hibernate.boost.IEntityMerge;
 import com.absir.orm.transaction.value.Transaction;
+import com.absir.orm.value.JoEntity;
 
 /**
  * @author absir
@@ -38,7 +41,7 @@ import com.absir.orm.transaction.value.Transaction;
  */
 @SuppressWarnings("unchecked")
 @Bean
-public class SecurityServiceImpl extends SecurityService implements ISecuritySupply {
+public class SecurityServiceImpl extends SecurityService implements ISecuritySupply, IEntityMerge<JUser> {
 
 	/*
 	 * (non-Javadoc)
@@ -162,16 +165,15 @@ public class SecurityServiceImpl extends SecurityService implements ISecuritySup
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * com.absir.appserv.system.service.SecurityService#setSecurityContext(com
+	 * @see com.absir.appserv.system.service.SecurityService#loginSecurity(com
 	 * .absir.appserv.system.security.SecurityContext,
 	 * com.absir.appserv.system.bean.proxy.JiUserBase)
 	 */
 	@Override
-	protected void setSecurityContext(SecurityContext securityContext, JiUserBase userBase) {
+	protected void loginSecurity(SecurityContext securityContext, JiUserBase userBase) {
 		// TODO Auto-generated method stub
-		if (userBase.getClass() == JUser.class) {
-			securityContext.setSecuritySupply(this);
+		if (JoEntity.entityClass(userBase.getClass()) == JUser.class) {
+			saveSession(securityContext);
 		}
 	}
 
@@ -182,7 +184,6 @@ public class SecurityServiceImpl extends SecurityService implements ISecuritySup
 	 * com.absir.appserv.system.service.SecurityService#findSecurityContext(
 	 * java.lang.String, com.absir.appserv.system.security.SecurityManager)
 	 */
-
 	@Override
 	@Transaction(readOnly = true)
 	protected SecurityContext findSecurityContext(String sessionId, SecurityManager securityManager) {
@@ -239,14 +240,29 @@ public class SecurityServiceImpl extends SecurityService implements ISecuritySup
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * com.absir.appserv.system.security.ISecuritySupply#removeSession(com.absir
-	 * .appserv.system.security.SecurityContext)
+	 * @see com.absir.orm.hibernate.boost.IEntityMerge#merge(java.lang.String,
+	 * java.lang.Object, com.absir.orm.hibernate.boost.IEntityMerge.MergeType,
+	 * java.lang.Object)
 	 */
+	@Transaction
 	@Override
-	public void removeSession(SecurityContext securityContext) {
+	public void merge(String entityName, JUser entity, MergeType mergeType, Object mergeEvent) {
 		// TODO Auto-generated method stub
-		// BeanService.ME.executeUpdate("DELETE", securityContext.get);
+		if (mergeType == MergeType.UPDATE || mergeType == MergeType.DELETE) {
+			Iterator<String> iterator = QueryDaoUtils.createQueryArray(BeanDao.getSession(), "SELECT o.id FROM JSession o WHERE o.userId = ? AND o.passTime > ?", entity.getUserId(),
+					ContextUtils.getContextTime()).iterate();
+			while (iterator.hasNext()) {
+				SecurityContext securityContext = ContextUtils.findContext(SecurityContext.class, iterator.next());
+				if (securityContext != null) {
+					if (mergeType == MergeType.UPDATE) {
+						securityContext.setUser(entity);
+
+					} else {
+						securityContext.setExpiration();
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -255,6 +271,6 @@ public class SecurityServiceImpl extends SecurityService implements ISecuritySup
 	@Schedule(fixedDelay = 24 * 36000)
 	@Transaction
 	protected void removeExpiredSession() {
-		QueryDaoUtils.createQueryArray(BeanDao.getSession(), "DELETE FROM JSession o WHERE o.passTime < ?", ContextUtils.getContextTime()).executeUpdate();
+		QueryDaoUtils.createQueryArray(BeanDao.getSession(), "DELETE o FROM JSession o WHERE o.passTime < ?", ContextUtils.getContextTime()).executeUpdate();
 	}
 }

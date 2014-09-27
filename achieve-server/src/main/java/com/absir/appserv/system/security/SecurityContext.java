@@ -11,35 +11,59 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.persistence.Entity;
+
+import com.absir.appserv.feature.menu.value.MaEntity;
+import com.absir.appserv.feature.menu.value.MaMenu;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
+import com.absir.appserv.system.bean.value.JaEdit;
+import com.absir.appserv.system.bean.value.JaLang;
+import com.absir.appserv.system.bean.value.JeEditable;
 import com.absir.context.core.ContextBean;
 import com.absir.context.core.ContextUtils;
+import com.absir.property.value.Properties;
+import com.absir.property.value.Property;
+import com.absir.property.value.PropertyInfo;
 
 /**
  * @author absir
  * 
  */
+@MaEntity(parent = { @MaMenu("在线管理") }, name = "会话")
+@Properties(@Property(name = "expirationTime", infos = @PropertyInfo(value = JaLang.class, valueInfo = "过期时间")))
+@Entity
 public class SecurityContext extends ContextBean<String> {
 
 	/** securitySupply */
+	@JaEdit(editable = JeEditable.DISABLE)
 	private ISecuritySupply securitySupply;
 
 	/** user */
+	@JaEdit(groups = JaEdit.GROUP_LIST)
+	@JaLang("用户")
 	private JiUserBase user;
 
 	/** address */
+	@JaEdit(types = "ip", groups = JaEdit.GROUP_LIST)
+	@JaLang(value = "IP地址", tag = "ip")
 	private String address;
 
 	/** agent */
+	@JaEdit(groups = JaEdit.GROUP_LIST)
+	@JaLang(value = "设备", tag = "device")
 	private String agent;
 
 	/** metas */
 	private Map<String, Serializable> metas;
 
 	/** lifeTime */
+	@JaEdit(groups = JaEdit.GROUP_LIST)
+	@JaLang(value = "生命时间")
 	private long lifeTime;
 
 	/** maxExpirationTime */
+	@JaEdit(groups = JaEdit.GROUP_LIST)
+	@JaLang(value = "最大过期时间")
 	private long maxExpirationTime;
 
 	/** metaObjects */

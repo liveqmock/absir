@@ -32,6 +32,18 @@ public class JoEntity implements Serializable {
 	private Class<?> entityClass;
 
 	/**
+	 * @param entityClass
+	 * @return
+	 */
+	public static Class<?> entityClass(Class<?> entityClass) {
+		while (AopProxy.class.isAssignableFrom(entityClass) || HibernateProxy.class.isAssignableFrom(entityClass)) {
+			entityClass = entityClass.getSuperclass();
+		}
+
+		return entityClass;
+	}
+
+	/**
 	 * 
 	 */
 	public JoEntity() {
@@ -43,10 +55,7 @@ public class JoEntity implements Serializable {
 	 */
 	public JoEntity(String entityName, Class<?> entityClass) {
 		if (entityName == null) {
-			while (AopProxy.class.isAssignableFrom(entityClass) || HibernateProxy.class.isAssignableFrom(entityClass)) {
-				entityClass = entityClass.getSuperclass();
-			}
-
+			entityClass = entityClass(entityClass);
 			entityName = SessionFactoryUtils.getEntityNameNull(entityClass);
 
 		} else if (entityClass == null) {

@@ -88,6 +88,7 @@ public abstract class SecurityService implements ISecurityService, ISecurity, IG
 	 */
 	public void setSecurityContext(SecurityContext securityContext, Input input) {
 		input.getModel().put(SECURITY_CONTEXT_NAME, securityContext);
+		setUserBase(securityContext == null ? null : securityContext.getUser(), input);
 	}
 
 	/**
@@ -119,7 +120,7 @@ public abstract class SecurityService implements ISecurityService, ISecurity, IG
 	 * @param securityContext
 	 * @param userBase
 	 */
-	protected abstract void setSecurityContext(SecurityContext securityContext, JiUserBase userBase);
+	protected abstract void loginSecurity(SecurityContext securityContext, JiUserBase userBase);
 
 	/**
 	 * @param securityManager
@@ -142,14 +143,13 @@ public abstract class SecurityService implements ISecurityService, ISecurity, IG
 			sessionExpiration = remember;
 		}
 
-		setSecurityContext(securityContext, userBase);
 		securityContext.setMaxExpirationTime(sessionExpiration);
+		loginSecurity(securityContext, userBase);
 		setSecurityContext(securityContext, inputRequest);
 		if (remember > 0) {
 			inputRequest.setCookie(securityManager.getSessionKey(), sessionId, securityManager.getCookiePath(), remember);
 		}
 
-		setUserBase(userBase, inputRequest);
 		return securityContext;
 	}
 
@@ -191,7 +191,6 @@ public abstract class SecurityService implements ISecurityService, ISecurity, IG
 
 					securityContext.retainAt();
 					setSecurityContext(securityContext, input);
-					setUserBase(securityContext.getUser(), input);
 				}
 			}
 		}
@@ -251,7 +250,10 @@ public abstract class SecurityService implements ISecurityService, ISecurity, IG
 	public void logout(String name, Input input) {
 		// TODO Auto-generated method stub
 		SecurityContext securityContext = autoLogin(name, false, 0, input);
-		if (securityContext != null) {
+		if (securityContext == null) {
+			setUserBase(null, input);
+
+		} else {
 			// 销毁之前的登录
 			securityContext.setSecuritySupply(null);
 			securityContext.setExpiration();
@@ -264,8 +266,6 @@ public abstract class SecurityService implements ISecurityService, ISecurity, IG
 
 			setSecurityContext(null, input);
 		}
-
-		setUserBase(null, input);
 	}
 
 	/*

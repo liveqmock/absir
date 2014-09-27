@@ -40,7 +40,8 @@ public privileged aspect Proxy_Aspect_Bean {
 	/**
 	 * @author absir 关联实体
 	 */
-	@JaLang("副本主键")
+	@JaLang("关联主键")
+	@JaColum(indexs = { @Index(name = "assocId", columnList = "assocId") })
 	private Long JpAssoc.assocId;
 
 	public Long JpAssoc.getAssocId() {
@@ -88,6 +89,7 @@ public privileged aspect Proxy_Aspect_Bean {
 	 */
 	@JaLang("过期时间")
 	@JaEdit(types = "dateTime", groups = JaEdit.GROUP_LIST)
+	@JaColum(indexs = { @Index(name = "passTime", columnList = "passTime") })
 	private long JpPass.passTime;
 
 	public void JpPass.setPassTime(long passTime) {
@@ -142,7 +144,7 @@ public privileged aspect Proxy_Aspect_Bean {
 	/**
 	 * @author absir 关联用户
 	 */
-	@JaLang("关联用户")
+	@JaLang(value = "关联用户", tag = "assocUser")
 	@JaColum(indexs = @Index(name = "userId", columnList = "userId"))
 	private Long JpUser.userId;
 
@@ -157,7 +159,7 @@ public privileged aspect Proxy_Aspect_Bean {
 	/**
 	 * @author absir 关联用户
 	 */
-	@JaLang("关联用户角色")
+	@JaLang(value = "关联角色", tag = "assocRole")
 	@JaColum(indexs = @Index(name = "roleId", columnList = "roleId"))
 	private Long JpUserRole.roleId;
 

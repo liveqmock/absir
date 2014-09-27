@@ -14,7 +14,6 @@ import java.util.List;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.junit.Test;
 
-import com.absir.appserv.client.configure.xls.XCardDefine;
 import com.absir.appserv.configure.xls.XlsBase;
 import com.absir.appserv.configure.xls.XlsUtils;
 import com.absir.appserv.system.helper.HelperJson;
@@ -29,7 +28,7 @@ public class TestXlsReader extends AbstractTest {
 
 	@Test
 	public void test() throws IOException {
-		Class<? extends XlsBase> beanClass = XCardDefine.class;
+		Class<? extends XlsBase> beanClass = XlsBase.class;
 		HSSFWorkbook hssfWorkbook = new HSSFWorkbook(HelperFile.openInputStream(new File("/Users/absir/Desktop/" + beanClass.getSimpleName() + ".xls")));
 		List<? extends XlsBase> beanList = XlsUtils.getXlsList(hssfWorkbook, beanClass);
 		System.out.println(beanList);

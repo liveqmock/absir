@@ -24,7 +24,6 @@ import java.util.Set;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.junit.Test;
 
-import com.absir.appserv.client.configure.xls.XTaskDefine;
 import com.absir.appserv.configure.xls.XlsBase;
 import com.absir.appserv.configure.xls.XlsUtils;
 import com.absir.core.dyna.DynaBinder;
@@ -46,7 +45,7 @@ public class TestXlsExport extends AbstractTest {
 
 	@Test
 	public void main() throws IOException {
-		Class<?> beanClass = XTaskDefine.class;
+		Class<?> beanClass = XlsBase.class;
 		List<Object> beanList = new ArrayList<Object>();
 		beanList.add(newXlsBean(beanClass));
 		beanList.add(newXlsBean(beanClass));

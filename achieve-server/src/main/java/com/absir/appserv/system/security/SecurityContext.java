@@ -28,7 +28,7 @@ public class SecurityContext extends ContextBean<String> {
 	private JiUserBase user;
 
 	/** address */
-	private long address;
+	private String address;
 
 	/** agent */
 	private String agent;
@@ -78,7 +78,7 @@ public class SecurityContext extends ContextBean<String> {
 	/**
 	 * @return the address
 	 */
-	public long getAddress() {
+	public String getAddress() {
 		return address;
 	}
 
@@ -86,7 +86,7 @@ public class SecurityContext extends ContextBean<String> {
 	 * @param address
 	 *            the address to set
 	 */
-	public void setAddress(long address) {
+	public void setAddress(String address) {
 		this.address = address;
 	}
 

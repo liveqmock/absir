@@ -412,6 +412,38 @@ public class BeanServiceBase implements BeanService, ICrudSupply {
 	 * (non-Javadoc)
 	 * 
 	 * @see
+	 * com.absir.appserv.system.service.BeanService#persists(java.util.Collection
+	 * )
+	 */
+	@Override
+	public void persists(Collection<?> entities) {
+		// TODO Auto-generated method stub
+		Session session = getSession();
+		for (Object entity : entities) {
+			session.persist(entity);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.system.service.BeanService#persists(java.lang.String,
+	 * java.util.Collection)
+	 */
+	@Override
+	public void persists(String entityName, Collection<?> entities) {
+		// TODO Auto-generated method stub
+		Session session = getSession();
+		for (Object entity : entities) {
+			session.persist(entityName, entity);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
 	 * com.absir.appserv.system.service.BeanService#mergers(java.util.Collection
 	 * )
 	 */

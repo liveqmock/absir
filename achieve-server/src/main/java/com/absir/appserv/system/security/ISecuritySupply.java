@@ -18,4 +18,8 @@ public interface ISecuritySupply {
 	 */
 	public void saveSession(SecurityContext securityContext);
 
+	/**
+	 * @param securityContext
+	 */
+	public void removeSession(SecurityContext securityContext);
 }

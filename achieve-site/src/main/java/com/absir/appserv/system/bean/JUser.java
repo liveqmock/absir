@@ -35,13 +35,13 @@ import com.absir.validator.value.Email;
 @Entity
 public class JUser extends JbUser implements JpUserBase, JpMeta, Serializable {
 
-	@JaLang("用户密码")
+	@JaLang("密码")
 	@JaEdit(editable = JeEditable.OPTIONAL, types = "password")
 	@JaCrud(cruds = { Crud.CREATE, Crud.UPDATE }, factory = PasswordCrudFactory.class)
 	@Column(columnDefinition = "char(32)")
 	private String password;
 
-	@JaLang("密码加密")
+	@JaLang(value = "加密", tag = "encryption")
 	@Prop(include = 99)
 	@JaEdit(editable = JeEditable.DISABLE)
 	private String salt;
@@ -61,11 +61,11 @@ public class JUser extends JbUser implements JpUserBase, JpMeta, Serializable {
 	@JaEdit(types = "dateTime", groups = JaEdit.GROUP_LIST)
 	private long lastErrorLogin;
 
-	@JaLang("关联邮箱")
+	@JaLang("邮箱")
 	@Email
 	private String email;
 
-	@JaLang("关联手机")
+	@JaLang("手机")
 	private String mobile;
 
 	/*

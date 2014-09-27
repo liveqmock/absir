@@ -14,9 +14,9 @@ import javax.servlet.ServletRequest;
 import com.absir.appserv.developer.Pag;
 import com.absir.appserv.dyna.DynaBinderUtils;
 import com.absir.appserv.support.developer.IDeveloper.ISecurity;
+import com.absir.appserv.system.bean.JLog;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.bean.value.JeRoleLevel;
-import com.absir.appserv.system.helper.HelperLong;
 import com.absir.appserv.system.helper.HelperRandom;
 import com.absir.appserv.system.security.ISecurityService;
 import com.absir.appserv.system.security.SecurityContext;
@@ -133,7 +133,7 @@ public abstract class SecurityService implements ISecurityService, ISecurity, IG
 		String sessionId = HelperRandom.randSecendId(contextTime, 8, inputRequest.getRequest().hashCode());
 		SecurityContext securityContext = ContextUtils.getContext(SecurityContext.class, sessionId);
 		securityContext.setUser(userBase);
-		securityContext.setAddress(HelperLong.longIP(inputRequest.getRequest().getRemoteAddr(), -1));
+		securityContext.setAddress(inputRequest.getAddress());
 		securityContext.setAgent(inputRequest.getRequest().getHeader("user-agent"));
 		securityContext.setLifeTime(securityManager.getSessionLife());
 		securityContext.retainAt(contextTime);
@@ -223,16 +223,17 @@ public abstract class SecurityService implements ISecurityService, ISecurity, IG
 
 			SecurityManager securityManager = getSecurityManager(name);
 			if (!validator(userBase, password, securityManager.getError(), securityManager.getErrorTime())) {
+				JLog.log(name, "login", input.getAddress(), username, false);
 				throw new ServerException(ServerStatus.NO_USER, userBase);
 			}
 
 			if (userBase.getUserRoleLevel() >= roleLevel) {
 				SecurityContext securityContext = loginUser(securityManager, userBase, remember, inputRequest);
 				if (securityContext != null) {
+					JLog.log(name, "login", input.getAddress(), username, true);
 					inputRequest.setSession(securityManager.getSessionKey(), securityContext.getId());
+					return securityContext;
 				}
-
-				return securityContext;
 			}
 		}
 

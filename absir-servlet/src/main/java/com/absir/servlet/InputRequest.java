@@ -182,6 +182,17 @@ public class InputRequest extends Input {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see com.absir.server.in.Input#getAddress()
+	 */
+	@Override
+	public String getAddress() {
+		// TODO Auto-generated method stub
+		return request.getRemoteAddr();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.absir.server.in.Input#getAttribute(java.lang.String)
 	 */
 	@Override

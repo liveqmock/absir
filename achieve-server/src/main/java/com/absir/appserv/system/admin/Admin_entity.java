@@ -9,6 +9,7 @@ package com.absir.appserv.system.admin;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ import com.absir.appserv.dyna.DynaBinderUtils;
 import com.absir.appserv.feature.transaction.TransactionIntercepter;
 import com.absir.appserv.jdbc.JdbcCondition;
 import com.absir.appserv.jdbc.JdbcPage;
+import com.absir.appserv.system.bean.JLog;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.bean.value.JaCrud.Crud;
 import com.absir.appserv.system.service.BeanService;
@@ -249,6 +251,7 @@ public class Admin_entity extends AdminServer {
 
 		} catch (ServerException e) {
 			// TODO: handle exception
+			JLog.log("admin", "save/" + id == null ? entityName : (entityName + "/" + id), input.getAddress(), user == null ? null : user.getUsername(), false);
 			return "admin/entity/save.denied";
 		}
 
@@ -290,6 +293,7 @@ public class Admin_entity extends AdminServer {
 			model.put("id", crudSupply.getIdentifier(entityName, entity));
 		}
 
+		JLog.log("admin", "save/" + id == null ? entityName : (entityName + "/" + id), input.getAddress(), user == null ? null : user.getUsername(), true);
 		return "admin/entity/save";
 	}
 
@@ -314,9 +318,11 @@ public class Admin_entity extends AdminServer {
 
 		} catch (Throwable e) {
 			// TODO Auto-generated catch block
+			JLog.log("admin", "delete/" + entityName + "/" + id, input.getAddress(), user == null ? null : user.getUsername(), false);
 			return "admin/entity/delete.error";
 		}
 
+		JLog.log("admin", "delete/" + entityName + "/" + id, input.getAddress(), user == null ? null : user.getUsername(), true);
 		return "admin/entity/delete";
 	}
 
@@ -333,14 +339,25 @@ public class Admin_entity extends AdminServer {
 		ICrudSupply crudSupply = getCrudSupply(entityName, null);
 		JiUserBase user = SecurityService.ME.getUserBase(input);
 		AuthServiceUtils.deletePropertyFilter(entityName, crudSupply, user);
+		List<JLog> logs = new ArrayList<JLog>(ids.length);
 		try {
 			EntityService.ME.delete(entityName, crudSupply, user, ids);
 
 		} catch (Throwable e) {
 			// TODO Auto-generated catch block
+			for (String id : ids) {
+				logs.add(new JLog("admin", "delete/" + entityName + "/" + id, input.getAddress(), user == null ? null : user.getUsername(), false));
+			}
+
+			JLog.logs(logs);
 			return "admin/entity/delete.error";
 		}
 
+		for (String id : ids) {
+			logs.add(new JLog("admin", "delete/" + entityName + "/" + id, input.getAddress(), user == null ? null : user.getUsername(), true));
+		}
+
+		JLog.logs(logs);
 		return "admin/entity/delete";
 	}
 
@@ -372,21 +389,6 @@ public class Admin_entity extends AdminServer {
 	}
 
 	/**
-	 * 导入Excel(上传)
-	 * 
-	 * @param entityName
-	 * @param input
-	 * @return
-	 * @throws IOException
-	 */
-	public void upload(String entityName, Input input) throws IOException {
-		ICrudSupply crudSupply = getCrudSupply(entityName, input);
-		if (crudSupply instanceof CrudSupply) {
-			throw new ServerException(ServerStatus.IN_404);
-		}
-	}
-
-	/**
 	 * 导入Excel
 	 * 
 	 * @param entityName
@@ -405,6 +407,7 @@ public class Admin_entity extends AdminServer {
 		PropertyFilter filter = AuthServiceUtils.insertPropertyFilter(entityName, crudSupply, user);
 		List<?> entities = XlsUtils.getXlsList(new HSSFWorkbook(xls.getInputStream()), null, crudSupply.getEntityClass(entityName), XlsUtils.XLS_BASE, false);
 		EntityService.ME.merge(entityName, crudSupply, user, entities, filter);
+		JLog.log("admin", "importXls/" + entityName, input.getAddress(), user == null ? null : user.getUsername(), true);
 		return "admin/entity/importXls";
 	}
 

@@ -270,6 +270,19 @@ public interface BeanService {
 	 * @param entities
 	 */
 	@Transaction
+	public void persists(Collection<?> entities);
+
+	/**
+	 * @param entityName
+	 * @param entities
+	 */
+	@Transaction
+	public void persists(String entityName, Collection<?> entities);
+
+	/**
+	 * @param entities
+	 */
+	@Transaction
 	public void mergers(Collection<?> entities);
 
 	/**

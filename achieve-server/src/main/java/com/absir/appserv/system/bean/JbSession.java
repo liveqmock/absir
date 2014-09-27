@@ -30,15 +30,15 @@ public abstract class JbSession extends JbVerifier {
 	private String username;
 
 	@JaEdit(types = "ip", groups = JaEdit.GROUP_LIST)
-	@JaLang("地址")
+	@JaLang(value = "IP地址", tag = "ip")
 	private long address;
 
 	@JaEdit(groups = JaEdit.GROUP_LIST)
-	@JaLang("设备")
+	@JaLang(value = "设备", tag = "device")
 	private String agent;
 
 	@JaEdit(types = "dateTime", groups = JaEdit.GROUP_LIST)
-	@JaLang("最后登录")
+	@JaLang(value = "最后登录", tag = "lastLogin")
 	private long lastTime;
 
 	@JaLang("附加信息")

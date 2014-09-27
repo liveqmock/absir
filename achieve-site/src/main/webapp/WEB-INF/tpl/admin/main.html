@@ -1,17 +1,11 @@
 #set(page_title = @Pag.configure().sitename + @Pag.lang("管理后台")) #tag _layout("/WEB-INF/tpl/layout.html")
 <link href="${jui}themes/css/style.css" rel="stylesheet" media="screen" />
-<link href="${jui}plugs/bootstrapSelect/bootstrap-select.css"
-	rel="stylesheet" media="screen" />
-<link href="${jui}plugs/colorpicker/css/bootstrap-colorpicker.min.css"
-	rel="stylesheet" media="screen" />
-<link href="${jui}plugs/uploadify/css/uploadify.css" rel="stylesheet"
-	media="screen" />
-<link href="${jui}plugs/kindeditor_4.1.10/themes/default/default.css"
-	rel="stylesheet" media="screen" />
-<link href="${jui}themes/purple/core.css" rel="stylesheet"
-	media="screen" />
-<link href="${jui}plugs/Huploadify/Huploadify.css" rel="stylesheet"
-	media="screen" />
+<link href="${jui}themes/purple/core.css" rel="stylesheet" media="screen" />
+<link href="${jui}plugs/bootstrapSelect/bootstrap-select.css" rel="stylesheet" media="screen" />
+<link href="${jui}plugs/colorpicker/css/bootstrap-colorpicker.min.css" rel="stylesheet" media="screen" />
+<link href="${jui}plugs/uploadify/css/uploadify.css" rel="stylesheet" media="screen" />
+<link href="${jui}plugs/Huploadify/Huploadify.css" rel="stylesheet" media="screen" />
+<link href="${jui}plugs/kindeditor_4.1.10/themes/default/default.css" rel="stylesheet" media="screen" />
 <script src="${jui}js/dwz.min.js"></script>
 <script src="${jui}plugs/colorpicker/js/bootstrap-colorpicker.min.js"></script>
 <script src="${jui}plugs/uploadify/scripts/jquery.uploadify.min.js"></script>
@@ -28,7 +22,7 @@
 <script type="text/javascript">
 $(function(){
     DWZ.init("${jui}dwz.frag.xml", {
-        loginUrl:"logintimeout.html", loginTitle:@Pag.lang("登录"),
+        loginUrl:"logintimeout.html", loginTitle:"${@Pag.lang("登录")}",
         statusCode:{ok:200, error:300, timeout:301},
         pageInfo:{pageNum:"pageNum", numPerPage:"numPerPage", orderField:"orderField", orderDirection:"orderDirection"},
         keys: {statusCode:"statusCode", message:"message"},
@@ -56,7 +50,6 @@ function MainMenuClick(event, treeId, treeNode) {
 }
 </script>
 #define(JiUserBase USER)
-<body scroll="no">
 	<!--[if lte IE 7]>
         <div id="errorie">IE too lower!</div>
     <![endif]-->
@@ -366,8 +359,7 @@ function MainMenuClick(event, treeId, treeNode) {
 		</div>
 	</div>
 	<div id="footer">
-		Copyright &copy; 2013 - 2014 <a href="http://www.xknaan.com/"
-			target="_blank">Bootstrap for DWZ富客户端框架</a>
-		<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1252983288'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s23.cnzz.com/stat.php%3Fid%3D1252983288%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script>
+		Copyright &copy; 2014 - 2015 <a href="http://absir.com/"
+			target="_blank">Achieve Server开发框架</a>
 	</div>
 	#end

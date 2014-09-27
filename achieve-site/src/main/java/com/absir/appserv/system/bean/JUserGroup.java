@@ -25,7 +25,7 @@ import com.absir.appserv.system.bean.value.JaLang;
 @Entity
 public class JUserGroup extends JbBean implements JpUser {
 
-	@JaLang("群组名称")
+	@JaLang(value = "群组名称", tag = "groupName")
 	private String name;
 
 	@JaLang("成员名片")

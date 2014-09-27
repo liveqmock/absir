@@ -259,7 +259,15 @@ public abstract class Input extends Bean<Serializable> implements IAttributes {
 		return BeanFactoryUtils.getEnvironment() != Environment.PRODUCT && paramDebug();
 	}
 
+	/**
+	 * @return
+	 */
 	public abstract boolean paramDebug();
+	
+	/**
+	 * @return
+	 */
+	public abstract String getAddress();
 
 	/**
 	 * @param name

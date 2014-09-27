@@ -253,6 +253,17 @@ public class InputSocket extends Input {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see com.absir.server.in.Input#getAddress()
+	 */
+	@Override
+	public String getAddress() {
+		// TODO Auto-generated method stub
+		return socketChannel.socket().getInetAddress().getHostAddress();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.absir.server.in.Input#getParams(java.lang.String)
 	 */
 	@Override

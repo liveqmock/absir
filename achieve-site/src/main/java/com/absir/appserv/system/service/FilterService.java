@@ -7,7 +7,7 @@
  */
 package com.absir.appserv.system.service;
 
-import com.absir.appserv.data.value.DataQuery;
+import com.absir.appserv.system.dao.BeanDao;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
 import com.absir.orm.transaction.value.Transaction;
@@ -23,11 +23,11 @@ public abstract class FilterService {
 	public final static FilterService ME = BeanFactoryUtils.get(FilterService.class);
 
 	/**
-	 * @param name
+	 * @param value
 	 * @return
 	 */
 	@Transaction(readOnly = true)
-	@DataQuery(value = "SELECT COUNT(o) FROM JFilter o WHERE o.id LIKE ?")
-	public abstract int findFilter(String name);
-
+	public boolean findFilter(String value) {
+		return BeanDao.getSession().createQuery("SELECT o.id FROM JFilter o WHERE ? LIKE o.id").setParameter(0, value).iterate().hasNext();
+	}
 }

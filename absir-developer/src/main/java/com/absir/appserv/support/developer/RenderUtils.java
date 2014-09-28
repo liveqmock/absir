@@ -7,17 +7,46 @@
  */
 package com.absir.appserv.support.developer;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 
 import com.absir.bean.basis.Environment;
 import com.absir.bean.core.BeanFactoryUtils;
+import com.absir.context.core.ContextUtils;
 
 /**
  * @author absir
  *
  */
 public class RenderUtils {
+
+	/**
+	 * @param include
+	 * @param renders
+	 * @return
+	 * @throws IOException
+	 */
+	public static String load(String include, Object... renders) throws IOException {
+		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+		IRender.ME.rend(byteArrayOutputStream, include, renders);
+		return byteArrayOutputStream.toString(ContextUtils.getCharset().displayName());
+
+	}
+
+	/**
+	 * @param include
+	 * @param renders
+	 * @return
+	 * @throws IOException
+	 */
+	public static String loadExist(String include, Object... renders) throws IOException {
+		if (new File(IRender.ME.getRealPath(include, renders)).exists()) {
+			return load(include, renders);
+		}
+
+		return null;
+	}
 
 	/**
 	 * @param include

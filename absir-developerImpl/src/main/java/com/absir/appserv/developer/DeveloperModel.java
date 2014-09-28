@@ -7,17 +7,30 @@
  */
 package com.absir.appserv.developer;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletRequest;
+
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
+import org.jsoup.nodes.ScripteNode;
 
 import com.absir.appserv.crud.CrudUtils;
 import com.absir.appserv.developer.model.EntityModel;
 import com.absir.appserv.developer.model.ModelFactory;
 import com.absir.appserv.support.developer.IField;
+import com.absir.appserv.support.developer.RenderUtils;
 import com.absir.appserv.system.bean.value.JaEdit;
+import com.absir.core.kernel.KernelArray;
 import com.absir.orm.value.JoEntity;
 
 /**
@@ -64,6 +77,26 @@ public class DeveloperModel {
 		return (DeveloperModel) modelObject;
 	}
 
+	/**
+	 * @param field
+	 * @param include
+	 * @param exclude
+	 * @param nameSet
+	 * @return
+	 */
+	public static boolean allow(IField field, int include, int exclude, Set<String> nameSet) {
+		if (field.getCrudField().allow(include, exclude)) {
+			if (nameSet == null) {
+				return include == 0;
+
+			} else {
+				return nameSet.contains(field.getName());
+			}
+		}
+
+		return false;
+	}
+
 	/** entityName */
 	private String entityName;
 
@@ -85,6 +118,145 @@ public class DeveloperModel {
 	 */
 	public EntityModel getEntityModel() {
 		return entityModel;
+	}
+
+	/**
+	 * 获取开发模版
+	 * 
+	 * @param div
+	 * @param theme
+	 * @param subtable
+	 * @param group
+	 * @param include
+	 * @param exclude
+	 * @param names
+	 * @param renders
+	 * @return
+	 * @throws IOException
+	 */
+	public String element(String div, String theme, boolean subtable, String group, int include, int exclude, String[] names, Object... renders) throws IOException {
+		ServletRequest request = KernelArray.getAssignable(renders, ServletRequest.class);
+		DeveloperGenerator generator = DeveloperGenerator.getDeveloperGenerator(request);
+		if (generator == null) {
+			generator = new DeveloperGenerator();
+		}
+
+		Set<String> nameSet = null;
+		if (names != null) {
+			nameSet = new HashSet<String>();
+			for (String name : names) {
+				nameSet.add(name);
+			}
+		}
+
+		Document document = new Document("");
+		Element element = document.appendElement(div);
+		request.setAttribute("element", element);
+		// 顶部代码
+		String node = RenderUtils.loadExist(theme + "top" + DeveloperUtils.suffix, renders);
+		List<Node> nodes = node == null ? null : ScripteNode.append(element, node);
+		String identifier;
+		String themeType = theme + "type/";
+		String[] relativePaths = new String[] { "" };
+		if (group == null) {
+			for (IField field : entityModel.getPrimaries()) {
+				if (allow(field, include, exclude, nameSet)) {
+					identifier = "name=" + "\"" + field.getName() + "\"";
+					if (!generator.append(identifier, element)) {
+						request.setAttribute("field", field);
+						request.setAttribute("identifier", identifier);
+						nodes = ScripteNode.append(element, RenderUtils.load(theme + "primary" + DeveloperUtils.suffix, renders));
+						request.setAttribute("nodes", nodes);
+						DeveloperUtils.includeExist(themeType, field.getTypes(), relativePaths, renders);
+					}
+				}
+			}
+		}
+
+		List<IField> subtableFields = subtable ? new ArrayList<IField>() : null;
+		Map<String, List<IField>> subtableSubFields = subtable ? new HashMap<String, List<IField>>() : null;
+		for (IField field : group == null ? entityModel.getFields() : entityModel.getGroupFields(group)) {
+			if (allow(field, include, exclude, nameSet)) {
+				if (subtable) {
+					if (field.getTypes().size() > 0 && "subtable".equals(field.getTypes().get(0))) {
+						// 关联实体字段
+						subtableFields.add(field);
+						continue;
+
+					} else {
+						// 关联实体索引字段
+						String subField = (String) field.getMetas().get("subField");
+						if (subField != null) {
+							List<IField> fields = subtableSubFields.get(subField);
+							if (fields == null) {
+								fields = new ArrayList<IField>();
+								subtableSubFields.put(subField, fields);
+							}
+
+							fields.add(field);
+							continue;
+						}
+					}
+
+					identifier = "name=" + "\"" + field.getName() + "\"";
+					if (!generator.append(identifier, element)) {
+						request.setAttribute("field", field);
+						request.setAttribute("identifier", identifier);
+						nodes = ScripteNode.append(element, RenderUtils.load(theme + "field" + DeveloperUtils.suffix, renders));
+						request.setAttribute("nodes", nodes);
+						DeveloperUtils.includeExist(themeType, field.getTypes(), relativePaths, renders);
+					}
+				}
+			}
+		}
+
+		// 分割代码
+		node = RenderUtils.loadExist(theme + "center" + DeveloperUtils.suffix, renders);
+		nodes = node == null ? null : ScripteNode.append(element, node);
+		// 编辑关联实体
+		if (subtable && subtableFields.size() > 0) {
+			request.setAttribute("subtable", true);
+			// 关联顶部代码
+			node = RenderUtils.loadExist(theme + "subtop" + DeveloperUtils.suffix, renders);
+			nodes = node == null ? null : ScripteNode.append(element, node);
+			String themeSub = theme + "sub/";
+			for (IField field : subtableFields) {
+				identifier = "name=\"" + field.getName() + "-sub\"";
+				if (!!generator.append(identifier, element)) {
+					request.setAttribute("identifier", identifier);
+					request.setAttribute("field", field);
+					nodes = ScripteNode.append(element, RenderUtils.load(theme + "sub" + DeveloperUtils.suffix, renders));
+					request.setAttribute("nodes", nodes);
+					DeveloperUtils.includeExist(themeSub, field.getTypes(), relativePaths, renders);
+				}
+			}
+
+			// 关联分割代码
+			node = RenderUtils.loadExist(theme + "subcenter" + DeveloperUtils.suffix, renders);
+			nodes = node == null ? null : ScripteNode.append(element, node);
+
+			for (IField field : subtableFields) {
+				identifier = "name=\"" + field.getName() + "-subtable\"";
+				if (!!generator.append(identifier, element)) {
+					request.setAttribute("field", field);
+					request.setAttribute("identifier", identifier);
+					nodes = ScripteNode.append(element, RenderUtils.load(theme + "subfield" + DeveloperUtils.suffix, renders));
+					request.setAttribute("nodes", nodes);
+					DeveloperUtils.includeExist(themeType, field.getTypes(), relativePaths, renders);
+				}
+			}
+
+			// 关联底部代码
+			node = RenderUtils.loadExist(theme + "subbottom" + DeveloperUtils.suffix, renders);
+			nodes = node == null ? null : ScripteNode.append(element, node);
+		}
+
+		// 底部代码
+		node = RenderUtils.loadExist(theme + "bottom" + DeveloperUtils.suffix, renders);
+		nodes = node == null ? null : ScripteNode.append(element, node);
+		request.setAttribute("element", element);
+		// 生成代码对象再处理
+		return element.html();
 	}
 
 	/**

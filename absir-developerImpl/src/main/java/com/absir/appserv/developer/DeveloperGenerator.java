@@ -39,7 +39,7 @@ public class DeveloperGenerator {
 	 */
 	public static DeveloperGenerator getDeveloperGenerator(ServletRequest request) {
 		Stack<DeveloperGenerator> generators = (Stack<DeveloperGenerator>) request.getAttribute(GENERATOR_STACK_KEY);
-		return generators.peek();
+		return generators == null ? null : generators.peek();
 	}
 
 	/**
@@ -47,6 +47,10 @@ public class DeveloperGenerator {
 	 * @return
 	 */
 	protected static DeveloperGenerator pushDeveloperGenerator(ServletRequest request) {
+		if (request == null) {
+			return null;
+		}
+
 		Stack<DeveloperGenerator> generators = (Stack<DeveloperGenerator>) request.getAttribute(GENERATOR_STACK_KEY);
 		if (generators == null) {
 			generators = new Stack<DeveloperGenerator>();

@@ -53,6 +53,7 @@ import com.absir.core.kernel.KernelObject;
 import com.absir.core.kernel.KernelString;
 import com.absir.core.util.UtilAccessor;
 import com.absir.core.util.UtilAccessor.Accessor;
+import com.absir.orm.value.JoEntity;
 import com.absir.servlet.InDispathFilter;
 
 /**
@@ -124,22 +125,11 @@ public class WebJetbrickSupply implements IMethodSupport<ConfigureFound> {
 				webGlobalVariables.register("ADMIN_ROUTE", MenuContextUtils.getAdminRoute());
 			}
 
-			// getVariableResolverBean().getVariableResolver().setDynamicResolver(new
-			// DynamicResolver() {
-			//
-			// @Override
-			// public String getDynamicMember(Class<?> beanClass, String name,
-			// boolean isSafeCall, SegmentCode code) {
-			// // TODO Auto-generated method stub
-			// return "com.absir.appserv.support.web.WebJetbrickSupply.getter("
-			// + code.toString() + ", \"" + name + "\")";
-			// }
-			// });
-
-			getVariableResolverBean().getVariableResolver().addImportClass(KernelObject.class.getName());
+			getVariableResolverBean().getVariableResolver().addImportClass(JoEntity.class.getName());
 			getVariableResolverBean().getVariableResolver().addImportClass(IMenuBean.class.getName());
-			getVariableResolverBean().getVariableResolver().addImportPackage(JiUserBase.class.getPackage().getName());
+			getVariableResolverBean().getVariableResolver().addImportPackage(KernelObject.class.getPackage().getName());
 			getVariableResolverBean().getVariableResolver().addImportPackage(JEmbedLL.class.getPackage().getName());
+			getVariableResolverBean().getVariableResolver().addImportPackage(JiUserBase.class.getPackage().getName());
 			getVariableResolverBean().getVariableResolver().addImportPackage(Pag.class.getPackage().getName());
 		}
 
@@ -400,6 +390,16 @@ public class WebJetbrickSupply implements IMethodSupport<ConfigureFound> {
 		}
 
 		return obj;
+	}
+
+	/**
+	 * @param ctx
+	 * @return
+	 * @throws IOException
+	 */
+	@BaFunction
+	public static JetPageContext pageContext(JetPageContext ctx) throws IOException {
+		return ctx;
 	}
 
 	/**

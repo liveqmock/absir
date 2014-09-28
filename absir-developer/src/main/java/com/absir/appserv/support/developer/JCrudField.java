@@ -163,4 +163,29 @@ public class JCrudField implements Serializable {
 	public void setKeyJoEntity(JoEntity keyJoEntity) {
 		this.keyJoEntity = keyJoEntity;
 	}
+
+	/**
+	 * @param include
+	 * @return
+	 */
+	public boolean allowInclude(int include) {
+		return include == 0 || (include & this.include) != 0;
+	}
+
+	/**
+	 * @param exclude
+	 * @return
+	 */
+	public boolean allowExclude(int exclude) {
+		return exclude == 0 || (exclude & this.exclude) == 0;
+	}
+
+	/**
+	 * @param include
+	 * @param exclude
+	 * @return
+	 */
+	public boolean allow(int include, int exclude) {
+		return allowInclude(include) && allowExclude(exclude);
+	}
 }

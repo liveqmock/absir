@@ -1,20 +1,55 @@
-EntityModel entityModel = (EntityModel)request.getAttribute("entityModel");
-DeveloperGenerator generator = DeveloperGenerator.getDeveloperGenerator(request);
-	
+#define(developerModel = @DeveloperModel.forEntityNameClass(joEntity, request))
+#define(entityModel = developerModel.getEntityModel())
+#define(generator = @DeveloperGenerator.getDeveloperGenerator(request))
+#define(document = new org.jsoup.nodes.Document(""))
+#set("document", document);
+#document.outputSettings().escapeMode(org.jsoup.nodes.ScripteNode.NONE);
+#define(Element element)
+#define(List<org.jsoup.nodes.Node> nodes)
+#define(Node node)
+#@Scenario.set("edit", request)
+#set(element = document.appendElement("div"))
+#define(String[] inputs)
+#define(int inputInclude)
+#define(int inputExclude)
+#define(String inputUI);
+#define(String inputOption = inputUI == null ? "edit" : (inputUI + "/" + "edit"));
+#set("inputOption", inputOption)
+#define(String identifier)
+#define(String readonly = '${create ? "" : "readonly"}')
+#foreach(field in entityModel.getPrimaries())
+	##编辑实体主键
+	#if(field.getCrudField().allow(inputInclude, inputExclude) || (inputs != null && KernelArray.contain(inputs, field.getName())))
+		#set(identifier = 'name="' + field.getName() + '"')
+		#if(!generator.append(identifier, element))
+			#if(field.isGenerated())
+				##自增长主键
+				<p>
+					<label>${@Pag.getLang(field.getCaption())}</label>
+					<input ${identifier} type="text" size="30" readonly="readonly" value="\${entity.${field.getName()}}"/>
+				</p>
+			#else
+				##一般主键
+				#block(node)
+				<p>
+					<label>${@Pag.getLang(field.getCaption())}</label>
+					<input ${identifier} type="text" size="30" value="\${entity.${field.getName()}}"/>
+				</p>
+				#end
+				##适配字段特性
+				#set("field", field)
+				#define(nodes = @ScripteNode.append(element, node))
+				#((org.jsoup.nodes.Element) nodes.get(0)).getElementsByTag("input").get(0).attr(readonly, "true")
+				#set("nodes", nodes);
+				#@DeveloperUtils.includeExist(inputOption, field.getTypes(), pageContext())
+			#end
+		#end
+	#end
+#end
+#define(List<IField> subtableFields = new ArrayList<IField>())
+#define(Map<String, List<IField>> subtableSubFields = new HashMap<String, List<IField>>())
 
-String identifier;
-	
-Document document = new Document("");
-document.outputSettings().escapeMode(ScripteNode.NONE);
 
-Element element;
-List<Node> nodes;
-Node node;
-#@Scenario.set("edit", request);
-#element = document.appendElement("div");
-#define String[] inputs;
-
-#String readonly = "${create ? \"\" : \" readonly\"}";
 			for (IField field : entityModel.getPrimaries()) {
 		// 编辑实体主键
 		identifier = "name=\"" + field.getName() + "\"";

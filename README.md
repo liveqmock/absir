@@ -4,6 +4,8 @@
 
 项目作者 absir
 
+开发交流QQ群 185373195
+
 项目使用手册 [https://github.com/absir/absir/blob/master/manual.md#cn-title](https://github.com/absir/absir/blob/master/manual.md#cn-title)
 
 

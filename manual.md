@@ -9,6 +9,7 @@
 * [Ioc启动](#cn-ioc)
 * [Ioc功能核心](#cn-ioc-featrue)
 * [Aop功能核心](#cn-aop-featrue)
+* [其他.特色功能](#cn-other)
 
 
 <a name="cn-name"></a>
@@ -286,3 +287,154 @@ absir-aop提供了基础的`AopBeanDefine`的`IBeanDefineProcessor`处理类。A
 [回目录](#cn-title)
 
 spring拥有的功能基本都有 还有好多要写 好多......
+
+<a name="cn-other"></a>
+先提前简单介绍一下几个特色功能
+
+## 抽象的输入的MVC
+即无论http请求，还是socket数据包，或者用户的命令行输入都可以抽象为一个Input请求，即可以作用在Server服务对象上
+Server对象本身是通过IOC创建，支持拦截器，自定义mappingPath，mappingPathResolver, 方法输入参数自动数据绑定等
+
+例如如下代码
+
+	@Server
+	public class admin_user extends AdminServer {
+
+	/**
+	 * @param input
+	 */
+	public void password(Input input) {
+		input.getModel().put("userId", SecurityService.ME.getUserBase(input).getUserId());
+	}
+
+	/**
+	 * 修改密码
+	 * 
+	 * @param password
+	 * @param newPassword
+	 * @param input
+	 * @return
+	 */
+	@Mapping(method = InMethod.POST)
+	public String password(@Param String password, @Param String newPassword, Input input) {
+	
+	
+	就可以服务所有Input请求 请求默认地址为 user/password
+	
+	想定制修改地址 或者 默认地址规则都很简单
+	
+在java web开发时通常会将大量的静态数据请求放在一个空格的web project里面，那是大多数url匹配引擎是采用顺序匹配的方法，效率非常底下。
+
+absir-server模块中独创的 二分法url匹配机制，效率是顺序匹配的指数级，再也不需要考虑数url匹配效率了。
+
+## 模版生成
+absir-developerImpl 模块提功能居于实体的一套生成开发模版的基础服务，强大的property支持的覆盖机制，让你可以在自由的定制实体属性规则。
+
+ServerDiyView 可以提供默认用developer模块生成，实际模版的方法。
+
+其中自带的absir-layout 在开发者环境或开发者登录的情况下请求url后加上?diy 就可以用absir-layout自由拖拽布局，模版。
+
+## 自动菜单
+
+achieve-server中 MenuUtils中的包扫描获取默认菜单，让你不需要手动维护开发过程中的菜单列表。
+
+## 权限机制
+自带userrole权限机制， 自带url和 entity两种权限规则，entity权限支持到字段级别。
+
+## 字段可以定义权限规则
+
+	@MappedSuperclass
+	public class JbUser extends JbBean {
+
+	@JaLang("开发者")
+	@JaEdit(editable = JeEditable.DISABLE)
+	@JaField(assocClasses = JbPermission.class, referencEntityClass = DeveloperAssoc.class)
+	private boolean developer;
+	
+	这样一个简单定义获取用户列表时，非developer用户就会排除列表中的eveloper用户。
+
+	public class DeveloperAssoc implements IAssocDao {
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.system.dao.IAssocDao#supportAssocClass(java.lang.Class,
+	 * java.lang.String, com.absir.appserv.system.bean.proxy.JiUserBase,
+	 * com.absir.appserv.support.entity.value.JePermission)
+	 */
+	@Override
+	public boolean supportAssocClass(Class<? extends JiAssoc> assocClass, String rootEntityName, JiUserBase user, JePermission permission) {
+		// TODO Auto-generated method stub
+		return user != null && !user.isDeveloper();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.system.dao.IAssocDao#assocConditions(java.lang.String,
+	 * com.absir.appserv.system.bean.proxy.JiUserBase,
+	 * com.absir.appserv.support.entity.value.JePermission, java.lang.Object,
+	 * com.absir.appserv.jdbc.JdbcCondition,
+	 * com.absir.appserv.jdbc.JdbcCondition.Conditions,
+	 * com.absir.appserv.jdbc.JdbcCondition.Conditions)
+	 */
+	@Override
+	public void assocConditions(String rootEntityName, JiUserBase user, JePermission permission, Object strategies, JdbcCondition jdbcCondition, Conditions includeConditions,
+			Conditions excludeConditions) {
+		// TODO Auto-generated method stub
+		excludeConditions.add(jdbcCondition.getCurrentPropertyAlias() + ".developer");
+		excludeConditions.add(false);
+	}
+	}
+
+
+## 语言层面支持国际化
+
+	国际化开关就一个 `lang.i18n` 配置属性
+	
+	`lang.locale` 定义默认语言
+	
+	`lang.locales` 定义支持语言 
+	
+	`lang.resouce` 定义语言文件目录 默认为${classPath}lang/
+	
+	语言文件同样支持配置文件读取语法
+	
+
+	@Embeddable
+	public static class LangEmbed {
+
+		public String name;
+
+		/**
+		 * @return the name
+		 */
+		@Langs
+		public String getName() {
+			return name;
+		}
+	}
+	
+	只是在get方法上加一个@Langs标签 就使的国际化打开后 LangEmbed的name属性支持国际化。
+	
+	同时所有的国际化信息全部存储到JLocale表中不同的localeCode字段下，是不是批量处理也很方便。
+	
+	entityName id  		name  			_0 	_1 	_2
+	LangBean	3		name				
+	LangBean	langEmbed@3	name				
+
+	
+	在开发模版中用 Pag.getLang(name, echo) 就可以定义默认显示语言， 国际化打开后又可以支持国际化。
+	
+	是不是国际化很爽。
+	
+## 自定entityApi和entityAdmin
+
+默认实现了entity的api接口 和 entity的管理后台（暂时只有absir-developerJsp）
+
+大多数情况我们只需要创建实体 其他什么都不用写。。。。
+
+
+暂时先写这么多，

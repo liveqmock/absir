@@ -51,6 +51,7 @@
 		<module>absir-tiny</module>
 		<module>absir-template</module>
 		<module>absir-qq</module>
+		<module>absir-email</module>
 	</modules>
 	<dependencies>
 		<dependency>

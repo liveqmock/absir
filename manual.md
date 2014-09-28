@@ -291,7 +291,7 @@ spring拥有的功能基本都有 还有好多要写 好多......
 <a name="cn-other"></a>
 先提前简单介绍一下几个特色功能
 
-## 抽象的输入的MVC
+## 抽象输入的MVC
 即无论http请求，还是socket数据包，或者用户的命令行输入都可以抽象为一个Input请求，即可以作用在Server服务对象上
 Server对象本身是通过IOC创建，支持拦截器，自定义mappingPath，mappingPathResolver, 方法输入参数自动数据绑定等
 
@@ -430,7 +430,7 @@ achieve-server中 MenuUtils中的包扫描获取默认菜单，让你不需要�
 	
 	是不是国际化很爽。
 	
-## 自定entityApi和entityAdmin
+## 自带entityApi和entityAdmin
 
 默认实现了entity的api接口 和 entity的管理后台（暂时只有absir-developerJsp）
 

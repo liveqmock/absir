@@ -50,6 +50,7 @@ import com.absir.server.exception.ServerStatus;
 import com.absir.server.in.InMethod;
 import com.absir.server.in.InModel;
 import com.absir.server.in.Input;
+import com.absir.server.route.parameter.ParameterResolverBinder;
 import com.absir.server.value.Binder;
 import com.absir.server.value.Body;
 import com.absir.server.value.Mapping;
@@ -277,7 +278,12 @@ public class Admin_entity extends AdminServer {
 		}
 
 		binderResult.setValidation(true);
-		binderData.mapBind(BinderUtils.getDataMap(input.getParamMap()), entity);
+		Map<String, Object> dataMap = ParameterResolverBinder.getPropertyMap(input);
+		if (!create) {
+			dataMap.remove(crudSupply.getIdentifierName(entityName));
+		}
+
+		binderData.mapBind(dataMap, entity);
 		JoEntity joEntity = (JoEntity) input.getAttribute("joEntity");
 		CrudContextUtils.crud(create ? Crud.CREATE : Crud.UPDATE, crudRecord, joEntity, entity, user, filter, binderResult, input);
 		InModel model = input.getModel();

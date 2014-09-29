@@ -28,9 +28,12 @@ import com.absir.appserv.crud.CrudUtils;
 import com.absir.appserv.developer.model.EntityModel;
 import com.absir.appserv.developer.model.ModelFactory;
 import com.absir.appserv.support.developer.IField;
+import com.absir.appserv.support.developer.IRender;
 import com.absir.appserv.support.developer.RenderUtils;
 import com.absir.appserv.system.bean.value.JaEdit;
+import com.absir.core.helper.HelperFileName;
 import com.absir.core.kernel.KernelArray;
+import com.absir.core.kernel.KernelString;
 import com.absir.orm.value.JoEntity;
 
 /**
@@ -79,18 +82,32 @@ public class DeveloperModel {
 
 	/**
 	 * @param field
+	 * @param required
+	 * @return
+	 */
+	public static boolean allow(IField field, Boolean required) {
+		if (required != null) {
+			return required != field.isNullable();
+		}
+
+		return true;
+	}
+
+	/**
+	 * @param field
 	 * @param include
 	 * @param exclude
+	 * @param required
 	 * @param nameSet
 	 * @return
 	 */
-	public static boolean allow(IField field, int include, int exclude, Set<String> nameSet) {
+	public static boolean allow(IField field, int include, int exclude, Boolean required, Set<String> nameSet) {
 		if (field.getCrudField().allow(include, exclude)) {
 			if (nameSet == null) {
-				return include == 0;
+				return include == 0 && allow(field, required);
 
 			} else {
-				return nameSet.contains(field.getName());
+				return nameSet.contains(field.getName()) && allow(field, required);
 			}
 		}
 
@@ -129,12 +146,13 @@ public class DeveloperModel {
 	 * @param group
 	 * @param include
 	 * @param exclude
+	 * @param required
 	 * @param names
 	 * @param renders
 	 * @return
 	 * @throws IOException
 	 */
-	public String element(String div, String theme, boolean subtable, String group, int include, int exclude, String[] names, Object... renders) throws IOException {
+	public String generate(String div, String theme, boolean subtable, String group, int include, int exclude, Boolean required, String[] names, Object... renders) throws IOException {
 		ServletRequest request = KernelArray.getAssignable(renders, ServletRequest.class);
 		DeveloperGenerator generator = DeveloperGenerator.getDeveloperGenerator(request);
 		if (generator == null) {
@@ -160,7 +178,7 @@ public class DeveloperModel {
 		String[] relativePaths = new String[] { "" };
 		if (group == null) {
 			for (IField field : entityModel.getPrimaries()) {
-				if (allow(field, include, exclude, nameSet)) {
+				if (allow(field, include, exclude, required, nameSet)) {
 					identifier = "name=" + "\"" + field.getName() + "\"";
 					if (!generator.append(identifier, element)) {
 						request.setAttribute("field", field);
@@ -176,7 +194,7 @@ public class DeveloperModel {
 		List<IField> subtableFields = subtable ? new ArrayList<IField>() : null;
 		Map<String, List<IField>> subtableSubFields = subtable ? new HashMap<String, List<IField>>() : null;
 		for (IField field : group == null ? entityModel.getFields() : entityModel.getGroupFields(group)) {
-			if (allow(field, include, exclude, nameSet)) {
+			if (allow(field, include, exclude, required, nameSet)) {
 				if (subtable) {
 					if (field.getTypes().size() > 0 && "subtable".equals(field.getTypes().get(0))) {
 						// 关联实体字段
@@ -254,8 +272,13 @@ public class DeveloperModel {
 		// 底部代码
 		node = RenderUtils.loadExist(theme + "bottom" + DeveloperUtils.suffix, renders);
 		nodes = node == null ? null : ScripteNode.append(element, node);
-		request.setAttribute("element", element);
 		// 生成代码对象再处理
+		request.setAttribute("element", element);
+		String path = IRender.ME.getPath(renders);
+		path = KernelString.replaceLast(path, DeveloperUtils.suffix, "") + "." + entityName + "." + HelperFileName.getName(HelperFileName.getPathNoEndSeparator(theme)) + DeveloperUtils.suffix;
+		node = RenderUtils.loadExist(path);
+		nodes = node == null ? null : ScripteNode.append(element, node);
+		// 返回处理完成代码
 		return element.html();
 	}
 

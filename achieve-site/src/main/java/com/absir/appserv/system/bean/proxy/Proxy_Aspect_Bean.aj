@@ -30,6 +30,7 @@ import com.absir.appserv.system.bean.value.JeRoleLevel;
 import com.absir.appserv.system.bean.value.JeUserType;
 import com.absir.appserv.system.crud.DateCrudFactory;
 import com.absir.orm.value.JaColum;
+import com.absir.property.value.Prop;
 
 /**
  * @author absir
@@ -176,6 +177,7 @@ public privileged aspect Proxy_Aspect_Bean {
 	 * 
 	 */
 	@JaLang("用户名")
+	@Prop(include = 1)
 	@JaColum(indexs = @Index(name = "username", columnList = "username"))
 	@JaEdit(groups = { JaEdit.GROUP_LIST })
 	@Column(unique = true, length = 64)

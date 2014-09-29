@@ -25,6 +25,7 @@ import com.absir.appserv.system.bean.value.JeEditable;
 import com.absir.appserv.system.crud.PasswordCrudFactory;
 import com.absir.property.value.Prop;
 import com.absir.validator.value.Email;
+import com.absir.validator.value.NotEmpty;
 
 /**
  * @author absir
@@ -36,6 +37,7 @@ import com.absir.validator.value.Email;
 public class JUser extends JbUser implements JpUserBase, JpMeta, Serializable {
 
 	@JaLang("密码")
+	@Prop(include = 1)
 	@JaEdit(editable = JeEditable.OPTIONAL, types = "password")
 	@JaCrud(cruds = { Crud.CREATE, Crud.UPDATE }, factory = PasswordCrudFactory.class)
 	@Column(columnDefinition = "char(32)")
@@ -62,10 +64,13 @@ public class JUser extends JbUser implements JpUserBase, JpMeta, Serializable {
 	private long lastErrorLogin;
 
 	@JaLang("邮箱")
+	@Prop(include = 1)
 	@Email
+	@NotEmpty
 	private String email;
 
 	@JaLang("手机")
+	@Prop(include = 1)
 	private String mobile;
 
 	/*

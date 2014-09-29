@@ -136,7 +136,17 @@ public class InputServiceUtils {
 			List<List<Object>> metasConditions = new ArrayList<List<Object>>();
 			int size = 0;
 			for (Entry<String, String[]> entry : ((Map<String, String[]>) (Object) input.getParamMap()).entrySet()) {
-				SearchServiceUtils.addSearchMetasCondition(filter, entry.getKey(), entry.getValue()[0], fieldMetas, metasConditions);
+				String propertyPath = entry.getKey();
+				String value = entry.getValue()[0];
+				if (propertyPath.startsWith(".")) {
+					for (String path : propertyPath.split("\\|")) {
+						SearchServiceUtils.addSearchMetasCondition(filter, path, value, fieldMetas, metasConditions);
+					}
+
+				} else {
+					SearchServiceUtils.addSearchMetasCondition(filter, propertyPath, value, fieldMetas, metasConditions);
+				}
+
 				if (size != metasConditions.size()) {
 					size = metasConditions.size();
 					conditions.add(entry.getKey());

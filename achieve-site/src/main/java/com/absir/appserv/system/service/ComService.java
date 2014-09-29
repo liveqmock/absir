@@ -7,6 +7,8 @@
  */
 package com.absir.appserv.system.service;
 
+import org.hibernate.Query;
+
 import com.absir.appserv.system.dao.BeanDao;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
@@ -28,6 +30,9 @@ public abstract class ComService {
 	 */
 	@Transaction(readOnly = true)
 	public boolean findFilter(String value) {
-		return BeanDao.getSession().createQuery("SELECT o.id FROM JFilter o WHERE ? LIKE o.id").setParameter(0, value).iterate().hasNext();
+		Query query = BeanDao.getSession().createQuery("SELECT o.id FROM JFilter o WHERE ? LIKE o.id");
+		query.setParameter(0, value);
+		query.setMaxResults(1);
+		return query.iterate().hasNext();
 	}
 }

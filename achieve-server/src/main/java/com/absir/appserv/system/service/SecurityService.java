@@ -17,7 +17,6 @@ import com.absir.appserv.support.developer.IDeveloper.ISecurity;
 import com.absir.appserv.system.bean.JLog;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.bean.value.JeRoleLevel;
-import com.absir.appserv.system.helper.HelperRandom;
 import com.absir.appserv.system.security.ISecurityService;
 import com.absir.appserv.system.security.SecurityContext;
 import com.absir.appserv.system.security.SecurityManager;
@@ -131,7 +130,7 @@ public abstract class SecurityService implements ISecurityService, ISecurity, IG
 	 */
 	public SecurityContext loginUser(SecurityManager securityManager, JiUserBase userBase, long remember, InputRequest inputRequest) {
 		long contextTime = ContextUtils.getContextTime();
-		String sessionId = HelperRandom.randSecendId(contextTime, 8, inputRequest.getRequest().hashCode());
+		String sessionId = VerifierService.randVerifierId(inputRequest.getRequest());
 		SecurityContext securityContext = ContextUtils.getContext(SecurityContext.class, sessionId);
 		securityContext.setUser(userBase);
 		securityContext.setAddress(inputRequest.getAddress());

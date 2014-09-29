@@ -62,7 +62,7 @@ public class Protal_user {
 	 * @param verifierId
 	 */
 	public void activate(@Param String verifierId) {
-		
+
 	}
 
 	/**

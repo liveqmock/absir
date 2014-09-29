@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
+import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 
 import com.absir.appserv.system.bean.JVerifier;
@@ -59,9 +60,10 @@ public class VerifierService {
 	 * @param lifeTime
 	 */
 	public void persistVerifier(Object dist, String tag, String value, long lifeTime) {
-		String id = tag + '@' + randVerifierId(dist);
+		String id = randVerifierId(dist);
 		JVerifier verifier = new JVerifier();
 		verifier.setId(id);
+		verifier.setTag(tag);
 		verifier.setValue(value);
 		verifier.setPassTime(ContextUtils.getContextTime() + lifeTime);
 		BeanService.ME.persist(verifier);
@@ -75,8 +77,12 @@ public class VerifierService {
 	 */
 	@Transaction(readOnly = true)
 	public JVerifier findVerifier(String id, String tag) {
-		Iterator<JVerifier> iterator = BeanDao.getSession().createQuery("SELECT o FROM JVerifier o WHERE o.id = ? AND o.passTime > ?").setParameter(0, tag + '@' + id)
-				.setParameter(1, ContextUtils.getContextTime()).iterate();
+		Query query = BeanDao.getSession().createQuery("SELECT o FROM JVerifier o WHERE o.id = ? AND o.passTime > ? AND o.tag = ?");
+		query.setMaxResults(1);
+		query.setParameter(0, id);
+		query.setParameter(1, ContextUtils.getContextTime());
+		query.setParameter(2, tag);
+		Iterator<JVerifier> iterator = query.iterate();
 		return iterator.hasNext() ? iterator.next() : null;
 	}
 

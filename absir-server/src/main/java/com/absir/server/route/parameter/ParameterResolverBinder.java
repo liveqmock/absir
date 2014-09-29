@@ -50,6 +50,19 @@ public class ParameterResolverBinder implements ParameterResolver<Binder> {
 		return (Map<String, Object>) properties;
 	}
 
+	/**
+	 * @param name
+	 * @param toClass
+	 * @param group
+	 * @param input
+	 * @return
+	 */
+	public static <T> T getBinderObject(String name, Class<T> toClass, int group, Input input) {
+		BinderData binderData = input.getBinderData();
+		binderData.getBinderResult().getPropertyFilter().setGroup(group);
+		return binderData.mapBind(getPropertyMap(input), name, toClass);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 

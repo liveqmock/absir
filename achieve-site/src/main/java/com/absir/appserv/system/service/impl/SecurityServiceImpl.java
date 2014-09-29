@@ -29,7 +29,6 @@ import com.absir.appserv.system.service.SecurityService;
 import com.absir.appserv.system.service.UserService;
 import com.absir.bean.inject.value.Bean;
 import com.absir.context.core.ContextUtils;
-import com.absir.context.schedule.value.Schedule;
 import com.absir.core.kernel.KernelObject;
 import com.absir.orm.hibernate.boost.IEntityMerge;
 import com.absir.orm.transaction.value.Transaction;
@@ -263,14 +262,5 @@ public class SecurityServiceImpl extends SecurityService implements ISecuritySup
 				}
 			}
 		}
-	}
-
-	/**
-	 * 清除过期登录
-	 */
-	@Schedule(fixedDelay = 24 * 36000)
-	@Transaction
-	protected void removeExpiredSession() {
-		QueryDaoUtils.createQueryArray(BeanDao.getSession(), "DELETE o FROM JSession o WHERE o.passTime < ?", ContextUtils.getContextTime()).executeUpdate();
 	}
 }

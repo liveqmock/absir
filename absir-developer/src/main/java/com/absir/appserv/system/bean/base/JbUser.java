@@ -10,6 +10,7 @@ package com.absir.appserv.system.bean.base;
 import javax.persistence.MappedSuperclass;
 
 import com.absir.appserv.system.assoc.DeveloperAssoc;
+import com.absir.appserv.system.bean.proxy.JiDeveloper;
 import com.absir.appserv.system.bean.value.JaEdit;
 import com.absir.appserv.system.bean.value.JaLang;
 import com.absir.appserv.system.bean.value.JeEditable;
@@ -20,7 +21,7 @@ import com.absir.orm.value.JaField;
  * 
  */
 @MappedSuperclass
-public class JbUser extends JbBean {
+public class JbUser extends JbBean implements JiDeveloper {
 
 	@JaLang("开发者")
 	@JaEdit(editable = JeEditable.DISABLE)

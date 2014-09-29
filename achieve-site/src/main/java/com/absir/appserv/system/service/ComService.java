@@ -17,10 +17,10 @@ import com.absir.orm.transaction.value.Transaction;
  *
  */
 @Bean
-public abstract class FilterService {
+public abstract class ComService {
 
 	/** ME */
-	public final static FilterService ME = BeanFactoryUtils.get(FilterService.class);
+	public final static ComService ME = BeanFactoryUtils.get(ComService.class);
 
 	/**
 	 * @param value

@@ -22,6 +22,7 @@ import com.absir.appserv.jdbc.JdbcCondition;
 import com.absir.appserv.jdbc.JdbcPage;
 import com.absir.appserv.lang.LangBundleImpl;
 import com.absir.appserv.system.bean.base.JbBean;
+import com.absir.appserv.system.bean.proxy.JiDeveloper;
 import com.absir.appserv.system.bean.proxy.JiSub;
 import com.absir.appserv.system.bean.proxy.JiTree;
 import com.absir.appserv.system.bean.value.JaCrud.Crud;
@@ -681,6 +682,10 @@ public class BeanServiceBase implements BeanService, ICrudSupply {
 	@Override
 	public void deleteEntity(String entityName, Object entity) {
 		// TODO Auto-generated method stub
+		if (entity instanceof JiDeveloper && ((JiDeveloper) entity).isDeveloper()) {
+			return;
+		}
+
 		delete(entityName, entity);
 	}
 

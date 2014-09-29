@@ -13,12 +13,7 @@ import com.absir.appserv.system.bean.JYiDongSession;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.bean.value.JePayStatus;
 import com.absir.appserv.system.configure.JYiDongConfigure;
-import com.absir.appserv.system.dao.BeanDao;
-import com.absir.appserv.system.dao.utils.QueryDaoUtils;
 import com.absir.bean.inject.value.Bean;
-import com.absir.context.core.ContextUtils;
-import com.absir.context.schedule.value.Schedule;
-import com.absir.orm.transaction.value.Transaction;
 
 /**
  * @author absir
@@ -32,15 +27,6 @@ public class YiDongService implements IdentityService, IPayInterface {
 
 	/** PLAT_FORM_NAME */
 	public static final String PLAT_FORM_NAME = "YiDong";
-
-	/**
-	 * 清除过期登录
-	 */
-	@Schedule(fixedDelay = 24 * 36000)
-	@Transaction
-	protected void removeExpiredSession() {
-		QueryDaoUtils.createQueryArray(BeanDao.getSession(), "DELETE FROM JYiDongSession o WHERE o.passTime < ?", ContextUtils.getContextTime()).executeUpdate();
-	}
 
 	/**
 	 * @param userId

@@ -26,6 +26,12 @@ public class JSiteConfigure extends JConfigureBase {
 	@JaLang("允许注册")
 	private boolean allowRegister = true;
 
+	@JaLang("验证时间")
+	private long verifyTime = 3600000;
+
+	@JaLang("注册未激活")
+	private boolean registerDisable;
+
 	@JaLang("关键字")
 	private String[] keywords = new String[] { "achieve", "server", "java", "web", "cms", "framework" };
 
@@ -61,6 +67,36 @@ public class JSiteConfigure extends JConfigureBase {
 	 */
 	public void setAllowRegister(boolean allowRegister) {
 		this.allowRegister = allowRegister;
+	}
+
+	/**
+	 * @return the verifyTime
+	 */
+	public long getVerifyTime() {
+		return verifyTime;
+	}
+
+	/**
+	 * @param verifyTime
+	 *            the verifyTime to set
+	 */
+	public void setVerifyTime(long verifyTime) {
+		this.verifyTime = verifyTime;
+	}
+
+	/**
+	 * @return the registerDisable
+	 */
+	public boolean isRegisterDisable() {
+		return registerDisable;
+	}
+
+	/**
+	 * @param registerDisable
+	 *            the registerDisable to set
+	 */
+	public void setRegisterDisable(boolean registerDisable) {
+		this.registerDisable = registerDisable;
 	}
 
 	/**

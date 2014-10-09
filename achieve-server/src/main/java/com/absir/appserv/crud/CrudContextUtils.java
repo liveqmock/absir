@@ -146,7 +146,7 @@ public abstract class CrudContextUtils extends CrudUtils {
 			@Override
 			public boolean isSupport(CrudProperty crudProperty) {
 				// TODO Auto-generated method stub
-				return !(crudProperty.crudProcessor instanceof CrudProcessorInput);
+				return true;
 			}
 
 			@Override

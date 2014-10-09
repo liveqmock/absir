@@ -44,12 +44,24 @@ public class RichCrudFactory implements ICrudFactory, ICrudProcessorInput<Object
 	/** REMOTE_RICH_NAME */
 	private static final String REMOTE_RICH_NAME = "REMOTE_RICH@";
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.appserv.crud.ICrudProcessorInput#isMultipart()
+	 */
 	@Override
 	public boolean isMultipart() {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.appserv.crud.ICrudProcessor#crud(com.absir.appserv.crud.
+	 * CrudProperty, java.lang.Object, com.absir.appserv.crud.CrudHandler,
+	 * com.absir.appserv.system.bean.proxy.JiUserBase)
+	 */
 	@Override
 	public void crud(CrudProperty crudProperty, Object entity, CrudHandler handler, JiUserBase user) {
 		// TODO Auto-generated method stub
@@ -57,7 +69,6 @@ public class RichCrudFactory implements ICrudFactory, ICrudProcessorInput<Object
 			String entityName = handler.getCrudEntity().getJoEntity().getEntityName();
 			if (entityName != null) {
 				Session session = BeanDao.getSession();
-
 				String eid = entityName + "@" + CrudService.ME.getCrudSupply(entityName).getIdentifier(entityName, handler.getRoot());
 				List<JUpload> uploads = QueryDaoUtils.createQueryArray(session, "SELECT o FROM JUpload o WHERE o.id.eid = ?", eid).list();
 				if (!uploads.isEmpty()) {
@@ -74,6 +85,16 @@ public class RichCrudFactory implements ICrudFactory, ICrudProcessorInput<Object
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.crud.ICrudProcessorInput#crud(com.absir.appserv.crud
+	 * .CrudProperty, com.absir.property.PropertyErrors,
+	 * com.absir.appserv.crud.CrudHandler,
+	 * com.absir.appserv.system.bean.proxy.JiUserBase,
+	 * com.absir.server.in.Input)
+	 */
 	@Override
 	public Object crud(CrudProperty crudProperty, PropertyErrors errors, CrudHandler handler, JiUserBase user, Input input) {
 		// TODO Auto-generated method stub
@@ -88,18 +109,21 @@ public class RichCrudFactory implements ICrudFactory, ICrudProcessorInput<Object
 			}
 		}
 
-		return Boolean.FALSE;
+		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.crud.ICrudProcessorInput#crud(com.absir.appserv.crud
+	 * .CrudProperty, java.lang.Object, com.absir.appserv.crud.CrudHandler,
+	 * com.absir.appserv.system.bean.proxy.JiUserBase, java.lang.Object)
+	 */
 	@Override
 	public void crud(CrudProperty crudProperty, Object entity, CrudHandler handler, JiUserBase user, Object inputBody) {
 		// TODO Auto-generated method stub
-		if (handler.getCrud() == Crud.DELETE) {
-			crud(crudProperty, entity, handler, user);
 
-		} else if (inputBody == Boolean.TRUE) {
-
-		}
 	}
 
 	/*

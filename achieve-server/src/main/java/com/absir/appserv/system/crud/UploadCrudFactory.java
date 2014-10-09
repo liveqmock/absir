@@ -226,12 +226,14 @@ public class UploadCrudFactory implements ICrudFactory, ICrudProcessorInput<File
 	@Override
 	public FileItem crud(CrudProperty crudProperty, PropertyErrors errors, CrudHandler handler, JiUserBase user, Input input) {
 		// TODO Auto-generated method stub
-		String field = handler.getFilter().getPropertyPath();
-		if (input instanceof InputRequest) {
-			FileItem file = getUploadFile((InputRequest) input, field + "_file");
-			if (file != null && !KernelString.isEmpty(file.getName())) {
-				verifyMultipartFile(field, file, crudProperty.getjCrud().getParameters(), errors);
-				return file;
+		if (handler.getCrud() != Crud.DELETE) {
+			String field = handler.getFilter().getPropertyPath();
+			if (input instanceof InputRequest) {
+				FileItem file = getUploadFile((InputRequest) input, field + "_file");
+				if (file != null && !KernelString.isEmpty(file.getName())) {
+					verifyMultipartFile(field, file, crudProperty.getjCrud().getParameters(), errors);
+					return file;
+				}
 			}
 		}
 

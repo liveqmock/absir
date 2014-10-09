@@ -541,7 +541,7 @@ public abstract class CrudUtils {
 	 * @param joEntity
 	 * @return
 	 */
-	protected static CrudEntity getCrudEntity(JoEntity joEntity) {
+	public static CrudEntity getCrudEntity(JoEntity joEntity) {
 		CrudEntity crudEntity = Jo_Entity_Map_Crud_Entity.get(joEntity);
 		if (crudEntity != null) {
 			return crudEntity;

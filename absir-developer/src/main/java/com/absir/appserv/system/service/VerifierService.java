@@ -7,16 +7,19 @@
  */
 package com.absir.appserv.system.service;
 
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 
+import com.absir.appserv.crud.CrudEntity;
+import com.absir.appserv.crud.CrudUtils;
 import com.absir.appserv.system.bean.JVerifier;
 import com.absir.appserv.system.bean.base.JbVerifier;
+import com.absir.appserv.system.bean.value.JaCrud.Crud;
 import com.absir.appserv.system.dao.BeanDao;
 import com.absir.appserv.system.dao.utils.QueryDaoUtils;
 import com.absir.appserv.system.helper.HelperRandom;
@@ -27,10 +30,10 @@ import com.absir.bean.inject.value.Started;
 import com.absir.bean.inject.value.Value;
 import com.absir.context.core.ContextUtils;
 import com.absir.context.schedule.cron.CronFixDelayRunable;
-import com.absir.core.kernel.KernelCollection;
 import com.absir.orm.hibernate.SessionFactoryBean;
 import com.absir.orm.hibernate.SessionFactoryUtils;
 import com.absir.orm.transaction.value.Transaction;
+import com.absir.orm.value.JoEntity;
 
 /**
  * @author absir
@@ -99,22 +102,22 @@ public class VerifierService {
 		SessionFactoryBean sessionFactoryBean = SessionFactoryUtils.get();
 		SessionFactory sessionFactory = sessionFactoryBean.getSessionFactory();
 		if (sessionFactory != null) {
-			Collection<String> names = new HashSet<String>();
+			final Map<String, CrudEntity> nameMapCrudEntity = new HashMap<String, CrudEntity>();
 			for (Entry<String, Entry<Class<?>, SessionFactory>> entry : sessionFactoryBean.getJpaEntityNameMapEntityClassFactory().entrySet()) {
 				Entry<Class<?>, SessionFactory> value = entry.getValue();
 				if (value.getValue() == sessionFactory && JbVerifier.class.isAssignableFrom(value.getClass())) {
-					names.add(entry.getKey());
+					JoEntity joEntity = new JoEntity(entry.getKey(), entry.getValue().getKey());
+					nameMapCrudEntity.put(entry.getKey(), CrudUtils.getCrudEntity(joEntity));
 				}
 			}
 
-			if (!names.isEmpty()) {
-				final String[] verifierNames = KernelCollection.toArray(names, String.class);
+			if (!nameMapCrudEntity.isEmpty()) {
 				ContextUtils.getScheduleFactory().addScheduleRunable(new CronFixDelayRunable(new Runnable() {
 
 					@Override
 					public void run() {
 						// TODO Auto-generated method stub
-						ME.removeExpiredSession(verifierNames);
+						ME.removeExpiredSession(nameMapCrudEntity);
 					}
 
 				}, clearFixDelay));
@@ -125,12 +128,22 @@ public class VerifierService {
 
 	/**
 	 * 清除过期验证
+	 * 
+	 * @param nameMapCrudEntity
 	 */
 	@Transaction
-	protected void removeExpiredSession(String[] verifierNames) {
+	protected void removeExpiredSession(Map<String, CrudEntity> nameMapCrudEntity) {
 		long contextTime = ContextUtils.getContextTime();
-		for (String verifierName : verifierNames) {
-			QueryDaoUtils.createQueryArray(BeanDao.getSession(), "DELETE o FROM " + verifierName + " o WHERE o.passTime > 0 AND o.passTime < ?", contextTime).executeUpdate();
+		for (Entry<String, CrudEntity> entry : nameMapCrudEntity.entrySet()) {
+			if (entry.getValue() != null) {
+				Iterator<Object> iterator = QueryDaoUtils.createQueryArray(BeanDao.getSession(), "SELECT o FROM " + entry.getKey() + " o WHERE o.passTime > 0 AND o.passTime < ?", contextTime)
+						.iterate();
+				while (iterator.hasNext()) {
+					CrudUtils.crud(Crud.DELETE, null, entry.getValue().getJoEntity(), iterator.next(), null, null);
+				}
+			}
+
+			QueryDaoUtils.createQueryArray(BeanDao.getSession(), "DELETE o FROM " + entry.getKey() + " o WHERE o.passTime > 0 AND o.passTime < ?", contextTime).executeUpdate();
 		}
 	}
 }

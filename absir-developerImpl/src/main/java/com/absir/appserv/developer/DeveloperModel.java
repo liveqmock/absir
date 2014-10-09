@@ -40,6 +40,7 @@ import com.absir.orm.value.JoEntity;
  * @author absir
  * 
  */
+@SuppressWarnings("unchecked")
 public class DeveloperModel {
 
 	/**
@@ -78,6 +79,72 @@ public class DeveloperModel {
 		}
 
 		return (DeveloperModel) modelObject;
+	}
+
+	/** ELEMENT_NAME */
+	private static final String ELEMENT_NAME = DeveloperModel.class + "@ELEMENT_NAME";
+
+	/** NODES_NAME */
+	private static final String NODES_NAME = DeveloperModel.class + "@NODES_NAME";
+
+	/** INPUT_NAME */
+	private static final String INPUT_NAME = DeveloperModel.class + "@INPUT_NAME";
+
+	/** IDENTIFIER_NAME */
+	private static final String IDENTIFIER_NAME = DeveloperModel.class + "@IDENTIFIER_NAME";
+
+	/** FIELD_NAME */
+	private static final String FIELD_NAME = DeveloperModel.class + "@FIELD_NAME";
+
+	/** RELATIVE_PATHS */
+	private static final String[] RELATIVE_PATHS = new String[] { "" };
+
+	/**
+	 * @param request
+	 * @return
+	 */
+	public static Element getElement(ServletRequest request) {
+		return (Element) request.getAttribute(ELEMENT_NAME);
+	}
+
+	/**
+	 * @param request
+	 * @return
+	 */
+	public static List<Node> getNodes(ServletRequest request) {
+		return (List<Node>) request.getAttribute(NODES_NAME);
+	}
+
+	/**
+	 * @param request
+	 * @return
+	 */
+	public static Element getElementInput(ServletRequest request) {
+		return (Element) request.getAttribute(INPUT_NAME);
+	}
+
+	/**
+	 * @param input
+	 * @param request
+	 */
+	public static void setElementInput(Element input, ServletRequest request) {
+		request.setAttribute(INPUT_NAME, input);
+	}
+
+	/**
+	 * @param request
+	 * @return
+	 */
+	public static String getIdentifier(ServletRequest request) {
+		return (String) request.getAttribute(IDENTIFIER_NAME);
+	}
+
+	/**
+	 * @param request
+	 * @return
+	 */
+	public static IField getField(ServletRequest request) {
+		return (IField) request.getAttribute(FIELD_NAME);
 	}
 
 	/**
@@ -138,6 +205,50 @@ public class DeveloperModel {
 	}
 
 	/**
+	 * @param div
+	 * @param theme
+	 * @param name
+	 * @param renders
+	 * @return
+	 * @throws IOException
+	 */
+	public Element show(String div, String theme, String name, Object... renders) throws IOException {
+		IField nameField = null;
+		for (IField field : entityModel.getFields()) {
+			if (field.getName().equals(name)) {
+				nameField = field;
+				break;
+			}
+		}
+
+		for (IField field : entityModel.getPrimaries()) {
+			if (field.getName().equals(name)) {
+				nameField = field;
+				break;
+			}
+		}
+
+		if (nameField == null) {
+			return null;
+		}
+
+		ServletRequest request = KernelArray.getAssignable(renders, ServletRequest.class);
+		DeveloperGenerator generator = DeveloperGenerator.getDeveloperGenerator(request);
+		if (generator == null) {
+			generator = new DeveloperGenerator();
+		}
+
+		Document document = new Document("");
+		Element element = document.appendElement(div);
+		request.setAttribute(ELEMENT_NAME, element);
+		request.setAttribute(FIELD_NAME, nameField);
+		List<Node> nodes = ScripteNode.append(element, RenderUtils.load(theme + "show" + DeveloperUtils.suffix, renders));
+		request.setAttribute(NODES_NAME, nodes);
+		DeveloperUtils.includeExist(theme + "type/", nameField.getTypes(), RELATIVE_PATHS, renders);
+		return element;
+	}
+
+	/**
 	 * 获取开发模版
 	 * 
 	 * @param div
@@ -152,7 +263,7 @@ public class DeveloperModel {
 	 * @return
 	 * @throws IOException
 	 */
-	public String generate(String div, String theme, boolean subtable, String group, int include, int exclude, Boolean required, String[] names, Object... renders) throws IOException {
+	public Element generate(String div, String theme, boolean subtable, String group, int include, int exclude, Boolean required, String[] names, Object... renders) throws IOException {
 		ServletRequest request = KernelArray.getAssignable(renders, ServletRequest.class);
 		DeveloperGenerator generator = DeveloperGenerator.getDeveloperGenerator(request);
 		if (generator == null) {
@@ -169,23 +280,23 @@ public class DeveloperModel {
 
 		Document document = new Document("");
 		Element element = document.appendElement(div);
-		request.setAttribute("element", element);
 		// 顶部代码
 		String node = RenderUtils.loadExist(theme + "top" + DeveloperUtils.suffix, renders);
 		List<Node> nodes = node == null ? null : ScripteNode.append(element, node);
+		request.setAttribute(ELEMENT_NAME, element);
+		request.setAttribute(NODES_NAME, nodes);
 		String identifier;
 		String themeType = theme + "type/";
-		String[] relativePaths = new String[] { "" };
 		if (group == null) {
 			for (IField field : entityModel.getPrimaries()) {
 				if (allow(field, include, exclude, required, nameSet)) {
 					identifier = "name=" + "\"" + field.getName() + "\"";
 					if (!generator.append(identifier, element)) {
-						request.setAttribute("field", field);
-						request.setAttribute("identifier", identifier);
+						request.setAttribute(IDENTIFIER_NAME, identifier);
+						request.setAttribute(FIELD_NAME, field);
 						nodes = ScripteNode.append(element, RenderUtils.load(theme + "primary" + DeveloperUtils.suffix, renders));
-						request.setAttribute("nodes", nodes);
-						DeveloperUtils.includeExist(themeType, field.getTypes(), relativePaths, renders);
+						request.setAttribute(NODES_NAME, nodes);
+						DeveloperUtils.includeExist(themeType, field.getTypes(), RELATIVE_PATHS, renders);
 					}
 				}
 			}
@@ -218,11 +329,11 @@ public class DeveloperModel {
 
 					identifier = "name=" + "\"" + field.getName() + "\"";
 					if (!generator.append(identifier, element)) {
-						request.setAttribute("field", field);
-						request.setAttribute("identifier", identifier);
+						request.setAttribute(IDENTIFIER_NAME, identifier);
+						request.setAttribute(FIELD_NAME, field);
 						nodes = ScripteNode.append(element, RenderUtils.load(theme + "field" + DeveloperUtils.suffix, renders));
-						request.setAttribute("nodes", nodes);
-						DeveloperUtils.includeExist(themeType, field.getTypes(), relativePaths, renders);
+						request.setAttribute(NODES_NAME, nodes);
+						DeveloperUtils.includeExist(themeType, field.getTypes(), RELATIVE_PATHS, renders);
 					}
 				}
 			}
@@ -241,11 +352,11 @@ public class DeveloperModel {
 			for (IField field : subtableFields) {
 				identifier = "name=\"" + field.getName() + "-sub\"";
 				if (!!generator.append(identifier, element)) {
-					request.setAttribute("identifier", identifier);
-					request.setAttribute("field", field);
+					request.setAttribute(IDENTIFIER_NAME, identifier);
+					request.setAttribute(FIELD_NAME, field);
 					nodes = ScripteNode.append(element, RenderUtils.load(theme + "sub" + DeveloperUtils.suffix, renders));
-					request.setAttribute("nodes", nodes);
-					DeveloperUtils.includeExist(themeSub, field.getTypes(), relativePaths, renders);
+					request.setAttribute(NODES_NAME, nodes);
+					DeveloperUtils.includeExist(themeSub, field.getTypes(), RELATIVE_PATHS, renders);
 				}
 			}
 
@@ -256,11 +367,11 @@ public class DeveloperModel {
 			for (IField field : subtableFields) {
 				identifier = "name=\"" + field.getName() + "-subtable\"";
 				if (!!generator.append(identifier, element)) {
-					request.setAttribute("field", field);
-					request.setAttribute("identifier", identifier);
+					request.setAttribute(IDENTIFIER_NAME, identifier);
+					request.setAttribute(FIELD_NAME, field);
 					nodes = ScripteNode.append(element, RenderUtils.load(theme + "subfield" + DeveloperUtils.suffix, renders));
-					request.setAttribute("nodes", nodes);
-					DeveloperUtils.includeExist(themeType, field.getTypes(), relativePaths, renders);
+					request.setAttribute(NODES_NAME, nodes);
+					DeveloperUtils.includeExist(themeType, field.getTypes(), RELATIVE_PATHS, renders);
 				}
 			}
 
@@ -279,7 +390,7 @@ public class DeveloperModel {
 		node = RenderUtils.loadExist(path);
 		nodes = node == null ? null : ScripteNode.append(element, node);
 		// 返回处理完成代码
-		return element.html();
+		return element;
 	}
 
 	/**

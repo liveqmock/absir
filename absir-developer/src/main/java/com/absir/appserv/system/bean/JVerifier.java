@@ -10,6 +10,7 @@ package com.absir.appserv.system.bean;
 import javax.persistence.Entity;
 
 import com.absir.appserv.system.bean.base.JbVerifier;
+import com.absir.appserv.system.bean.value.JaEdit;
 import com.absir.appserv.system.bean.value.JaLang;
 
 /**
@@ -20,7 +21,8 @@ import com.absir.appserv.system.bean.value.JaLang;
 public class JVerifier extends JbVerifier {
 
 	/** tag */
-	@JaLang("标示")
+	@JaEdit(groups = JaEdit.GROUP_LIST)
+	@JaLang("标签")
 	private String tag;
 
 	/** value */

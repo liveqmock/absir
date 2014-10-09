@@ -93,6 +93,22 @@ public class UploadCrudFactory implements ICrudFactory, ICrudProcessorInput<File
 	}
 
 	/**
+	 * @param uploadFile
+	 * @param inputStream
+	 * @throws IOException
+	 */
+	public static void upload(String uploadFile, InputStream inputStream) throws IOException {
+		HelperFile.write(new File(uploadPath + uploadFile), inputStream);
+	}
+
+	/**
+	 * @param uploadFile
+	 */
+	public static void delete(String uploadFile) {
+		HelperFile.deleteQuietly(new File(uploadPath + uploadFile));
+	}
+
+	/**
 	 * @param uploadUrl
 	 * @param uploadPath
 	 */
@@ -262,7 +278,7 @@ public class UploadCrudFactory implements ICrudFactory, ICrudProcessorInput<File
 			String uploadFile = (String) crudProperty.get(entity);
 			if (!KernelString.isEmpty(uploadFile)) {
 				if (handler.getCrudRecord() == null || !handler.getCrudRecord().containsKey(RECORD + uploadFile)) {
-					HelperFile.deleteQuietly(new File(uploadPath + uploadFile));
+					delete(uploadFile);
 				}
 			}
 
@@ -327,7 +343,7 @@ public class UploadCrudFactory implements ICrudFactory, ICrudProcessorInput<File
 					uploadStream = requestBody.getInputStream();
 				}
 
-				HelperFile.write(new File(uploadPath + uploadFile), uploadStream);
+				upload(uploadFile, uploadStream);
 
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -351,7 +367,7 @@ public class UploadCrudFactory implements ICrudFactory, ICrudProcessorInput<File
 		if (crudHandler.getCrud() == Crud.DELETE) {
 			String uploadFile = (String) crudProperty.get(entity);
 			if (!KernelString.isEmpty(uploadFile)) {
-				HelperFile.deleteQuietly(new File(getUploadPath() + uploadFile));
+				delete(uploadFile);
 			}
 		}
 	}
@@ -368,5 +384,4 @@ public class UploadCrudFactory implements ICrudFactory, ICrudProcessorInput<File
 		// TODO Auto-generated method stub
 		return this;
 	}
-
 }

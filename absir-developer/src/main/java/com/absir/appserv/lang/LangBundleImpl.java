@@ -959,7 +959,7 @@ public class LangBundleImpl extends LangBundle {
 								if (!KernelClass.isBasicClass(returnType)) {
 									String property = KernelString.unCapitalize(method.getName().substring(3));
 									CrudProperty crudProperty = CrudUtils.getCrudProperty(new JoEntity(entityName, entityClass), property);
-									if (crudProperty != null && crudProperty.getCrudProcessor() != null && crudProperty.getCrudProcessor() instanceof BeanCrudFactory.Proccessor) {
+									if (crudProperty != null && crudProperty.getCrudProcessor() != null && crudProperty.getCrudProcessor() instanceof BeanCrudFactory) {
 										final JoEntity joEntity = crudProperty.getValueEntity();
 										if (joEntity != null && joEntity.getClass() != null) {
 											if (KernelClass.isCustomClass(joEntity.getEntityClass())) {

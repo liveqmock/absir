@@ -28,47 +28,50 @@ import com.absir.orm.value.JoEntity;
  * @author absir
  * 
  */
-public class SubCrudFactory implements ICrudFactory {
+public class SubCrudFactory implements ICrudFactory, ICrudProcessor {
 
-	/** SUB_PROCESSOR */
-	private static final ICrudProcessor SUB_PROCESSOR = new ICrudProcessor() {
-
-		@Override
-		public void crud(CrudProperty crudProperty, Object entity, CrudHandler crudHandler, JiUserBase user) {
-			// TODO Auto-generated method stub
-			Object property = crudProperty.get(entity);
-			if (property == null) {
-				crudProperty.set(entity, 0);
-				return;
-			}
-
-			if (!(property instanceof Integer)) {
-				return;
-			}
-
-			Object[] parameters = crudProperty.getjCrud().getParameters();
-			if (parameters[0] == null) {
-				return;
-			}
-
-			if (parameters[0] instanceof String) {
-				Class<?> entityClass = crudProperty.getCrudEntity().getJoEntity().getEntityClass();
-				parameters[0] = UtilAccessor.getAccessorObj(entity, (String) parameters[0], entityClass == null ? null : entityClass.getName());
-			}
-
-			try {
-				Collection<?> subtable = (Collection<?>) ((Accessor) parameters[0]).get(entity);
-				if ((Integer) property >= subtable.size()) {
-					crudProperty.set(entity, 0);
-				}
-
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-			crudProperty.set(entity, new Date());
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.appserv.crud.ICrudProcessor#crud(com.absir.appserv.crud.
+	 * CrudProperty, java.lang.Object, com.absir.appserv.crud.CrudHandler,
+	 * com.absir.appserv.system.bean.proxy.JiUserBase)
+	 */
+	@Override
+	public void crud(CrudProperty crudProperty, Object entity, CrudHandler crudHandler, JiUserBase user) {
+		// TODO Auto-generated method stub
+		Object property = crudProperty.get(entity);
+		if (property == null) {
+			crudProperty.set(entity, 0);
+			return;
 		}
-	};
+
+		if (!(property instanceof Integer)) {
+			return;
+		}
+
+		Object[] parameters = crudProperty.getjCrud().getParameters();
+		if (parameters[0] == null) {
+			return;
+		}
+
+		if (parameters[0] instanceof String) {
+			Class<?> entityClass = crudProperty.getCrudEntity().getJoEntity().getEntityClass();
+			parameters[0] = UtilAccessor.getAccessorObj(entity, (String) parameters[0], entityClass == null ? null : entityClass.getName());
+		}
+
+		try {
+			Collection<?> subtable = (Collection<?>) ((Accessor) parameters[0]).get(entity);
+			if ((Integer) property >= subtable.size()) {
+				crudProperty.set(entity, 0);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		crudProperty.set(entity, new Date());
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -98,6 +101,6 @@ public class SubCrudFactory implements ICrudFactory {
 			crudField.getjCrud().getParameters()[0] = jaSubField.value();
 		}
 
-		return SUB_PROCESSOR;
+		return this;
 	}
 }

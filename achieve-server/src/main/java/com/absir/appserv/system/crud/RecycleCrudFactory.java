@@ -23,26 +23,29 @@ import com.absir.orm.value.JoEntity;
  * @author absir
  * 
  */
-public class RecycleCrudFactory implements ICrudFactory {
+public class RecycleCrudFactory implements ICrudFactory, ICrudProcessor {
 
-	/** RECYCLE_PROCESSOR */
-	private static final ICrudProcessor RECYCLE_PROCESSOR = new ICrudProcessor() {
-
-		@Override
-		public void crud(CrudProperty crudProperty, Object entity, CrudHandler handler, JiUserBase user) {
-			// TODO Auto-generated method stub
-			String recycleName = crudProperty.getCrudEntity().getJoEntity().getEntityName() + "Recycle";
-			Class<?> recycleClass = SessionFactoryUtils.getEntityClass(recycleName);
-			if (recycleClass != null) {
-				Object recycle = KernelClass.newInstance(recycleClass);
-				if (recycle != null) {
-					KernelObject.copy(entity, recycle);
-				}
-
-				CrudServiceUtils.merge(recycleName, handler.getCrudRecord(), recycle, true, user, null);
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.appserv.crud.ICrudProcessor#crud(com.absir.appserv.crud.
+	 * CrudProperty, java.lang.Object, com.absir.appserv.crud.CrudHandler,
+	 * com.absir.appserv.system.bean.proxy.JiUserBase)
+	 */
+	@Override
+	public void crud(CrudProperty crudProperty, Object entity, CrudHandler handler, JiUserBase user) {
+		// TODO Auto-generated method stub
+		String recycleName = crudProperty.getCrudEntity().getJoEntity().getEntityName() + "Recycle";
+		Class<?> recycleClass = SessionFactoryUtils.getEntityClass(recycleName);
+		if (recycleClass != null) {
+			Object recycle = KernelClass.newInstance(recycleClass);
+			if (recycle != null) {
+				KernelObject.copy(entity, recycle);
 			}
+
+			CrudServiceUtils.merge(recycleName, handler.getCrudRecord(), recycle, true, user, null);
 		}
-	};
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -54,6 +57,6 @@ public class RecycleCrudFactory implements ICrudFactory {
 	@Override
 	public ICrudProcessor getProcessor(JoEntity joEntity, JCrudField crudField) {
 		// TODO Auto-generated method stub
-		return RECYCLE_PROCESSOR;
+		return this;
 	}
 }

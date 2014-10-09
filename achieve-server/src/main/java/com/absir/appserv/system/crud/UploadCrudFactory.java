@@ -54,7 +54,7 @@ import com.absir.servlet.InputRequest;
  */
 @Base
 @Bean
-public class UploadCrudFactory implements ICrudFactory {
+public class UploadCrudFactory implements ICrudFactory, ICrudProcessorInput<FileItem> {
 
 	/** uploadUrl */
 	private static String uploadUrl;
@@ -203,171 +203,156 @@ public class UploadCrudFactory implements ICrudFactory {
 		}
 	}
 
-	/**
-	 * @author absir
+	/*
+	 * (non-Javadoc)
 	 * 
+	 * @see com.absir.appserv.crud.ICrudProcessorRequest#isMultipart()
 	 */
-	public static class MultipartFileProcessor implements ICrudProcessorInput<FileItem> {
+	@Override
+	public boolean isMultipart() {
+		// TODO Auto-generated method stub
+		return true;
+	}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see com.absir.appserv.crud.ICrudProcessorRequest#isMultipart()
-		 */
-		@Override
-		public boolean isMultipart() {
-			// TODO Auto-generated method stub
-			return true;
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.appserv.crud.ICrudProcessorInput#crud(com.absir.appserv
+	 * .crud.CrudProperty, com.absir.property.PropertyErrors,
+	 * com.absir.appserv.crud.CrudHandler,
+	 * com.absir.appserv.system.bean.proxy.JiUserBase,
+	 * com.absir.server.in.Input)
+	 */
+	@Override
+	public FileItem crud(CrudProperty crudProperty, PropertyErrors errors, CrudHandler handler, JiUserBase user, Input input) {
+		// TODO Auto-generated method stub
+		String field = handler.getFilter().getPropertyPath();
+		if (input instanceof InputRequest) {
+			FileItem file = getUploadFile((InputRequest) input, field + "_file");
+			if (file != null && !KernelString.isEmpty(file.getName())) {
+				verifyMultipartFile(field, file, crudProperty.getjCrud().getParameters(), errors);
+				return file;
+			}
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * com.absir.appserv.crud.ICrudProcessorInput#crud(com.absir.appserv
-		 * .crud.CrudProperty, com.absir.property.PropertyErrors,
-		 * com.absir.appserv.crud.CrudHandler,
-		 * com.absir.appserv.system.bean.proxy.JiUserBase,
-		 * com.absir.server.in.Input)
-		 */
-		@Override
-		public FileItem crud(CrudProperty crudProperty, PropertyErrors errors, CrudHandler handler, JiUserBase user, Input input) {
-			// TODO Auto-generated method stub
-			String field = handler.getFilter().getPropertyPath();
-			if (input instanceof InputRequest) {
-				FileItem file = getUploadFile((InputRequest) input, field + "_file");
-				if (file != null && !KernelString.isEmpty(file.getName())) {
-					verifyMultipartFile(field, file, crudProperty.getjCrud().getParameters(), errors);
-					return file;
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.appserv.crud.ICrudProcessorRequest#crud(com.absir.appserv
+	 * .crud.CrudProperty, java.lang.Object, com.absir.appserv.crud.CrudHandler,
+	 * com.absir.appserv.system.bean.proxy.JiUserBase, java.lang.Object)
+	 */
+	@Override
+	public void crud(CrudProperty crudProperty, Object entity, CrudHandler handler, JiUserBase user, FileItem requestBody) {
+		// TODO Auto-generated method stub
+		if (requestBody == null) {
+			if (handler.getCrudRecord() != null) {
+				String uploadFile = (String) crudProperty.get(entity);
+				if (KernelString.isEmpty(uploadFile)) {
+					handler.getCrudRecord().put(RECORD + uploadFile, Boolean.TRUE);
 				}
 			}
 
-			return null;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * com.absir.appserv.crud.ICrudProcessorRequest#crud(com.absir.appserv
-		 * .crud.CrudProperty, java.lang.Object,
-		 * com.absir.appserv.crud.CrudHandler,
-		 * com.absir.appserv.system.bean.proxy.JiUserBase, java.lang.Object)
-		 */
-		@Override
-		public void crud(CrudProperty crudProperty, Object entity, CrudHandler handler, JiUserBase user, FileItem requestBody) {
-			// TODO Auto-generated method stub
-			if (requestBody == null) {
-				if (handler.getCrudRecord() != null) {
-					String uploadFile = (String) crudProperty.get(entity);
-					if (KernelString.isEmpty(uploadFile)) {
-						handler.getCrudRecord().put(RECORD + uploadFile, Boolean.TRUE);
-					}
+		} else {
+			String uploadFile = (String) crudProperty.get(entity);
+			if (!KernelString.isEmpty(uploadFile)) {
+				if (handler.getCrudRecord() == null || !handler.getCrudRecord().containsKey(RECORD + uploadFile)) {
+					HelperFile.deleteQuietly(new File(uploadPath + uploadFile));
 				}
+			}
 
-			} else {
-				String uploadFile = (String) crudProperty.get(entity);
-				if (!KernelString.isEmpty(uploadFile)) {
-					if (handler.getCrudRecord() == null || !handler.getCrudRecord().containsKey(RECORD + uploadFile)) {
-						HelperFile.deleteQuietly(new File(uploadPath + uploadFile));
-					}
-				}
+			InputStream uploadStream = null;
+			String extensionName = HelperFileName.getExtension(requestBody.getName());
+			try {
+				Object[] parameters = crudProperty.getjCrud().getParameters();
+				MultipartUploader multipartUploader = parameters.length == 0 ? null : (MultipartUploader) parameters[0];
+				if (multipartUploader != null) {
+					if (multipartUploader.ruleName == null) {
+						Accessor accessor = crudProperty.getAccessor();
+						if (accessor != null) {
+							UploadRule uploadRule = accessor.getAnnotation(UploadRule.class, false);
+							if (uploadRule != null) {
+								multipartUploader.ruleName = uploadRule.value();
+								multipartUploader.ided = multipartUploader.ruleName.contains(":id");
+							}
+						}
 
-				InputStream uploadStream = null;
-				String extensionName = HelperFileName.getExtension(requestBody.getName());
-				try {
-					Object[] parameters = crudProperty.getjCrud().getParameters();
-					MultipartUploader multipartUploader = parameters.length == 0 ? null : (MultipartUploader) parameters[0];
-					if (multipartUploader != null) {
 						if (multipartUploader.ruleName == null) {
-							Accessor accessor = crudProperty.getAccessor();
-							if (accessor != null) {
-								UploadRule uploadRule = accessor.getAnnotation(UploadRule.class, false);
-								if (uploadRule != null) {
-									multipartUploader.ruleName = uploadRule.value();
-									multipartUploader.ided = multipartUploader.ruleName.contains(":id");
-								}
-							}
-
-							if (multipartUploader.ruleName == null) {
-								multipartUploader.ruleName = "";
-							}
-						}
-
-						if ("".equals(multipartUploader.ruleName)) {
-							multipartUploader = null;
-
-						} else {
-							String identity = "";
-							if (multipartUploader.ided && entity instanceof IBase) {
-								Serializable id = ((IBase<?>) entity).getId();
-								if (id == null) {
-									JoEntity joEntity = handler.getCrudEntity().getJoEntity();
-									if (joEntity != null && joEntity.getEntityName() != null) {
-										CrudServiceUtils.merge(joEntity.getEntityName(), handler.getCrudRecord(), handler.getRoot(), handler.getCrud() == Crud.CREATE, user, null);
-									}
-								}
-
-								id = ((IBase<?>) entity).getId();
-								if (id != null) {
-									identity = DynaBinderUtils.getParamFromValue(id);
-								}
-							}
-
-							uploadFile = HelperString
-									.replaceEach(multipartUploader.ruleName, new String[] { ":name", ":id", ":ext" }, new String[] { crudProperty.getName(), identity, extensionName });
+							multipartUploader.ruleName = "";
 						}
 					}
 
-					if (multipartUploader == null && entity instanceof IUploadRule) {
-						IUploadRule uploadRule = (IUploadRule) entity;
-						uploadFile = uploadRule.getUploadRuleName(crudProperty.getName(), extensionName);
-						if (uploadFile != null) {
-							uploadStream = uploadRule.proccessInputStream(crudProperty.getName(), requestBody.getInputStream(), extensionName);
+					if ("".equals(multipartUploader.ruleName)) {
+						multipartUploader = null;
+
+					} else {
+						String identity = "";
+						if (multipartUploader.ided && entity instanceof IBase) {
+							Serializable id = ((IBase<?>) entity).getId();
+							if (id == null) {
+								JoEntity joEntity = handler.getCrudEntity().getJoEntity();
+								if (joEntity != null && joEntity.getEntityName() != null) {
+									CrudServiceUtils.merge(joEntity.getEntityName(), handler.getCrudRecord(), handler.getRoot(), handler.getCrud() == Crud.CREATE, user, null);
+								}
+							}
+
+							id = ((IBase<?>) entity).getId();
+							if (id != null) {
+								identity = DynaBinderUtils.getParamFromValue(id);
+							}
 						}
+
+						uploadFile = HelperString.replaceEach(multipartUploader.ruleName, new String[] { ":name", ":id", ":ext" }, new String[] { crudProperty.getName(), identity, extensionName });
 					}
-
-					if (uploadFile == null) {
-						uploadFile = HelperRandom.randSecendId() + "." + HelperFileName.getExtension(requestBody.getName());
-					}
-
-					if (uploadStream == null) {
-						uploadStream = requestBody.getInputStream();
-					}
-
-					HelperFile.write(new File(uploadPath + uploadFile), uploadStream);
-
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					LOGGER.error("upload error", e);
 				}
 
-				crudProperty.set(entity, uploadFile);
-			}
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * com.absir.appserv.crud.ICrudProcessor#crud(com.absir.appserv.crud
-		 * .CrudProperty, java.lang.Object, com.absir.appserv.crud.CrudHandler,
-		 * com.absir.appserv.system.bean.proxy.JiUserBase)
-		 */
-		@Override
-		public void crud(CrudProperty crudProperty, Object entity, CrudHandler crudHandler, JiUserBase user) {
-			// TODO Auto-generated method stub
-			if (crudHandler.getCrud() == Crud.DELETE) {
-				String uploadFile = (String) crudProperty.get(entity);
-				if (!KernelString.isEmpty(uploadFile)) {
-					HelperFile.deleteQuietly(new File(BeanFactoryUtils.getBeanConfig().getResourcePath() + uploadFile));
+				if (multipartUploader == null && entity instanceof IUploadRule) {
+					IUploadRule uploadRule = (IUploadRule) entity;
+					uploadFile = uploadRule.getUploadRuleName(crudProperty.getName(), extensionName);
+					if (uploadFile != null) {
+						uploadStream = uploadRule.proccessInputStream(crudProperty.getName(), requestBody.getInputStream(), extensionName);
+					}
 				}
+
+				if (uploadFile == null) {
+					uploadFile = HelperRandom.randSecendId() + "." + HelperFileName.getExtension(requestBody.getName());
+				}
+
+				if (uploadStream == null) {
+					uploadStream = requestBody.getInputStream();
+				}
+
+				HelperFile.write(new File(uploadPath + uploadFile), uploadStream);
+
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				LOGGER.error("upload error", e);
 			}
+
+			crudProperty.set(entity, uploadFile);
 		}
 	}
 
-	/** Multipart_File_PROCESSOR */
-	private static final ICrudProcessor Multipart_File_PROCESSOR = new MultipartFileProcessor();
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.appserv.crud.ICrudProcessor#crud(com.absir.appserv.crud
+	 * .CrudProperty, java.lang.Object, com.absir.appserv.crud.CrudHandler,
+	 * com.absir.appserv.system.bean.proxy.JiUserBase)
+	 */
+	@Override
+	public void crud(CrudProperty crudProperty, Object entity, CrudHandler crudHandler, JiUserBase user) {
+		// TODO Auto-generated method stub
+		if (crudHandler.getCrud() == Crud.DELETE) {
+			String uploadFile = (String) crudProperty.get(entity);
+			if (!KernelString.isEmpty(uploadFile)) {
+				HelperFile.deleteQuietly(new File(getUploadPath() + uploadFile));
+			}
+		}
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -379,7 +364,7 @@ public class UploadCrudFactory implements ICrudFactory {
 	@Override
 	public ICrudProcessor getProcessor(JoEntity joEntity, JCrudField crudField) {
 		// TODO Auto-generated method stub
-		return Multipart_File_PROCESSOR;
+		return this;
 	}
 
 }

@@ -12,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
+import com.absir.appserv.system.bean.value.JaEdit;
 import com.absir.appserv.system.bean.value.JaLang;
 
 /**
@@ -21,6 +22,7 @@ import com.absir.appserv.system.bean.value.JaLang;
 @MappedSuperclass
 public class JbBean extends JbBase {
 
+	@JaEdit(groups = { JaEdit.GROUP_SUG, JaEdit.GROUP_SUGGEST })
 	@JaLang("纪录编号")
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)

@@ -20,24 +20,27 @@ import com.absir.orm.value.JoEntity;
  * @author absir
  * 
  */
-public class UserCrudFactory implements ICrudFactory {
+public class UserCrudFactory implements ICrudFactory, ICrudProcessor {
 
-	/** USER_ID_PROCESSOR */
-	private static final ICrudProcessor USER_ID_PROCESSOR = new ICrudProcessor() {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.appserv.crud.ICrudProcessor#crud(com.absir.appserv.crud.
+	 * CrudProperty, java.lang.Object, com.absir.appserv.crud.CrudHandler,
+	 * com.absir.appserv.system.bean.proxy.JiUserBase)
+	 */
+	@Override
+	public void crud(CrudProperty crudProperty, Object entity, CrudHandler crudHandler, JiUserBase user) {
+		// TODO Auto-generated method stub
+		if (user != null) {
+			if (crudProperty.getType().isAssignableFrom(user.getClass())) {
+				crudProperty.set(entity, user);
 
-		@Override
-		public void crud(CrudProperty crudProperty, Object entity, CrudHandler crudHandler, JiUserBase user) {
-			// TODO Auto-generated method stub
-			if (user != null) {
-				if (crudProperty.getType().isAssignableFrom(user.getClass())) {
-					crudProperty.set(entity, user);
-
-				} else {
-					crudProperty.set(entity, DynaBinder.to(user.getUserId(), crudProperty.getType()));
-				}
+			} else {
+				crudProperty.set(entity, DynaBinder.to(user.getUserId(), crudProperty.getType()));
 			}
 		}
-	};
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -49,6 +52,6 @@ public class UserCrudFactory implements ICrudFactory {
 	@Override
 	public ICrudProcessor getProcessor(JoEntity joEntity, JCrudField crudField) {
 		// TODO Auto-generated method stub
-		return USER_ID_PROCESSOR;
+		return this;
 	}
 }

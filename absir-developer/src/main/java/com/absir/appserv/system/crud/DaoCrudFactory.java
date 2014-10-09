@@ -22,22 +22,25 @@ import com.absir.orm.value.JoEntity;
  * 
  */
 @SuppressWarnings("unchecked")
-public class DaoCrudFactory implements ICrudFactory {
+public class DaoCrudFactory implements ICrudFactory, ICrudProcessor {
 
-	/** DAO_PROCESSOR */
-	private static final ICrudProcessor DAO_PROCESSOR = new ICrudProcessor() {
-
-		@Override
-		public void crud(CrudProperty crudProperty, Object entity, CrudHandler crudHandler, JiUserBase user) {
-			// TODO Auto-generated method stub
-			BaseDao<Object, ?> baseDao = (BaseDao<Object, ?>) BeanDao.getBaseDao(entity.getClass());
-			if (baseDao == null) {
-				return;
-			}
-
-			baseDao.crud(crudHandler.getCrud(), crudProperty, crudHandler, entity);
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.appserv.crud.ICrudProcessor#crud(com.absir.appserv.crud.
+	 * CrudProperty, java.lang.Object, com.absir.appserv.crud.CrudHandler,
+	 * com.absir.appserv.system.bean.proxy.JiUserBase)
+	 */
+	@Override
+	public void crud(CrudProperty crudProperty, Object entity, CrudHandler crudHandler, JiUserBase user) {
+		// TODO Auto-generated method stub
+		BaseDao<Object, ?> baseDao = (BaseDao<Object, ?>) BeanDao.getBaseDao(entity.getClass());
+		if (baseDao == null) {
+			return;
 		}
-	};
+
+		baseDao.crud(crudHandler.getCrud(), crudProperty, crudHandler, entity);
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -53,6 +56,6 @@ public class DaoCrudFactory implements ICrudFactory {
 			return null;
 		}
 
-		return DAO_PROCESSOR;
+		return this;
 	}
 }

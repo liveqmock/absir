@@ -24,6 +24,7 @@ import com.absir.bean.basis.Base;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Started;
+import com.absir.bean.inject.value.Value;
 import com.absir.context.core.ContextUtils;
 import com.absir.context.schedule.cron.CronFixDelayRunable;
 import com.absir.core.kernel.KernelCollection;
@@ -39,6 +40,10 @@ import com.absir.orm.transaction.value.Transaction;
 @Base
 @Bean
 public class VerifierService {
+
+	/** clearFixDelay */
+	@Value("verifier.clear")
+	private long clearFixDelay = 24 * 36000;
 
 	/** ME */
 	public static final VerifierService ME = BeanFactoryUtils.get(VerifierService.class);
@@ -112,7 +117,7 @@ public class VerifierService {
 						ME.removeExpiredSession(verifierNames);
 					}
 
-				}, 24 * 36000));
+				}, clearFixDelay));
 			}
 
 		}
@@ -125,7 +130,7 @@ public class VerifierService {
 	protected void removeExpiredSession(String[] verifierNames) {
 		long contextTime = ContextUtils.getContextTime();
 		for (String verifierName : verifierNames) {
-			QueryDaoUtils.createQueryArray(BeanDao.getSession(), "DELETE o FROM " + verifierName + " o WHERE o.passTime < ?", contextTime).executeUpdate();
+			QueryDaoUtils.createQueryArray(BeanDao.getSession(), "DELETE o FROM " + verifierName + " o WHERE o.passTime > 0 AND o.passTime < ?", contextTime).executeUpdate();
 		}
 	}
 }

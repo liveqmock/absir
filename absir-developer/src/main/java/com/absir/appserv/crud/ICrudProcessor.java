@@ -8,12 +8,13 @@
 package com.absir.appserv.crud;
 
 import com.absir.appserv.system.bean.proxy.JiUserBase;
+import com.absir.bean.inject.InjectRetain;
 
 /**
  * @author absir
  * 
  */
-public interface ICrudProcessor {
+public interface ICrudProcessor extends InjectRetain {
 
 	/**
 	 * @param crudProperty

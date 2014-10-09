@@ -21,19 +21,22 @@ import com.absir.orm.value.JoEntity;
  * @author absir
  * 
  */
-public class DateCrudFactory implements ICrudFactory {
+public class DateCrudFactory implements ICrudFactory, ICrudProcessor {
 
-	/** DATE_PROCESSOR */
-	private static final ICrudProcessor DATE_PROCESSOR = new ICrudProcessor() {
-
-		@Override
-		public void crud(CrudProperty crudProperty, Object entity, CrudHandler crudHandler, JiUserBase user) {
-			// TODO Auto-generated method stub
-			if (crudHandler.getCrud() != JaCrud.Crud.CREATE || KernelDyna.to(crudProperty.get(entity), long.class) <= 0) {
-				crudProperty.set(entity, KernelDyna.to(System.currentTimeMillis(), crudProperty.getType()));
-			}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.appserv.crud.ICrudProcessor#crud(com.absir.appserv.crud.
+	 * CrudProperty, java.lang.Object, com.absir.appserv.crud.CrudHandler,
+	 * com.absir.appserv.system.bean.proxy.JiUserBase)
+	 */
+	@Override
+	public void crud(CrudProperty crudProperty, Object entity, CrudHandler crudHandler, JiUserBase user) {
+		// TODO Auto-generated method stub
+		if (crudHandler.getCrud() != JaCrud.Crud.CREATE || KernelDyna.to(crudProperty.get(entity), long.class) <= 0) {
+			crudProperty.set(entity, KernelDyna.to(System.currentTimeMillis(), crudProperty.getType()));
 		}
-	};
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -45,6 +48,6 @@ public class DateCrudFactory implements ICrudFactory {
 	@Override
 	public ICrudProcessor getProcessor(JoEntity joEntity, JCrudField crudField) {
 		// TODO Auto-generated method stub
-		return DATE_PROCESSOR;
+		return this;
 	}
 }

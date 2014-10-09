@@ -11,6 +11,7 @@ import java.io.Serializable;
 
 import javax.persistence.Embeddable;
 
+import com.absir.appserv.system.bean.value.JaEdit;
 import com.absir.appserv.system.bean.value.JaLang;
 import com.absir.core.kernel.KernelObject;
 
@@ -23,10 +24,12 @@ import com.absir.core.kernel.KernelObject;
 public class JEmbedLL implements Serializable {
 
 	/** eid */
+	@JaEdit(groups = { JaEdit.GROUP_SUG, JaEdit.GROUP_SUGGEST })
 	@JaLang("编号")
 	private Long eid;
 
 	/** mid */
+	@JaEdit(groups = { JaEdit.GROUP_SUG, JaEdit.GROUP_SUGGEST })
 	@JaLang("关联")
 	private Long mid;
 

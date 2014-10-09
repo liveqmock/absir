@@ -21,6 +21,7 @@ import com.absir.appserv.system.bean.value.JaLang;
 @MappedSuperclass
 public class JbVerifier extends JbBase implements JiPass {
 
+	@JaEdit(groups = { JaEdit.GROUP_SUG, JaEdit.GROUP_SUGGEST })
 	@JaLang(value = "验证主键", tag = "verifierId")
 	@Id
 	private String id;

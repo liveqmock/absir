@@ -220,15 +220,27 @@ public class HelperRandom {
 	 * @return
 	 */
 	public static StringBuilder randSecendBuidler(long time, int size) {
-		int max = size >= 8 ? Integer.MAX_VALUE : (1 << (size * 4)) - 1;
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append(Long.toHexString(time));
-		stringBuilder.append(randFormate(size, Integer.toHexString(RANDOM.nextInt(max)).toCharArray()));
+		stringBuilder.append(randFormate(16, Long.toHexString(time).toCharArray()));
+		randAppendFormate(stringBuilder, size);
 		return stringBuilder;
 	}
 
 	/**
-	 * @param i
+	 * @param time
+	 * @param size
+	 * @return
+	 */
+	public static StringBuilder randSecendBuidler(int time, int size) {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append(randFormate(8, Integer.toHexString(time).toCharArray()));
+		randAppendFormate(stringBuilder, size);
+		return stringBuilder;
+	}
+
+	/**
+	 * @param size
+	 * @param chars
 	 * @return
 	 */
 	public static char[] randFormate(int size, char[] chars) {
@@ -245,6 +257,40 @@ public class HelperRandom {
 			}
 
 			return buff;
+		}
+	}
+
+	/**
+	 * @param stringBuilder
+	 * @param size
+	 */
+	public static void randAppendFormate(StringBuilder stringBuilder, int size) {
+		while (size > 0) {
+			char[] chars = size > 8 ? Long.toHexString(RANDOM.nextLong()).toCharArray() : Integer.toHexString(RANDOM.nextInt()).toCharArray();
+			int length = chars.length;
+			if (length < size) {
+				if (size > 8) {
+					if (length < 16) {
+						length = 16;
+						chars = randFormate(length, chars);
+					}
+
+				} else {
+					if (length < 8) {
+						length = 8;
+						chars = randFormate(length, chars);
+					}
+				}
+			}
+
+			if (size >= length) {
+				stringBuilder.append(chars);
+
+			} else {
+				stringBuilder.append(chars, length - size, size);
+			}
+
+			size -= length;
 		}
 	}
 }

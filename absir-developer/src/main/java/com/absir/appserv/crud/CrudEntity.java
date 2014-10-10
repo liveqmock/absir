@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.absir.appserv.crud.value.ICrudBean;
 import com.absir.orm.value.JoEntity;
 
 /**
@@ -27,6 +28,9 @@ public class CrudEntity {
 
 	/** curCrudProperties */
 	protected List<CrudProperty> crudProperties;
+
+	/** crudEntityNone */
+	protected boolean crudEntityNone;
 
 	/**
 	 * @param crudProperty
@@ -70,5 +74,19 @@ public class CrudEntity {
 	 */
 	public Iterator<CrudProperty> getCrudPropertiesIterator() {
 		return crudProperties == null ? null : crudProperties.iterator();
+	}
+
+	/**
+	 * 
+	 */
+	protected void initCrudEntity() {
+		crudEntityNone = crudProperties == null && crudPropertyReferences == null && !ICrudBean.class.isAssignableFrom(joEntity.getEntityClass());
+	}
+
+	/**
+	 * @return the crudEntityNone
+	 */
+	public boolean isCrudEntityNone() {
+		return crudEntityNone;
 	}
 }

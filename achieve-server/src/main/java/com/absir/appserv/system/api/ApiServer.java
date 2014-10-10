@@ -93,7 +93,7 @@ public abstract class ApiServer {
 		}
 
 		if (BeanFactoryUtils.getEnvironment().compareTo(Environment.DEBUG) <= 0 || input.isDebug() || !(e instanceof ServerException)) {
-			LOGGER.error("", e);
+			LOGGER.debug("on server " + input.getUri(), e);
 		}
 
 		return new MessageCode(e);

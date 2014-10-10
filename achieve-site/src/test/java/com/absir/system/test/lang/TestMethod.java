@@ -14,6 +14,7 @@ import javax.script.ScriptException;
 
 import org.junit.Test;
 
+import com.absir.appserv.system.helper.HelperRandom;
 import com.absir.core.dyna.DynaBinder;
 import com.absir.system.test.AbstractTest;
 
@@ -162,5 +163,11 @@ public class TestMethod extends AbstractTest {
 	public void main() throws IOException, ScriptException, NoSuchMethodException {
 		System.out.println(DynaBinder.to("name", List.class));
 		System.out.println(DynaBinder.to("name", String[].class));
+		System.out.println(HelperRandom.randSecendId(7));
+		System.out.println(HelperRandom.randSecendId(8));
+		System.out.println(HelperRandom.randSecendId(9));
+		System.out.println(HelperRandom.randSecendId(31));
+		System.out.println(HelperRandom.randSecendId(32));
+		System.out.println(HelperRandom.randSecendId(33));
 	}
 }

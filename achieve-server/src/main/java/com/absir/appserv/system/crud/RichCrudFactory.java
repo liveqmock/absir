@@ -7,8 +7,11 @@
  */
 package com.absir.appserv.system.crud;
 
-import java.io.File;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.hibernate.Session;
 
@@ -17,17 +20,20 @@ import com.absir.appserv.crud.CrudProperty;
 import com.absir.appserv.crud.ICrudFactory;
 import com.absir.appserv.crud.ICrudProcessor;
 import com.absir.appserv.crud.ICrudProcessorInput;
+import com.absir.appserv.dyna.DynaBinderUtils;
 import com.absir.appserv.support.developer.JCrudField;
 import com.absir.appserv.system.bean.JUpload;
+import com.absir.appserv.system.bean.JUploadCite;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.bean.value.JaCrud.Crud;
 import com.absir.appserv.system.dao.BeanDao;
 import com.absir.appserv.system.dao.utils.QueryDaoUtils;
+import com.absir.appserv.system.helper.HelperString;
 import com.absir.appserv.system.service.CrudService;
 import com.absir.bean.basis.Base;
 import com.absir.bean.inject.value.Bean;
+import com.absir.context.core.ContextUtils;
 import com.absir.core.dyna.DynaBinder;
-import com.absir.core.helper.HelperFile;
 import com.absir.orm.value.JoEntity;
 import com.absir.property.PropertyErrors;
 import com.absir.server.in.Input;
@@ -43,6 +49,46 @@ public class RichCrudFactory implements ICrudFactory, ICrudProcessorInput<Object
 
 	/** REMOTE_RICH_NAME */
 	private static final String REMOTE_RICH_NAME = "REMOTE_RICH@";
+
+	/**
+	 * 获取关联ID
+	 * 
+	 * @param entity
+	 * @param id
+	 * @return
+	 */
+	public static String getAssocId(String entityName, Object id) {
+		if (id != null) {
+			return entityName + "@" + DynaBinderUtils.getParamFromValue(id);
+		}
+
+		return null;
+	}
+
+	/**
+	 * 获取关联ID
+	 * 
+	 * @param handler
+	 * @return
+	 */
+	public static String getAssocId(CrudHandler handler) {
+		String entityName = handler.getCrudEntity().getJoEntity().getEntityName();
+		if (entityName != null) {
+			Object id = CrudService.ME.getCrudSupply(entityName).getIdentifier(entityName, handler.getRoot());
+			return getAssocId(entityName, id);
+		}
+
+		return null;
+	}
+
+	/**
+	 * @param session
+	 * @param assocId
+	 * @return
+	 */
+	public static List<JUploadCite> getUploadCites(Session session, String assocId) {
+		return QueryDaoUtils.createQueryArray(session, "SELECT o FROM JUploadCite o WHERE o.id.eid = ?", assocId).list();
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -66,19 +112,18 @@ public class RichCrudFactory implements ICrudFactory, ICrudProcessorInput<Object
 	public void crud(CrudProperty crudProperty, Object entity, CrudHandler handler, JiUserBase user) {
 		// TODO Auto-generated method stub
 		if (handler.getCrud() == Crud.DELETE) {
-			String entityName = handler.getCrudEntity().getJoEntity().getEntityName();
-			if (entityName != null) {
+			String assocId = getAssocId(handler);
+			if (assocId != null) {
 				Session session = BeanDao.getSession();
-				String eid = entityName + "@" + CrudService.ME.getCrudSupply(entityName).getIdentifier(entityName, handler.getRoot());
-				List<JUpload> uploads = QueryDaoUtils.createQueryArray(session, "SELECT o FROM JUpload o WHERE o.id.eid = ?", eid).list();
-				if (!uploads.isEmpty()) {
-					QueryDaoUtils.createQueryArray(session, "DELETE o FROM JUpload o WHERE o.id.eid = ?", eid).executeUpdate();
+				List<JUploadCite> uploadCites = getUploadCites(session, assocId);
+				if (!uploadCites.isEmpty()) {
+					QueryDaoUtils.createQueryArray(session, "DELETE o FROM JUploadCite o WHERE o.id.eid = ?", assocId).executeUpdate();
 					session.flush();
-					for (JUpload upload : uploads) {
-						String mid = upload.getId().getMid();
-						if (!QueryDaoUtils.createQueryArray(session, "SELECT o.id.eid FROM JUpload o WHERE o.id.mid = ?", mid).iterate().hasNext()) {
-							HelperFile.deleteQuietly(new File(UploadCrudFactory.getUploadPath() + mid));
-						}
+					long contextTime = ContextUtils.getContextTime();
+					for (JUploadCite uploadCite : uploadCites) {
+						JUpload upload = uploadCite.getUpload();
+						upload.setPassTime(contextTime + UploadCrudFactory.getUploadPassTime());
+						session.merge(upload);
 					}
 				}
 			}
@@ -104,13 +149,19 @@ public class RichCrudFactory implements ICrudFactory, ICrudProcessorInput<Object
 				remote = input.getParamMap().get(REMOTE_RICH_NAME);
 			}
 
-			if (DynaBinder.to(remote, Boolean.class) == Boolean.TRUE) {
+			if (DynaBinder.to(remote, boolean.class)) {
 				return Boolean.TRUE;
 			}
 		}
 
-		return null;
+		return Boolean.FALSE;
 	}
+
+	/** IMG_SRC_PATTERN */
+	public static final Pattern IMG_SRC_PATTERN = Pattern.compile("<img[^<>]*?[\\s| ]{1}src=[\"']{1}([^\"']*)[\"']{1}", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+
+	/** SRC_EXCLUDE_CHARS */
+	public static final char[] SRC_EXCLUDE_CHARS = new char[] { '\'', '"', '\r', '\n' };
 
 	/*
 	 * (non-Javadoc)
@@ -123,7 +174,75 @@ public class RichCrudFactory implements ICrudFactory, ICrudProcessorInput<Object
 	@Override
 	public void crud(CrudProperty crudProperty, Object entity, CrudHandler handler, JiUserBase user, Object inputBody) {
 		// TODO Auto-generated method stub
+		if (handler.getCrud() != Crud.DELETE) {
+			String value = (String) crudProperty.get(entity);
+			if (value != null) {
+				// 远程下载图片
+				if (inputBody == Boolean.TRUE) {
+					int end = 0;
+					StringBuilder stringBuilder = new StringBuilder();
+					Matcher matcher = IMG_SRC_PATTERN.matcher(value);
+					char[] chars = value.toCharArray();
+					while (matcher.find()) {
+						String src = matcher.group(1);
+						if (!src.startsWith(UploadCrudFactory.getUploadUrl())) {
+							String find = matcher.group();
+							String replace = UploadCrudFactory.ME.remoteDownload(src, "jpg", user);
+							if (replace == null) {
+								stringBuilder.append(chars, end, matcher.end() - end);
 
+							} else {
+								replace = UploadCrudFactory.getUploadUrl() + replace;
+								stringBuilder.append(chars, end, matcher.start() - end);
+								stringBuilder.append(find.replace(src, replace));
+							}
+
+							end = matcher.end();
+						}
+					}
+
+					if (end != 0) {
+						int len = chars.length - end;
+						if (len > end) {
+							stringBuilder.append(chars, end, len - end);
+						}
+
+						crudProperty.set(entity, stringBuilder.toString());
+					}
+				}
+
+				// 查找关联文件
+				Set<String> srcs = new HashSet<String>();
+				int end = 0;
+				int length = value.length();
+				String uploadUrl = UploadCrudFactory.getUploadUrl();
+				int len = uploadUrl.length();
+				while (end < length) {
+					int pos = value.indexOf(uploadUrl, end);
+					if (pos > 0) {
+						end = pos + len;
+						char chr = value.charAt(pos - 1);
+						if (chr == '\'' || chr == '"') {
+							pos = value.indexOf(chr, end);
+							if (pos > 0) {
+								int last = pos - end - 1;
+								if (last > 1) {
+									String src = value.substring(end, last);
+									if (HelperString.indexOfAny(src, SRC_EXCLUDE_CHARS) < 0) {
+										srcs.add(src);
+									}
+								}
+
+								end = pos + 1;
+							}
+						}
+
+					} else {
+						break;
+					}
+				}
+			}
+		}
 	}
 
 	/*
@@ -136,6 +255,6 @@ public class RichCrudFactory implements ICrudFactory, ICrudProcessorInput<Object
 	@Override
 	public ICrudProcessor getProcessor(JoEntity joEntity, JCrudField crudField) {
 		// TODO Auto-generated method stub
-		return this;
+		return CharSequence.class.isAssignableFrom(crudField.getType()) ? this : null;
 	}
 }

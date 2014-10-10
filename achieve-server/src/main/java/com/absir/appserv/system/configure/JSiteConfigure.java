@@ -38,6 +38,12 @@ public class JSiteConfigure extends JConfigureBase {
 	@JaLang("描述")
 	private String discription = "achieve server is a java stack type web development framework, make as blog, bussiness, cms, game server";
 
+	@JaLang("上传大小")
+	private long uploadSize = 2000000;
+
+	@JaLang("上传扩展名")
+	private String uploadExtension = "gif|jpg|png|txt|doc|xls|zip|rar";
+
 	/**
 	 * @return the sitename
 	 */
@@ -129,5 +135,35 @@ public class JSiteConfigure extends JConfigureBase {
 	 */
 	public void setDiscription(String discription) {
 		this.discription = discription;
+	}
+
+	/**
+	 * @return the uploadSize
+	 */
+	public long getUploadSize() {
+		return uploadSize;
+	}
+
+	/**
+	 * @param uploadSize
+	 *            the uploadSize to set
+	 */
+	public void setUploadSize(long uploadSize) {
+		this.uploadSize = uploadSize;
+	}
+
+	/**
+	 * @return the uploadExtension
+	 */
+	public String getUploadExtension() {
+		return uploadExtension;
+	}
+
+	/**
+	 * @param uploadExtension
+	 *            the uploadExtension to set
+	 */
+	public void setUploadExtension(String uploadExtension) {
+		this.uploadExtension = uploadExtension;
 	}
 }

@@ -7,29 +7,46 @@
  */
 package com.absir.appserv.system.bean;
 
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 
+import org.hibernate.Session;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import com.absir.appserv.crud.CrudHandler;
+import com.absir.appserv.crud.value.ICrudBean;
 import com.absir.appserv.feature.menu.value.MaEntity;
 import com.absir.appserv.feature.menu.value.MaMenu;
-import com.absir.appserv.system.bean.base.JbBeanSS;
+import com.absir.appserv.system.bean.base.JbBean;
+import com.absir.appserv.system.bean.proxy.JiPass;
 import com.absir.appserv.system.bean.value.JaCrud;
 import com.absir.appserv.system.bean.value.JaCrud.Crud;
 import com.absir.appserv.system.bean.value.JaEdit;
 import com.absir.appserv.system.bean.value.JaLang;
 import com.absir.appserv.system.bean.value.JaName;
 import com.absir.appserv.system.crud.DateCrudFactory;
+import com.absir.appserv.system.crud.UploadCrudFactory;
+import com.absir.appserv.system.dao.BeanDao;
 
 /**
  * @author absir
  *
  */
 @MaEntity(parent = { @MaMenu("附件管理") }, name = "上传")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Entity
-public class JUpload extends JbBeanSS {
+public class JUpload extends JbBean implements JiPass, ICrudBean {
+
+	@JaLang("文件路径")
+	@JaEdit(groups = { JaEdit.GROUP_SUG, JaEdit.GROUP_SUGGEST })
+	@Column(unique = true)
+	private String filePath;
 
 	@JaLang(value = "文件类型")
 	@JaEdit(groups = JaEdit.GROUP_LIST)
-	@JaName("JUser")
 	private String fileType;
 
 	@JaLang(value = "关联用户", tag = "assocUser")
@@ -41,6 +58,25 @@ public class JUpload extends JbBeanSS {
 	@JaEdit(types = "dateTime", groups = JaEdit.GROUP_LIST)
 	@JaCrud(value = "dateCrudFactory", cruds = { Crud.CREATE }, factory = DateCrudFactory.class)
 	private long createTime;
+
+	@JaLang("过期时间")
+	@JaEdit(types = "dateTime", groups = JaEdit.GROUP_LIST)
+	private long passTime;
+
+	/**
+	 * @return the filePath
+	 */
+	public String getFilePath() {
+		return filePath;
+	}
+
+	/**
+	 * @param filePath
+	 *            the filePath to set
+	 */
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
+	}
 
 	/**
 	 * @return the fileType
@@ -85,5 +121,47 @@ public class JUpload extends JbBeanSS {
 	 */
 	public void setCreateTime(long createTime) {
 		this.createTime = createTime;
+	}
+
+	/**
+	 * @return the passTime
+	 */
+	public long getPassTime() {
+		return passTime;
+	}
+
+	/**
+	 * @param passTime
+	 *            the passTime to set
+	 */
+	public void setPassTime(long passTime) {
+		this.passTime = passTime;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.crud.value.ICrudBean#proccessCrud(com.absir.appserv
+	 * .system.bean.value.JaCrud.Crud, com.absir.appserv.crud.CrudHandler)
+	 */
+	@Override
+	public void proccessCrud(Crud crud, CrudHandler handler) {
+		// TODO Auto-generated method stub
+		if (crud == Crud.DELETE) {
+			Session session = BeanDao.getSession();
+			session.flush();
+			try {
+				session.delete(this);
+				session.flush();
+				UploadCrudFactory.ME.delete(filePath);
+
+			} catch (Exception e) {
+				// TODO: handle exception
+				session.cancelQuery();
+				passTime = 0;
+				session.merge(this);
+			}
+		}
 	}
 }

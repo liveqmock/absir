@@ -14,11 +14,13 @@ import java.util.Map.Entry;
 
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.absir.appserv.crud.CrudEntity;
 import com.absir.appserv.crud.CrudUtils;
 import com.absir.appserv.system.bean.JVerifier;
-import com.absir.appserv.system.bean.base.JbVerifier;
+import com.absir.appserv.system.bean.proxy.JiPass;
 import com.absir.appserv.system.bean.value.JaCrud.Crud;
 import com.absir.appserv.system.dao.BeanDao;
 import com.absir.appserv.system.dao.utils.QueryDaoUtils;
@@ -44,9 +46,12 @@ import com.absir.orm.value.JoEntity;
 @Bean
 public class VerifierService {
 
+	/** LOGGER */
+	protected static final Logger LOGGER = LoggerFactory.getLogger(VerifierService.class);
+
 	/** clearFixDelay */
 	@Value("verifier.clear")
-	private long clearFixDelay = 24 * 36000;
+	private long clearFixDelay = 8 * 3600000;
 
 	/** ME */
 	public static final VerifierService ME = BeanFactoryUtils.get(VerifierService.class);
@@ -56,7 +61,7 @@ public class VerifierService {
 	 * @return
 	 */
 	public static String randVerifierId(Object dist) {
-		return HelperRandom.randSecendId(ContextUtils.getContextTime(), 8, dist.hashCode());
+		return HelperRandom.randSecendId(System.currentTimeMillis(), 8, dist.hashCode());
 	}
 
 	/**
@@ -105,7 +110,7 @@ public class VerifierService {
 			final Map<String, CrudEntity> nameMapCrudEntity = new HashMap<String, CrudEntity>();
 			for (Entry<String, Entry<Class<?>, SessionFactory>> entry : sessionFactoryBean.getJpaEntityNameMapEntityClassFactory().entrySet()) {
 				Entry<Class<?>, SessionFactory> value = entry.getValue();
-				if (value.getValue() == sessionFactory && JbVerifier.class.isAssignableFrom(value.getClass())) {
+				if (value.getValue() == sessionFactory && JiPass.class.isAssignableFrom(value.getClass())) {
 					JoEntity joEntity = new JoEntity(entry.getKey(), entry.getValue().getKey());
 					nameMapCrudEntity.put(entry.getKey(), CrudUtils.getCrudEntity(joEntity));
 				}
@@ -117,7 +122,7 @@ public class VerifierService {
 					@Override
 					public void run() {
 						// TODO Auto-generated method stub
-						ME.removeExpiredSession(nameMapCrudEntity);
+						ME.clearExpiredVerifier(nameMapCrudEntity);
 					}
 
 				}, clearFixDelay));
@@ -132,18 +137,24 @@ public class VerifierService {
 	 * @param nameMapCrudEntity
 	 */
 	@Transaction
-	protected void removeExpiredSession(Map<String, CrudEntity> nameMapCrudEntity) {
+	protected void clearExpiredVerifier(Map<String, CrudEntity> nameMapCrudEntity) {
 		long contextTime = ContextUtils.getContextTime();
 		for (Entry<String, CrudEntity> entry : nameMapCrudEntity.entrySet()) {
-			if (entry.getValue() != null) {
-				Iterator<Object> iterator = QueryDaoUtils.createQueryArray(BeanDao.getSession(), "SELECT o FROM " + entry.getKey() + " o WHERE o.passTime > 0 AND o.passTime < ?", contextTime)
-						.iterate();
-				while (iterator.hasNext()) {
-					CrudUtils.crud(Crud.DELETE, null, entry.getValue().getJoEntity(), iterator.next(), null, null);
+			try {
+				if (entry.getValue() != null) {
+					Iterator<Object> iterator = QueryDaoUtils.createQueryArray(BeanDao.getSession(), "SELECT o FROM " + entry.getKey() + " o WHERE o.passTime > 0 AND o.passTime < ?", contextTime)
+							.iterate();
+					while (iterator.hasNext()) {
+						CrudUtils.crud(Crud.DELETE, null, entry.getValue().getJoEntity(), iterator.next(), null, null);
+					}
 				}
-			}
 
-			QueryDaoUtils.createQueryArray(BeanDao.getSession(), "DELETE o FROM " + entry.getKey() + " o WHERE o.passTime > 0 AND o.passTime < ?", contextTime).executeUpdate();
+				QueryDaoUtils.createQueryArray(BeanDao.getSession(), "DELETE o FROM " + entry.getKey() + " o WHERE o.passTime > 0 AND o.passTime < ?", contextTime).executeUpdate();
+
+			} catch (Throwable e) {
+				// TODO: handle exception
+				LOGGER.error("clear expired verifier " + entry.getKey() + " error!", e);
+			}
 		}
 	}
 }

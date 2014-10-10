@@ -11,6 +11,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.fileupload.FileItem;
@@ -22,20 +27,28 @@ import com.absir.appserv.crud.CrudProperty;
 import com.absir.appserv.crud.ICrudFactory;
 import com.absir.appserv.crud.ICrudProcessor;
 import com.absir.appserv.crud.ICrudProcessorInput;
+import com.absir.appserv.developer.Pag;
 import com.absir.appserv.dyna.DynaBinderUtils;
 import com.absir.appserv.support.developer.JCrudField;
+import com.absir.appserv.system.bean.JUpload;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.bean.value.JaCrud.Crud;
+import com.absir.appserv.system.crud.value.IUploadProcessor;
 import com.absir.appserv.system.crud.value.IUploadRule;
 import com.absir.appserv.system.crud.value.UploadRule;
+import com.absir.appserv.system.helper.HelperClient;
 import com.absir.appserv.system.helper.HelperRandom;
 import com.absir.appserv.system.helper.HelperString;
 import com.absir.appserv.system.service.utils.CrudServiceUtils;
 import com.absir.bean.basis.Base;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
+import com.absir.bean.inject.value.Inject;
+import com.absir.bean.inject.value.InjectType;
+import com.absir.bean.inject.value.Orders;
 import com.absir.bean.inject.value.Started;
 import com.absir.bean.inject.value.Value;
+import com.absir.context.core.ContextUtils;
 import com.absir.core.base.IBase;
 import com.absir.core.helper.HelperFile;
 import com.absir.core.helper.HelperFileName;
@@ -45,6 +58,8 @@ import com.absir.core.kernel.KernelString;
 import com.absir.core.util.UtilAccessor.Accessor;
 import com.absir.orm.value.JoEntity;
 import com.absir.property.PropertyErrors;
+import com.absir.server.exception.ServerException;
+import com.absir.server.exception.ServerStatus;
 import com.absir.server.in.Input;
 import com.absir.servlet.InputRequest;
 
@@ -56,17 +71,24 @@ import com.absir.servlet.InputRequest;
 @Bean
 public class UploadCrudFactory implements ICrudFactory, ICrudProcessorInput<FileItem> {
 
+	/** ME */
+	public static final UploadCrudFactory ME = BeanFactoryUtils.get(UploadCrudFactory.class);
+
+	/** RECORD */
+	public static final String RECORD = "UPLOAD@";
+
+	/** LOGGER */
+	protected static final Logger LOGGER = LoggerFactory.getLogger(UploadCrudFactory.class);
+
 	/** uploadUrl */
 	private static String uploadUrl;
 
 	/** uploadPath */
 	private static String uploadPath;
 
-	/** RECORD */
-	public static final String RECORD = "UPLOAD@";
-
-	/** LOGGER */
-	private static final Logger LOGGER = LoggerFactory.getLogger(UploadCrudFactory.class);
+	/** uploadPassTime */
+	@Value(value = "upload.passTime")
+	private static long uploadPassTime = 3600000;
 
 	/**
 	 * @return
@@ -83,6 +105,13 @@ public class UploadCrudFactory implements ICrudFactory, ICrudProcessorInput<File
 	}
 
 	/**
+	 * @return the uploadPassTime
+	 */
+	public static long getUploadPassTime() {
+		return uploadPassTime;
+	}
+
+	/**
 	 * @param name
 	 * @param fileItem
 	 * @return
@@ -90,22 +119,6 @@ public class UploadCrudFactory implements ICrudFactory, ICrudProcessorInput<File
 	public static FileItem getUploadFile(InputRequest input, String name) {
 		List<FileItem> fileItems = input.parseParameterMap().get(name);
 		return fileItems == null || fileItems.isEmpty() ? null : fileItems.get(0);
-	}
-
-	/**
-	 * @param uploadFile
-	 * @param inputStream
-	 * @throws IOException
-	 */
-	public static void upload(String uploadFile, InputStream inputStream) throws IOException {
-		HelperFile.write(new File(uploadPath + uploadFile), inputStream);
-	}
-
-	/**
-	 * @param uploadFile
-	 */
-	public static void delete(String uploadFile) {
-		HelperFile.deleteQuietly(new File(uploadPath + uploadFile));
 	}
 
 	/**
@@ -120,6 +133,115 @@ public class UploadCrudFactory implements ICrudFactory, ICrudProcessorInput<File
 
 		UploadCrudFactory.uploadUrl = uploadUrl;
 		UploadCrudFactory.uploadPath = HelperFileName.normalizeNoEndSeparator(BeanFactoryUtils.getBeanConfig().getResourcePath() + uploadPath) + "/";
+	}
+
+	/** DATE_FORMAT */
+	public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd");
+
+	/**
+	 * @return
+	 */
+	public String randUploadFile() {
+		Date date = new Date();
+		return DATE_FORMAT.format(date) + '/' + HelperRandom.randSecendBuidler((int) date.getTime(), 16);
+	}
+
+	/**
+	 * @param uploadFile
+	 * @param inputStream
+	 * @throws IOException
+	 */
+	public void upload(String uploadFile, InputStream inputStream) throws IOException {
+		HelperFile.write(new File(uploadPath + uploadFile), inputStream);
+	}
+
+	/**
+	 * @param uploadFile
+	 */
+	public void delete(String uploadFile) {
+		HelperFile.deleteQuietly(new File(uploadPath + uploadFile));
+	}
+
+	/**
+	 * 远程下载
+	 * 
+	 * @param url
+	 * @param defaultExtension
+	 * @param user
+	 * @return
+	 */
+	public String remoteDownload(String url, String defaultExtension, JiUserBase user) {
+		String extension = HelperFileName.getExtension(url);
+		if (KernelString.isEmpty(extension)) {
+			extension = defaultExtension;
+			if (KernelString.isEmpty(extension)) {
+				return null;
+			}
+		}
+
+		try {
+			return uploadExtension(extension, HelperClient.openConnection((HttpURLConnection) (new URL(url)).openConnection()), user);
+
+		} catch (Throwable e) {
+			// TODO Auto-generated catch block
+			return null;
+		}
+	}
+
+	/** uploadProcessors */
+	@Orders
+	@Inject(type = InjectType.Selectable)
+	private IUploadProcessor[] uploadProcessors;
+
+	/**
+	 * 上传扩展名内容
+	 * 
+	 * @param extension
+	 * @param inputStream
+	 * @param user
+	 * @return
+	 * @throws IOException
+	 */
+	public String uploadExtension(String extension, InputStream inputStream, JiUserBase user) throws IOException {
+		extension = extension.toLowerCase();
+		if (Pag.CONFIGURE.getUploadSize() < inputStream.available()) {
+			throw new ServerException(ServerStatus.ON_DENIED, "size");
+		}
+
+		if (!Pag.CONFIGURE.getUploadExtension().contains(extension)) {
+			throw new ServerException(ServerStatus.ON_DENIED, "extension");
+		}
+
+		JUpload upload = new JUpload();
+		upload.setFilePath(extension);
+		if (uploadProcessors != null) {
+			for (IUploadProcessor uploadProcessor : uploadProcessors) {
+				inputStream = uploadProcessor.process(upload, inputStream);
+				if (upload.getFileType() != null) {
+					break;
+				}
+			}
+
+			if (inputStream == null) {
+				throw new ServerException(ServerStatus.ON_DENIED, "process");
+			}
+		}
+
+		extension = upload.getFilePath();
+		String uploadFile = randUploadFile() + '.' + extension;
+		upload(uploadFile, inputStream);
+		if (upload.getFileType() == null) {
+			upload.setFileType(extension);
+		}
+
+		long contextTime = ContextUtils.getContextTime();
+		upload.setCreateTime(contextTime);
+		upload.setPassTime(contextTime + uploadPassTime);
+		if (user != null) {
+			upload.setUserId(user.getUserId());
+		}
+
+		return uploadFile;
 	}
 
 	/**
@@ -289,18 +411,20 @@ public class UploadCrudFactory implements ICrudFactory, ICrudProcessorInput<File
 				MultipartUploader multipartUploader = parameters.length == 0 ? null : (MultipartUploader) parameters[0];
 				if (multipartUploader != null) {
 					if (multipartUploader.ruleName == null) {
+						String ruleName = null;
 						Accessor accessor = crudProperty.getAccessor();
 						if (accessor != null) {
 							UploadRule uploadRule = accessor.getAnnotation(UploadRule.class, false);
 							if (uploadRule != null) {
-								multipartUploader.ruleName = uploadRule.value();
-								multipartUploader.ided = multipartUploader.ruleName.contains(":id");
+								ruleName = uploadRule.value();
+								multipartUploader.ided = ruleName.contains(":id");
+								if (KernelString.isEmpty(HelperFileName.getPath(ruleName))) {
+									ruleName = "data/" + ruleName;
+								}
 							}
 						}
 
-						if (multipartUploader.ruleName == null) {
-							multipartUploader.ruleName = "";
-						}
+						multipartUploader.ruleName = ruleName == null ? "" : ruleName;
 					}
 
 					if ("".equals(multipartUploader.ruleName)) {
@@ -336,7 +460,7 @@ public class UploadCrudFactory implements ICrudFactory, ICrudProcessorInput<File
 				}
 
 				if (uploadFile == null) {
-					uploadFile = HelperRandom.randSecendId() + "." + HelperFileName.getExtension(requestBody.getName());
+					uploadFile = randUploadFile() + "." + HelperFileName.getExtension(requestBody.getName());
 				}
 
 				if (uploadStream == null) {

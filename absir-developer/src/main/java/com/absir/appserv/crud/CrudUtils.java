@@ -551,6 +551,10 @@ public abstract class CrudUtils {
 			crudEntity = generateCrudEntity(joEntity);
 		}
 
+		if (crudEntity.isCrudEntityNone()) {
+			return null;
+		}
+
 		return crudEntity;
 	}
 
@@ -609,10 +613,6 @@ public abstract class CrudUtils {
 			crudFields = IDeveloper.ME.getCrudFields(joEntity);
 		}
 
-		if (crudFields == null) {
-			return null;
-		}
-
 		crudEntity = new CrudEntity();
 		for (JCrudField crudField : crudFields) {
 			addCrudEntityProperty(joEntity, crudEntity, crudField, joEntity.getEntityClass());
@@ -620,7 +620,7 @@ public abstract class CrudUtils {
 
 		crudEntity.joEntity = joEntity;
 		Jo_Entity_Map_Crud_Entity.put(joEntity, crudEntity);
-
+		crudEntity.initCrudEntity();
 		return crudEntity;
 	}
 

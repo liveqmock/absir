@@ -19,7 +19,6 @@ import com.absir.appserv.lang.LangBundleImpl;
 import com.absir.appserv.system.bean.JMaMenu;
 import com.absir.appserv.system.bean.JMenu;
 import com.absir.appserv.system.bean.JMenuCite;
-import com.absir.appserv.system.bean.JMenuPermission;
 import com.absir.appserv.system.bean.JPermission;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.bean.value.JeVote;
@@ -30,7 +29,6 @@ import com.absir.appserv.system.service.utils.AuthServiceUtils;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Inject;
 import com.absir.bean.inject.value.InjectType;
-import com.absir.core.kernel.KernelObject;
 import com.absir.core.kernel.KernelString;
 import com.absir.orm.transaction.value.Transaction;
 
@@ -156,44 +154,6 @@ public class MenuBeanService {
 		}
 
 		return menuBeans;
-	}
-
-	/**
-	 * 添加菜单权限
-	 * 
-	 * @param parent
-	 * @param menuBeanRoot
-	 */
-	@Transaction
-	public void addMenuPermission(MenuBeanRoot menuBeanRoot) {
-		addMenuPermission(BeanDao.getSession(), menuBeanRoot);
-	}
-
-	/**
-	 * 添加菜单权限
-	 * 
-	 * @param session
-	 * @param menuBeanRoot
-	 */
-	private void addMenuPermission(Session session, MenuBeanRoot menuBeanRoot) {
-		if (menuBeanRoot.getChildren() == null) {
-			return;
-		}
-
-		for (MenuBeanRoot beanRoot : menuBeanRoot.getChildren().values()) {
-			String url = beanRoot.getMenuBean().getRef();
-			if (KernelObject.equals("MENU", beanRoot.getMenuBean().getUrlType()) && !KernelString.isEmpty(url)) {
-				JMenuPermission menuPermission = (JMenuPermission) QueryDaoUtils.select(session, "JMenuPermission", new Object[] { "o.id", url });
-				if (menuPermission == null) {
-					menuPermission = new JMenuPermission();
-					menuPermission.setId(url);
-					menuPermission.setAllowIds(new long[] { 1L });
-					session.persist(menuPermission);
-				}
-
-				addMenuPermission(session, beanRoot);
-			}
-		}
 	}
 
 	/**

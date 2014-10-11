@@ -31,6 +31,7 @@ import com.absir.appserv.system.bean.value.JaCrud.Crud;
 import com.absir.appserv.system.dao.BeanDao;
 import com.absir.appserv.system.dao.utils.QueryDaoUtils;
 import com.absir.appserv.system.helper.HelperString;
+import com.absir.appserv.system.service.AuthService;
 import com.absir.appserv.system.service.CrudService;
 import com.absir.appserv.system.service.utils.CrudServiceUtils;
 import com.absir.bean.basis.Base;
@@ -54,6 +55,9 @@ public class RichCrudFactory implements ICrudFactory, ICrudProcessorInput<Object
 
 	/** ME */
 	public static final RichCrudFactory ME = BeanFactoryUtils.get(RichCrudFactory.class);
+
+	/** UPLOAD */
+	public static final String UPLOAD = "upload";
 
 	/** RECORD */
 	public static final String RECORD = "RICH@";
@@ -155,7 +159,7 @@ public class RichCrudFactory implements ICrudFactory, ICrudProcessorInput<Object
 	@Override
 	public Object crud(CrudProperty crudProperty, PropertyErrors errors, CrudHandler handler, JiUserBase user, Input input) {
 		// TODO Auto-generated method stub
-		if (handler.getCrud() != Crud.DELETE) {
+		if (handler.getCrud() != Crud.DELETE && AuthService.ME.menuPermission(UPLOAD, user)) {
 			Object remote = input.getParamMap().get(REMOTE_RICH_NAME);
 			if (remote == null) {
 				remote = input.getParamMap().get(REMOTE_RICH_NAME);

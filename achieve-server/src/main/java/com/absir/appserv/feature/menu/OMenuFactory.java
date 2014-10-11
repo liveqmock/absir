@@ -8,9 +8,13 @@
 package com.absir.appserv.feature.menu;
 
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import net.sf.cglib.proxy.MethodProxy;
+
+import org.hibernate.Session;
 
 import com.absir.aop.AopInterceptor;
 import com.absir.aop.AopInterceptorAbstract;
@@ -21,17 +25,22 @@ import com.absir.appserv.feature.menu.OMenuFactory.MenuAopInterceptor;
 import com.absir.appserv.feature.menu.value.MaFactory;
 import com.absir.appserv.feature.menu.value.MaPermission;
 import com.absir.appserv.lang.LangBundleImpl;
+import com.absir.appserv.system.bean.JMenuPermission;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
+import com.absir.appserv.system.dao.BeanDao;
+import com.absir.appserv.system.dao.utils.QueryDaoUtils;
 import com.absir.appserv.system.service.AuthService;
 import com.absir.appserv.system.service.SecurityService;
 import com.absir.bean.basis.Basis;
 import com.absir.bean.basis.BeanDefine;
 import com.absir.bean.core.BeanFactoryImpl;
 import com.absir.bean.inject.value.Bean;
+import com.absir.bean.inject.value.Started;
 import com.absir.context.core.ContextUtils;
 import com.absir.core.kernel.KernelArray;
 import com.absir.core.kernel.KernelCollection;
 import com.absir.core.kernel.KernelString;
+import com.absir.orm.transaction.value.Transaction;
 import com.absir.server.exception.ServerException;
 import com.absir.server.exception.ServerStatus;
 import com.absir.server.on.OnPut;
@@ -116,7 +125,37 @@ public class OMenuFactory extends AopMethodDefineAbstract<MenuAopInterceptor, St
 			interceptor = maPermission.value();
 		}
 
-		return KernelString.isEmpty(interceptor) ? null : interceptor;
+		if (KernelString.isEmpty(interceptor)) {
+			return null;
+		}
+
+		refs.add(interceptor);
+		return interceptor;
+	}
+
+	/** refs */
+	private Set<String> refs = new HashSet<String>();
+
+	/**
+	 * 添加菜单默认权限
+	 */
+	@Transaction
+	@Started
+	protected void initRefs() {
+		if (refs != null) {
+			Session session = BeanDao.getSession();
+			for (String ref : refs) {
+				JMenuPermission menuPermission = (JMenuPermission) QueryDaoUtils.select(session, "JMenuPermission", new Object[] { "o.id", ref });
+				if (menuPermission == null) {
+					menuPermission = new JMenuPermission();
+					menuPermission.setId(ref);
+					menuPermission.setAllowIds(new long[] { 1L });
+					session.persist(menuPermission);
+				}
+			}
+
+			refs = null;
+		}
 	}
 
 	/*

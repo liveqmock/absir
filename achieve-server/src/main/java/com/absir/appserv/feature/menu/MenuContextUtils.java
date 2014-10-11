@@ -108,9 +108,6 @@ public abstract class MenuContextUtils {
 
 				});
 
-				// 添加扫瞄权限
-				menuBeanService.addMenuPermission(menuBeanRoot);
-
 				// 权限实体收集
 				List<String> entityNames = Developer.isDeveloper() ? new ArrayList<String>() : null;
 				// 实体CRUD菜单

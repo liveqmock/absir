@@ -7,10 +7,13 @@
  */
 package com.absir.spring;
 
+import java.util.Collection;
+
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.absir.bean.basis.Basis;
 import com.absir.bean.basis.BeanConfig;
+import com.absir.bean.basis.BeanSupply;
 import com.absir.bean.config.IBeanFactoryAware;
 import com.absir.bean.core.BeanFactoryImpl;
 import com.absir.bean.inject.value.Bean;
@@ -56,6 +59,56 @@ public class SpringBeanDefineAware implements IBeanFactoryAware {
 
 		CONTEXT.setConfigLocations(locations);
 		CONTEXT.start();
+		beanFactory.addBeanSupply(new BeanSupply() {
+
+			@Override
+			public <T> Collection<T> getBeanObjects(Class<T> beanType) {
+				// TODO Auto-generated method stub
+				try {
+					return CONTEXT.getBeansOfType(beanType).values();
+
+				} catch (Exception e) {
+					// TODO: handle exception
+					return null;
+				}
+			}
+
+			@Override
+			public <T> T getBeanObject(String beanName, Class<T> beanType) {
+				// TODO Auto-generated method stub
+				try {
+					return CONTEXT.getBean(beanName, beanType);
+
+				} catch (Exception e) {
+					// TODO: handle exception
+					return null;
+				}
+			}
+
+			@Override
+			public <T> T getBeanObject(Class<T> beanType) {
+				// TODO Auto-generated method stub
+				try {
+					return CONTEXT.getBean(beanType);
+
+				} catch (Exception e) {
+					// TODO: handle exception
+					return null;
+				}
+			}
+
+			@Override
+			public Object getBeanObject(String beanName) {
+				// TODO Auto-generated method stub
+				try {
+					return CONTEXT.getBean(beanName);
+
+				} catch (Exception e) {
+					// TODO: handle exception
+					return null;
+				}
+			}
+		});
 	}
 
 	/*

@@ -400,7 +400,7 @@ public final class BeanFactoryImpl implements BeanFactory {
 
 		if (beanSupplies != null) {
 			for (BeanSupply beanSupply : beanSupplies) {
-				List<T> beans = beanSupply.getBeanObjects(beanType);
+				Collection<T> beans = beanSupply.getBeanObjects(beanType);
 				if (beans != null) {
 					beanObjects.addAll(beans);
 				}

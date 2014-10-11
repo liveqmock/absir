@@ -7,7 +7,7 @@
  */
 package com.absir.bean.basis;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * @author absir
@@ -38,6 +38,6 @@ public interface BeanSupply {
 	 * @param beanType
 	 * @return
 	 */
-	public <T> List<T> getBeanObjects(Class<T> beanType);
+	public <T> Collection<T> getBeanObjects(Class<T> beanType);
 
 }

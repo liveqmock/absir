@@ -41,6 +41,12 @@ public interface BeanFactory extends BeanSupply {
 	public Object getBeanObject(String beanName, Type beanType, boolean forcible);
 
 	/**
+	 * @param beanType
+	 * @return
+	 */
+	public <T> List<T> getBeanObjects(Class<T> beanType);
+
+	/**
 	 * @param beanName
 	 * @return
 	 */

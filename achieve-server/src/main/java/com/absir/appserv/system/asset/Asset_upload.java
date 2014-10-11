@@ -7,11 +7,23 @@
  */
 package com.absir.appserv.system.asset;
 
+import java.io.IOException;
+
+import org.apache.commons.fileupload.FileItem;
+
 import com.absir.appserv.feature.menu.value.MaPermission;
+import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.crud.RichCrudFactory;
+import com.absir.appserv.system.crud.UploadCrudFactory;
+import com.absir.appserv.system.service.SecurityService;
 import com.absir.bean.basis.Base;
+import com.absir.core.helper.HelperFileName;
+import com.absir.server.in.Input;
+import com.absir.server.value.Before;
+import com.absir.server.value.Body;
+import com.absir.server.value.Nullable;
+import com.absir.server.value.Param;
 import com.absir.server.value.Server;
-import com.absir.servlet.InputRequest;
 
 /**
  * @author absir
@@ -22,10 +34,38 @@ import com.absir.servlet.InputRequest;
 public class Asset_upload extends AssetServer {
 
 	/**
-	 * @param inputRequest
+	 * @param input
 	 */
-	@MaPermission(RichCrudFactory.UPLOAD)
-	public void upload(InputRequest inputRequest) {
+	@Before
+	public void onAuthentication(@Nullable @Param String name, Input input) {
+		SecurityService.ME.autoLogin(name, true, 0, input);
+	}
 
+	/**
+	 * @param inputRequest
+	 * @throws IOException
+	 */
+	@Body
+	@MaPermission(RichCrudFactory.UPLOAD)
+	public String upload(@Param FileItem file, Input input) throws IOException {
+		return UploadCrudFactory.ME.uploadExtension(HelperFileName.getExtension(file.getName()), file.getInputStream(), SecurityService.ME.getUserBase(input));
+	}
+
+	/**
+	 * @param inputRequest
+	 * @throws IOException
+	 */
+	@Body
+	@MaPermission(RichCrudFactory.UPLOAD)
+	public String[] upload(@Param FileItem[] files, Input input) throws IOException {
+		JiUserBase user = SecurityService.ME.getUserBase(input);
+		int length = files.length;
+		String[] uploadPaths = new String[length];
+		for (int i = 0; i < length; i++) {
+			FileItem file = files[i];
+			uploadPaths[i] = UploadCrudFactory.ME.uploadExtension(HelperFileName.getExtension(file.getName()), file.getInputStream(), user);
+		}
+
+		return uploadPaths;
 	}
 }

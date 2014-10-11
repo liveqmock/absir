@@ -194,8 +194,14 @@ public abstract class SecurityService implements ISecurityService, ISecurity, IG
 			}
 		}
 
-		if (securityContext == null || securityContext.getUser() == null || securityContext.getUser().isDisabled()) {
+		if (securityContext == null) {
 			return null;
+
+		} else {
+			JiUserBase user = securityContext.getUser();
+			if (user == null || user.isDisabled() || user.getUserRoleLevel() < roleLevel) {
+				return null;
+			}
 		}
 
 		return securityContext;

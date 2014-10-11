@@ -17,31 +17,12 @@ import com.absir.core.kernel.KernelLang.FilterTemplate;
  * @author absir
  * 
  */
-public interface BeanFactory {
+public interface BeanFactory extends BeanSupply {
 
 	/**
 	 * @return
 	 */
 	public BeanConfig getBeanConfig();
-
-	/**
-	 * @param beanName
-	 * @return
-	 */
-	public Object getBeanObject(String beanName);
-
-	/**
-	 * @param beanType
-	 * @return
-	 */
-	public <T> T getBeanObject(Class<T> beanType);
-
-	/**
-	 * @param beanName
-	 * @param beanType
-	 * @return
-	 */
-	public <T> T getBeanObject(String beanName, Class<T> beanType);
 
 	/**
 	 * @param beanName
@@ -58,12 +39,6 @@ public interface BeanFactory {
 	 * @return
 	 */
 	public Object getBeanObject(String beanName, Type beanType, boolean forcible);
-
-	/**
-	 * @param beanType
-	 * @return
-	 */
-	public <T> List<T> getBeanObjects(Class<T> beanType);
 
 	/**
 	 * @param beanName

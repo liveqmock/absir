@@ -24,6 +24,7 @@ import com.absir.bean.basis.BeanConfig;
 import com.absir.bean.basis.BeanDefine;
 import com.absir.bean.basis.BeanFactory;
 import com.absir.bean.basis.BeanScope;
+import com.absir.bean.basis.BeanSupply;
 import com.absir.bean.config.IBeanDefineAware;
 import com.absir.bean.config.IBeanObjectProcessor;
 import com.absir.bean.config.IBeanSoftReferenceAware;
@@ -55,6 +56,9 @@ public final class BeanFactoryImpl implements BeanFactory {
 
 	/** beanFactoryImpl */
 	private BeanFactoryImpl beanFactoryImpl;
+
+	/** beanSupplies */
+	private List<BeanSupply> beanSupplies;
 
 	/** beanConfig */
 	private final BeanConfig beanConfig;
@@ -95,6 +99,34 @@ public final class BeanFactoryImpl implements BeanFactory {
 		this.beanSoftReferenceAwares = beanSoftReferenceAwares;
 	}
 
+	/**
+	 * @param beanFactoryImpl
+	 *            the beanFactoryImpl to set
+	 */
+	public void setBeanFactoryImpl(BeanFactoryImpl beanFactoryImpl) {
+		BeanFactoryImpl self = this;
+		while (true) {
+			BeanFactoryImpl parent = self.beanFactoryImpl;
+			if (parent == null) {
+				self.beanFactoryImpl = beanFactoryImpl;
+				break;
+			}
+
+			self = parent;
+		}
+	}
+
+	/**
+	 * @param beanSupply
+	 */
+	public void addBeanSupply(BeanSupply beanSupply) {
+		if (beanSupplies == null) {
+			beanSupplies = new ArrayList<BeanSupply>();
+		}
+
+		beanSupplies.add(beanSupply);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -125,7 +157,16 @@ public final class BeanFactoryImpl implements BeanFactory {
 			}
 		}
 
-		return null;
+		if (beanSupplies != null) {
+			for (BeanSupply beanSupply : beanSupplies) {
+				Object beanObject = beanSupply.getBeanObject(beanName);
+				if (beanObject != null) {
+					return beanObject;
+				}
+			}
+		}
+
+		return beanFactoryImpl == null ? null : beanFactoryImpl.getBeanObject(beanName);
 	}
 
 	/*
@@ -146,6 +187,15 @@ public final class BeanFactoryImpl implements BeanFactory {
 
 				} else {
 					return (T) beanObject;
+				}
+			}
+		}
+
+		if (beanSupplies != null) {
+			for (BeanSupply beanSupply : beanSupplies) {
+				T beanObject = beanSupply.getBeanObject(beanType);
+				if (beanObject != null) {
+					return beanObject;
 				}
 			}
 		}
@@ -227,6 +277,17 @@ public final class BeanFactoryImpl implements BeanFactory {
 
 						max = similar;
 						beanObject = object;
+					}
+				}
+			}
+		}
+
+		if (beanObject == null) {
+			if (beanSupplies != null) {
+				for (BeanSupply beanSupply : beanSupplies) {
+					beanObject = beanSupply.getBeanObject(beanName, beanType);
+					if (beanObject != null) {
+						return beanObject;
 					}
 				}
 			}
@@ -335,6 +396,15 @@ public final class BeanFactoryImpl implements BeanFactory {
 
 		if (Orderable.class.isAssignableFrom(beanType)) {
 			KernelList.sortOrderable((List<Orderable>) beanObjects);
+		}
+
+		if (beanSupplies != null) {
+			for (BeanSupply beanSupply : beanSupplies) {
+				List<T> beans = beanSupply.getBeanObjects(beanType);
+				if (beans != null) {
+					beanObjects.addAll(beans);
+				}
+			}
 		}
 
 		return beanObjects;

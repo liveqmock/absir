@@ -52,6 +52,7 @@
 		<module>absir-template</module>
 		<module>absir-qq</module>
 		<module>absir-email</module>
+		<module>absir-spring</module>
 	</modules>
 	<dependencies>
 		<dependency>

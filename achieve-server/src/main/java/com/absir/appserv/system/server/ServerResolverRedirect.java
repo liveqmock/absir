@@ -45,6 +45,20 @@ public class ServerResolverRedirect implements ReturnedResolver<Boolean> {
 	 * (non-Javadoc)
 	 * 
 	 * @see
+	 * com.absir.server.route.returned.ReturnedResolver#getReturned(java.lang
+	 * .Class)
+	 */
+	@Override
+	public Boolean getReturned(Class<?> beanClass) {
+		// TODO Auto-generated method stub
+		Redirect redirect = beanClass.getAnnotation(Redirect.class);
+		return redirect == null ? null : redirect.forward();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
 	 * com.absir.server.route.returned.ReturnedResolver#resolveReturnedValue
 	 * (java.lang.Object, java.lang.Object, com.absir.server.on.OnPut)
 	 */

@@ -30,8 +30,7 @@ import com.absir.server.on.OnPut;
 import com.absir.server.route.RouteMethod;
 import com.absir.server.route.parameter.ParameterResolver;
 import com.absir.server.route.parameter.ParameterResolverMethod;
-import com.absir.server.route.returned.ReturnedResolver;
-import com.absir.server.value.Body;
+import com.absir.server.route.returned.ReturnedResolverBody;
 
 /**
  * @author absir
@@ -39,7 +38,7 @@ import com.absir.server.value.Body;
  */
 @Base
 @Bean
-public class ServerResolverBodys implements ParameterResolver<Object>, ParameterResolverMethod, ReturnedResolver<Class<?>>, IServerResolverBody {
+public class ServerResolverBodys extends ReturnedResolverBody implements ParameterResolver<Object>, ParameterResolverMethod, IServerResolverBody {
 
 	/** ME */
 	public static final ServerResolverBodys ME = BeanFactoryUtils.get(ServerResolverBodys.class);
@@ -66,9 +65,10 @@ public class ServerResolverBodys implements ParameterResolver<Object>, Parameter
 	 * java.lang.annotation.Annotation[][], java.lang.reflect.Method)
 	 */
 	@Override
-	public Class<?> getBodyParameter(int i, String[] parameterNames, Class<?>[] parameterTypes, Annotation[][] annotations, Method method) {
+	public Integer getBodyParameter(int i, String[] parameterNames, Class<?>[] parameterTypes, Annotation[][] annotations, Method method) {
 		// TODO Auto-generated method stub
-		return KernelArray.getAssignable(annotations[i], Bodys.class) == null ? null : Body.class;
+		Bodys bodys = KernelArray.getAssignable(annotations[i], Bodys.class);
+		return bodys == null ? null : bodys.value();
 	}
 
 	/*
@@ -90,11 +90,11 @@ public class ServerResolverBodys implements ParameterResolver<Object>, Parameter
 	 * 
 	 * @see
 	 * com.absir.appserv.system.server.IServerResolverBody#getBodyParameterValue
-	 * (com.absir.server.on.OnPut, java.lang.Object, java.lang.Class,
-	 * java.lang.String, com.absir.server.route.RouteMethod)
+	 * (com.absir.server.on.OnPut, int, java.lang.Class, java.lang.String,
+	 * com.absir.server.route.RouteMethod)
 	 */
 	@Override
-	public Object getBodyParameterValue(OnPut onPut, Object parameter, Class<?> parameterType, String beanName, RouteMethod routeMethod) throws Exception {
+	public Object getBodyParameterValue(OnPut onPut, int group, Class<?> parameterType, String beanName, RouteMethod routeMethod) throws Exception {
 		// TODO Auto-generated method stub
 		Input input = onPut.getInput();
 		InputStream inputStream = input.getInputStream();
@@ -145,9 +145,24 @@ public class ServerResolverBodys implements ParameterResolver<Object>, Parameter
 	 * .reflect.Method)
 	 */
 	@Override
-	public Class<?> getReturned(Method method) {
+	public Integer getReturned(Method method) {
 		// TODO Auto-generated method stub
-		return method.getAnnotation(Bodys.class) == null ? null : Body.class;
+		Bodys bodys = method.getAnnotation(Bodys.class);
+		return bodys == null ? null : bodys.value();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.server.route.returned.ReturnedResolver#getReturned(java.lang
+	 * .Class)
+	 */
+	@Override
+	public Integer getReturned(Class<?> beanClass) {
+		// TODO Auto-generated method stub
+		Bodys bodys = beanClass.getAnnotation(Bodys.class);
+		return bodys == null ? null : bodys.value();
 	}
 
 	/*
@@ -158,7 +173,7 @@ public class ServerResolverBodys implements ParameterResolver<Object>, Parameter
 	 * (java.lang.Object, java.lang.Object, com.absir.server.on.OnPut)
 	 */
 	@Override
-	public void resolveReturnedValue(Object returnValue, Class<?> returned, OnPut onPut) throws Exception {
+	public void resolveReturnedValue(Object returnValue, Integer returned, OnPut onPut) throws Exception {
 		// TODO Auto-generated method stub
 		if (onPut.getInput().isDebug()) {
 			ServerResolverBody.ME.resolveReturnedValue(returnValue, returned, onPut);
@@ -174,7 +189,7 @@ public class ServerResolverBodys implements ParameterResolver<Object>, Parameter
 	 * @param onPut
 	 * @throws Exception
 	 */
-	public void sResolveReturnedValue(Object returnValue, Class<?> returned, OnPut onPut) throws Exception {
+	public void sResolveReturnedValue(Object returnValue, Integer returned, OnPut onPut) throws Exception {
 		if (returnValue != null) {
 			ServerResolverBody serverResolverBody = ServerResolverBody.ME;
 			Input input = onPut.getInput();

@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
  * @author absir
  * 
  */
-@Target({ ElementType.METHOD })
+@Target({ ElementType.TYPE, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface View {
 

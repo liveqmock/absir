@@ -23,8 +23,6 @@ import com.absir.server.exception.ServerStatus;
 import com.absir.server.in.InMethod;
 import com.absir.server.in.InModel;
 import com.absir.server.in.Input;
-import com.absir.server.on.OnPut;
-import com.absir.server.route.returned.ReturnedResolver;
 import com.absir.server.socket.resolver.SocketChannelResolver;
 
 /**
@@ -314,18 +312,6 @@ public class InputSocket extends Input {
 	public void write(byte[] b, int off, int len) throws IOException {
 		// TODO Auto-generated method stub
 		writeByteBufferSuccess(socketChannel, status == ServerStatus.ON_SUCCESS.getCode() ? true : false, callbackIndex, b);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.absir.server.in.Input#getReturnedResolver(com.absir.server.on.OnPut)
-	 */
-	@Override
-	public ReturnedResolver<Object> getReturnedResolver(OnPut onPut) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/**

@@ -23,7 +23,7 @@ import com.absir.server.value.Body;
  */
 @Base(order = -128)
 @Bean
-public class ReturnedResolverBody implements ReturnedResolver<Class<?>> {
+public class ReturnedResolverBody implements ReturnedResolver<Integer> {
 
 	/** charset */
 	protected String charset = ContextUtils.getCharset().displayName();
@@ -54,9 +54,24 @@ public class ReturnedResolverBody implements ReturnedResolver<Class<?>> {
 	 * .reflect.Method)
 	 */
 	@Override
-	public Class<?> getReturned(Method method) {
+	public Integer getReturned(Method method) {
 		// TODO Auto-generated method stub
-		return method.getAnnotation(Body.class) == null ? null : Body.class;
+		Body body = method.getAnnotation(Body.class);
+		return body == null ? null : body.value();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.server.route.returned.ReturnedResolver#getReturned(java.lang
+	 * .Class)
+	 */
+	@Override
+	public Integer getReturned(Class<?> beanClass) {
+		// TODO Auto-generated method stub
+		Body body = beanClass.getAnnotation(Body.class);
+		return body == null ? null : body.value();
 	}
 
 	/*
@@ -67,7 +82,7 @@ public class ReturnedResolverBody implements ReturnedResolver<Class<?>> {
 	 * (java.lang.Object, java.lang.Object, com.absir.server.on.OnPut)
 	 */
 	@Override
-	public void resolveReturnedValue(Object returnValue, Class<?> returned, OnPut onPut) throws Exception {
+	public void resolveReturnedValue(Object returnValue, Integer returned, OnPut onPut) throws Exception {
 		// TODO Auto-generated method stub
 		if (returnValue != null) {
 			Input input = onPut.getInput();

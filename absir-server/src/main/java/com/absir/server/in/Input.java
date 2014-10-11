@@ -29,6 +29,7 @@ import com.absir.server.route.RouteAction;
 import com.absir.server.route.RouteEntry;
 import com.absir.server.route.RouteMatcher;
 import com.absir.server.route.returned.ReturnedResolver;
+import com.absir.server.route.returned.ReturnedResolverView;
 
 /**
  * @author absir
@@ -263,7 +264,7 @@ public abstract class Input extends Bean<Serializable> implements IAttributes {
 	 * @return
 	 */
 	public abstract boolean paramDebug();
-	
+
 	/**
 	 * @return
 	 */
@@ -347,5 +348,7 @@ public abstract class Input extends Bean<Serializable> implements IAttributes {
 	 * @param returnValue
 	 * @return
 	 */
-	public abstract ReturnedResolver<Object> getReturnedResolver(OnPut onPut);
+	public ReturnedResolver<?> getReturnedResolver(OnPut onPut) {
+		return ReturnedResolverView.ME;
+	}
 }

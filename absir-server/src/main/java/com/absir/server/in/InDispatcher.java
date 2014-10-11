@@ -24,7 +24,7 @@ import com.absir.server.route.returned.ReturnedResolver;
  * @author absir
  * 
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({ "rawtypes", "unchecked" })
 @Configure
 public abstract class InDispatcher<T, R> implements IDispatcher<T> {
 
@@ -142,9 +142,8 @@ public abstract class InDispatcher<T, R> implements IDispatcher<T> {
 	@Override
 	public void resolveReturnedValue(Object routeBean, OnPut onPut) throws Throwable {
 		// TODO Auto-generated method stub
-		ReturnedResolver<Object> returnedResolver = onPut.getReturnedResolver();
+		ReturnedResolver returnedResolver = onPut.getReturnedResolver();
 		if (returnedResolver == null) {
-			// onPut.setReturned(null);
 			returnedResolver = onPut.getInput().getReturnedResolver(onPut);
 			if (returnedResolver == null) {
 				return;

@@ -174,9 +174,8 @@ public class RouteFactory implements IBeanDefineSupply, IBeanFactoryAware, IMeth
 		}
 
 		if (methodMapRouteMethod.get(beanMethod) == null) {
-			RouteMethod routeMethod = getRouteMethod(beanMethod, method);
+			RouteMethod routeMethod = getRouteMethod(beanType, beanMethod, method);
 			methodMapRouteMethod.put(beanMethod, routeMethod);
-
 			if (define instanceof Before) {
 				routeEntry.addBeforeMethod(routeMethod);
 
@@ -219,13 +218,17 @@ public class RouteFactory implements IBeanDefineSupply, IBeanFactoryAware, IMeth
 	}
 
 	/**
+	 * @param beanType
+	 * @param beanMethod
+	 * @param method
 	 * @return
 	 */
-	protected RouteMethod getRouteMethod(Method beanMethod, Method method) {
-		return getRouteMethod(beanMethod, method, null, null, null);
+	protected RouteMethod getRouteMethod(Class<?> beanType, Method beanMethod, Method method) {
+		return getRouteMethod(beanType, beanMethod, method, null, null, null);
 	}
 
 	/**
+	 * @param beanType
 	 * @param beanMethod
 	 * @param method
 	 * @param parameterPathNames
@@ -233,7 +236,8 @@ public class RouteFactory implements IBeanDefineSupply, IBeanFactoryAware, IMeth
 	 * @param parameterPathAnnotations
 	 * @return
 	 */
-	protected RouteMethod getRouteMethod(Method beanMethod, Method method, List<String> parameterPathNames, List<Integer> parameterPathIndexs, List<Annotation[]> parameterPathAnnotations) {
+	protected RouteMethod getRouteMethod(Class<?> beanType, Method beanMethod, Method method, List<String> parameterPathNames, List<Integer> parameterPathIndexs,
+			List<Annotation[]> parameterPathAnnotations) {
 		RouteMethod routeMethod = new RouteMethod(beanMethod);
 		Annotation[][] parameterAnnotations = beanMethod.getParameterAnnotations();
 		int length = parameterAnnotations.length;
@@ -281,7 +285,6 @@ public class RouteFactory implements IBeanDefineSupply, IBeanFactoryAware, IMeth
 
 		if (returnedResolvers != null) {
 			while (beanMethod != null) {
-
 				for (ReturnedResolver returnedResolver : returnedResolvers) {
 					routeMethod.returned = returnedResolver.getReturned(beanMethod);
 					if (routeMethod.returned != null) {
@@ -291,6 +294,18 @@ public class RouteFactory implements IBeanDefineSupply, IBeanFactoryAware, IMeth
 				}
 
 				beanMethod = beanMethod == method ? null : method;
+			}
+
+			while (beanType != null && beanType != Object.class) {
+				for (ReturnedResolver returnedResolver : returnedResolvers) {
+					routeMethod.returned = returnedResolver.getReturned(beanType);
+					if (routeMethod.returned != null) {
+						routeMethod.returnedResolver = returnedResolver;
+						return routeMethod;
+					}
+				}
+
+				beanType = beanType.getSuperclass();
 			}
 		}
 
@@ -377,7 +392,7 @@ public class RouteFactory implements IBeanDefineSupply, IBeanFactoryAware, IMeth
 						List<String> parameterPathNames = new ArrayList<String>();
 						List<Integer> parameterPathIndexs = new ArrayList<Integer>();
 						List<Annotation[]> parameterPathAnnotations = new ArrayList<Annotation[]>();
-						RouteMethod routeMethod = getRouteMethod(method, null, parameterPathNames, parameterPathIndexs, parameterPathAnnotations);
+						RouteMethod routeMethod = getRouteMethod(beanType, method, null, parameterPathNames, parameterPathIndexs, parameterPathAnnotations);
 						List<String> mappings = new ArrayList<String>();
 						List<InMethod> inMethods = new ArrayList<InMethod>();
 						iRoute.routeMapping(name, new ObjectEntry<Mapping, List<String>>(mapping, null), method, parameterPathNames, mappings, inMethods);

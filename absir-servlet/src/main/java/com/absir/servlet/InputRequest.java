@@ -35,8 +35,6 @@ import com.absir.core.kernel.KernelLang;
 import com.absir.server.in.InMethod;
 import com.absir.server.in.InModel;
 import com.absir.server.in.Input;
-import com.absir.server.on.OnPut;
-import com.absir.server.route.returned.ReturnedResolver;
 
 /**
  * @author absir
@@ -367,18 +365,6 @@ public class InputRequest extends Input {
 	public void write(byte[] b, int off, int len) throws IOException {
 		// TODO Auto-generated method stub
 		getOutputStream().write(b, off, len);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.absir.server.in.Input#getReturnedResolver(com.absir.server.on.OnPut)
-	 */
-	@Override
-	public ReturnedResolver<Object> getReturnedResolver(OnPut onPut) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/**

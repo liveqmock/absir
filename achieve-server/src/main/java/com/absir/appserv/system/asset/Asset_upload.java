@@ -11,6 +11,7 @@ import com.absir.appserv.feature.menu.value.MaPermission;
 import com.absir.appserv.system.crud.RichCrudFactory;
 import com.absir.bean.basis.Base;
 import com.absir.server.value.Server;
+import com.absir.servlet.InputRequest;
 
 /**
  * @author absir
@@ -20,9 +21,11 @@ import com.absir.server.value.Server;
 @Server
 public class Asset_upload extends AssetServer {
 
+	/**
+	 * @param inputRequest
+	 */
 	@MaPermission(RichCrudFactory.UPLOAD)
-	public void upload() {
+	public void upload(InputRequest inputRequest) {
 
 	}
-
 }

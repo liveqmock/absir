@@ -24,6 +24,12 @@ public interface ReturnedResolver<T> {
 	public T getReturned(Method method);
 
 	/**
+	 * @param beanClass
+	 * @return
+	 */
+	public T getReturned(Class<?> beanClass);
+
+	/**
 	 * @param returnValue
 	 * @param returned
 	 * @param onPut

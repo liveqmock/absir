@@ -28,17 +28,17 @@ public interface IServerResolverBody {
 	 * @param method
 	 * @return
 	 */
-	public Class<?> getBodyParameter(int i, String[] parameterNames, Class<?>[] parameterTypes, Annotation[][] annotations, Method method);
+	public Integer getBodyParameter(int i, String[] parameterNames, Class<?>[] parameterTypes, Annotation[][] annotations, Method method);
 
 	/**
 	 * @param onPut
-	 * @param parameter
+	 * @param group
 	 * @param parameterType
 	 * @param beanName
 	 * @param routeMethod
 	 * @return
 	 * @throws Exception
 	 */
-	public Object getBodyParameterValue(OnPut onPut, Object parameter, Class<?> parameterType, String beanName, RouteMethod routeMethod) throws Exception;
+	public Object getBodyParameterValue(OnPut onPut, int group, Class<?> parameterType, String beanName, RouteMethod routeMethod) throws Exception;
 
 }

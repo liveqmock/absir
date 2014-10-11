@@ -48,6 +48,23 @@ public class ReturnedResolverView implements ReturnedResolver<String> {
 	 * (non-Javadoc)
 	 * 
 	 * @see
+	 * com.absir.server.route.returned.ReturnedResolver#getReturned(java.lang
+	 * .Class)
+	 */
+	@Override
+	public String getReturned(Class<?> beanClass) {
+		// TODO Auto-generated method stub
+		View view = beanClass.getAnnotation(View.class);
+		return view == null ? null : view.value();
+	}
+
+	/** ROOT_REGX */
+	public static final String ROOT_REGX = "^([/\\\\]*)[^/\\\\]*([/\\\\]+)";
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
 	 * com.absir.server.route.returned.ReturnedResolver#resolveReturnedValue
 	 * (java.lang.Object, java.lang.Object, com.absir.server.on.OnPut)
 	 */
@@ -56,23 +73,26 @@ public class ReturnedResolverView implements ReturnedResolver<String> {
 		// TODO Auto-generated method stub
 		if (returnValue != null) {
 			if (returnValue instanceof String) {
-				returned = (String) returnValue;
-
-			} else {
-				onPut.getInput().write(returnValue.toString());
-				return;
+				resolveReturnedView((String) returnValue, onPut);
 			}
 		}
 
-		if (KernelString.isEmpty(returned)) {
-			Input input = onPut.getInput();
-			RouteAction routeAction = input.getRouteAction();
-			if (routeAction == null) {
+		Input input = onPut.getInput();
+		RouteAction routeAction = input.getRouteAction();
+		if (routeAction == null) {
+			if (KernelString.isEmpty(returned)) {
 				return;
 			}
 
+		} else {
 			if (routeAction.getRouteView() == null) {
-				routeAction.setRouteView(HelperFileName.normalizeNoEndSeparator(new String(input.getRouteMatcher().getMapping())));
+				String routeView = HelperFileName.normalizeNoEndSeparator(new String(input.getRouteMatcher().getMapping()));
+				if (!KernelString.isEmpty(returned)) {
+					// 替换根目录
+					routeView.replaceFirst(ROOT_REGX, "$1" + routeView + "$2");
+				}
+
+				routeAction.setRouteView(routeView);
 			}
 
 			returned = routeAction.getRouteView();

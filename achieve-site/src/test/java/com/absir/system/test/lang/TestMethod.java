@@ -169,5 +169,10 @@ public class TestMethod extends AbstractTest {
 		System.out.println(HelperRandom.randSecendId(31));
 		System.out.println(HelperRandom.randSecendId(32));
 		System.out.println(HelperRandom.randSecendId(33));
+		//[^/\\]*([/\\]*)
+		String regx = "^([/\\\\]*)[^/\\\\]*([/\\\\]+)";
+		System.out.println("\\/ddd/a/sdsd".replaceFirst(regx, "$1admin$2"));
+		System.out.println("ddd/a/sdsd".replaceFirst(regx, "$1admin$2"));
+		System.out.println("/ddd\\a/sdsd".replaceFirst(regx, "$1admin$2"));
 	}
 }

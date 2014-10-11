@@ -75,7 +75,7 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 	@Override
 	public Object getParameter(int i, String[] parameterNames, Class<?>[] parameterTypes, Annotation[][] annotations, Method method) {
 		// TODO Auto-generated method stub
-		return getParameter(this, i, parameterNames, parameterTypes, annotations, method);
+		return getParameter(this, i, parameterNames, parameterTypes, annotations, method, true);
 	}
 
 	/**
@@ -88,9 +88,24 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 	 * @return
 	 */
 	public Object getParameter(IServerResolverBody body, int i, String[] parameterNames, Class<?>[] parameterTypes, Annotation[][] annotations, Method method) {
-		if (body.getBodyParameter(i, parameterNames, parameterTypes, annotations, method) != null) {
+		return getParameter(body, i, parameterNames, parameterTypes, annotations, method, false);
+	}
+
+	/**
+	 * @param body
+	 * @param i
+	 * @param parameterNames
+	 * @param parameterTypes
+	 * @param annotations
+	 * @param method
+	 * @param defaultBody
+	 * @return
+	 */
+	protected Object getParameter(IServerResolverBody body, int i, String[] parameterNames, Class<?>[] parameterTypes, Annotation[][] annotations, Method method, boolean defaultBody) {
+		Integer value = body.getBodyParameter(i, parameterNames, parameterTypes, annotations, method);
+		if (defaultBody || value != null) {
 			Result binderResult = KernelArray.getAssignable(annotations[i], Result.class);
-			return binderResult == null ? Boolean.TRUE : binderResult;
+			return binderResult == null ? value : binderResult;
 		}
 
 		return null;
@@ -105,9 +120,10 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 	 * java.lang.annotation.Annotation[][], java.lang.reflect.Method)
 	 */
 	@Override
-	public Class<?> getBodyParameter(int i, String[] parameterNames, Class<?>[] parameterTypes, Annotation[][] annotations, Method method) {
+	public Integer getBodyParameter(int i, String[] parameterNames, Class<?>[] parameterTypes, Annotation[][] annotations, Method method) {
 		// TODO Auto-generated method stub
-		return KernelArray.getAssignable(annotations[i], Body.class) == null ? null : Body.class;
+		Body body = KernelArray.getAssignable(annotations[i], Body.class);
+		return body == null ? null : body.value();
 	}
 
 	/** BODY_OBJECT_NAME */
@@ -139,13 +155,10 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 	 */
 	public Object getParameterValue(IServerResolverBody body, OnPut onPut, Object parameter, Class<?> parameterType, String beanName, RouteMethod routeMethod) throws Exception {
 		// TODO Auto-generated method stub
-		if (parameter == Boolean.TRUE) {
-			return body.getBodyParameterValue(onPut, parameter, parameterType, beanName, routeMethod);
-
-		} else {
+		if (parameter.getClass() == Result.class) {
 			Object bodyObject = onPut.getInput().getAttribute(BODY_OBJECT_NAME);
 			if (bodyObject == null) {
-				bodyObject = body.getBodyParameterValue(onPut, parameter, Object.class, null, routeMethod);
+				bodyObject = body.getBodyParameterValue(onPut, 0, Object.class, null, routeMethod);
 				onPut.getInput().setAttribute(BODY_OBJECT_NAME, bodyObject);
 			}
 
@@ -155,6 +168,9 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 			binderData.getBinderResult().setValidation(result.validation());
 			String name = result.name();
 			return binderData.bind(KernelString.isEmpty(name) || !(bodyObject instanceof Map) ? bodyObject : ((Map<?, ?>) bodyObject).get(name), beanName, parameterType);
+
+		} else {
+			return body.getBodyParameterValue(onPut, (Integer) parameter, parameterType, beanName, routeMethod);
 		}
 	}
 
@@ -163,11 +179,11 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 	 * 
 	 * @see
 	 * com.absir.appserv.system.server.IServerResolverBody#getBodyParameterValue
-	 * (com.absir.server.on.OnPut, java.lang.Object, java.lang.Class,
-	 * java.lang.String, com.absir.server.route.RouteMethod)
+	 * (com.absir.server.on.OnPut, int, java.lang.Class, java.lang.String,
+	 * com.absir.server.route.RouteMethod)
 	 */
 	@Override
-	public Object getBodyParameterValue(OnPut onPut, Object parameter, Class<?> parameterType, String beanName, RouteMethod routeMethod) throws Exception {
+	public Object getBodyParameterValue(OnPut onPut, int group, Class<?> parameterType, String beanName, RouteMethod routeMethod) throws Exception {
 		// TODO Auto-generated method stub
 		Input input = onPut.getInput();
 		if (parameterType == String.class) {
@@ -207,7 +223,7 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 	 * (java.lang.Object, java.lang.Object, com.absir.server.on.OnPut)
 	 */
 	@Override
-	public void resolveReturnedValue(Object returnValue, Class<?> returned, OnPut onPut) throws Exception {
+	public void resolveReturnedValue(Object returnValue, Integer returned, OnPut onPut) throws Exception {
 		// TODO Auto-generated method stub
 		if (returnValue != null) {
 			Input input = onPut.getInput();

@@ -38,6 +38,25 @@ public abstract class CrudServiceUtils {
 
 	/**
 	 * @param entityName
+	 * @param entity
+	 * @param create
+	 * @return
+	 */
+	public static Object identifier(String entityName, Object entity, boolean create) {
+		ICrudSupply crudSupply = CrudService.ME.getCrudSupply(entityName);
+		if (crudSupply != null) {
+			Object identifier = create ? null : crudSupply.getIdentifier(entityName, entity);
+			if (identifier == null) {
+				crudSupply.mergeEntity(entityName, entity, create);
+				return crudSupply.getIdentifier(entityName, entity);
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * @param entityName
 	 * @param id
 	 * @param jdbcCondition
 	 * @return

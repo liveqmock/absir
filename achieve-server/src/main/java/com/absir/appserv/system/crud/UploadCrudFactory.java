@@ -10,7 +10,6 @@ package com.absir.appserv.system.crud;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DateFormat;
@@ -49,7 +48,6 @@ import com.absir.bean.inject.value.Orders;
 import com.absir.bean.inject.value.Started;
 import com.absir.bean.inject.value.Value;
 import com.absir.context.core.ContextUtils;
-import com.absir.core.base.IBase;
 import com.absir.core.helper.HelperFile;
 import com.absir.core.helper.HelperFileName;
 import com.absir.core.kernel.KernelArray;
@@ -391,7 +389,7 @@ public class UploadCrudFactory implements ICrudFactory, ICrudProcessorInput<File
 		if (requestBody == null) {
 			if (handler.getCrudRecord() != null) {
 				String uploadFile = (String) crudProperty.get(entity);
-				if (KernelString.isEmpty(uploadFile)) {
+				if (!KernelString.isEmpty(uploadFile)) {
 					handler.getCrudRecord().put(RECORD + uploadFile, Boolean.TRUE);
 				}
 			}
@@ -432,16 +430,8 @@ public class UploadCrudFactory implements ICrudFactory, ICrudProcessorInput<File
 
 					} else {
 						String identity = "";
-						if (multipartUploader.ided && entity instanceof IBase) {
-							Serializable id = ((IBase<?>) entity).getId();
-							if (id == null) {
-								JoEntity joEntity = handler.getCrudEntity().getJoEntity();
-								if (joEntity != null && joEntity.getEntityName() != null) {
-									CrudServiceUtils.merge(joEntity.getEntityName(), handler.getCrudRecord(), handler.getRoot(), handler.getCrud() == Crud.CREATE, user, null);
-								}
-							}
-
-							id = ((IBase<?>) entity).getId();
+						if (multipartUploader.ided) {
+							Object id = CrudServiceUtils.identifier(handler.getCrudEntity().getJoEntity().getEntityName(), entity, handler.isCreate());
 							if (id != null) {
 								identity = DynaBinderUtils.getParamFromValue(id);
 							}
@@ -506,6 +496,6 @@ public class UploadCrudFactory implements ICrudFactory, ICrudProcessorInput<File
 	@Override
 	public ICrudProcessor getProcessor(JoEntity joEntity, JCrudField crudField) {
 		// TODO Auto-generated method stub
-		return this;
+		return ME;
 	}
 }

@@ -12,6 +12,7 @@ import java.util.Collection;
 
 import org.hibernate.proxy.HibernateProxy;
 
+import com.absir.appserv.crud.ICrudSupply;
 import com.absir.core.base.IBase;
 
 /**
@@ -61,6 +62,21 @@ public class HelperBase {
 		int i = 0;
 		for (IBase base : bases) {
 			ids[i++] = base.getId();
+		}
+
+		return ids;
+	}
+
+	/**
+	 * @param bases
+	 * @param crudSupply
+	 * @return
+	 */
+	public static Object[] getBaseIds(String entityName, Collection<?> bases, ICrudSupply crudSupply) {
+		Object[] ids = new Serializable[bases.size()];
+		int i = 0;
+		for (Object base : bases) {
+			ids[i++] = crudSupply.getIdentifier(entityName, base);
 		}
 
 		return ids;

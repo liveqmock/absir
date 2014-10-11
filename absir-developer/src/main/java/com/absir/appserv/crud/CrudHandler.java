@@ -50,6 +50,9 @@ public abstract class CrudHandler {
 	/** entity */
 	protected Object entity;
 
+	/** created */
+	protected boolean created;
+
 	/**
 	 * @param crud
 	 * @param filter
@@ -144,6 +147,18 @@ public abstract class CrudHandler {
 		entity = KernelObject.expressGetter(getRootEntity(), propertyPath);
 		entityMap.put(propertyPath, entity);
 		return entity;
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean isCreate() {
+		if (created) {
+			return false;
+		}
+
+		created = true;
+		return crud == Crud.CREATE;
 	}
 
 	/**

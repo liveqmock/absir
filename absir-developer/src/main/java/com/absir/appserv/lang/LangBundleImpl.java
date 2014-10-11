@@ -39,6 +39,7 @@ import com.absir.appserv.system.crud.BeanCrudFactory;
 import com.absir.appserv.system.helper.HelperBase;
 import com.absir.appserv.system.service.BeanService;
 import com.absir.appserv.system.service.CrudService;
+import com.absir.appserv.system.service.utils.CrudServiceUtils;
 import com.absir.bean.basis.Base;
 import com.absir.bean.core.BeanConfigImpl;
 import com.absir.bean.core.BeanFactoryUtils;
@@ -420,23 +421,27 @@ public class LangBundleImpl extends LangBundle {
 		 * @param parent
 		 * @param entity
 		 * @param nameId
+		 * @param crudHandler
 		 */
-		public void setNameId(LangIterceptor parent, Object entity, String[] nameId) {
+		public void setNameId(LangIterceptor parent, Object entity, String[] nameId, CrudHandler crudHandler) {
 			this.parent = parent;
 			if (id == null) {
 				this.nameId = nameId;
-				initId(entity);
+				initId(entity, crudHandler);
 			}
 		}
 
 		/**
-		 * 
+		 * @param entity
+		 * @param crudHandler
 		 */
-		public void initId(Object entity) {
+		public void initId(Object entity, CrudHandler crudHandler) {
 			if (id == null) {
 				if (nameId == null) {
-					id = DynaBinderUtils.to(((IBase) entity).getId(), String.class);
-					if (id != null) {
+					Object oid = crudHandler == null ? ((IBase) entity).getId() : CrudServiceUtils
+							.identifier(crudHandler.getCrudEntity().getJoEntity().getEntityName(), entity, crudHandler.isCreate());
+					if (oid != null) {
+						id = DynaBinderUtils.to(oid, String.class);
 						relateId = id;
 					}
 
@@ -656,7 +661,7 @@ public class LangBundleImpl extends LangBundle {
 					}
 				}
 
-				initId(entity);
+				initId(entity, handler);
 				if (id == null) {
 					return;
 				}
@@ -1162,6 +1167,26 @@ public class LangBundleImpl extends LangBundle {
 
 	/**
 	 * @param entityName
+	 * @param entities
+	 * @param crudSupply
+	 * @return
+	 */
+	public <T> List<T> getLangProxy(final String entityName, final List<T> entities, ICrudSupply crudSupply) {
+		if (isI18n() && !entities.isEmpty()) {
+			Object entity = entities.get(0);
+			if (entity instanceof IBase) {
+				return (List<T>) getLangProxy(entityName, new JoEntity(entityName, entity.getClass()), entities, HelperBase.getBaseIds((Collection<? extends IBase>) entities));
+
+			} else {
+				return (List<T>) getLangProxy(entityName, new JoEntity(entityName, entity.getClass()), entities, HelperBase.getBaseIds(entityName, entities, crudSupply));
+			}
+		}
+
+		return entities;
+	}
+
+	/**
+	 * @param entityName
 	 * @param entity
 	 * @return
 	 */
@@ -1225,7 +1250,7 @@ public class LangBundleImpl extends LangBundle {
 	protected <T> T getLangProxy(LangIterceptor parent, JoEntity joEntity, T entity, String[] nameId, Map<Method, LangEntry> langInterceptors, List<String> finds, List<LangIterceptor> iterceptors) {
 		AopProxy proxy = AopProxyUtils.getProxy(entity, langInterfaces, false, true);
 		LangIterceptor langIterceptor = getLangIterceptor(joEntity.getEntityName() == null ? parent.entityName : joEntity.getEntityName(), null, langInterceptors);
-		langIterceptor.setNameId(parent, entity, nameId);
+		langIterceptor.setNameId(parent, entity, nameId, null);
 		String id = langIterceptor.id;
 		if (id != null) {
 			Map<String, Map<String, Object>> nameMapValue = findLangNameMapValue(langIterceptor.entityName, id);

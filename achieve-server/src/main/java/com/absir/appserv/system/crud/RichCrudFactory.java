@@ -8,6 +8,7 @@
 package com.absir.appserv.system.crud;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -22,6 +23,7 @@ import com.absir.appserv.crud.ICrudProcessor;
 import com.absir.appserv.crud.ICrudProcessorInput;
 import com.absir.appserv.dyna.DynaBinderUtils;
 import com.absir.appserv.support.developer.JCrudField;
+import com.absir.appserv.system.bean.JEmbedSL;
 import com.absir.appserv.system.bean.JUpload;
 import com.absir.appserv.system.bean.JUploadCite;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
@@ -30,10 +32,13 @@ import com.absir.appserv.system.dao.BeanDao;
 import com.absir.appserv.system.dao.utils.QueryDaoUtils;
 import com.absir.appserv.system.helper.HelperString;
 import com.absir.appserv.system.service.CrudService;
+import com.absir.appserv.system.service.utils.CrudServiceUtils;
 import com.absir.bean.basis.Base;
+import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
 import com.absir.context.core.ContextUtils;
 import com.absir.core.dyna.DynaBinder;
+import com.absir.orm.transaction.value.Transaction;
 import com.absir.orm.value.JoEntity;
 import com.absir.property.PropertyErrors;
 import com.absir.server.in.Input;
@@ -46,6 +51,12 @@ import com.absir.server.in.Input;
 @Base
 @Bean
 public class RichCrudFactory implements ICrudFactory, ICrudProcessorInput<Object> {
+
+	/** ME */
+	public static final RichCrudFactory ME = BeanFactoryUtils.get(RichCrudFactory.class);
+
+	/** RECORD */
+	public static final String RECORD = "RICH@";
 
 	/** REMOTE_RICH_NAME */
 	private static final String REMOTE_RICH_NAME = "REMOTE_RICH@";
@@ -108,6 +119,7 @@ public class RichCrudFactory implements ICrudFactory, ICrudProcessorInput<Object
 	 * CrudProperty, java.lang.Object, com.absir.appserv.crud.CrudHandler,
 	 * com.absir.appserv.system.bean.proxy.JiUserBase)
 	 */
+	@Transaction
 	@Override
 	public void crud(CrudProperty crudProperty, Object entity, CrudHandler handler, JiUserBase user) {
 		// TODO Auto-generated method stub
@@ -171,6 +183,7 @@ public class RichCrudFactory implements ICrudFactory, ICrudProcessorInput<Object
 	 * .CrudProperty, java.lang.Object, com.absir.appserv.crud.CrudHandler,
 	 * com.absir.appserv.system.bean.proxy.JiUserBase, java.lang.Object)
 	 */
+	@Transaction
 	@Override
 	public void crud(CrudProperty crudProperty, Object entity, CrudHandler handler, JiUserBase user, Object inputBody) {
 		// TODO Auto-generated method stub
@@ -241,6 +254,40 @@ public class RichCrudFactory implements ICrudFactory, ICrudProcessorInput<Object
 						break;
 					}
 				}
+
+				String entityName = handler.getCrudEntity().getJoEntity().getEntityName();
+				Object id = CrudServiceUtils.identifier(entityName, entity, handler.isCreate());
+				if (id != null) {
+					String assocId = getAssocId(entityName, id);
+					Session session = BeanDao.getSession();
+					if (handler.getCrud() == Crud.UPDATE) {
+						if (handler.getCrudRecord() != null && !handler.getCrudRecord().containsKey(RECORD)) {
+							handler.getCrudRecord().put(RECORD, Boolean.TRUE);
+							long contextTime = ContextUtils.getContextTime();
+							List<JUploadCite> uploadCites = getUploadCites(session, assocId);
+							for (JUploadCite uploadCite : uploadCites) {
+								JUpload upload = uploadCite.getUpload();
+								if (!srcs.contains(upload.getFilePath())) {
+									session.delete(uploadCite);
+									upload.setPassTime(contextTime + UploadCrudFactory.getUploadPassTime());
+								}
+							}
+						}
+					}
+
+					for (String src : srcs) {
+						Iterator<JUpload> iterator = QueryDaoUtils.createQueryArray(session, "SELECT o FROM JUpload o WHERE o.filePath = ?", src).iterate();
+						if (iterator.hasNext()) {
+							JUpload upload = iterator.next();
+							upload.setPassTime(0);
+							session.merge(upload);
+							JUploadCite uploadCite = new JUploadCite();
+							uploadCite.setId(new JEmbedSL(assocId, upload.getId()));
+							uploadCite.setUpload(upload);
+							session.merge(uploadCite);
+						}
+					}
+				}
 			}
 		}
 	}
@@ -255,6 +302,6 @@ public class RichCrudFactory implements ICrudFactory, ICrudProcessorInput<Object
 	@Override
 	public ICrudProcessor getProcessor(JoEntity joEntity, JCrudField crudField) {
 		// TODO Auto-generated method stub
-		return CharSequence.class.isAssignableFrom(crudField.getType()) ? this : null;
+		return CharSequence.class.isAssignableFrom(crudField.getType()) ? ME : null;
 	}
 }

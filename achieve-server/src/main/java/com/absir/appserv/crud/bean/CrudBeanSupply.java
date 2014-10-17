@@ -17,6 +17,7 @@ import com.absir.core.kernel.KernelClass;
  * @author absir
  * 
  */
+@SuppressWarnings("unchecked")
 @Bean
 @Basis
 @MaSupply(folder = "功能管理", name = "添加", method = "edit")

@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.absir.appserv.game.context.JbPlayerContext;
+import com.absir.appserv.game.context.PlayerServiceBase;
 import com.absir.appserv.game.context.value.IFight;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.helper.HelperServer;
@@ -66,7 +67,7 @@ public class SocketService implements SocketSessionResolver {
 	public Serializable register(SocketChannel socketChannel, ServerContext serverContext, byte[] buffer) throws Throwable {
 		// TODO Auto-generated method stub
 		JiUserBase userBase = IdentityServiceLocal.getUserBase(new String(buffer));
-		Long id = PlayerService.ME.getPlayerId(serverContext.getServer().getId(), userBase);
+		Long id = PlayerServiceBase.ME.getPlayerId(serverContext.getServer().getId(), userBase);
 		if (id != null) {
 			JbPlayerContext playerContext = ContextUtils.getContext(JbPlayerContext.COMPONENT.PLAYER_CONTEXT_CLASS, id);
 			if (playerContext.getPlayer().getCard() != 0) {

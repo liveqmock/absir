@@ -22,4 +22,7 @@ public interface IPropDefine {
 	// 道具宝石
 	public int getDiamond();
 
+	// 道具执行对象
+	public Object getPropInvoker();
+
 }

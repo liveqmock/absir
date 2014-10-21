@@ -24,7 +24,7 @@ import com.absir.orm.value.JaColum;
  * 
  */
 @MappedSuperclass
-public class JbPlayer extends JbBean implements ILevelExp {
+public abstract class JbPlayer extends JbBean implements ILevelExp {
 
 	@JaLang("服务区")
 	@JsonIgnore

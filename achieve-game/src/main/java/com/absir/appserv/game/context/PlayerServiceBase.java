@@ -5,11 +5,12 @@
  *
  * Create on 2013-10-22 下午2:11:40
  */
-package com.absir.appserv.game.service;
+package com.absir.appserv.game.context;
 
 import java.util.Iterator;
 import java.util.List;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 
 import com.absir.appserv.data.value.DataQuery;
@@ -21,22 +22,30 @@ import com.absir.appserv.game.bean.value.IRewardBean;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.dao.BeanDao;
 import com.absir.appserv.system.dao.utils.QueryDaoUtils;
-import com.absir.bean.basis.Base;
 import com.absir.bean.core.BeanFactoryUtils;
-import com.absir.bean.inject.value.Bean;
 import com.absir.orm.transaction.value.Transaction;
 
 /**
  * @author absir
  * 
  */
-@SuppressWarnings({ "unchecked" })
-@Base
-@Bean
-public abstract class PlayerService {
+@SuppressWarnings({ "rawtypes", "unchecked" })
+public abstract class PlayerServiceBase {
 
 	/** ME */
-	public static final PlayerService ME = BeanFactoryUtils.get(PlayerService.class);
+	public static final PlayerServiceBase ME = BeanFactoryUtils.get(PlayerServiceBase.class);
+
+	/**
+	 * 过滤字段
+	 * 
+	 * @param name
+	 * @return
+	 */
+	@Transaction(readOnly = true)
+	@DataQuery(value = "SELECT COUNT(o) FROM JFilter o WHERE o.id LIKE ?")
+	public boolean findFilter(String name) {
+		return QueryDaoUtils.createQueryArray(BeanDao.getSession(), "SELECT o.id FROM JFilter o WHERE o.id LIKE ?", name).iterate().hasNext();
+	}
 
 	/**
 	 * 角色列表
@@ -95,13 +104,6 @@ public abstract class PlayerService {
 	/**
 	 * 创建角色
 	 * 
-	 * @return
-	 */
-	protected abstract JbPlayer createPlayer();
-
-	/**
-	 * 创建角色
-	 * 
 	 * @param serverId
 	 * @param userBase
 	 * @param name
@@ -131,7 +133,7 @@ public abstract class PlayerService {
 			platformUser.setServerId(serverId);
 		}
 
-		JbPlayer player = createPlayer();
+		JbPlayer player = JbPlayerContext.COMPONENT.createPlayer();
 		player.setServerId(serverId);
 		player.setUserId(userBase.getUserId());
 		player.setName(name);
@@ -141,6 +143,27 @@ public abstract class PlayerService {
 		platformUser.setPlayerId(player.getId());
 		session.merge(platformUser);
 		return player;
+	}
+
+	/**
+	 * 载入玩家
+	 * 
+	 * @param playerContext
+	 * @return
+	 */
+	@Transaction(readOnly = true)
+	public void loadPlayerContext(JbPlayerContext playerContext) {
+		playerContext.load();
+	}
+
+	/**
+	 * 保存玩家
+	 * 
+	 * @param playerContext
+	 */
+	@Transaction
+	public void savePlayerContext(JbPlayerContext playerContext) {
+		playerContext.save();
 	}
 
 	/**
@@ -264,5 +287,30 @@ public abstract class PlayerService {
 		}
 
 		return null;
+	}
+
+	/**
+	 * 奖励列表数量
+	 * 
+	 * @return
+	 */
+	protected int getRewardPageSize() {
+		return 10;
+	}
+
+	/**
+	 * 奖励列表
+	 * 
+	 * @param playerId
+	 * @return
+	 */
+	@Transaction(readOnly = true)
+	public List<IRewardBean> getPlayerRewards(Long playerId, int pageIndex) {
+		if (--pageIndex < 0) {
+			pageIndex = 0;
+		}
+
+		Query query = QueryDaoUtils.createQueryArray(BeanDao.getSession(), "SELECT o FROM JPlayerReward o WHERE o.playerId = ?", playerId);
+		return query.setFirstResult(pageIndex * getRewardPageSize()).setMaxResults(getRewardPageSize()).setCacheable(true).list();
 	}
 }

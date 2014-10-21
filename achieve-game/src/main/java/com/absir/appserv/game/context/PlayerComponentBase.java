@@ -9,7 +9,6 @@ package com.absir.appserv.game.context;
 
 import java.io.File;
 import java.io.Serializable;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -26,6 +25,7 @@ import com.absir.appserv.game.bean.JbPlayer;
 import com.absir.appserv.game.bean.value.ICardDefine;
 import com.absir.appserv.game.bean.value.IPlayerDefine;
 import com.absir.appserv.game.bean.value.IPropDefine;
+import com.absir.appserv.game.bean.value.IRewardDefine;
 import com.absir.appserv.game.confiure.JPlayerConfigure;
 import com.absir.appserv.game.utils.GameUtils;
 import com.absir.appserv.game.value.IExp;
@@ -37,7 +37,6 @@ import com.absir.bean.inject.value.Inject;
 import com.absir.context.core.ContextUtils;
 import com.absir.core.dyna.DynaBinder;
 import com.absir.core.kernel.KernelClass;
-import com.absir.core.kernel.KernelReflect;
 
 /**
  * @author absir
@@ -46,13 +45,7 @@ import com.absir.core.kernel.KernelReflect;
 @SuppressWarnings({ "unchecked" })
 @Base
 @Bean
-public class PlayerComponent<C extends JbCard, P extends JbPlayerContext<C, ?, ?, ?, ?, ?>, PC extends JPlayerConfigure, PD extends IPlayerDefine, CD extends ICardDefine, CE extends IExp, PP extends IPropDefine> {
-
-	// 卡牌类
-	public final Class<C> CARD_CLASS;
-
-	// 卡牌创建
-	private final Constructor<C> CARD_CONSTRUCTOR;
+public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerContext<C, ?, ?, ?, ?, ?>, PC extends JPlayerConfigure, PD extends IPlayerDefine, CD extends ICardDefine, CE extends IExp, PP extends IPropDefine, RP extends IRewardDefine> {
 
 	// 角色类
 	public final Class<P> PLAYER_CONTEXT_CLASS;
@@ -78,13 +71,14 @@ public class PlayerComponent<C extends JbCard, P extends JbPlayerContext<C, ?, ?
 	// 道具定义
 	protected XlsDao<PP, Serializable> propDefineDao;
 
+	// 奖励定义
+	protected XlsDao<RP, Serializable> rewardDefineDao;
+
 	/**
 	 * 初始化
 	 */
-	public PlayerComponent() {
+	public PlayerComponentBase() {
 		Class<?>[] componentClasses = KernelClass.componentClasses(getClass());
-		CARD_CLASS = (Class<C>) componentClasses[0];
-		CARD_CONSTRUCTOR = KernelReflect.constructor(CARD_CLASS);
 		PLAYER_CONTEXT_CLASS = (Class<P>) componentClasses[1];
 		PLAYER_CONTEXT_MAP = (Map<Long, P>) (Object) ContextUtils.getContextFactory().getContextMap(PLAYER_CONTEXT_CLASS);
 		PLAYER_CONFIGURE = (PC) JConfigureUtils.getConfigure((Class<? extends JConfigureBase>) componentClasses[2]);
@@ -110,6 +104,7 @@ public class PlayerComponent<C extends JbCard, P extends JbPlayerContext<C, ?, ?
 		}
 
 		propDefineDao = (XlsDao<PP, Serializable>) XlsUtils.getXlsDao((Class<? extends XlsBase>) componentClasses[6]);
+		rewardDefineDao = (XlsDao<RP, Serializable>) XlsUtils.getXlsDao((Class<? extends XlsBase>) componentClasses[7]);
 	}
 
 	/**
@@ -124,14 +119,14 @@ public class PlayerComponent<C extends JbCard, P extends JbPlayerContext<C, ?, ?
 	 * 
 	 * @return
 	 */
-	public C createCard() {
-		try {
-			return CARD_CONSTRUCTOR.newInstance();
+	public abstract C createCard();
 
-		} catch (Throwable e) {
-			return null;
-		}
-	}
+	/**
+	 * 创建角色
+	 * 
+	 * @return
+	 */
+	public abstract JbPlayer createPlayer();
 
 	/**
 	 * 获取在线玩家
@@ -187,7 +182,7 @@ public class PlayerComponent<C extends JbCard, P extends JbPlayerContext<C, ?, ?
 	 * @param playerContext
 	 * @return
 	 */
-	protected int getPlayerMaxLevel(P playerContext) {
+	public int getPlayerMaxLevel(P playerContext) {
 		return PLAYER_CONFIGURE.getMaxLevel();
 	}
 
@@ -196,7 +191,7 @@ public class PlayerComponent<C extends JbCard, P extends JbPlayerContext<C, ?, ?
 	 * 
 	 * @return
 	 */
-	protected List<PD> getPlayerExps() {
+	public List<PD> getPlayerExps() {
 		return playerDefines;
 	}
 
@@ -205,7 +200,7 @@ public class PlayerComponent<C extends JbCard, P extends JbPlayerContext<C, ?, ?
 	 * 
 	 * @param card
 	 */
-	protected void resetCard(C card) {
+	public void resetCard(C card) {
 		card.setExp(0);
 		modifyCardLevel(card, 1);
 	}
@@ -216,7 +211,7 @@ public class PlayerComponent<C extends JbCard, P extends JbPlayerContext<C, ?, ?
 	 * @param cardId
 	 * @return
 	 */
-	protected ICardDefine getCardDefine(Serializable cardId) {
+	public ICardDefine getCardDefine(Serializable cardId) {
 		return cardDefineDao.get(cardId);
 	}
 
@@ -226,8 +221,18 @@ public class PlayerComponent<C extends JbCard, P extends JbPlayerContext<C, ?, ?
 	 * @param propId
 	 * @return
 	 */
-	protected IPropDefine getPropDefine(Serializable propId) {
+	public IPropDefine getPropDefine(Serializable propId) {
 		return propDefineDao.get(propId);
+	}
+
+	/**
+	 * 获取道具定义
+	 * 
+	 * @param rewardId
+	 * @return
+	 */
+	public IRewardDefine getRewardDefine(Serializable rewardId) {
+		return rewardDefineDao.get(rewardId);
 	}
 
 	/**
@@ -237,7 +242,7 @@ public class PlayerComponent<C extends JbCard, P extends JbPlayerContext<C, ?, ?
 	 * @param level
 	 * @return
 	 */
-	protected C generateCard(ICardDefine cardDefine) {
+	public C generateCard(ICardDefine cardDefine) {
 		C card = createCard();
 		card.setCardDefine(cardDefine);
 		resetCard(card);
@@ -250,7 +255,7 @@ public class PlayerComponent<C extends JbCard, P extends JbPlayerContext<C, ?, ?
 	 * @param card
 	 * @return
 	 */
-	protected int getCardMaxLevel(C card) {
+	public int getCardMaxLevel(C card) {
 		return card.getCardDefine().getMaxLevel();
 	}
 

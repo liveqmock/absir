@@ -32,7 +32,6 @@ import com.absir.appserv.game.bean.value.IRewardDefine;
 import com.absir.appserv.game.context.value.IFight;
 import com.absir.appserv.game.context.value.IPropEvolute;
 import com.absir.appserv.game.context.value.OReward;
-import com.absir.appserv.game.service.PlayerService;
 import com.absir.appserv.game.service.SocketService;
 import com.absir.appserv.game.utils.GameUtils;
 import com.absir.appserv.game.value.LevelExpCxt;
@@ -57,7 +56,7 @@ import com.absir.server.exception.ServerStatus;
 public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A extends JbPlayerA, PD extends IPlayerDefine, R extends JbReward, F extends IFight> extends ContextBean<Long> {
 
 	// 功能组件
-	public static final PlayerComponent COMPONENT = BeanFactoryUtils.get(PlayerComponent.class);
+	public static final PlayerComponentBase COMPONENT = BeanFactoryUtils.get(PlayerComponentBase.class);
 
 	// 玩家全部卡牌
 	@Transient
@@ -296,6 +295,11 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 		this.fight = fight;
 	}
 
+	/**
+	 * 载入数据
+	 */
+	protected abstract void load();
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -304,6 +308,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	@Override
 	protected void initialize() {
 		// TODO Auto-generated method stub
+		PlayerServiceBase.ME.loadPlayerContext(this);
 		int lastOnlineDay = (int) (playerA.getLastOffline() / (24 * 3600000));
 		onlineTime = ContextUtils.getContextTime();
 		int onlineDay = (int) (onlineTime / (24 * 3600000));
@@ -356,6 +361,11 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 		return super.stepDone(contextTime);
 	}
 
+	/**
+	 * 保存数据
+	 */
+	protected abstract void save();
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -366,6 +376,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 		// TODO Auto-generated method stub
 		playerA.setLastOffline(ContextUtils.getContextTime());
 		playerA.setOnlineTime(playerA.getOnlineTime() + playerA.getLastOffline() - onlineTime);
+		PlayerServiceBase.ME.savePlayerContext(this);
 	}
 
 	/**
@@ -595,7 +606,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 * @return
 	 */
 	public C gainCard(C card) {
-		card = PlayerService.ME.addPlayerCard(player, getResetCard(card));
+		card = PlayerServiceBase.ME.addPlayerCard(player, getResetCard(card));
 		playerCards.put(card.getId(), card);
 		return card;
 	}
@@ -611,7 +622,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 		}
 
 		playerCards.remove(card.getId());
-		PlayerService.ME.removePlayerCard(player, card);
+		PlayerServiceBase.ME.removePlayerCard(player, card);
 	}
 
 	/**
@@ -1022,7 +1033,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 * @param rewardDefine
 	 */
 	public synchronized Object reward(long rewardId) {
-		JbReward reward = PlayerService.ME.getPlayerReward(getId(), rewardId);
+		JbReward reward = PlayerServiceBase.ME.getPlayerReward(getId(), rewardId);
 		if (reward == null) {
 			throw new ServerException(ServerStatus.ON_DELETED);
 		}

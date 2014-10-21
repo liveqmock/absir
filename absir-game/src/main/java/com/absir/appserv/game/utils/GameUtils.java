@@ -54,7 +54,7 @@ public abstract class GameUtils {
 	 * @param maxLevel
 	 * @return
 	 */
-	public static int doExp(int exp, ILevel iLevel, List<IExp> iExps, int maxLevel) {
+	public static int doExp(int exp, ILevel iLevel, List<? extends IExp> iExps, int maxLevel) {
 		return doExp(exp, iLevel, LEVEL_EXP_CXT, iExps, maxLevel);
 	}
 
@@ -68,7 +68,7 @@ public abstract class GameUtils {
 	 * @param maxLevel
 	 * @return
 	 */
-	public static <T extends ILevel> int doExp(int exp, T obj, LevelCxt<T> levelCxt, List<IExp> iExps, int maxLevel) {
+	public static <T extends ILevel> int doExp(int exp, T obj, LevelCxt<T> levelCxt, List<? extends IExp> iExps, int maxLevel) {
 		int level = levelCxt.getLevel(obj);
 		while (true) {
 			IExp iExp = iExps.get(level);
@@ -92,7 +92,7 @@ public abstract class GameUtils {
 	 * @param iExps
 	 * @param maxLevel
 	 */
-	public static void modifyExp(int exp, ILevelExp iLevelExp, List<IExp> iExps, int maxLevel) {
+	public static void modifyExp(int exp, ILevelExp iLevelExp, List<? extends IExp> iExps, int maxLevel) {
 		modifyExp(exp, iLevelExp, LEVEL_EXP_CXT, iExps, maxLevel);
 	}
 
@@ -105,7 +105,7 @@ public abstract class GameUtils {
 	 * @param iExps
 	 * @param maxLevel
 	 */
-	public static <T extends ILevelExp> void modifyExp(int exp, T obj, LevelExpCxt<T> levelExpCxt, List<IExp> iExps, int maxLevel) {
+	public static <T extends ILevelExp> void modifyExp(int exp, T obj, LevelExpCxt<T> levelExpCxt, List<? extends IExp> iExps, int maxLevel) {
 		if (levelExpCxt.getLevel(obj) > maxLevel) {
 			return;
 		}

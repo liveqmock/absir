@@ -53,6 +53,8 @@
 		<module>absir-qq</module>
 		<module>absir-email</module>
 		<module>absir-spring</module>
+		<module>absir-scene</module>
+		<module>achieve-game</module>
 	</modules>
 	<dependencies>
 		<dependency>

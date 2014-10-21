@@ -29,6 +29,9 @@ import com.absir.appserv.game.bean.value.ICardDefine;
 import com.absir.appserv.game.bean.value.IPlayerDefine;
 import com.absir.appserv.game.bean.value.IPropDefine;
 import com.absir.appserv.game.bean.value.IRewardDefine;
+import com.absir.appserv.game.bean.value.ITaskDefine;
+import com.absir.appserv.game.bean.value.ITaskDefine.ITaskDetail;
+import com.absir.appserv.game.bean.value.ITaskDefine.ITaskPass;
 import com.absir.appserv.game.context.value.IFight;
 import com.absir.appserv.game.context.value.IPropEvolute;
 import com.absir.appserv.game.context.value.OReward;
@@ -1045,4 +1048,99 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 
 		return doReward((R) reward);
 	}
+
+	/**
+	 * 任务ID
+	 * 
+	 * @param scene
+	 * @param pass
+	 * @return
+	 */
+	public static String getTaskId(int scene, int pass) {
+		return scene + "." + pass;
+	}
+
+	/**
+	 * 进入任务
+	 * 
+	 * @return
+	 */
+	public synchronized F task(int scene, int pass, int detail) {
+		if (playerCards.size() >= player.getMaxCardNumber()) {
+			throw new ServerException(ServerStatus.IN_FAILED, "CardNumber");
+		}
+
+		ITaskDefine taskDefine = COMPONENT.getTaskDefine(scene);
+		if (taskDefine.getLevel() > player.getLevel()) {
+			throw new ServerException(ServerStatus.IN_FAILED, "Level");
+		}
+
+		ITaskPass taskPass = taskDefine.getTaskPasses()[pass];
+		ITaskDetail taskDetail = taskPass.getTaskDetails()[detail];
+		String taskId = getTaskId(scene, pass);
+		if (detail > 0) {
+			Integer progress = (Integer) playerA.getTaskProgresses().get(taskId);
+			if (progress == null || progress < detail) {
+				throw new ServerException(ServerStatus.IN_FAILED, "Progress");
+			}
+
+		} else {
+			// 顺序开启条件
+			int nScene = scene;
+			int nPass = pass;
+			if (pass == 0) {
+				if (scene > 1) {
+					nScene--;
+				}
+
+			} else {
+				nPass--;
+			}
+
+			if (nScene != scene || nPass != pass) {
+				String nTaskId = getTaskId(nScene, nPass);
+				Integer nProgress = (Integer) playerA.getTaskProgresses().get(nTaskId);
+				if (nProgress == null) {
+					throw new ServerException(ServerStatus.IN_FAILED, "Progress");
+				}
+			}
+		}
+
+		if (player.getEp() < taskDetail.getEp()) {
+			throw new ServerException(ServerStatus.IN_FAILED, "Ep");
+		}
+
+		F fight = doTaskFight(taskId, scene, pass, detail, taskDefine, taskPass, taskDetail);
+		setFight(fight);
+		return fight;
+	}
+
+	/**
+	 * 任务完成
+	 * 
+	 * @param taskId
+	 * @param detail
+	 */
+	public synchronized void taskComplete(String taskId, int detail) {
+		Map<String, Integer> taskProgresses = playerA.getTaskProgresses();
+		Integer progress = taskProgresses.get(taskId);
+		++detail;
+		if (progress == null || progress < detail) {
+			taskProgresses.put(taskId, detail);
+		}
+	}
+
+	/**
+	 * 获取任务战斗
+	 * 
+	 * @param taskId
+	 * @param scene
+	 * @param pass
+	 * @param detail
+	 * @param taskDefine
+	 * @param taskPass
+	 * @param taskDetail
+	 * @return
+	 */
+	protected abstract F doTaskFight(String taskId, int scene, int pass, int detail, ITaskDefine taskDefine, ITaskPass taskPass, ITaskDetail taskDetail);
 }

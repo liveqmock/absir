@@ -26,6 +26,7 @@ import com.absir.appserv.game.bean.value.ICardDefine;
 import com.absir.appserv.game.bean.value.IPlayerDefine;
 import com.absir.appserv.game.bean.value.IPropDefine;
 import com.absir.appserv.game.bean.value.IRewardDefine;
+import com.absir.appserv.game.bean.value.ITaskDefine;
 import com.absir.appserv.game.confiure.JPlayerConfigure;
 import com.absir.appserv.game.utils.GameUtils;
 import com.absir.appserv.game.value.IExp;
@@ -45,7 +46,7 @@ import com.absir.core.kernel.KernelClass;
 @SuppressWarnings({ "unchecked" })
 @Base
 @Bean
-public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerContext<C, ?, ?, ?, ?, ?>, PC extends JPlayerConfigure, PD extends IPlayerDefine, CD extends ICardDefine, CE extends IExp, PP extends IPropDefine, RP extends IRewardDefine> {
+public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerContext<C, ?, ?, ?, ?, ?>, PC extends JPlayerConfigure, PD extends IPlayerDefine, CD extends ICardDefine, CE extends IExp, PP extends IPropDefine, RD extends IRewardDefine, TD extends ITaskDefine> {
 
 	// 角色类
 	public final Class<P> PLAYER_CONTEXT_CLASS;
@@ -72,7 +73,10 @@ public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerCo
 	protected XlsDao<PP, Serializable> propDefineDao;
 
 	// 奖励定义
-	protected XlsDao<RP, Serializable> rewardDefineDao;
+	protected XlsDao<RD, Serializable> rewardDefineDao;
+
+	// 奖励定义
+	protected XlsDao<TD, Serializable> taskDefineDao;
 
 	/**
 	 * 初始化
@@ -104,7 +108,8 @@ public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerCo
 		}
 
 		propDefineDao = (XlsDao<PP, Serializable>) XlsUtils.getXlsDao((Class<? extends XlsBase>) componentClasses[6]);
-		rewardDefineDao = (XlsDao<RP, Serializable>) XlsUtils.getXlsDao((Class<? extends XlsBase>) componentClasses[7]);
+		rewardDefineDao = (XlsDao<RD, Serializable>) XlsUtils.getXlsDao((Class<? extends XlsBase>) componentClasses[7]);
+		taskDefineDao = (XlsDao<TD, Serializable>) XlsUtils.getXlsDao((Class<? extends XlsBase>) componentClasses[8]);
 	}
 
 	/**
@@ -211,7 +216,7 @@ public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerCo
 	 * @param cardId
 	 * @return
 	 */
-	public ICardDefine getCardDefine(Serializable cardId) {
+	public CD getCardDefine(Serializable cardId) {
 		return cardDefineDao.get(cardId);
 	}
 
@@ -221,7 +226,7 @@ public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerCo
 	 * @param propId
 	 * @return
 	 */
-	public IPropDefine getPropDefine(Serializable propId) {
+	public PP getPropDefine(Serializable propId) {
 		return propDefineDao.get(propId);
 	}
 
@@ -231,8 +236,18 @@ public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerCo
 	 * @param rewardId
 	 * @return
 	 */
-	public IRewardDefine getRewardDefine(Serializable rewardId) {
+	public RD getRewardDefine(Serializable rewardId) {
 		return rewardDefineDao.get(rewardId);
+	}
+
+	/**
+	 * 获取任务定义
+	 * 
+	 * @param taskId
+	 * @return
+	 */
+	public TD getTaskDefine(Serializable taskId) {
+		return taskDefineDao.get(taskId);
 	}
 
 	/**

@@ -46,6 +46,8 @@ import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Inject;
 import com.absir.context.core.ContextBean;
 import com.absir.context.core.ContextUtils;
+import com.absir.core.util.UtilQueue;
+import com.absir.core.util.UtilQueueBlock;
 import com.absir.property.value.Allow;
 import com.absir.server.exception.ServerException;
 import com.absir.server.exception.ServerStatus;
@@ -109,7 +111,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	public abstract class Notifier implements Runnable {
 
 		// 准备好了
-		protected boolean posted;
+		protected boolean posting;
 
 		/**
 		 * 初始化
@@ -119,18 +121,25 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 		}
 
 		/**
-		 * 
+		 * 投递
 		 */
 		public void post() {
-			posted = true;
+			posting = true;
 			checkPosted();
 		}
 
 		/**
-		 * 投递
+		 * 取消
+		 */
+		public void cancel() {
+			posting = false;
+		}
+
+		/**
+		 * 检查投递
 		 */
 		protected void checkPosted() {
-			if (posted) {
+			if (posting) {
 				ContextUtils.getThreadPoolExecutor().execute(this);
 			}
 		}
@@ -139,9 +148,9 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 		 * 执行
 		 */
 		public synchronized void run() {
-			if (posted) {
+			if (posting) {
 				if (doPost()) {
-					posted = false;
+					posting = false;
 				}
 			}
 		}
@@ -154,8 +163,25 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 		protected abstract boolean doPost();
 	}
 
+	// 更改通知
+	public final Notifier modifierNotifier = new Notifier() {
+
+		@Override
+		protected boolean doPost() {
+			// TODO Auto-generated method stub
+			return modifierNotifier();
+		}
+	};
+
+	/**
+	 * @return
+	 */
+	protected boolean modifierNotifier() {
+		return SocketService.writeByteObject(socketChannel, SocketService.CALLBACK_MODIFY, "", true);
+	}
+
 	// 奖励通知
-	public transient Notifier rewardNotifier = new Notifier() {
+	public final Notifier rewardNotifier = new Notifier() {
 
 		@Override
 		protected boolean doPost() {
@@ -172,7 +198,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	}
 
 	// 消息通知
-	public transient Notifier messageNotifier = new Notifier() {
+	public final Notifier messageNotifier = new Notifier() {
 
 		@Override
 		protected boolean doPost() {
@@ -188,21 +214,50 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 		return SocketService.writeByteObject(socketChannel, SocketService.CALLBACK_MESSAGE, playerA.getMessageNumber(), true);
 	}
 
-	// 更改通知
-	public transient Notifier modifierNotifier = new Notifier() {
+	// 会话队列
+	public final UtilQueue<Object> chatQueue = createChatQueue();
+
+	/**
+	 * 创建会话队列
+	 * 
+	 * @return
+	 */
+	protected UtilQueue<Object> createChatQueue() {
+		return new UtilQueueBlock<Object>(50);
+	}
+
+	// 会话通知
+	public transient Notifier chatNotifier = new Notifier() {
 
 		@Override
 		protected boolean doPost() {
 			// TODO Auto-generated method stub
-			return modifierNotifier();
+			return talkNotifier();
 		}
 	};
+
+	/** chats */
+	protected List<Object> chats;
 
 	/**
 	 * @return
 	 */
-	protected boolean modifierNotifier() {
-		return SocketService.writeByteObject(socketChannel, SocketService.CALLBACK_MODIFY, "", true);
+	protected boolean talkNotifier() {
+		if (chats == null || SocketService.writeByteObject(socketChannel, SocketService.CALLBACK_CHAT, chats, true)) {
+			while (true) {
+				chats = chatQueue.readElements(10);
+				if (!SocketService.writeByteObject(socketChannel, SocketService.CALLBACK_CHAT, chats, true)) {
+					break;
+				}
+
+				if (!chatNotifier.posting) {
+					chats = null;
+					break;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	/**

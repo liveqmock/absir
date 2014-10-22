@@ -145,6 +145,9 @@ public class SocketService implements SocketSessionResolver {
 	/** CALLBACK_MESSAGE */
 	public static final int CALLBACK_MESSAGE = 12;
 
+	/** CALLBACK_CHAT */
+	public static final int CALLBACK_CHAT = 13;
+
 	/**
 	 * @param playerId
 	 * @param callbackIndex

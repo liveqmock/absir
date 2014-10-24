@@ -50,7 +50,7 @@ public abstract class OCard<C extends OCard, F extends OFight> extends OObject<C
 	 * @param paused
 	 * @param result
 	 */
-	public void paused(OCard target, int paused, IResult result) {
+	public void paused(C target, int paused, IResult result) {
 		addReportDetail(target, PAUSED, paused);
 		paused += this.paused;
 		setPaused(paused);
@@ -134,7 +134,7 @@ public abstract class OCard<C extends OCard, F extends OFight> extends OObject<C
 	 * .game.value.OObject, java.lang.String, java.lang.Object)
 	 */
 	@Override
-	public void addReportDetail(OObject target, String effect, Object parameters) {
+	public void addReportDetail(C target, String effect, Object parameters) {
 		// TODO Auto-generated method stub
 		currentFight().addReportDetail(getId(), target == null ? null : new Serializable[] { target.getId() }, effect, parameters);
 	}

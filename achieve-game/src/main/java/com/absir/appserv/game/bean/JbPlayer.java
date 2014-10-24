@@ -13,6 +13,7 @@ import javax.persistence.MappedSuperclass;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
 import com.absir.appserv.game.value.ILevelExp;
+import com.absir.appserv.system.bean.JPlatformUser;
 import com.absir.appserv.system.bean.base.JbBean;
 import com.absir.appserv.system.bean.value.JaEdit;
 import com.absir.appserv.system.bean.value.JaLang;

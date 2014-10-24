@@ -10,6 +10,8 @@ package com.absir.scene;
 import java.util.Iterator;
 import java.util.List;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 import com.absir.context.bean.IStep;
 import com.absir.core.util.UtilLinked;
 
@@ -20,9 +22,11 @@ import com.absir.core.util.UtilLinked;
 public class SceneZone<T extends ISceneObject, E> implements IStep, ISceneBroadcast<T, E> {
 
 	/** sceneObjects */
+	@JsonIgnore
 	private UtilLinked<T> sceneObjects = new UtilLinked<T>();
 
 	/** sceneBroadCasts */
+	@JsonIgnore
 	private UtilLinked<ISceneBroadcast<T, E>> sceneBroadCasts = new UtilLinked<ISceneBroadcast<T, E>>();
 
 	/**
@@ -51,6 +55,13 @@ public class SceneZone<T extends ISceneObject, E> implements IStep, ISceneBroadc
 	 */
 	public void removeSceneBroadcast(ISceneBroadcast<T, E> sceneBroadcast) {
 		sceneBroadCasts.remove(sceneBroadcast);
+	}
+
+	/**
+	 * @return
+	 */
+	public Iterator<T> iterator() {
+		return sceneObjects.iterator();
 	}
 
 	/**

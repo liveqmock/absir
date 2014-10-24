@@ -46,21 +46,6 @@ public class OReportDetail {
 		this.effectData = effectData;
 	}
 
-	// /**
-	// * @return the depth
-	// */
-	// public int getDepth() {
-	// return depth;
-	// }
-	//
-	// /**
-	// * @param depth
-	// * the depth to set
-	// */
-	// protected void setDepth(int depth) {
-	// this.depth = depth;
-	// }
-
 	/**
 	 * @return the self
 	 */

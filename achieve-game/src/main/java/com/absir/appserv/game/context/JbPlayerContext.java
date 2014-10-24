@@ -164,7 +164,8 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	}
 
 	// 更改通知
-	public final Notifier modifierNotifier = new Notifier() {
+	@JsonIgnore
+	private Notifier modifierNotifier = new Notifier() {
 
 		@Override
 		protected boolean doPost() {
@@ -181,7 +182,8 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	}
 
 	// 奖励通知
-	public final Notifier rewardNotifier = new Notifier() {
+	@JsonIgnore
+	private Notifier rewardNotifier = new Notifier() {
 
 		@Override
 		protected boolean doPost() {
@@ -198,7 +200,8 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	}
 
 	// 消息通知
-	public final Notifier messageNotifier = new Notifier() {
+	@JsonIgnore
+	private Notifier messageNotifier = new Notifier() {
 
 		@Override
 		protected boolean doPost() {
@@ -215,7 +218,8 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	}
 
 	// 会话队列
-	public final UtilQueue<Object> chatQueue = createChatQueue();
+	@JsonIgnore
+	private UtilQueue<Object> chatQueue = createChatQueue();
 
 	/**
 	 * 创建会话队列
@@ -304,7 +308,8 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	}
 
 	// 会话通知
-	public final Notifier chatNotifier = new NotifierQueue() {
+	@JsonIgnore
+	private Notifier chatNotifier = new NotifierQueue() {
 
 		@Override
 		protected Object getPostObject() {
@@ -324,6 +329,48 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 */
 	protected Object talkNotifier() {
 		return chatQueue.readElements(10);
+	}
+
+	/**
+	 * @return the notifiers
+	 */
+	public List<Notifier> getNotifiers() {
+		return notifiers;
+	}
+
+	/**
+	 * @return the modifierNotifier
+	 */
+	public Notifier getModifierNotifier() {
+		return modifierNotifier;
+	}
+
+	/**
+	 * @return the rewardNotifier
+	 */
+	public Notifier getRewardNotifier() {
+		return rewardNotifier;
+	}
+
+	/**
+	 * @return the messageNotifier
+	 */
+	public Notifier getMessageNotifier() {
+		return messageNotifier;
+	}
+
+	/**
+	 * @return the chatQueue
+	 */
+	public UtilQueue<Object> getChatQueue() {
+		return chatQueue;
+	}
+
+	/**
+	 * @return the chatNotifier
+	 */
+	public Notifier getChatNotifier() {
+		return chatNotifier;
 	}
 
 	/**

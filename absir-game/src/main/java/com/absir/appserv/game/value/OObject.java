@@ -254,7 +254,7 @@ public abstract class OObject<T extends OObject> implements JiBase {
 			if (target.died()) {
 				target = null;
 
-			} else if (!(invincible && !isInvincible())) {
+			} else if (!(invincible && target.isInvincible())) {
 				return;
 			}
 		}
@@ -690,5 +690,5 @@ public abstract class OObject<T extends OObject> implements JiBase {
 	 * @param effect
 	 * @param parameters
 	 */
-	public abstract void addReportDetail(OObject target, String effect, Object parameters);
+	public abstract void addReportDetail(T target, String effect, Object parameters);
 }

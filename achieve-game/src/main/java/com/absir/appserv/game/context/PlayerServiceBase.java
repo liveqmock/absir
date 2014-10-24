@@ -14,11 +14,11 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import com.absir.appserv.data.value.DataQuery;
-import com.absir.appserv.game.bean.JPlatformUser;
 import com.absir.appserv.game.bean.JbCard;
 import com.absir.appserv.game.bean.JbPlayer;
 import com.absir.appserv.game.bean.JbReward;
 import com.absir.appserv.game.bean.value.IRewardBean;
+import com.absir.appserv.system.bean.JPlatformUser;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.dao.BeanDao;
 import com.absir.appserv.system.dao.utils.QueryDaoUtils;

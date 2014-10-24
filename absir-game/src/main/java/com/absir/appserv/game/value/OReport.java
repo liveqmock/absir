@@ -20,9 +20,6 @@ import com.absir.appserv.system.bean.dto.EnumSerializer;
  */
 public class OReport {
 
-	// 战报深度
-	// private transient int depth;
-
 	// 战斗开始
 	private long began;
 
@@ -109,21 +106,4 @@ public class OReport {
 		// reportDetail.setDepth(depth);
 		reportDetails.add(reportDetail);
 	}
-
-	// /**
-	// * 开始详细战报
-	// *
-	// * @param reportDetail
-	// */
-	// public void beganReportDetail(OReportDetail reportDetail) {
-	// addReportDetail(reportDetail);
-	// depth++;
-	// }
-	//
-	// /**
-	// * 完成详细战报
-	// */
-	// public void completeReportDetail() {
-	// depth--;
-	// }
 }

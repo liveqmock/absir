@@ -5,7 +5,7 @@
  *
  * Create on 2013-3-10 下午11:30:34
  */
-package com.absir.appserv.game.bean;
+package com.absir.appserv.system.bean;
 
 import java.io.Serializable;
 import java.util.Collection;

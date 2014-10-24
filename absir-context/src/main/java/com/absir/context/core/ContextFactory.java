@@ -76,6 +76,10 @@ public class ContextFactory {
 	private int maxThread = 128;
 
 	/** stopDelay */
+	@Value("context.delay")
+	private int delay = 1000;
+
+	/** stopDelay */
 	@Value("context.stopDelay")
 	private int stopDelay = 1000;
 
@@ -378,7 +382,7 @@ public class ContextFactory {
 	@Started
 	private void start() {
 		utilAtom = getUtilAtom(maxThread);
-		new Timer().schedule(contextTimerTask, 0, 1000);
+		new Timer().schedule(contextTimerTask, 0, delay);
 	}
 
 	/**

@@ -226,38 +226,104 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 		return new UtilQueueBlock<Object>(50);
 	}
 
-	// 会话通知
-	public transient Notifier chatNotifier = new Notifier() {
+	/**
+	 * @author absir
+	 *
+	 */
+	protected abstract class NotifierQueue extends Notifier {
 
+		/** runed */
+		protected boolean runed;
+
+		/** postObject */
+		protected Object postObject;
+
+		/**
+		 * 清除通知
+		 */
+		public void clear() {
+			cancel();
+			postObject = null;
+		}
+
+		/**
+		 * 检查投递
+		 */
+		protected synchronized void checkPosted() {
+			if (posting && !runed) {
+				runed = true;
+				ContextUtils.getThreadPoolExecutor().execute(this);
+			}
+		}
+
+		/**
+		 * 执行
+		 */
+		public synchronized void run() {
+			while (true) {
+				if (postObject == null || SocketService.writeByteObject(socketChannel, getCallbackIndex(), postObject, true)) {
+					postObject = getPostObject();
+					if (!SocketService.writeByteObject(socketChannel, getCallbackIndex(), postObject, true)) {
+						break;
+					}
+
+					if (!posting) {
+						postObject = null;
+						break;
+					}
+				}
+			}
+
+			runed = false;
+		}
+
+		/**
+		 * 推送频道
+		 * 
+		 * @return
+		 */
+		protected abstract int getCallbackIndex();
+
+		/**
+		 * 推送频道
+		 * 
+		 * @return
+		 */
+		protected abstract Object getPostObject();
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see com.absir.appserv.game.context.JbPlayerContext.Notifier#doPost()
+		 */
 		@Override
 		protected boolean doPost() {
 			// TODO Auto-generated method stub
+			return false;
+		}
+	}
+
+	// 会话通知
+	public final Notifier chatNotifier = new NotifierQueue() {
+
+		@Override
+		protected Object getPostObject() {
+			// TODO Auto-generated method stub
 			return talkNotifier();
 		}
-	};
 
-	/** chats */
-	protected List<Object> chats;
+		@Override
+		protected int getCallbackIndex() {
+			// TODO Auto-generated method stub
+			return SocketService.CALLBACK_CHAT;
+		}
+	};
 
 	/**
 	 * @return
 	 */
-	protected boolean talkNotifier() {
-		if (chats == null || SocketService.writeByteObject(socketChannel, SocketService.CALLBACK_CHAT, chats, true)) {
-			while (true) {
-				chats = chatQueue.readElements(10);
-				if (!SocketService.writeByteObject(socketChannel, SocketService.CALLBACK_CHAT, chats, true)) {
-					break;
-				}
-
-				if (!chatNotifier.posting) {
-					chats = null;
-					break;
-				}
-			}
-		}
-
-		return false;
+	protected Object talkNotifier() {
+		return chatQueue.readElements(10);
 	}
 
 	/**

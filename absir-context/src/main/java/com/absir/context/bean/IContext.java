@@ -11,18 +11,12 @@ package com.absir.context.bean;
  * @author absir
  * 
  */
-public interface IContext {
+public interface IContext extends IStep {
 
 	/**
 	 * @param contextTime
 	 */
 	public void retainAt(long contextTime);
-
-	/**
-	 * @param contextTime
-	 * @return
-	 */
-	public boolean stepDone(long contextTime);
 
 	/**
 	 * 

@@ -7,17 +7,20 @@
  */
 package com.absir.scene;
 
+import com.absir.appserv.game.value.OReportDetail;
+
 /**
  * @author absir
  *
  */
+@SuppressWarnings("rawtypes")
 public interface ISceneBroadcast<T extends ISceneObject, E> {
 
 	/**
 	 * @param sceneObject
-	 * @param key
-	 * @param report
+	 * @param event
+	 * @param reportDetail
 	 */
-	public boolean broadcast(T sceneObject, E event, Object report);
+	public boolean broadcast(T sceneObject, E event, OReportDetail reportDetail);
 
 }

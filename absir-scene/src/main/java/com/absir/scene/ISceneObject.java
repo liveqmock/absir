@@ -7,11 +7,15 @@
  */
 package com.absir.scene;
 
+import java.io.Serializable;
+
+import com.absir.core.base.IBase;
+
 /**
  * @author absir
  *
  */
-public interface ISceneObject {
+public interface ISceneObject<ID extends Serializable> extends IBase<ID> {
 
 	/**
 	 * 对象步进

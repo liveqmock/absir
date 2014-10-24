@@ -17,9 +17,6 @@ import java.io.Serializable;
  */
 public class OReportDetail {
 
-	// 战报深度
-	// private int depth;
-
 	// 战报对象
 	private Serializable self;
 
@@ -42,7 +39,19 @@ public class OReportDetail {
 	 * @param effectData
 	 */
 	public OReportDetail(Object effectData) {
-		this();
+		this.effectData = effectData;
+	}
+
+	/**
+	 * @param self
+	 * @param targets
+	 * @param effect
+	 * @param effectData
+	 */
+	public OReportDetail(Serializable self, Serializable[] targets, String effect, Object effectData) {
+		this.self = self;
+		this.targets = targets;
+		this.effect = effect;
 		this.effectData = effectData;
 	}
 

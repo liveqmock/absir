@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 
+import com.absir.appserv.game.value.OReportDetail;
 import com.absir.context.bean.IStep;
 import com.absir.core.util.UtilLinked;
 
@@ -19,6 +20,7 @@ import com.absir.core.util.UtilLinked;
  * @author absir
  *
  */
+@SuppressWarnings("rawtypes")
 public class SceneZone<T extends ISceneObject, E> implements IStep, ISceneBroadcast<T, E> {
 
 	/** sceneObjects */
@@ -64,6 +66,9 @@ public class SceneZone<T extends ISceneObject, E> implements IStep, ISceneBroadc
 		return sceneObjects.iterator();
 	}
 
+	/** OBJECT_EFFECT */
+	public static final String OBJECT_EFFECT = "O";
+
 	/**
 	 * @param contextTime
 	 */
@@ -73,13 +78,13 @@ public class SceneZone<T extends ISceneObject, E> implements IStep, ISceneBroadc
 		List<T> removes = sceneObjects.syncRemoves();
 		for (T add : adds) {
 			if (add.isSensory()) {
-				broadcast(add, null, add.getStatusObject());
+				broadcast(add, null, new OReportDetail(add.getId(), null, OBJECT_EFFECT, add.getStatusObject()));
 			}
 		}
 
 		for (T remove : removes) {
 			if (remove.isSensory()) {
-				broadcast(remove, null, null);
+				broadcast(remove, null, new OReportDetail(remove.getId(), null, OBJECT_EFFECT, null));
 			}
 		}
 
@@ -92,17 +97,17 @@ public class SceneZone<T extends ISceneObject, E> implements IStep, ISceneBroadc
 			if (sceneObject.stepDone(contextTime)) {
 				if (sensory != sceneObject.isSensory()) {
 					if (sensory) {
-						broadcast(sceneObject, null, null);
+						broadcast(sceneObject, null, new OReportDetail(sceneObject.getId(), null, OBJECT_EFFECT, null));
 
 					} else {
-						broadcast(sceneObject, null, sceneObject.getStatusObject());
+						broadcast(sceneObject, null, new OReportDetail(sceneObject.getId(), null, OBJECT_EFFECT, sceneObject.getStatusObject()));
 					}
 				}
 
 			} else {
 				iterator.remove();
 				if (sensory) {
-					broadcast(sceneObject, null, null);
+					broadcast(sceneObject, null, new OReportDetail(sceneObject.getId(), null, OBJECT_EFFECT, null));
 				}
 			}
 		}
@@ -118,11 +123,11 @@ public class SceneZone<T extends ISceneObject, E> implements IStep, ISceneBroadc
 	 * java.lang.Object, java.lang.Object)
 	 */
 	@Override
-	public boolean broadcast(T sceneObject, E event, Object report) {
+	public boolean broadcast(T sceneObject, E event, OReportDetail reportDetail) {
 		// TODO Auto-generated method stub
 		Iterator<ISceneBroadcast<T, E>> iterator = sceneBroadCasts.iterator();
 		while (iterator.hasNext()) {
-			if (!iterator.next().broadcast(sceneObject, event, report)) {
+			if (!iterator.next().broadcast(sceneObject, event, reportDetail)) {
 				iterator.remove();
 			}
 		}

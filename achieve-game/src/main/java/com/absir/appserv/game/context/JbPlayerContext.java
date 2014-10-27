@@ -436,6 +436,10 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	public void setSocketChannel(SocketChannel socketChannel) {
 		if (socketChannel == null) {
 			player.setOnline(false);
+			F fight = this.fight;
+			if (fight != null) {
+				fight.disconnect();
+			}
 
 		} else {
 			player.setOnline(true);
@@ -459,8 +463,9 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 *            the fight to set
 	 */
 	public void setFight(F fight) {
-		if (this.fight != null) {
-			this.fight.disconnect();
+		F current = this.fight;
+		if (current != null) {
+			current.close();
 		}
 
 		this.fight = fight;
@@ -545,6 +550,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	@Override
 	public void uninitialize() {
 		// TODO Auto-generated method stub
+		setFight(null);
 		playerA.setLastOffline(ContextUtils.getContextTime());
 		playerA.setOnlineTime(playerA.getOnlineTime() + playerA.getLastOffline() - onlineTime);
 		PlayerServiceBase.ME.savePlayerContext(this);

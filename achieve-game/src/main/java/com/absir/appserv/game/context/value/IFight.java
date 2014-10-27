@@ -18,4 +18,9 @@ public interface IFight {
 	 */
 	public void disconnect();
 
+	/**
+	 * 战斗关闭
+	 */
+	public void close();
+
 }

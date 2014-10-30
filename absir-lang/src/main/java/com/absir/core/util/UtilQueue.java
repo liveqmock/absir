@@ -53,7 +53,15 @@ public class UtilQueue<T> {
 	 * @return
 	 */
 	public int getLength() {
-		return circle ? (capacity - current + index) : (index - current);
+		return index == current ? circle ? capacity : 0 : index > current ? (index - current) : (capacity - current + index);
+	}
+
+	/**
+	 * 清除数据
+	 */
+	public synchronized void clear() {
+		circle = false;
+		index = current = 0;
 	}
 
 	/**

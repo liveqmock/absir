@@ -7,7 +7,7 @@
  */
 package com.absir.appserv.game.bean;
 
-import javax.persistence.Entity;
+import javax.persistence.MappedSuperclass;
 
 import com.absir.appserv.game.bean.value.ICardDefine;
 import com.absir.appserv.game.value.ILevelExp;
@@ -18,7 +18,7 @@ import com.absir.appserv.system.bean.value.JaLang;
  * @author absir
  * 
  */
-@Entity
+@MappedSuperclass
 public abstract class JbCard extends JbBean implements ILevelExp {
 
 	@JaLang("当前等级")

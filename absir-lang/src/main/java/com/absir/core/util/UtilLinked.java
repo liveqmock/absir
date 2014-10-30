@@ -65,7 +65,7 @@ public class UtilLinked<T> {
 	 * @return
 	 */
 	public List<T> syncRemoves() {
-		List<T> removes = addList;
+		List<T> removes = removeList;
 		if (removes.isEmpty()) {
 			return null;
 

@@ -22,7 +22,9 @@ import com.absir.appserv.system.bean.JPlatformUser;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.dao.BeanDao;
 import com.absir.appserv.system.dao.utils.QueryDaoUtils;
+import com.absir.bean.basis.Base;
 import com.absir.bean.core.BeanFactoryUtils;
+import com.absir.bean.inject.value.Bean;
 import com.absir.orm.transaction.value.Transaction;
 
 /**
@@ -30,6 +32,8 @@ import com.absir.orm.transaction.value.Transaction;
  * 
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
+@Base
+@Bean
 public abstract class PlayerServiceBase {
 
 	/** ME */

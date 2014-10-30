@@ -31,9 +31,7 @@ import com.absir.appserv.game.confiure.JPlayerConfigure;
 import com.absir.appserv.game.utils.GameUtils;
 import com.absir.appserv.game.value.IExp;
 import com.absir.appserv.game.value.LevelExpCxt;
-import com.absir.bean.basis.Base;
 import com.absir.bean.core.BeanFactoryUtils;
-import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Inject;
 import com.absir.context.core.ContextUtils;
 import com.absir.core.dyna.DynaBinder;
@@ -44,8 +42,6 @@ import com.absir.core.kernel.KernelClass;
  *
  */
 @SuppressWarnings({ "unchecked" })
-@Base
-@Bean
 public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerContext<C, ?, ?, ?, ?, ?>, PC extends JPlayerConfigure, PD extends IPlayerDefine, CD extends ICardDefine, CE extends IExp, PP extends IPropDefine, RD extends IRewardDefine, TD extends ITaskDefine> {
 
 	// 角色类

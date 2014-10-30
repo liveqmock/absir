@@ -70,7 +70,7 @@ public class SocketService implements SocketSessionResolver {
 		Long id = PlayerServiceBase.ME.getPlayerId(serverContext.getServer().getId(), userBase);
 		if (id != null) {
 			JbPlayerContext playerContext = ContextUtils.getContext(JbPlayerContext.COMPONENT.PLAYER_CONTEXT_CLASS, id);
-			if (playerContext.getPlayer().getCard() != 0) {
+			if (playerContext.getPlayer().getCard() == 0) {
 				return null;
 			}
 

@@ -8,9 +8,7 @@
 package com.absir.template;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,71 +26,151 @@ public class TemplateEngine {
 
 		/**
 		 * @param target
-		 * @param args
+		 * @param parameter
 		 * @return
 		 */
-		public Object eval(Object target, Object[] args);
+		public Object eval(Object target, Object parameter);
 	}
 
-	/** referStacks */
-	public Map<String, Integer> referStacks = new HashMap<String, Integer>();
+	public abstract class StackArgs implements IStack {
 
-	/** stacks */
-	public List<IStack> stacks = new ArrayList<IStack>();
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see com.absir.template.TemplateEngine.IStack#eval(java.lang.Object,
+		 * java.lang.Object)
+		 */
+		@Override
+		public Object eval(Object target, Object parameter) {
+			// TODO Auto-generated method stub
+			return evalArgs(target, (Object[]) parameter);
+		}
 
-	/**
-	 * @param refer
-	 * @param stack
-	 */
-	public void register(String refer, IStack stack) {
-		referStacks.put(refer, stacks.size());
-		stacks.add(stack);
+		public abstract Object evalArgs(Object target, Object[] args);
 	}
 
+	/** nameMapStack */
+	private Map<String, IStack> nameMapStack = new HashMap<String, IStack>();
+
 	/**
-	 * @param refer
+	 * @param name
 	 * @return
 	 */
-	public IStack get(String refer) {
-		return stacks.get(referStacks.get(refer));
+	public IStack get(String name) {
+		return nameMapStack.get(name);
+	}
+
+	/**
+	 * @param name
+	 * @param stack
+	 */
+	public IStack set(String name, IStack stack) {
+		return nameMapStack.put(name, stack);
+	}
+
+	/**
+	 * @param name
+	 * @param stack
+	 */
+	public IStack unset(String name) {
+		return nameMapStack.remove(name);
 	}
 
 	/**
 	 * 
 	 */
 	public void initEngine() {
-		register("#register", new IStack() {
+		set("#get", new IStack() {
 
 			@Override
-			public Object eval(Object target, Object[] args) {
-				// TODO Auto-generated method stub
-				register((String) target, (IStack) args[0]);
-				return null;
-			}
-		});
-		register("#get", new IStack() {
-
-			@Override
-			public Object eval(Object target, Object[] args) {
+			public Object eval(Object target, Object parameter) {
 				// TODO Auto-generated method stub
 				return get((String) target);
 			}
 		});
-		register("#map", new IStack() {
+		set("#set", new IStack() {
 
 			@Override
-			public Object eval(Object target, Object[] args) {
+			public Object eval(Object target, Object parameter) {
+				// TODO Auto-generated method stub
+				return set((String) target, (IStack) parameter);
+			}
+		});
+		set("#unset", new IStack() {
+
+			@Override
+			public Object eval(Object target, Object parameter) {
+				// TODO Auto-generated method stub
+				return unset((String) target);
+			}
+		});
+		set("@hash", new IStack() {
+
+			@Override
+			public Object eval(Object target, Object parameter) {
+				// TODO Auto-generated method stub
+				return target.hashCode();
+			}
+		});
+		set("@equals", new IStack() {
+
+			@Override
+			public Object eval(Object target, Object parameter) {
+				// TODO Auto-generated method stub
+				return target.equals(parameter);
+			}
+		});
+		set("@array", new IStack() {
+
+			@Override
+			public Object eval(Object target, Object parameter) {
+				// TODO Auto-generated method stub
+				return new Object[(Integer) parameter];
+			}
+
+		});
+		set("@array.get", new IStack() {
+
+			@Override
+			public Object eval(Object target, Object parameter) {
+				// TODO Auto-generated method stub
+				return ((Object[]) target)[(Integer) parameter];
+			}
+
+		});
+		set("@array.set", new StackArgs() {
+
+			@Override
+			public Object evalArgs(Object target, Object[] args) {
+				// TODO Auto-generated method stub
+				return ((Object[]) target)[(Integer) args[0]] = args[1];
+			}
+
+		});
+		set("@map", new IStack() {
+
+			@Override
+			public Object eval(Object target, Object parameter) {
 				// TODO Auto-generated method stub
 				return new HashMap<Object, Object>();
 			}
 		});
-		register("#map.get", new IStack() {
+		set("@map.get", new IStack() {
 
 			@Override
-			public Object eval(Object target, Object[] args) {
+			public Object eval(Object target, Object parameter) {
 				// TODO Auto-generated method stub
-				return ((Map<Object, Object>)target).get(args[0]);
+				return ((Map<Object, Object>) target).get(parameter);
 			}
+		});
+		set("@map.put", new StackArgs() {
+
+			@Override
+			public Object evalArgs(Object target, Object[] args) {
+				// TODO Auto-generated method stub
+				return ((Map<Object, Object>) target).put(args[0], args[1]);
+			}
+
 		});
 	}
 

@@ -7,6 +7,8 @@
  */
 package com.absir.appserv.game.bean.value;
 
+import java.io.Serializable;
+
 /**
  * @author absir
  *
@@ -14,7 +16,7 @@ package com.absir.appserv.game.bean.value;
 public interface IPropDefine {
 
 	// 道具编号
-	public int getId();
+	public Serializable getId();
 
 	// 道具价格
 	public int getPrice();

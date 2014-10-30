@@ -11,8 +11,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.persistence.Entity;
-
 import com.absir.appserv.feature.menu.value.MaEntity;
 import com.absir.appserv.feature.menu.value.MaMenu;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
@@ -31,7 +29,6 @@ import com.absir.property.value.PropertyInfo;
  */
 @MaEntity(parent = { @MaMenu("在线管理") }, name = "会话")
 @Properties(@Property(name = "expirationTime", infos = @PropertyInfo(value = JaLang.class, valueInfo = "过期时间")))
-@Entity
 public class SecurityContext extends ContextBean<String> {
 
 	/** securitySupply */

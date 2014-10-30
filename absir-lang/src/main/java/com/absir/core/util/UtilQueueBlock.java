@@ -19,7 +19,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class UtilQueueBlock<T> extends UtilQueue<T> {
 
 	/** reading */
-	protected Boolean reading;
+	protected boolean reading;
 
 	/** lock */
 	protected Lock lock = new ReentrantLock();
@@ -41,14 +41,15 @@ public class UtilQueueBlock<T> extends UtilQueue<T> {
 	 * @see com.absir.core.util.UtilQueue#addElement(java.lang.Object)
 	 */
 	@Override
-	public synchronized void addElement(T element) {
+	public void addElement(T element) {
+		lock.lock();
 		super.addElement(element);
 		if (reading) {
-			lock.lock();
 			reading = false;
 			condition.signal();
-			lock.unlock();
 		}
+
+		lock.unlock();
 	}
 
 	/**
@@ -57,7 +58,7 @@ public class UtilQueueBlock<T> extends UtilQueue<T> {
 	protected void readingWaite() throws InterruptedException {
 		lock.lock();
 		reading = true;
-		condition.wait();
+		condition.await();
 		lock.unlock();
 	}
 
@@ -67,7 +68,7 @@ public class UtilQueueBlock<T> extends UtilQueue<T> {
 	 * @see com.absir.core.util.UtilQueue#readElement()
 	 */
 	@Override
-	public synchronized T readElement() {
+	public T readElement() {
 		T element;
 		try {
 			while (true) {
@@ -94,7 +95,7 @@ public class UtilQueueBlock<T> extends UtilQueue<T> {
 	 * @see com.absir.core.util.UtilQueue#readElements(int)
 	 */
 	@Override
-	public synchronized List<T> readElements(int max) {
+	public List<T> readElements(int max) {
 		List<T> elements;
 		try {
 			while (true) {

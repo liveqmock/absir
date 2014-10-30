@@ -7,6 +7,7 @@
  */
 package com.absir.appserv.game.bean;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -91,7 +92,7 @@ public abstract class JbPlayerA<T extends PlayerAtt> extends JbBase {
 
 		/** propNumbers */
 		@JaLang("道具数量")
-		public Map<Integer, Integer> propNumbers;
+		public Map<Serializable, Integer> propNumbers;
 	}
 
 	/**
@@ -283,7 +284,7 @@ public abstract class JbPlayerA<T extends PlayerAtt> extends JbBase {
 		playerAtt.taskProgresses = playerAtt.taskProgresses == null ? new HashMap<String, Integer>() : new HashMap<String, Integer>(playerAtt.taskProgresses);
 		playerAtt.metaRecards = playerAtt.metaRecards == null ? new HashMap<String, Integer>() : new HashMap<String, Integer>(playerAtt.metaRecards);
 		if (playerAtt.propNumbers == null) {
-			playerAtt.propNumbers = new LinkedHashMap<Integer, Integer>();
+			playerAtt.propNumbers = new LinkedHashMap<Serializable, Integer>();
 		}
 	}
 
@@ -320,7 +321,7 @@ public abstract class JbPlayerA<T extends PlayerAtt> extends JbBase {
 	/**
 	 * @return the propNumbers
 	 */
-	public Map<Integer, Integer> getPropNumbers() {
+	public Map<Serializable, Integer> getPropNumbers() {
 		return getPlayerAtt().propNumbers;
 	}
 
@@ -328,7 +329,7 @@ public abstract class JbPlayerA<T extends PlayerAtt> extends JbBase {
 	 * @param propNumbers
 	 *            the propNumbers to set
 	 */
-	public void setPropNumbers(Map<Integer, Integer> propNumbers) {
+	public void setPropNumbers(Map<Serializable, Integer> propNumbers) {
 		getPlayerAtt().propNumbers = propNumbers;
 	}
 

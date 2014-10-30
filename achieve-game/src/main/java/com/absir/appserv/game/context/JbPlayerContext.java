@@ -7,6 +7,7 @@
  */
 package com.absir.appserv.game.context;
 
+import java.io.Serializable;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -253,10 +254,14 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 		/**
 		 * 检查投递
 		 */
-		protected synchronized void checkPosted() {
+		protected void checkPosted() {
 			if (posting && !runed) {
-				runed = true;
-				ContextUtils.getThreadPoolExecutor().execute(this);
+				synchronized (this) {
+					if (!runed) {
+						runed = true;
+						ContextUtils.getThreadPoolExecutor().execute(this);
+					}
+				}
 			}
 		}
 
@@ -640,7 +645,8 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	}
 
 	// 设置玩家等级
-	public LevelExpCxt<P> playerExpCxt;
+	@JsonIgnore
+	private LevelExpCxt<P> playerExpCxt;
 
 	/**
 	 * 获取设置玩家等级
@@ -1058,7 +1064,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 * @return
 	 */
 	public int modifyProp(IPropDefine propDefine, int size) {
-		Map<Integer, Integer> propNumbers = playerA.getPropNumbers();
+		Map<Serializable, Integer> propNumbers = playerA.getPropNumbers();
 		synchronized (propNumbers) {
 			Integer number = propNumbers.get(propDefine);
 			if (number != null) {
@@ -1109,7 +1115,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 * @return
 	 */
 	public int sellProp(IPropDefine propDefine, int size) {
-		Map<Integer, Integer> propNumbers = playerA.getPropNumbers();
+		Map<Serializable, Integer> propNumbers = playerA.getPropNumbers();
 		int number;
 		synchronized (propNumbers) {
 			Integer propNumber = propNumbers.get(propDefine.getId());

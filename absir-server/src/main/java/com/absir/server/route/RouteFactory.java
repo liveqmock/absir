@@ -12,8 +12,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.absir.bean.basis.Basis;
 import com.absir.bean.basis.BeanDefine;
@@ -265,7 +267,7 @@ public class RouteFactory implements IBeanDefineSupply, IBeanFactoryAware, IMeth
 			}
 
 			if (parameter == null) {
-				parameter = parameterResolverPath.getParameter(i, parameterNames, routeMethod.parameterTypes, parameterAnnotations, method);
+				parameter = parameterResolverPath.getParameter(i, parameterNames, routeMethod.parameterTypes, parameterAnnotations, beanMethod);
 				if (parameterPathNames != null) {
 					parameterPathNames.add((String) parameter);
 				}
@@ -346,6 +348,7 @@ public class RouteFactory implements IBeanDefineSupply, IBeanFactoryAware, IMeth
 			Object beanObject = beanDefine.getBeanObject(beanFactory);
 			beanDefine = beanFactory.getBeanDefine(beanDefine.getBeanName());
 			beanDefines.set(i, beanDefine);
+			Set<Method> beanMethods = new HashSet<Method>();
 			if (beanObject != null) {
 				String name = null;
 				RouteEntry routeEntry = null;
@@ -354,55 +357,64 @@ public class RouteFactory implements IBeanDefineSupply, IBeanFactoryAware, IMeth
 				Mapping mapping = null;
 				boolean urlDecode = false;
 				Class<?> beanType = beanDefine.getBeanType();
-				for (Method method : beanType.getDeclaredMethods()) {
-					if (Modifier.isPublic(method.getModifiers()) && !(Modifier.isStatic(method.getModifiers()) || method.getName().charAt(0) == '_' || method.getAnnotation(Close.class) != null)) {
-						if (name == null) {
-							name = KernelString.lastString(beanDefine.getBeanType().getSimpleName(), '_');
-							routeEntry = getRouteEntry(beanType);
-							routeEntity = getRouteEntity(beanObject, beanDefine, routeDefine);
-							iRoute = routeEntry == null ? null : routeEntry.getIRoute();
-							if (iRoute == null) {
-								iRoute = routeMapping;
-							}
-
-							Class<?> beanClass = beanType;
-							while (beanClass != null && beanClass != Object.class) {
-								mapping = beanClass.getAnnotation(Mapping.class);
-								if (mapping != null) {
-									break;
+				Class<?> beanClass = beanType;
+				while (beanClass != null && beanClass != Object.class) {
+					for (Method method : beanClass.getDeclaredMethods()) {
+						if (Modifier.isPublic(method.getModifiers()) && !(Modifier.isStatic(method.getModifiers()) || method.getName().charAt(0) == '_' || method.getAnnotation(Close.class) != null)) {
+							if (name == null) {
+								name = KernelString.lastString(beanDefine.getBeanType().getSimpleName(), '_');
+								routeEntry = getRouteEntry(beanType);
+								routeEntity = getRouteEntity(beanObject, beanDefine, routeDefine);
+								iRoute = routeEntry == null ? null : routeEntry.getIRoute();
+								if (iRoute == null) {
+									iRoute = routeMapping;
 								}
 
-								beanClass = beanClass.getSuperclass();
-							}
+								Class<?> routeClass = beanType;
+								while (routeClass != null && routeClass != Object.class) {
+									mapping = routeClass.getAnnotation(Mapping.class);
+									if (mapping != null) {
+										break;
+									}
 
-							beanClass = beanType;
-							while (beanClass != null && beanClass != Object.class) {
-								if (beanClass.getAnnotation(UrlDecode.class) != null) {
-									urlDecode = true;
-									break;
-
-								} else if (beanClass.getAnnotation(UrlBase.class) != null) {
-									break;
+									routeClass = routeClass.getSuperclass();
 								}
 
-								beanClass = beanClass.getSuperclass();
-							}
-						}
+								routeClass = beanType;
+								while (routeClass != null && routeClass != Object.class) {
+									if (routeClass.getAnnotation(UrlDecode.class) != null) {
+										urlDecode = true;
+										break;
 
-						List<String> parameterPathNames = new ArrayList<String>();
-						List<Integer> parameterPathIndexs = new ArrayList<Integer>();
-						List<Annotation[]> parameterPathAnnotations = new ArrayList<Annotation[]>();
-						RouteMethod routeMethod = getRouteMethod(beanType, method, null, parameterPathNames, parameterPathIndexs, parameterPathAnnotations);
-						List<String> mappings = new ArrayList<String>();
-						List<InMethod> inMethods = new ArrayList<InMethod>();
-						iRoute.routeMapping(name, new ObjectEntry<Mapping, List<String>>(mapping, null), method, parameterPathNames, mappings, inMethods);
-						if (mappings.size() > 0) {
-							boolean url = (urlDecode || method.getAnnotation(UrlDecode.class) != null) && method.getAnnotation(UrlBase.class) == null;
-							String[] parameterPathNameArray = KernelCollection.toArray(parameterPathNames, String.class);
-							routeMapping.routeMapping(new RouteAction(url, routeEntity, routeEntry, routeMethod, parameterPathNameArray, parameterPathIndexs, parameterPathAnnotations),
-									parameterPathNameArray, mappings, inMethods);
+									} else if (routeClass.getAnnotation(UrlBase.class) != null) {
+										break;
+									}
+
+									routeClass = routeClass.getSuperclass();
+								}
+							}
+
+							if (!beanMethods.add(InjectBeanFactory.getInstance().getBeanMethod(beanType, method))) {
+								continue;
+							}
+
+							List<String> parameterPathNames = new ArrayList<String>();
+							List<Integer> parameterPathIndexs = new ArrayList<Integer>();
+							List<Annotation[]> parameterPathAnnotations = new ArrayList<Annotation[]>();
+							RouteMethod routeMethod = getRouteMethod(beanType, method, null, parameterPathNames, parameterPathIndexs, parameterPathAnnotations);
+							List<String> mappings = new ArrayList<String>();
+							List<InMethod> inMethods = new ArrayList<InMethod>();
+							iRoute.routeMapping(name, new ObjectEntry<Mapping, List<String>>(mapping, null), method, parameterPathNames, mappings, inMethods);
+							if (mappings.size() > 0) {
+								boolean url = (urlDecode || method.getAnnotation(UrlDecode.class) != null) && method.getAnnotation(UrlBase.class) == null;
+								String[] parameterPathNameArray = KernelCollection.toArray(parameterPathNames, String.class);
+								routeMapping.routeMapping(new RouteAction(url, routeEntity, routeEntry, routeMethod, parameterPathNameArray, parameterPathIndexs, parameterPathAnnotations),
+										parameterPathNameArray, mappings, inMethods);
+							}
 						}
 					}
+
+					beanClass = beanClass.getSuperclass();
 				}
 			}
 		}

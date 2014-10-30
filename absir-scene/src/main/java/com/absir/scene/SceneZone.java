@@ -76,25 +76,35 @@ public class SceneZone<T extends ISceneObject, E> implements IStep, ISceneBroadc
 		sceneBroadCasts.sync();
 		List<T> adds = sceneObjects.syncAdds();
 		List<T> removes = sceneObjects.syncRemoves();
-		for (T add : adds) {
-			if (add.isSensory()) {
-				broadcast(add, null, new OReportDetail(add.getId(), null, OBJECT_EFFECT, add.getStatusObject()));
+		if (adds != null) {
+			for (T add : adds) {
+				if (add.isSensory()) {
+					broadcast(add, null, new OReportDetail(add.getId(), null, OBJECT_EFFECT, add.getStatusObject()));
+				}
 			}
 		}
 
-		for (T remove : removes) {
-			if (remove.isSensory()) {
-				broadcast(remove, null, new OReportDetail(remove.getId(), null, OBJECT_EFFECT, null));
+		if (removes != null) {
+			for (T remove : removes) {
+				if (remove.isSensory()) {
+					broadcast(remove, null, new OReportDetail(remove.getId(), null, OBJECT_EFFECT, null));
+				}
 			}
 		}
 
 		Iterator<T> iterator = sceneObjects.iterator();
-		T sceneObject;
+		T sceneObject = null;
 		boolean sensory;
 		while (iterator.hasNext()) {
 			sceneObject = iterator.next();
 			sensory = sceneObject.isSensory();
 			if (sceneObject.stepDone(contextTime)) {
+				iterator.remove();
+				if (sensory) {
+					broadcast(sceneObject, null, new OReportDetail(sceneObject.getId(), null, OBJECT_EFFECT, null));
+				}
+
+			} else {
 				if (sensory != sceneObject.isSensory()) {
 					if (sensory) {
 						broadcast(sceneObject, null, new OReportDetail(sceneObject.getId(), null, OBJECT_EFFECT, null));
@@ -103,16 +113,10 @@ public class SceneZone<T extends ISceneObject, E> implements IStep, ISceneBroadc
 						broadcast(sceneObject, null, new OReportDetail(sceneObject.getId(), null, OBJECT_EFFECT, sceneObject.getStatusObject()));
 					}
 				}
-
-			} else {
-				iterator.remove();
-				if (sensory) {
-					broadcast(sceneObject, null, new OReportDetail(sceneObject.getId(), null, OBJECT_EFFECT, null));
-				}
 			}
 		}
 
-		return true;
+		return sceneObject == null;
 	}
 
 	/*

@@ -43,6 +43,13 @@ public class ContextStep implements Runnable {
 	}
 
 	/**
+	 * @return the detlaTime
+	 */
+	public long getDetlaTime() {
+		return detlaTime;
+	}
+
+	/**
 	 * @param step
 	 */
 	public synchronized void addStep(IStep step) {
@@ -52,15 +59,15 @@ public class ContextStep implements Runnable {
 	/**
 	 * 
 	 */
-	public void cancel() {
-		cancel = true;
+	public void start() {
+		ContextUtils.getThreadPoolExecutor().execute(this);
 	}
 
 	/**
-	 * @return the detlaTime
+	 * 
 	 */
-	public long getDetlaTime() {
-		return detlaTime;
+	public void cancel() {
+		cancel = true;
 	}
 
 	/*
@@ -83,10 +90,10 @@ public class ContextStep implements Runnable {
 				}
 
 				long contextTime = System.currentTimeMillis();
-				detlaTime -= contextTime;
+				detlaTime = contextTime - detlaTime;
 				Iterator<IStep> iterator = steps.iterator();
 				while (iterator.hasNext()) {
-					if (!iterator.next().stepDone(contextTime)) {
+					if (iterator.next().stepDone(contextTime)) {
 						iterator.remove();
 					}
 				}

@@ -220,14 +220,14 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 
 	// 会话队列
 	@JsonIgnore
-	private UtilQueue<Object> chatQueue = createChatQueue();
+	private UtilQueueBlock<Object> chatQueue = createChatQueue();
 
 	/**
 	 * 创建会话队列
 	 * 
 	 * @return
 	 */
-	protected UtilQueue<Object> createChatQueue() {
+	protected UtilQueueBlock<Object> createChatQueue() {
 		return new UtilQueueBlock<Object>(50);
 	}
 
@@ -246,10 +246,16 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 		/**
 		 * 清除通知
 		 */
-		public void clear() {
-			cancel();
+		public void cancel() {
+			super.cancel();
+			cancelQueue();
 			postObject = null;
 		}
+
+		/**
+		 * 清除队列
+		 */
+		protected abstract void cancelQueue();
 
 		/**
 		 * 检查投递
@@ -266,11 +272,11 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 		}
 
 		/**
-		 * 执行
+		 * 执行投递
 		 */
-		public synchronized void run() {
-			while (true) {
-				if (postObject == null || SocketService.writeByteObject(socketChannel, getCallbackIndex(), postObject, true)) {
+		public void run() {
+			if (postObject == null || SocketService.writeByteObject(socketChannel, getCallbackIndex(), postObject, true)) {
+				while (true) {
 					postObject = getPostObject();
 					if (!SocketService.writeByteObject(socketChannel, getCallbackIndex(), postObject, true)) {
 						break;
@@ -327,6 +333,12 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 			// TODO Auto-generated method stub
 			return SocketService.CALLBACK_CHAT;
 		}
+
+		@Override
+		protected void cancelQueue() {
+			// TODO Auto-generated method stub
+			canceltalkQueue();
+		}
 	};
 
 	/**
@@ -334,6 +346,13 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 */
 	protected Object talkNotifier() {
 		return chatQueue.readElements(10);
+	}
+
+	/**
+	 * 
+	 */
+	protected void canceltalkQueue() {
+		chatQueue.cancel();
 	}
 
 	/**
@@ -555,6 +574,10 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	@Override
 	public void uninitialize() {
 		// TODO Auto-generated method stub
+		for (Notifier notifier : notifiers) {
+			notifier.cancel();
+		}
+
 		setFight(null);
 		playerA.setLastOffline(ContextUtils.getContextTime());
 		playerA.setOnlineTime(playerA.getOnlineTime() + playerA.getLastOffline() - onlineTime);

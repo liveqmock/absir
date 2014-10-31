@@ -73,7 +73,19 @@ public class SceneZone<T extends ISceneObject, E> implements IStep, ISceneBroadc
 	 * @param contextTime
 	 */
 	public boolean stepDone(long contextTime) {
-		sceneBroadCasts.sync();
+		sceneBroadCasts.syncRemoves();
+		List<ISceneBroadcast<T, E>> sceneBroadCastAdds = sceneBroadCasts.syncAdds();
+		if (sceneBroadCastAdds != null) {
+			Iterator<T> iterator = sceneObjects.iterator();
+			T sceneObject = null;
+			while (iterator.hasNext()) {
+				sceneObject = iterator.next();
+				if (sceneObject.isSensory()) {
+					broadcast(sceneObject, null, new OReportDetail(sceneObject.getId(), null, OBJECT_EFFECT, sceneObject.getStatusObject()));
+				}
+			}
+		}
+
 		List<T> adds = sceneObjects.syncAdds();
 		List<T> removes = sceneObjects.syncRemoves();
 		if (adds != null) {

@@ -35,6 +35,14 @@ public class UtilQueueBlock<T> extends UtilQueue<T> {
 		// TODO Auto-generated constructor stub
 	}
 
+	/**
+	 * 
+	 */
+	public void cancel() {
+		clear();
+		readingSignal();
+	};
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -42,8 +50,15 @@ public class UtilQueueBlock<T> extends UtilQueue<T> {
 	 */
 	@Override
 	public void addElement(T element) {
-		lock.lock();
 		super.addElement(element);
+		readingSignal();
+	}
+
+	/**
+	 * 
+	 */
+	protected void readingSignal() {
+		lock.lock();
 		if (reading) {
 			reading = false;
 			condition.signal();

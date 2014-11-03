@@ -26,7 +26,7 @@ public class ContextStep implements Runnable {
 	/** delay */
 	private long delay;
 
-	/** detlaTime */
+	/** deltaTime */
 	private long deltaTime;
 
 	/** steps */

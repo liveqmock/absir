@@ -27,7 +27,7 @@ public class ContextStep implements Runnable {
 	private long delay;
 
 	/** detlaTime */
-	private long detlaTime;
+	private long deltaTime;
 
 	/** steps */
 	private List<IStep> steps = new LinkedList<IStep>();
@@ -43,10 +43,10 @@ public class ContextStep implements Runnable {
 	}
 
 	/**
-	 * @return the detlaTime
+	 * @return the deltaTime
 	 */
-	public long getDetlaTime() {
-		return detlaTime;
+	public long getDeltaTime() {
+		return deltaTime;
 	}
 
 	/**
@@ -79,7 +79,7 @@ public class ContextStep implements Runnable {
 	public void run() {
 		// TODO Auto-generated method stub
 		try {
-			detlaTime = System.currentTimeMillis();
+			deltaTime = System.currentTimeMillis();
 			while (!cancel) {
 				List<IStep> adds = addSteps;
 				if (!adds.isEmpty()) {
@@ -90,7 +90,7 @@ public class ContextStep implements Runnable {
 				}
 
 				long contextTime = System.currentTimeMillis();
-				detlaTime = contextTime - detlaTime;
+				deltaTime = contextTime - deltaTime;
 				Iterator<IStep> iterator = steps.iterator();
 				while (iterator.hasNext()) {
 					if (iterator.next().stepDone(contextTime)) {
@@ -98,7 +98,7 @@ public class ContextStep implements Runnable {
 					}
 				}
 
-				detlaTime = contextTime;
+				deltaTime = contextTime;
 				Thread.sleep(delay);
 			}
 

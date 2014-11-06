@@ -10,8 +10,8 @@ package com.absir.appserv.game.value;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
@@ -49,10 +49,10 @@ public abstract class OObject<T extends OObject> implements JiBase {
 	protected int atk;
 
 	// BUFF状态
-	private List<OBuff> buffs = new LinkedList<OBuff>();
+	private Queue<OBuff> buffs;
 
 	// 属性BUFF计算
-	private transient HashMap<String, float[]> attBuffs = new HashMap<String, float[]>();
+	private transient HashMap<String, float[]> attBuffs = null;
 
 	// 治疗
 	private static final String TREAT = "T";
@@ -179,7 +179,7 @@ public abstract class OObject<T extends OObject> implements JiBase {
 	/**
 	 * @return the buffs
 	 */
-	public List<OBuff> getBuffs() {
+	public Queue<OBuff> getBuffs() {
 		return buffs;
 	}
 
@@ -195,7 +195,7 @@ public abstract class OObject<T extends OObject> implements JiBase {
 		}
 
 		// BUFF状态步进
-		synchronized (buffs) {
+		if (buffs != null) {
 			Iterator<OBuff> iterator = buffs.iterator();
 			while (iterator.hasNext()) {
 				OBuff oBuff = iterator.next();
@@ -285,7 +285,7 @@ public abstract class OObject<T extends OObject> implements JiBase {
 	 */
 	public final int atk(T target, int atk, Object damageFrom, IResult result) {
 		// 攻击BUFF
-		synchronized (buffs) {
+		if (buffs != null) {
 			Iterator<OBuff> iterator = buffs.iterator();
 			while (iterator.hasNext()) {
 				OBuff oBuff = iterator.next();
@@ -303,7 +303,7 @@ public abstract class OObject<T extends OObject> implements JiBase {
 		int damage = target.damage(this, atk, damageFrom, result);
 
 		// 伤害附加BUFF
-		synchronized (buffs) {
+		if (buffs != null) {
 			Iterator<OBuff> iterator = buffs.iterator();
 			while (iterator.hasNext()) {
 				OBuff oBuff = iterator.next();
@@ -318,7 +318,7 @@ public abstract class OObject<T extends OObject> implements JiBase {
 		}
 
 		// 伤害反弹BUFF
-		synchronized (target.buffs) {
+		if (buffs != null) {
 			Iterator<OBuff> iterator = target.buffs.iterator();
 			while (iterator.hasNext()) {
 				OBuff oBuff = iterator.next();
@@ -344,7 +344,7 @@ public abstract class OObject<T extends OObject> implements JiBase {
 	 */
 	public final int damage(T from, int atk, Object damageFrom, IResult result) {
 		// 防御BUFF
-		synchronized (buffs) {
+		if (buffs != null) {
 			Iterator<OBuff> iterator = buffs.iterator();
 			while (iterator.hasNext()) {
 				OBuff oBuff = iterator.next();
@@ -378,7 +378,7 @@ public abstract class OObject<T extends OObject> implements JiBase {
 		// 检测死亡
 		if (died()) {
 			// 死亡BUFF
-			synchronized (buffs) {
+			if (buffs != null) {
 				Iterator<OBuff> iterator = buffs.iterator();
 				while (iterator.hasNext()) {
 					OBuff oBuff = iterator.next();
@@ -441,7 +441,7 @@ public abstract class OObject<T extends OObject> implements JiBase {
 	 */
 	public final int treat(T target, int hp, Object hpFrom, IResult result) {
 		// 治疗BUFF
-		synchronized (buffs) {
+		if (buffs != null) {
 			Iterator<OBuff> iterator = buffs.iterator();
 			while (iterator.hasNext()) {
 				OBuff oBuff = iterator.next();
@@ -459,7 +459,7 @@ public abstract class OObject<T extends OObject> implements JiBase {
 		int treat = target.treat(hp, hpFrom, result);
 
 		// 治疗附加BUFF
-		synchronized (buffs) {
+		if (buffs != null) {
 			Iterator<OBuff> iterator = buffs.iterator();
 			while (iterator.hasNext()) {
 				OBuff oBuff = iterator.next();
@@ -474,7 +474,7 @@ public abstract class OObject<T extends OObject> implements JiBase {
 		}
 
 		// 治疗收益附加BUFF
-		synchronized (target.buffs) {
+		if (target.buffs != null) {
 			Iterator<OBuff> iterator = target.buffs.iterator();
 			while (iterator.hasNext()) {
 				OBuff oBuff = iterator.next();
@@ -499,7 +499,7 @@ public abstract class OObject<T extends OObject> implements JiBase {
 	 */
 	public final int treat(int hp, Object hpFrom, IResult result) {
 		// 治疗收益BUFF
-		synchronized (buffs) {
+		if (buffs != null) {
 			Iterator<OBuff> iterator = buffs.iterator();
 			while (iterator.hasNext()) {
 				OBuff oBuff = iterator.next();
@@ -547,32 +547,38 @@ public abstract class OObject<T extends OObject> implements JiBase {
 	 * @param result
 	 */
 	public final void addBuff(OBuff buff, IResult result) {
-		synchronized (buffs) {
-			int id = buffs.size();
-			Iterator<OBuff> iterator = buffs.iterator();
-			while (iterator.hasNext()) {
-				OBuff oBuff = iterator.next();
-				int against = oBuff.against(oBuff);
-				if (against < 0) {
-					return;
-
-				} else if (against > 0) {
-					result.setDone(true);
-					buffResult(iterator, oBuff, result);
-
-				} else {
-					int oId = oBuff.getId();
-					if (id <= oId) {
-						id = oId + 1;
-					}
+		if (buffs == null) {
+			synchronized (this) {
+				if (buffs == null) {
+					buffs = new ConcurrentLinkedQueue<OBuff>();
 				}
 			}
-
-			buff.setId(id);
-			addReportDetail(null, ADD_BUFF, buff);
-			buff.effect(this, result);
-			buffs.add(buff);
 		}
+
+		int id = buffs.size();
+		Iterator<OBuff> iterator = buffs.iterator();
+		while (iterator.hasNext()) {
+			OBuff oBuff = iterator.next();
+			int against = oBuff.against(oBuff);
+			if (against < 0) {
+				return;
+
+			} else if (against > 0) {
+				result.setDone(true);
+				buffResult(iterator, oBuff, result);
+
+			} else {
+				int oId = oBuff.getId();
+				if (id <= oId) {
+					id = oId + 1;
+				}
+			}
+		}
+
+		buff.setId(id);
+		addReportDetail(null, ADD_BUFF, buff);
+		buff.effect(this, result);
+		buffs.add(buff);
 	}
 
 	/**
@@ -582,7 +588,7 @@ public abstract class OObject<T extends OObject> implements JiBase {
 	 * @param result
 	 */
 	protected void clearBuff(long buffId, IResult result) {
-		synchronized (buffs) {
+		if (buffs != null) {
 			Iterator<OBuff> iterator = buffs.iterator();
 			while (iterator.hasNext()) {
 				OBuff oBuff = iterator.next();
@@ -601,7 +607,7 @@ public abstract class OObject<T extends OObject> implements JiBase {
 	 * @param result
 	 */
 	public void clearAllBuffs(IResult result) {
-		synchronized (buffs) {
+		if (buffs != null) {
 			Iterator<OBuff> iterator = buffs.iterator();
 			while (iterator.hasNext()) {
 				result.setDone(true);
@@ -617,17 +623,28 @@ public abstract class OObject<T extends OObject> implements JiBase {
 	 * @return
 	 */
 	protected float[] getAttBuffs(String name) {
-		synchronized (attBuffs) {
-			float[] buffs = attBuffs.get(name);
-			if (buffs == null) {
-				buffs = new float[2];
-				buffs[0] = 0;
-				buffs[1] = 1;
-				attBuffs.put(name, buffs);
+		if (attBuffs == null) {
+			synchronized (this) {
+				if (attBuffs == null) {
+					attBuffs = new HashMap<String, float[]>();
+				}
 			}
-
-			return buffs;
 		}
+
+		float[] buffs = attBuffs.get(name);
+		if (buffs == null) {
+			synchronized (attBuffs) {
+				buffs = attBuffs.get(name);
+				if (buffs == null) {
+					buffs = new float[2];
+					buffs[0] = 0;
+					buffs[1] = 1;
+					attBuffs.put(name, buffs);
+				}
+			}
+		}
+
+		return buffs;
 	}
 
 	/**

@@ -24,6 +24,7 @@ import com.absir.aop.AopProxyHandler;
 import com.absir.appserv.feature.menu.OMenuFactory.MenuAopInterceptor;
 import com.absir.appserv.feature.menu.value.MaFactory;
 import com.absir.appserv.feature.menu.value.MaPermission;
+import com.absir.appserv.feature.menu.value.MaPermissionRef;
 import com.absir.appserv.lang.LangBundleImpl;
 import com.absir.appserv.system.bean.JMenuPermission;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
@@ -108,7 +109,21 @@ public class OMenuFactory extends AopMethodDefineAbstract<MenuAopInterceptor, St
 	public String getAopInterceptor(String variable, Class<?> beanType) {
 		// TODO Auto-generated method stub
 		MaPermission maPermission = beanType.getAnnotation(MaPermission.class);
-		return maPermission == null ? null : maPermission.value();
+		if (maPermission == null) {
+			return null;
+		}
+
+		String value = maPermission.value();
+		if (KernelString.isEmpty(value)) {
+			return null;
+		}
+
+		if (beanType.getAnnotation(MaPermissionRef.class) == null) {
+			return value;
+		}
+
+		permissions.add(value);
+		return null;
 	}
 
 	/*
@@ -129,22 +144,22 @@ public class OMenuFactory extends AopMethodDefineAbstract<MenuAopInterceptor, St
 			return null;
 		}
 
-		refs.add(interceptor);
+		permissions.add(interceptor);
 		return interceptor;
 	}
 
-	/** refs */
-	private Set<String> refs = new HashSet<String>();
+	/** permissions */
+	private Set<String> permissions = new HashSet<String>();
 
 	/**
 	 * 添加菜单默认权限
 	 */
 	@Transaction
 	@Started
-	protected void initRefs() {
-		if (refs != null) {
+	protected void initPermissions() {
+		if (permissions != null) {
 			Session session = BeanDao.getSession();
-			for (String ref : refs) {
+			for (String ref : permissions) {
 				JMenuPermission menuPermission = (JMenuPermission) QueryDaoUtils.select(session, "JMenuPermission", new Object[] { "o.id", ref });
 				if (menuPermission == null) {
 					menuPermission = new JMenuPermission();
@@ -154,7 +169,7 @@ public class OMenuFactory extends AopMethodDefineAbstract<MenuAopInterceptor, St
 				}
 			}
 
-			refs = null;
+			permissions = null;
 		}
 	}
 

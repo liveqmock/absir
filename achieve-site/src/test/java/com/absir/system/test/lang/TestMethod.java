@@ -8,14 +8,12 @@
 package com.absir.system.test.lang;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.script.ScriptException;
 
 import org.junit.Test;
 
-import com.absir.appserv.system.helper.HelperRandom;
-import com.absir.core.dyna.DynaBinder;
+import com.absir.core.kernel.KernelObject;
 import com.absir.system.test.AbstractTest;
 
 /**
@@ -159,20 +157,26 @@ public class TestMethod extends AbstractTest {
 		new Exception().printStackTrace();
 	}
 
+	void test(String name, Object test, Object nl, Character t) {
+		System.out.println(name);
+	}
+
 	@Test
 	public void main() throws IOException, ScriptException, NoSuchMethodException {
-		System.out.println(DynaBinder.to("name", List.class));
-		System.out.println(DynaBinder.to("name", String[].class));
-		System.out.println(HelperRandom.randSecendId(7));
-		System.out.println(HelperRandom.randSecendId(8));
-		System.out.println(HelperRandom.randSecendId(9));
-		System.out.println(HelperRandom.randSecendId(31));
-		System.out.println(HelperRandom.randSecendId(32));
-		System.out.println(HelperRandom.randSecendId(33));
-		//[^/\\]*([/\\]*)
-		String regx = "^([/\\\\]*)[^/\\\\]*([/\\\\]+)";
-		System.out.println("\\/ddd/a/sdsd".replaceFirst(regx, "$1admin$2"));
-		System.out.println("ddd/a/sdsd".replaceFirst(regx, "$1admin$2"));
-		System.out.println("/ddd\\a/sdsd".replaceFirst(regx, "$1admin$2"));
+		KernelObject.declaredSend(this, "test", "abc", null, 1, null);
+
+		// System.out.println(DynaBinder.to("name", List.class));
+		// System.out.println(DynaBinder.to("name", String[].class));
+		// System.out.println(HelperRandom.randSecendId(7));
+		// System.out.println(HelperRandom.randSecendId(8));
+		// System.out.println(HelperRandom.randSecendId(9));
+		// System.out.println(HelperRandom.randSecendId(31));
+		// System.out.println(HelperRandom.randSecendId(32));
+		// System.out.println(HelperRandom.randSecendId(33));
+		// //[^/\\]*([/\\]*)
+		// String regx = "^([/\\\\]*)[^/\\\\]*([/\\\\]+)";
+		// System.out.println("\\/ddd/a/sdsd".replaceFirst(regx, "$1admin$2"));
+		// System.out.println("ddd/a/sdsd".replaceFirst(regx, "$1admin$2"));
+		// System.out.println("/ddd\\a/sdsd".replaceFirst(regx, "$1admin$2"));
 	}
 }

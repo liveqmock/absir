@@ -248,8 +248,10 @@ public abstract class KernelClass {
 	public static Class[] parameterTypes(Object... args) {
 		int length = args.length;
 		Class[] parameterTypes = new Class[length];
+		Object arg;
 		for (int i = 0; i < length; i++) {
-			parameterTypes[i] = args[i].getClass();
+			arg = args[i];
+			parameterTypes[i] = arg == null ? null : args[i].getClass();
 		}
 
 		return parameterTypes;

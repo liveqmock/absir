@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+<?xml version="1.0" encoding="UTF-8"?>
+<project-modules id="moduleCoreId" project-version="1.5.0">
     <wb-module deploy-name="achieve-site">
         <wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
         <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
@@ -13,10 +14,7 @@
         <dependent-module archiveName="absir-server-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-server/absir-server">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="absir-context-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-context/absir-context">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="absir-bean-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-bean/absir-bean">
+        <dependent-module archiveName="absir-aop-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-aop/absir-aop">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="absir-lang-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-lang/absir-lang">
@@ -26,9 +24,6 @@
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="absir-socket-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-socket/absir-socket">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="absir-card-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-card/absir-card">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="absir-game-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-game/absir-game">

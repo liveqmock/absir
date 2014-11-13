@@ -141,8 +141,6 @@ public class AopProxyHandler {
 						value = invoke(proxy, iterator, method, args, methodProxy);
 					}
 
-					return value;
-
 				} catch (Throwable e) {
 					ex = e;
 					throw e;
@@ -150,6 +148,8 @@ public class AopProxyHandler {
 				} finally {
 					value = aopInterceptor.after(proxy, value, interceptor, this, method, args, ex);
 				}
+
+				return value;
 			}
 		}
 

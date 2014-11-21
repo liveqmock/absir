@@ -77,6 +77,18 @@ public abstract class FriendService {
 	public static final int ACCORD_DELETED = -9;
 
 	/**
+	 * 是否是好友
+	 * 
+	 * @param player
+	 * @param target
+	 * @return
+	 */
+	public boolean isFriend(JbPlayer player, JbPlayer target) {
+		JbFriend friend = getFriend(player, target, false);
+		return friend != null && friend.getAccord() == ACCORD_SUCCESS;
+	}
+
+	/**
 	 * 添加好友
 	 * 
 	 * @param playerContext

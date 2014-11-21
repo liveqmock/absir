@@ -14,7 +14,7 @@ import com.absir.appserv.game.context.JbPlayerContext;
  * @author absir
  *
  */
-public interface IPropCard<C extends JbCard, P extends JbPlayerContext<C, ?, ?, ?, ?, ?>> {
+public interface IPropCard<C extends JbCard, P extends JbPlayerContext<C, ?, ?, ?, ?, ?, ?>> {
 
 	/**
 	 * @param card

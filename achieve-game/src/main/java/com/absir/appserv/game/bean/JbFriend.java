@@ -9,6 +9,8 @@ package com.absir.appserv.game.bean;
 
 import javax.persistence.MappedSuperclass;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 import com.absir.appserv.system.bean.base.JbBeanLL;
 
 /**
@@ -19,14 +21,16 @@ import com.absir.appserv.system.bean.base.JbBeanLL;
 public abstract class JbFriend extends JbBeanLL {
 
 	// 主动添加
-	private boolean accord;
+	private int accord;
 
 	// 角色
+	@JsonIgnore
 	public abstract JbPlayer getPlayer();
 
 	public abstract void setPlayer(JbPlayer player);
 
 	// 角色对象
+	@JsonIgnore
 	public abstract JbPlayer getTarget();
 
 	public abstract void setTarget(JbPlayer target);
@@ -34,7 +38,7 @@ public abstract class JbFriend extends JbBeanLL {
 	/**
 	 * @return the accord
 	 */
-	public boolean isAccord() {
+	public int getAccord() {
 		return accord;
 	}
 
@@ -42,7 +46,7 @@ public abstract class JbFriend extends JbBeanLL {
 	 * @param accord
 	 *            the accord to set
 	 */
-	public void setAccord(boolean accord) {
+	public void setAccord(int accord) {
 		this.accord = accord;
 	}
 }

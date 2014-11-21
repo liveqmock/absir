@@ -13,7 +13,7 @@ import com.absir.appserv.game.context.JbPlayerContext;
  * @author absir
  *
  */
-public interface IPropPlayer<P extends JbPlayerContext<?, ?, ?, ?, ?, ?>> {
+public interface IPropPlayer<P extends JbPlayerContext<?, ?, ?, ?, ?, ?, ?>> {
 
 	/**
 	 * @param playerContext

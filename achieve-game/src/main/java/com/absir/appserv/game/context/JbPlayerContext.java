@@ -26,6 +26,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.hibernate.Session;
 
 import com.absir.appserv.game.bean.JbCard;
+import com.absir.appserv.game.bean.JbFriend;
 import com.absir.appserv.game.bean.JbPlayer;
 import com.absir.appserv.game.bean.JbPlayerA;
 import com.absir.appserv.game.bean.JbReward;
@@ -41,6 +42,7 @@ import com.absir.appserv.game.context.value.IPropCard;
 import com.absir.appserv.game.context.value.IPropEvolute;
 import com.absir.appserv.game.context.value.IPropPlayer;
 import com.absir.appserv.game.context.value.OReward;
+import com.absir.appserv.game.service.FriendService;
 import com.absir.appserv.game.service.SocketService;
 import com.absir.appserv.game.utils.GameUtils;
 import com.absir.appserv.game.value.LevelExpCxt;
@@ -68,7 +70,8 @@ import com.absir.server.exception.ServerStatus;
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
 @Inject
-public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A extends JbPlayerA, PD extends IPlayerDefine, R extends JbReward, F extends IFight> extends ContextBean<Long> {
+public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A extends JbPlayerA, PD extends IPlayerDefine, R extends JbReward, F extends JbFriend, FI extends IFight> extends
+		ContextBean<Long> {
 
 	// 功能组件
 	public static final PlayerComponentBase COMPONENT = BeanFactoryUtils.get(PlayerComponentBase.class);
@@ -100,7 +103,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	// 当前战斗
 	@JsonIgnore
 	@JaEdit(editable = JeEditable.LOCKED)
-	protected F fight;
+	protected FI fight;
 
 	// 全部恢复
 	@JsonSerialize(contentAs = IBaseSerializer.class)
@@ -562,7 +565,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	public void setSocketChannel(SocketChannel socketChannel) {
 		if (socketChannel == null) {
 			player.setOnline(false);
-			F fight = this.fight;
+			FI fight = this.fight;
 			if (fight != null) {
 				fight.disconnect();
 			}
@@ -580,7 +583,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	/**
 	 * @return the fight
 	 */
-	public F getFight() {
+	public FI getFight() {
 		return fight;
 	}
 
@@ -588,8 +591,8 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 * @param fight
 	 *            the fight to set
 	 */
-	public void setFight(F fight) {
-		F current = this.fight;
+	public void setFight(FI fight) {
+		FI current = this.fight;
 		if (current != null) {
 			current.close();
 		}
@@ -1508,6 +1511,33 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	}
 
 	/**
+	 * 添加好友
+	 * 
+	 * @param player
+	 */
+	public synchronized int friend(JbPlayer target) {
+		if (target.getFriendNumber() >= target.getMaxFriendNumber()) {
+			return -1;
+		}
+
+		if (player.getFriendNumber() >= player.getMaxFriendNumber() || getId().equals(target.getId()) || player.getServerId() != target.getServerId()) {
+			throw new ServerException(ServerStatus.ON_DENIED);
+		}
+
+		return FriendService.ME.addFriend(this, target);
+	}
+
+	/**
+	 * 删除好友
+	 * 
+	 * @param target
+	 * @return
+	 */
+	public synchronized int unfriend(JbPlayer target) {
+		return FriendService.ME.deleteFriend(this, target);
+	}
+
+	/**
 	 * 任务ID
 	 * 
 	 * @param scene
@@ -1523,7 +1553,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 * 
 	 * @return
 	 */
-	public synchronized F task(int scene, int pass, int detail) {
+	public synchronized FI task(int scene, int pass, int detail) {
 		if (playerCards.size() >= player.getMaxCardNumber()) {
 			throw new ServerException(ServerStatus.IN_FAILED, "card number");
 		}
@@ -1568,7 +1598,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 			throw new ServerException(ServerStatus.IN_FAILED, "ep");
 		}
 
-		F fight = doTaskFight(taskId, scene, pass, detail, taskDefine, taskPass, taskDetail);
+		FI fight = doTaskFight(taskId, scene, pass, detail, taskDefine, taskPass, taskDetail);
 		setFight(fight);
 		return fight;
 	}
@@ -1600,5 +1630,5 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 * @param taskDetail
 	 * @return
 	 */
-	protected abstract F doTaskFight(String taskId, int scene, int pass, int detail, ITaskDefine taskDefine, ITaskPass taskPass, ITaskDetail taskDetail);
+	protected abstract FI doTaskFight(String taskId, int scene, int pass, int detail, ITaskDefine taskDefine, ITaskPass taskPass, ITaskDetail taskDetail);
 }

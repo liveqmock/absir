@@ -21,6 +21,7 @@ import com.absir.appserv.configure.xls.XlsBase;
 import com.absir.appserv.configure.xls.XlsDao;
 import com.absir.appserv.configure.xls.XlsUtils;
 import com.absir.appserv.game.bean.JbCard;
+import com.absir.appserv.game.bean.JbFriend;
 import com.absir.appserv.game.bean.JbPlayer;
 import com.absir.appserv.game.bean.JbPlayerA;
 import com.absir.appserv.game.bean.value.ICardDefine;
@@ -43,7 +44,7 @@ import com.absir.core.kernel.KernelClass;
  *
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerContext<C, ?, ?, ?, ?, ?>, PC extends JPlayerConfigure, PD extends IPlayerDefine, CD extends ICardDefine, CE extends IExp, PP extends IPropDefine, RD extends IRewardDefine, TD extends ITaskDefine> {
+public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerContext<C, ?, ?, ?, ?, ?, ?>, PC extends JPlayerConfigure, PD extends IPlayerDefine, CD extends ICardDefine, CE extends IExp, PP extends IPropDefine, RD extends IRewardDefine, TD extends ITaskDefine> {
 
 	// 角色上下文类
 	public final Class<P> PLAYER_CONTEXT_CLASS;
@@ -59,6 +60,9 @@ public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerCo
 
 	// 角色附加属性类
 	public final Class<? extends JbPlayerA> PLAYERA_CLASS;
+
+	// 好友类
+	public final Class<? extends JbFriend> FRIEND_CLASS;
 
 	// 角色等级定义
 	protected List<PD> playerDefines;
@@ -93,6 +97,7 @@ public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerCo
 		componentClasses = KernelClass.componentClasses(PLAYER_CONTEXT_CLASS);
 		PLAYER_CLASS = (Class<? extends JbPlayer>) componentClasses[1];
 		PLAYERA_CLASS = (Class<? extends JbPlayerA>) componentClasses[2];
+		FRIEND_CLASS = (Class<? extends JbFriend>) componentClasses[5];
 	}
 
 	/**
@@ -148,6 +153,13 @@ public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerCo
 	public abstract JbPlayerA<?> createPlayerA();
 
 	/**
+	 * 创建好友关系
+	 * 
+	 * @return
+	 */
+	public abstract JbFriend createFriend();
+
+	/**
 	 * 获取在线玩家
 	 * 
 	 * @param playerId
@@ -155,6 +167,17 @@ public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerCo
 	 */
 	public P find(Long playerId) {
 		return PLAYER_CONTEXT_MAP.get(playerId);
+	}
+
+	/**
+	 * 在线玩家数据
+	 * 
+	 * @param player
+	 * @return
+	 */
+	public <T extends JbPlayer> T onlinePlayers(T player) {
+		P playerContext = find(player.getId());
+		return playerContext == null ? player : (T) playerContext.getPlayer();
 	}
 
 	/**

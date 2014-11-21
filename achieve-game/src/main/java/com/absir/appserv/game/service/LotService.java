@@ -158,7 +158,7 @@ public class LotService extends ContextService implements IEntityMerge<JbLotCard
 				playerA.setFriendLotFree(contextTime);
 
 			} else {
-				playerContext.modifyFriendShipNumber(-LOT_CONFIGURE.getFriendshipNumber());
+				playerContext.modifyFriendShipNumber(-LOT_CONFIGURE.getFriendshipNumber(), false);
 			}
 
 			JbCard card = playerContext.gainCard(lotCardDefine(LOT_CONFIGURE.getFriendProbabilities()), 1);
@@ -212,7 +212,7 @@ public class LotService extends ContextService implements IEntityMerge<JbLotCard
 			playerA.setDiamondLotFree(contextTime);
 
 		} else {
-			playerContext.modifyDiamond(-LOT_CONFIGURE.getDiamondNumber());
+			playerContext.modifyDiamond(-LOT_CONFIGURE.getDiamondNumber(), false);
 		}
 
 		JbCard card = playerContext.gainCard(lotCardDefine(LOT_CONFIGURE.getDiamondProbabilities()), 1);
@@ -231,7 +231,7 @@ public class LotService extends ContextService implements IEntityMerge<JbLotCard
 			throw new ServerException(ServerStatus.ON_FAIL, "cardNumber");
 		}
 
-		playerContext.modifyDiamond(-LOT_CONFIGURE.getTenDiamondNumber());
+		playerContext.modifyDiamond(-LOT_CONFIGURE.getTenDiamondNumber(), false);
 		List<JbCard> cards = new ArrayList<JbCard>();
 		boolean isRare = false;
 		for (int i = 0; i < 8; i++) {

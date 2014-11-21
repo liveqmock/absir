@@ -12,6 +12,7 @@ import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,8 @@ import javax.persistence.Embedded;
 import javax.persistence.Transient;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.hibernate.Session;
 
 import com.absir.appserv.game.bean.JbCard;
 import com.absir.appserv.game.bean.JbPlayer;
@@ -34,19 +37,25 @@ import com.absir.appserv.game.bean.value.ITaskDefine;
 import com.absir.appserv.game.bean.value.ITaskDefine.ITaskDetail;
 import com.absir.appserv.game.bean.value.ITaskDefine.ITaskPass;
 import com.absir.appserv.game.context.value.IFight;
+import com.absir.appserv.game.context.value.IPropCard;
 import com.absir.appserv.game.context.value.IPropEvolute;
+import com.absir.appserv.game.context.value.IPropPlayer;
 import com.absir.appserv.game.context.value.OReward;
 import com.absir.appserv.game.service.SocketService;
 import com.absir.appserv.game.utils.GameUtils;
 import com.absir.appserv.game.value.LevelExpCxt;
+import com.absir.appserv.system.bean.dto.IBaseSerializer;
 import com.absir.appserv.system.bean.value.JaEdit;
 import com.absir.appserv.system.bean.value.JeEditable;
+import com.absir.appserv.system.dao.BeanDao;
+import com.absir.appserv.system.dao.utils.QueryDaoUtils;
 import com.absir.appserv.system.helper.HelperArray;
 import com.absir.appserv.system.helper.HelperRandom;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Inject;
 import com.absir.context.core.ContextBean;
 import com.absir.context.core.ContextUtils;
+import com.absir.core.base.IBase;
 import com.absir.core.util.UtilQueue;
 import com.absir.core.util.UtilQueueBlock;
 import com.absir.property.value.Allow;
@@ -83,11 +92,6 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	@Allow
 	protected long onlineTime;
 
-	// 自动回复行动力
-	@JaEdit(editable = JeEditable.LOCKED)
-	@Allow
-	protected long epTaskTime;
-
 	// SOCKET连接
 	@JsonIgnore
 	@JaEdit(editable = JeEditable.LOCKED)
@@ -97,6 +101,112 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	@JsonIgnore
 	@JaEdit(editable = JeEditable.LOCKED)
 	protected F fight;
+
+	// 全部恢复
+	@JsonSerialize(contentAs = IBaseSerializer.class)
+	@JaEdit(editable = JeEditable.DISABLE)
+	protected List<Recovery> recoveries = new ArrayList<Recovery>();
+
+	/**
+	 * 恢复
+	 * 
+	 * @author absir
+	 *
+	 */
+	public abstract class Recovery implements IBase<Long> {
+
+		// 恢复时间
+		private long recoveryTime;
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see com.absir.core.base.IBase#getId()
+		 */
+		@Override
+		public Long getId() {
+			// TODO Auto-generated method stub
+			return recoveryTime;
+		}
+
+		/**
+		 * 初始化
+		 */
+		public Recovery() {
+			// TODO Auto-generated constructor stub
+			start();
+			recoveries.add(this);
+		}
+
+		/**
+		 * @return
+		 */
+		protected abstract int getRecoveryInterval();
+
+		/**
+		 * @return
+		 */
+		protected abstract int getRecoveryValue();
+
+		/**
+		 * @param value
+		 * @return
+		 */
+		protected abstract boolean setRecoveryValue(int value);
+
+		/**
+		 * 
+		 */
+		public void start() {
+			if (recoveryTime == 0) {
+				recoveryTime = ContextUtils.getContextTime() + getRecoveryInterval();
+			}
+		}
+
+		/**
+		 * @param contextTime
+		 */
+		public void step(long contextTime) {
+			if (recoveryTime > 0 && recoveryTime <= contextTime) {
+				int recoveryValue = getRecoveryValue();
+				int value = recoveryValue;
+				int recoveryInterval = getEpRecoveryInterval();
+				if (recoveryInterval > 0) {
+					while ((recoveryTime += recoveryInterval) <= contextTime) {
+						value += recoveryValue;
+					}
+				}
+
+				if (setRecoveryValue(value)) {
+					recoveryTime = 0;
+				}
+			}
+		}
+	}
+
+	// 行动力恢复
+	@JsonIgnore
+	private Recovery epRecovery = new Recovery() {
+
+		@Override
+		protected int getRecoveryInterval() {
+			// TODO Auto-generated method stub
+			return getEpRecoveryInterval();
+		}
+
+		@Override
+		protected int getRecoveryValue() {
+			// TODO Auto-generated method stub
+			return getEpRecoveryValue();
+		}
+
+		@Override
+		protected boolean setRecoveryValue(int value) {
+			// TODO Auto-generated method stub
+			modifyEp(value, true);
+			return player.getEp() == player.getMaxEp();
+		}
+	};
 
 	// 全部通知
 	@JsonIgnore
@@ -118,6 +228,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 		 * 初始化
 		 */
 		public Notifier() {
+			// TODO Auto-generated constructor stub
 			notifiers.add(this);
 		}
 
@@ -434,15 +545,6 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	}
 
 	/**
-	 * 获取Ep回复时间
-	 * 
-	 * @return
-	 */
-	public long getEpTaskTime() {
-		return getEpTaskInterval() - (epTaskTime - ContextUtils.getContextTime());
-	}
-
-	/**
 	 * 获取玩家当前连接
 	 * 
 	 * @return the socketChannel
@@ -515,31 +617,91 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 		playerA.setOnlineDay(onlineDay);
 		if (lastOnlineDay < onlineDay) {
 			if (playerA.getLastOffline() == 0 || lastOnlineDay > onlineDay) {
-				playerA.setOnline(playerA.getOnline() + 1);
+				updatePlayerDay(playerA.getOnline() + 1);
 			}
 		}
 
 		// 初始化自动回复
-		if (player.getEp() < player.getMaxEp()) {
-			int ep = (int) ((onlineTime - playerA.getLastOffline()) / getEpTaskInterval());
-			modifyEp(ep < 0 ? 0 : ep);
-		}
+		stepDone(ContextUtils.getContextTime());
 
 		// 计算卡牌数量
 		countCardNumber();
 	}
 
 	/**
-	 * 更新在线天数
+	 * 初始化角色
+	 * 
+	 * @param session
+	 */
+	protected void initPlayer(Session session) {
+		Long id = getId();
+		player = (P) BeanDao.get(session, COMPONENT.PLAYER_CLASS, id);
+		if (player == null) {
+			throw new ServerException(ServerStatus.NO_LOGIN);
+		}
+
+		playerA = (A) BeanDao.get(session, COMPONENT.PLAYERA_CLASS, id);
+		if (playerA == null) {
+			playerA = (A) COMPONENT.createPlayerA();
+			playerA.setId(id);
+
+		} else {
+			Iterator<Entry<Serializable, Integer>> iterator = playerA.getPropNumbers().entrySet().iterator();
+			while (iterator.hasNext()) {
+				Entry<Serializable, Integer> entry = iterator.next();
+				if (entry.getValue() <= 0 || COMPONENT.getPropDefine(entry.getKey()) == null) {
+					iterator.remove();
+				}
+			}
+		}
+	}
+
+	/**
+	 * 初始化卡牌
+	 * 
+	 * @param session
+	 */
+	protected void initCards(Session session) {
+		Iterator<C> cardIterator = QueryDaoUtils.createQueryArray(session, "SELECT o FROM JCard o WHERE o.player = ?", player).iterate();
+		while (cardIterator.hasNext()) {
+			C card = cardIterator.next();
+			if (card.getCardDefine() != null) {
+				playerCards.put(card.getId(), card);
+			}
+		}
+	}
+
+	/**
+	 * 初始化消息数量
+	 * 
+	 * @param session
+	 */
+	protected void initNumber(Session session) {
+		playerA.setRewardNumber(QueryDaoUtils.firstTo(QueryDaoUtils.createQueryArray(session, "SELECT COUNT(o) FROM JPlayerReward o WHERE o.playerId = ?", getId()), int.class));
+		playerA.setMessageNumber(QueryDaoUtils.firstTo(
+				QueryDaoUtils.createQueryArray(session, "SELECT SUM(o.messageNumber) FROM JFollow o WHERE o.id.eid = ? AND o.following = TRUE AND o.follower = TRUE", getId()), int.class));
+	}
+
+	/**
+	 * 更新在线时间
 	 * 
 	 * @param contextTime
 	 */
-	public void updateOnlineDay(long contextTime) {
+	public void updateOnlineTime(long contextTime) {
 		int contextDay = (int) (contextTime / (24 * 3600000));
 		if (contextDay > playerA.getOnlineDay()) {
 			playerA.setOnline(contextDay);
-			playerA.setOnline(playerA.getOnline() + 1);
+			updatePlayerDay(playerA.getOnline() + 1);
 		}
+	}
+
+	/**
+	 * 更新在线天数
+	 * 
+	 * @param online
+	 */
+	protected void updatePlayerDay(int online) {
+		playerA.setOnline(online);
 	}
 
 	/*
@@ -549,13 +711,8 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 */
 	@Override
 	public boolean stepDone(long contextTime) {
-		if (epTaskTime < contextTime) {
-			int hp = 1;
-			while ((epTaskTime += getEpTaskInterval()) < contextTime) {
-				hp++;
-			}
-
-			modifyEp(hp);
+		for (Recovery recovery : recoveries) {
+			recovery.step(contextTime);
 		}
 
 		return super.stepDone(contextTime);
@@ -564,7 +721,11 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	/**
 	 * 保存数据
 	 */
-	protected abstract void save();
+	protected void save() {
+		Session session = BeanDao.getSession();
+		session.save(player);
+		session.save(playerA);
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -589,28 +750,40 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 * 
 	 * @return
 	 */
-	private int getEpTaskInterval() {
+	protected int getEpRecoveryInterval() {
 		return 300000;
+	}
+
+	/**
+	 * 行动力回复速度
+	 * 
+	 * @return
+	 */
+	protected int getEpRecoveryValue() {
+		return 1;
 	}
 
 	/**
 	 * 更改玩家行动力
 	 * 
 	 * @param ep
+	 * @param force
 	 */
-	public synchronized void modifyEp(int ep) {
+	public synchronized void modifyEp(int ep, boolean force) {
 		ep += player.getEp();
 		if (ep < 0) {
-			throw new ServerException(ServerStatus.IN_FAILED, "ep");
+			if (force) {
+				ep = 0;
+
+			} else {
+				throw new ServerException(ServerStatus.IN_FAILED, "ep");
+			}
 
 		} else if (ep >= player.getMaxEp()) {
 			ep = player.getMaxEp();
-			epTaskTime = 0;
 
 		} else {
-			if (epTaskTime < ContextUtils.getContextTime()) {
-				epTaskTime = ContextUtils.getContextTime() + getEpTaskInterval();
-			}
+			epRecovery.start();
 		}
 
 		player.setEp(ep);
@@ -620,11 +793,17 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 * 更改玩家金钱
 	 * 
 	 * @param money
+	 * @param force
 	 */
-	public synchronized void modifyMoney(int money) {
+	public synchronized void modifyMoney(int money, boolean force) {
 		money += player.getMoney();
 		if (money < 0) {
-			throw new ServerException(ServerStatus.IN_FAILED, "money");
+			if (force) {
+				money = 0;
+
+			} else {
+				throw new ServerException(ServerStatus.IN_FAILED, "money");
+			}
 		}
 
 		player.setMoney(money);
@@ -634,25 +813,56 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 * 更改玩家宝石
 	 * 
 	 * @param diamond
+	 * @param force
 	 */
-	public synchronized void modifyDiamond(int diamond) {
+	public synchronized void modifyDiamond(int diamond, boolean force) {
 		diamond += player.getDiamond();
 		if (diamond < 0) {
-			throw new ServerException(ServerStatus.IN_FAILED, "diamond");
+			if (force) {
+				diamond = 0;
+
+			} else {
+				throw new ServerException(ServerStatus.IN_FAILED, "diamond");
+			}
 		}
 
 		player.setDiamond(diamond);
 	}
 
 	/**
+	 * 更改玩家好友数量
+	 * 
+	 * @param friendNumber
+	 * @return
+	 */
+	public synchronized boolean modifyFriendNumber(int friendNumber) {
+		friendNumber += player.getFriendNumber();
+		if (friendNumber < 0) {
+			friendNumber = 0;
+
+		} else if (friendNumber > player.getMaxFriendNumber()) {
+			return false;
+		}
+
+		player.setFriendNumber(friendNumber);
+		return true;
+	}
+
+	/**
 	 * 更改玩家友情点数
 	 * 
 	 * @param friendShipNumber
+	 * @param force
 	 */
-	public synchronized void modifyFriendShipNumber(int friendShipNumber) {
+	public synchronized void modifyFriendShipNumber(int friendShipNumber, boolean force) {
 		friendShipNumber += player.getFriendshipNumber();
 		if (friendShipNumber < 0) {
-			throw new ServerException(ServerStatus.IN_FAILED, "friendShipNumber");
+			if (force) {
+				friendShipNumber = 0;
+
+			} else {
+				throw new ServerException(ServerStatus.IN_FAILED, "friend ship number");
+			}
 		}
 
 		player.setFriendshipNumber(friendShipNumber);
@@ -714,7 +924,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 		player.setMaxExp(playerDefine.getExp());
 		player.setLevel(level);
 		player.setMaxEp(player.getMaxEp() + playerDefine.getEp() - currentPlayerDefine.getEp());
-		modifyEp(player.getMaxEp());
+		modifyEp(player.getMaxEp(), true);
 		player.setMaxCardNumber(player.getMaxCardNumber() + playerDefine.getCardNumber() - currentPlayerDefine.getCardNumber());
 		player.setMaxFriendNumber(player.getMaxFriendNumber() + playerDefine.getFriendNumber() - currentPlayerDefine.getFriendNumber());
 	}
@@ -997,7 +1207,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 			allExp += COMPONENT.getFeedExp(target, card);
 		}
 
-		modifyMoney(COMPONENT.getFeedMoney(target, allExp, (List) cards));
+		modifyMoney(COMPONENT.getFeedMoney(target, allExp, (List) cards), false);
 		consumeCards(cards);
 		COMPONENT.modifyCardExp(target, allExp);
 		countCardNumber();
@@ -1029,7 +1239,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 			}
 		}
 
-		modifyMoney(-target.getCardDefine().getEvolutionPrice());
+		modifyMoney(-target.getCardDefine().getEvolutionPrice(), false);
 		consumeCards(cards);
 		countCardNumber();
 		float evolute = COMPONENT.getEvoluteOdds(target);
@@ -1061,7 +1271,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 * @return
 	 */
 	public synchronized int card(int number) {
-		modifyDiamond(-number * COMPONENT.PLAYER_CONFIGURE.getBuyCardNumber());
+		modifyDiamond(-number * COMPONENT.PLAYER_CONFIGURE.getBuyCardNumber(), false);
 		number *= COMPONENT.PLAYER_CONFIGURE.getCardNumberAdd();
 		player.setMaxCardNumber(player.getMaxCardNumber() + number);
 		return number;
@@ -1073,7 +1283,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 * @return
 	 */
 	public synchronized int friend(int number) {
-		modifyDiamond(-number * COMPONENT.PLAYER_CONFIGURE.getBuyFriendNumber());
+		modifyDiamond(-number * COMPONENT.PLAYER_CONFIGURE.getBuyFriendNumber(), false);
 		number *= COMPONENT.PLAYER_CONFIGURE.getFriendNumberAdd();
 		player.setMaxFriendNumber(player.getMaxFriendNumber() + number);
 		return number;
@@ -1084,9 +1294,10 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 * 
 	 * @param propDefine
 	 * @param size
+	 * @param force
 	 * @return
 	 */
-	public int modifyProp(IPropDefine propDefine, int size) {
+	public int modifyProp(IPropDefine propDefine, int size, boolean force) {
 		Map<Serializable, Integer> propNumbers = playerA.getPropNumbers();
 		synchronized (propNumbers) {
 			Integer number = propNumbers.get(propDefine);
@@ -1095,10 +1306,21 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 			}
 
 			if (size < 0) {
-				throw new ServerException(ServerStatus.IN_FAILED, "prop not enough");
+				if (force) {
+					size = 0;
+
+				} else {
+					throw new ServerException(ServerStatus.IN_FAILED, "prop not enough");
+				}
 			}
 
-			propNumbers.put(propDefine.getId(), size);
+			if (size == 0) {
+				propNumbers.remove(propDefine.getId());
+
+			} else {
+				propNumbers.put(propDefine.getId(), size);
+			}
+
 			return size;
 		}
 	}
@@ -1117,17 +1339,17 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 				throw new ServerException(ServerStatus.NO_PARAM);
 			}
 
-			modifyDiamond(-propDefine.getDiamond() * size);
+			modifyDiamond(-propDefine.getDiamond() * size, false);
 
 		} else {
 			if (propDefine.getPrice() <= 0) {
 				throw new ServerException(ServerStatus.NO_PARAM);
 			}
 
-			modifyMoney(-propDefine.getPrice() * size);
+			modifyMoney(-propDefine.getPrice() * size, false);
 		}
 
-		return modifyProp(propDefine, size);
+		return modifyProp(propDefine, size, false);
 	}
 
 	/**
@@ -1164,10 +1386,10 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 		}
 
 		if (propDefine.getPrice() > 0) {
-			modifyMoney((int) (propDefine.getPrice() * size * 0.8f));
+			modifyMoney((int) (propDefine.getPrice() * size * 0.8f), false);
 
 		} else {
-			modifyDiamond((int) (propDefine.getDiamond() * size * 0.8f));
+			modifyDiamond((int) (propDefine.getDiamond() * size * 0.8f), false);
 		}
 
 		return number;
@@ -1180,8 +1402,8 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 */
 	public synchronized Object doReward(R reward) {
 		Map<String, Object> rewardData = new HashMap<String, Object>();
-		modifyMoney(reward.getMoney());
-		modifyDiamond(reward.getDiamond());
+		modifyMoney(reward.getMoney(), true);
+		modifyDiamond(reward.getDiamond(), true);
 		if (reward.getCardDefines() != null) {
 			List<C> cards = new ArrayList<C>();
 			rewardData.put("cards", cards);
@@ -1201,7 +1423,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 				IPropDefine propDefine = COMPONENT.getPropDefine(entry.getKey());
 				if (propDefine != null) {
 					for (int i = entry.getValue(); i > 0; i--) {
-						entry.setValue(modifyProp(propDefine, entry.getValue()));
+						entry.setValue(modifyProp(propDefine, entry.getValue(), true));
 					}
 				}
 			}
@@ -1253,6 +1475,39 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	}
 
 	/**
+	 * 使用道具
+	 * 
+	 * @param propDefine
+	 * @return
+	 */
+	public synchronized Object prop(IPropDefine propDefine) {
+		Object propInvoker = propDefine.getPropInvoker();
+		if (propInvoker == null || !(propDefine instanceof IPropPlayer)) {
+			throw new ServerException(ServerStatus.IN_FAILED, "prop type error");
+		}
+
+		modifyProp(propDefine, -1, false);
+		return ((IPropPlayer) propInvoker).userPlayer(this);
+	}
+
+	/**
+	 * 使用道具(卡牌)
+	 * 
+	 * @param propDefine
+	 * @return
+	 */
+	public synchronized Object prop(IPropDefine propDefine, long cardId) {
+		Object propInvoker = propDefine.getPropInvoker();
+		if (propInvoker == null || !(propDefine instanceof IPropCard)) {
+			throw new ServerException(ServerStatus.IN_FAILED, "prop type error");
+		}
+
+		C card = getCard(cardId);
+		modifyProp(propDefine, -1, false);
+		return ((IPropCard) propInvoker).userCard(card, this);
+	}
+
+	/**
 	 * 任务ID
 	 * 
 	 * @param scene
@@ -1270,12 +1525,12 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 */
 	public synchronized F task(int scene, int pass, int detail) {
 		if (playerCards.size() >= player.getMaxCardNumber()) {
-			throw new ServerException(ServerStatus.IN_FAILED, "CardNumber");
+			throw new ServerException(ServerStatus.IN_FAILED, "card number");
 		}
 
 		ITaskDefine taskDefine = COMPONENT.getTaskDefine(scene);
 		if (taskDefine.getLevel() > player.getLevel()) {
-			throw new ServerException(ServerStatus.IN_FAILED, "Level");
+			throw new ServerException(ServerStatus.IN_FAILED, "level");
 		}
 
 		ITaskPass taskPass = taskDefine.getTaskPasses()[pass];
@@ -1284,7 +1539,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 		if (detail > 0) {
 			Integer progress = (Integer) playerA.getTaskProgresses().get(taskId);
 			if (progress == null || progress < detail) {
-				throw new ServerException(ServerStatus.IN_FAILED, "Progress");
+				throw new ServerException(ServerStatus.IN_FAILED, "task progress");
 			}
 
 		} else {
@@ -1304,13 +1559,13 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 				String nTaskId = getTaskId(nScene, nPass);
 				Integer nProgress = (Integer) playerA.getTaskProgresses().get(nTaskId);
 				if (nProgress == null) {
-					throw new ServerException(ServerStatus.IN_FAILED, "Progress");
+					throw new ServerException(ServerStatus.IN_FAILED, "task progress");
 				}
 			}
 		}
 
 		if (player.getEp() < taskDetail.getEp()) {
-			throw new ServerException(ServerStatus.IN_FAILED, "Ep");
+			throw new ServerException(ServerStatus.IN_FAILED, "ep");
 		}
 
 		F fight = doTaskFight(taskId, scene, pass, detail, taskDefine, taskPass, taskDetail);

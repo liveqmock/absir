@@ -20,6 +20,7 @@ import java.util.Set;
 
 import com.absir.core.kernel.KernelArray;
 import com.absir.core.kernel.KernelArray.ArrayAccessor;
+import com.absir.core.kernel.KernelClass;
 import com.absir.core.kernel.KernelLang;
 import com.absir.core.kernel.KernelLang.CallbackBreak;
 import com.absir.core.kernel.KernelReflect;
@@ -251,7 +252,7 @@ public class UtilDump {
 					template.setAccessible(true);
 					Object value = KernelReflect.get(obj, template);
 					dumpPrint(template.getName() + ":" + value, level, true);
-					if (value != null && cls != obj && ancest != 0 && !ancests.contains(value)) {
+					if (value != null && !KernelClass.isBasicClass(value.getClass()) && cls != obj && ancest != 0 && !ancests.contains(value)) {
 						dumpObject(value, fields, methods, ancest > 0 ? ancest - 1 : ancest, ancests, level, maxlevel);
 					}
 				}

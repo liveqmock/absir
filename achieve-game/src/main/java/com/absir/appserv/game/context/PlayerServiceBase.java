@@ -7,6 +7,7 @@
  */
 package com.absir.appserv.game.context;
 
+import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.List;
 
@@ -18,6 +19,7 @@ import com.absir.appserv.game.bean.JbCard;
 import com.absir.appserv.game.bean.JbPlayer;
 import com.absir.appserv.game.bean.JbReward;
 import com.absir.appserv.game.bean.value.IRewardBean;
+import com.absir.appserv.game.service.SocketService;
 import com.absir.appserv.system.bean.JPlatformUser;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.dao.BeanDao;
@@ -25,6 +27,11 @@ import com.absir.appserv.system.dao.utils.QueryDaoUtils;
 import com.absir.bean.basis.Base;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
+import com.absir.context.core.ContextFactory;
+import com.absir.context.core.ContextMap;
+import com.absir.context.core.ContextUtils;
+import com.absir.core.kernel.KernelLang.CallbackTemplate;
+import com.absir.core.util.UtilAbsir;
 import com.absir.orm.transaction.value.Transaction;
 
 /**
@@ -46,9 +53,8 @@ public abstract class PlayerServiceBase {
 	 * @return
 	 */
 	@Transaction(readOnly = true)
-	@DataQuery(value = "SELECT COUNT(o) FROM JFilter o WHERE o.id LIKE ?")
 	public boolean findFilter(String name) {
-		return QueryDaoUtils.createQueryArray(BeanDao.getSession(), "SELECT o.id FROM JFilter o WHERE o.id LIKE ?", name).iterate().hasNext();
+		return QueryDaoUtils.createQueryArray(BeanDao.getSession(), "SELECT o.id FROM JFilter o WHERE ? LIKE o.id", '%' + name + '%').iterate().hasNext();
 	}
 
 	/**
@@ -316,5 +322,57 @@ public abstract class PlayerServiceBase {
 
 		Query query = QueryDaoUtils.createQueryArray(BeanDao.getSession(), "SELECT o FROM JPlayerReward o WHERE o.playerId = ?", playerId);
 		return query.setFirstResult(pageIndex * getRewardPageSize()).setMaxResults(getRewardPageSize()).setCacheable(true).list();
+	}
+
+	/**
+	 * 保存玩家修改
+	 * 
+	 * @param playerId
+	 * @return
+	 */
+	@Transaction(rollback = Throwable.class)
+	protected void mergePlayer(Long playerId, CallbackTemplate<JbPlayer> playerModifier) {
+		Session session = BeanDao.getSession();
+		JbPlayer player = BeanDao.get(session, JbPlayerContext.COMPONENT.PLAYER_CLASS, playerId);
+		playerModifier.doWith(player);
+		session.save(player);
+	}
+
+	/**
+	 * 修改玩家属性
+	 * 
+	 * @param playerId
+	 * @param player
+	 */
+	public void modifyPlayer(Long playerId, CallbackTemplate<JbPlayer> playerModifier) {
+		String tokenId = UtilAbsir.getId(JbPlayerContext.COMPONENT.PLAYER_CONTEXT_CLASS, playerId);
+		ContextFactory contextFactory = ContextUtils.getContextFactory();
+		try {
+			synchronized (contextFactory.getToken(tokenId)) {
+				JbPlayerContext playerContext = JbPlayerContext.COMPONENT.find(playerId);
+				if (playerContext == null) {
+					mergePlayer(playerId, playerModifier);
+
+				} else {
+					JbPlayer player = playerContext.getPlayer();
+					ContextMap contextMap = new ContextMap(player);
+					synchronized (playerContext) {
+						playerModifier.doWith(playerContext.getPlayer());
+					}
+
+					if (playerContext.isExpiration()) {
+						playerContext.uninitialize();
+					}
+
+					SocketChannel socketChannel = playerContext.getSocketChannel();
+					if (socketChannel != null) {
+						SocketService.writeByteObject(socketChannel, SocketService.CALLBACK_MODIFY, contextMap.comparedMap());
+					}
+				}
+			}
+
+		} finally {
+			contextFactory.clearToken(tokenId);
+		}
 	}
 }

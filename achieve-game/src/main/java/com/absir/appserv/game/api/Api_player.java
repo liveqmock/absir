@@ -94,7 +94,7 @@ public class Api_player extends PlayerServer {
 					throw new ServerException(ServerStatus.NO_PARAM);
 				}
 
-				playerContext.modifyProp(propDefine, -1);
+				playerContext.modifyProp(propDefine, -1, false);
 				propEvolute = (IPropEvolute) propInvoker;
 			}
 		}
@@ -144,23 +144,39 @@ public class Api_player extends PlayerServer {
 	@JaLang("领取奖励")
 	public Object oReward(String rewardId, @Attribute JbPlayerContext playerContext) {
 		IRewardDefine rewardDefine = JbPlayerContext.COMPONENT.getRewardDefine(rewardId);
-
 		ContextMap playerMap = new ContextMap(playerContext.getPlayer());
 		playerMap.put("data", playerContext.reward(rewardDefine));
 		return playerMap.comparedMap();
 	}
 
+	@JaLang("使用道具")
+	public Object prop(int propId, @Attribute JbPlayerContext playerContext) {
+		IPropDefine propDefine = JbPlayerContext.COMPONENT.getPropDefine(propId);
+		ContextMap playerMap = new ContextMap(playerContext.getPlayer());
+		playerMap.put("data", playerContext.prop(propDefine));
+		return playerMap.comparedMap();
+	}
+
+	@JaLang("使用道具")
+	public Object prop(int propId, long cardId, @Attribute JbPlayerContext playerContext) {
+		IPropDefine propDefine = JbPlayerContext.COMPONENT.getPropDefine(propId);
+		ContextMap playerMap = new ContextMap(playerContext.getPlayer());
+		playerMap.put("data", playerContext.prop(propDefine, cardId));
+		return playerMap.comparedMap();
+	}
+
 	@JaLang("修改玩家数据")
-	public Object modifier(int level, int money, int diamond, int friendShipNumber, @Attribute JbPlayerContext playerContext) {
+	public Object modifier(int level, int ep, int money, int diamond, int friendShipNumber, @Attribute JbPlayerContext playerContext) {
 		if (!playerContext.getPlayerA().isDebug()) {
 			throw new ServerException(ServerStatus.ON_DENIED);
 		}
 
 		ContextMap playerMap = new ContextMap(playerContext.getPlayer());
 		playerContext.modifyLevel(level);
-		playerContext.modifyMoney(money);
-		playerContext.modifyDiamond(diamond);
-		playerContext.modifyFriendShipNumber(friendShipNumber);
+		playerContext.modifyEp(level, true);
+		playerContext.modifyMoney(money, true);
+		playerContext.modifyDiamond(diamond, true);
+		playerContext.modifyFriendShipNumber(friendShipNumber, true);
 		return playerMap.comparedMap();
 	}
 }

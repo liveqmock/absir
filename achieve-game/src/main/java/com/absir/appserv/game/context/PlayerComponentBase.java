@@ -22,6 +22,7 @@ import com.absir.appserv.configure.xls.XlsDao;
 import com.absir.appserv.configure.xls.XlsUtils;
 import com.absir.appserv.game.bean.JbCard;
 import com.absir.appserv.game.bean.JbPlayer;
+import com.absir.appserv.game.bean.JbPlayerA;
 import com.absir.appserv.game.bean.value.ICardDefine;
 import com.absir.appserv.game.bean.value.IPlayerDefine;
 import com.absir.appserv.game.bean.value.IPropDefine;
@@ -41,10 +42,10 @@ import com.absir.core.kernel.KernelClass;
  * @author absir
  *
  */
-@SuppressWarnings({ "unchecked" })
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerContext<C, ?, ?, ?, ?, ?>, PC extends JPlayerConfigure, PD extends IPlayerDefine, CD extends ICardDefine, CE extends IExp, PP extends IPropDefine, RD extends IRewardDefine, TD extends ITaskDefine> {
 
-	// 角色类
+	// 角色上下文类
 	public final Class<P> PLAYER_CONTEXT_CLASS;
 
 	// 全部在线角色
@@ -52,6 +53,12 @@ public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerCo
 
 	// 文件配置
 	public final PC PLAYER_CONFIGURE;
+
+	// 角色类
+	public final Class<? extends JbPlayer> PLAYER_CLASS;
+
+	// 角色附加属性类
+	public final Class<? extends JbPlayerA> PLAYERA_CLASS;
 
 	// 角色等级定义
 	protected List<PD> playerDefines;
@@ -82,6 +89,10 @@ public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerCo
 		PLAYER_CONTEXT_CLASS = (Class<P>) componentClasses[1];
 		PLAYER_CONTEXT_MAP = (Map<Long, P>) (Object) ContextUtils.getContextFactory().getContextMap(PLAYER_CONTEXT_CLASS);
 		PLAYER_CONFIGURE = (PC) JConfigureUtils.getConfigure((Class<? extends JConfigureBase>) componentClasses[2]);
+
+		componentClasses = KernelClass.componentClasses(PLAYER_CONTEXT_CLASS);
+		PLAYER_CLASS = (Class<? extends JbPlayer>) componentClasses[1];
+		PLAYERA_CLASS = (Class<? extends JbPlayerA>) componentClasses[2];
 	}
 
 	/**
@@ -128,6 +139,13 @@ public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerCo
 	 * @return
 	 */
 	public abstract JbPlayer createPlayer();
+
+	/**
+	 * 创建角色附加
+	 * 
+	 * @return
+	 */
+	public abstract JbPlayerA<?> createPlayerA();
 
 	/**
 	 * 获取在线玩家

@@ -547,30 +547,31 @@ public abstract class OObject<T extends OObject> implements JiBase {
 	 * @param result
 	 */
 	public final void addBuff(OBuff buff, IResult result) {
+		int id = buffs.size();
 		if (buffs == null) {
 			synchronized (this) {
 				if (buffs == null) {
 					buffs = new ConcurrentLinkedQueue<OBuff>();
 				}
 			}
-		}
 
-		int id = buffs.size();
-		Iterator<OBuff> iterator = buffs.iterator();
-		while (iterator.hasNext()) {
-			OBuff oBuff = iterator.next();
-			int against = oBuff.against(oBuff);
-			if (against < 0) {
-				return;
+		} else {
+			Iterator<OBuff> iterator = buffs.iterator();
+			while (iterator.hasNext()) {
+				OBuff oBuff = iterator.next();
+				int against = oBuff.against(oBuff);
+				if (against < 0) {
+					return;
 
-			} else if (against > 0) {
-				result.setDone(true);
-				buffResult(iterator, oBuff, result);
+				} else if (against > 0) {
+					result.setDone(true);
+					buffResult(iterator, oBuff, result);
 
-			} else {
-				int oId = oBuff.getId();
-				if (id <= oId) {
-					id = oId + 1;
+				} else {
+					int oId = oBuff.getId();
+					if (id <= oId) {
+						id = oId + 1;
+					}
 				}
 			}
 		}

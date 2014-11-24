@@ -22,15 +22,13 @@ import com.absir.server.exception.ServerException;
 import com.absir.server.exception.ServerStatus;
 import com.absir.server.value.Attribute;
 import com.absir.server.value.Param;
-import com.absir.server.value.Server;
 
 /**
  * @author absir
  * 
  */
 @SuppressWarnings({ "unchecked", "rawtypes" })
-@Server
-public class Api_player extends PlayerServer {
+public abstract class Api_playerBase extends PlayerServer {
 
 	@JaLang("玩家信息")
 	public JbPlayerContext route(@Attribute JbPlayerContext playerContext) {
@@ -162,6 +160,13 @@ public class Api_player extends PlayerServer {
 		IPropDefine propDefine = JbPlayerContext.COMPONENT.getPropDefine(propId);
 		ContextMap playerMap = new ContextMap(playerContext.getPlayer());
 		playerMap.put("data", playerContext.prop(propDefine, cardId));
+		return playerMap.comparedMap();
+	}
+
+	@JaLang("进入任务")
+	public Object task(int scene, int pass, int detail, @Attribute JbPlayerContext playerContext) {
+		ContextMap playerMap = new ContextMap(playerContext.getPlayer());
+		playerMap.put("data", playerContext.task(scene, pass, detail));
 		return playerMap.comparedMap();
 	}
 

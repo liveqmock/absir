@@ -28,6 +28,13 @@ public interface ICardDefine {
 	public int getMaxLevel();
 
 	/**
+	 * 出售价格
+	 * 
+	 * @return
+	 */
+	public int getPrice();
+
+	/**
 	 * 升级经验
 	 * 
 	 * @return

@@ -48,6 +48,13 @@ public interface ITaskDefine {
 	public interface ITaskDetail {
 
 		/**
+		 * 最大次数
+		 * 
+		 * @return
+		 */
+		public int getMax();
+
+		/**
 		 * 消耗精力
 		 * 
 		 * @return

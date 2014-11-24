@@ -705,6 +705,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 */
 	protected void updatePlayerDay(int online) {
 		playerA.setOnline(online);
+		playerA.getDailyRecards().clear();
 	}
 
 	/*
@@ -1167,7 +1168,9 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 * 
 	 * @param card
 	 */
-	protected abstract void doSell(C card);
+	protected void doSell(C card) {
+		modifyMoney(card.getCardDefine().getPrice(), true);
+	}
 
 	/**
 	 * 出售卡牌(多张)
@@ -1608,8 +1611,9 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 * 
 	 * @param taskId
 	 * @param detail
+	 * @param taskDefine
 	 */
-	public synchronized void taskComplete(String taskId, int detail) {
+	public synchronized void taskComplete(String taskId, int detail, ITaskDetail taskDefine) {
 		Map<String, Integer> taskProgresses = playerA.getTaskProgresses();
 		Integer progress = taskProgresses.get(taskId);
 		++detail;

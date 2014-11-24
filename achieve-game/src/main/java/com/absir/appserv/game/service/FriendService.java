@@ -226,4 +226,14 @@ public abstract class FriendService {
 
 		return players;
 	}
+
+	/**
+	 * 获取系统推荐
+	 * 
+	 * @param playerId
+	 * @return
+	 */
+	@Transaction(readOnly = true)
+	@DataQuery(value = "SELECT o FROM JFriend o WHERE (o.id.eid = :0 OR o.id.mid = :0) AND o.accord = " + ACCORD_SUCCESS + " @ ORDER BY o.encouraging DESC, o.encouragingTime DESC")
+	public abstract List<JbPlayer> getRecommends(Long playerId);
 }

@@ -8,6 +8,7 @@
 package com.absir.appserv.game.context;
 
 import java.nio.channels.SocketChannel;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -30,6 +31,7 @@ import com.absir.bean.inject.value.Bean;
 import com.absir.context.core.ContextFactory;
 import com.absir.context.core.ContextMap;
 import com.absir.context.core.ContextUtils;
+import com.absir.context.schedule.value.Schedule;
 import com.absir.core.kernel.KernelLang.CallbackTemplate;
 import com.absir.core.util.UtilAbsir;
 import com.absir.orm.transaction.value.Transaction;
@@ -373,6 +375,17 @@ public abstract class PlayerServiceBase {
 
 		} finally {
 			contextFactory.clearToken(tokenId);
+		}
+	}
+
+	/**
+	 * 更新玩家在线天数
+	 */
+	@Schedule(cron = "0 24 * * *")
+	protected static void updateOnlines() {
+		long contextTime = ContextUtils.getContextTime();
+		for (JbPlayerContext playerContext : (Collection<JbPlayerContext>) JbPlayerContext.COMPONENT.PLAYER_CONTEXT_MAP.values()) {
+			playerContext.updateOnlineTime(contextTime);
 		}
 	}
 }

@@ -90,6 +90,10 @@ public abstract class JbPlayerA<T extends PlayerAtt> extends JbBase {
 		@JaLang("参数纪录")
 		public Map<String, Integer> metaRecards;
 
+		/** dailyRecards */
+		@JaLang("每日纪录")
+		public Map<String, Integer> dailyRecards;
+
 		/** propNumbers */
 		@JaLang("道具数量")
 		public Map<Serializable, Integer> propNumbers;
@@ -283,6 +287,7 @@ public abstract class JbPlayerA<T extends PlayerAtt> extends JbBase {
 
 		playerAtt.taskProgresses = playerAtt.taskProgresses == null ? new HashMap<String, Integer>() : new HashMap<String, Integer>(playerAtt.taskProgresses);
 		playerAtt.metaRecards = playerAtt.metaRecards == null ? new HashMap<String, Integer>() : new HashMap<String, Integer>(playerAtt.metaRecards);
+		playerAtt.dailyRecards = playerAtt.dailyRecards == null ? new HashMap<String, Integer>() : new HashMap<String, Integer>(playerAtt.dailyRecards);
 		if (playerAtt.propNumbers == null) {
 			playerAtt.propNumbers = new LinkedHashMap<Serializable, Integer>();
 		}
@@ -316,6 +321,21 @@ public abstract class JbPlayerA<T extends PlayerAtt> extends JbBase {
 	 */
 	public void setMetaRecards(Map<String, Integer> metaRecards) {
 		getPlayerAtt().metaRecards = metaRecards;
+	}
+
+	/**
+	 * @return the dailyRecards
+	 */
+	public Map<String, Integer> getDailyRecards() {
+		return getPlayerAtt().dailyRecards;
+	}
+
+	/**
+	 * @param dailyRecards
+	 *            the dailyRecards to set
+	 */
+	public void setDailyRecards(Map<String, Integer> dailyRecards) {
+		getPlayerAtt().dailyRecards = dailyRecards;
 	}
 
 	/**

@@ -50,7 +50,7 @@ public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerCo
 	public final Class<P> PLAYER_CONTEXT_CLASS;
 
 	// 全部在线角色
-	private final Map<Long, P> PLAYER_CONTEXT_MAP;
+	public final Map<Long, P> PLAYER_CONTEXT_MAP;
 
 	// 文件配置
 	public final PC PLAYER_CONFIGURE;

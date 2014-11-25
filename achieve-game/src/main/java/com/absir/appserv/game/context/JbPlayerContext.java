@@ -42,7 +42,6 @@ import com.absir.appserv.game.context.value.IPropCard;
 import com.absir.appserv.game.context.value.IPropEvolute;
 import com.absir.appserv.game.context.value.IPropPlayer;
 import com.absir.appserv.game.context.value.OReward;
-import com.absir.appserv.game.service.FriendService;
 import com.absir.appserv.game.service.SocketService;
 import com.absir.appserv.game.utils.GameUtils;
 import com.absir.appserv.game.value.LevelExpCxt;
@@ -1296,6 +1295,17 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	}
 
 	/**
+	 * 道具数量
+	 * 
+	 * @param propId
+	 * @return
+	 */
+	public int propNumber(Serializable propId) {
+		Integer number = (Integer) playerA.getPropNumbers().get(propId);
+		return number == null ? 0 : number;
+	}
+
+	/**
 	 * 修改道具
 	 * 
 	 * @param propDefine
@@ -1514,33 +1524,6 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	}
 
 	/**
-	 * 添加好友
-	 * 
-	 * @param player
-	 */
-	public synchronized int friend(JbPlayer target) {
-		if (target.getFriendNumber() >= target.getMaxFriendNumber()) {
-			return -1;
-		}
-
-		if (player.getFriendNumber() >= player.getMaxFriendNumber() || getId().equals(target.getId()) || player.getServerId() != target.getServerId()) {
-			throw new ServerException(ServerStatus.ON_DENIED);
-		}
-
-		return FriendService.ME.addFriend(this, target);
-	}
-
-	/**
-	 * 删除好友
-	 * 
-	 * @param target
-	 * @return
-	 */
-	public synchronized int unfriend(JbPlayer target) {
-		return FriendService.ME.deleteFriend(this, target);
-	}
-
-	/**
 	 * 任务ID
 	 * 
 	 * @param scene
@@ -1549,6 +1532,17 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 */
 	public static String getTaskId(int scene, int pass) {
 		return scene + "." + pass;
+	}
+
+	/**
+	 * 任务日常
+	 * 
+	 * @param taskId
+	 * @param detail
+	 * @return
+	 */
+	public static String getTaskDaily(String taskId, int detail) {
+		return "TASK_" + taskId + "." + detail;
 	}
 
 	/**
@@ -1601,7 +1595,17 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 			throw new ServerException(ServerStatus.IN_FAILED, "ep");
 		}
 
-		FI fight = doTaskFight(taskId, scene, pass, detail, taskDefine, taskPass, taskDetail);
+		int max = taskDetail.getMax();
+		String taskDaily = null;
+		if (max > 0) {
+			taskDaily = getTaskDaily(taskId, detail);
+			Integer record = (Integer) playerA.getDailyRecards().get(taskDaily);
+			if (record != null && record > max) {
+				throw new ServerException(ServerStatus.IN_FAILED, "max");
+			}
+		}
+
+		FI fight = doTaskFight(taskId, scene, pass, detail, taskDaily, taskDefine, taskPass, taskDetail);
 		setFight(fight);
 		return fight;
 	}
@@ -1611,14 +1615,19 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 * 
 	 * @param taskId
 	 * @param detail
-	 * @param taskDefine
+	 * @param max
 	 */
-	public synchronized void taskComplete(String taskId, int detail, ITaskDetail taskDefine) {
+	public synchronized void taskComplete(String taskId, int detail, String taskDaily) {
 		Map<String, Integer> taskProgresses = playerA.getTaskProgresses();
 		Integer progress = taskProgresses.get(taskId);
 		++detail;
 		if (progress == null || progress < detail) {
 			taskProgresses.put(taskId, detail);
+		}
+
+		if (taskDaily != null) {
+			Integer record = (Integer) playerA.getDailyRecards().get(taskDaily);
+			playerA.getDailyRecards().put(taskId, record == null ? 1 : record + 1);
 		}
 	}
 
@@ -1629,10 +1638,11 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 * @param scene
 	 * @param pass
 	 * @param detail
+	 * @param taskDaily
 	 * @param taskDefine
 	 * @param taskPass
 	 * @param taskDetail
 	 * @return
 	 */
-	protected abstract FI doTaskFight(String taskId, int scene, int pass, int detail, ITaskDefine taskDefine, ITaskPass taskPass, ITaskDetail taskDetail);
+	protected abstract FI doTaskFight(String taskId, int scene, int pass, int detail, String taskDaily, ITaskDefine taskDefine, ITaskPass taskPass, ITaskDetail taskDetail);
 }

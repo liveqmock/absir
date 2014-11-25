@@ -175,7 +175,7 @@ public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerCo
 	 * @param player
 	 * @return
 	 */
-	public <T extends JbPlayer> T onlinePlayers(T player) {
+	public <T extends JbPlayer> T onlinePlayer(T player) {
 		P playerContext = find(player.getId());
 		return playerContext == null ? player : (T) playerContext.getPlayer();
 	}

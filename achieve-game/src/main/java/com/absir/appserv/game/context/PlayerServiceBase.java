@@ -49,6 +49,93 @@ public abstract class PlayerServiceBase {
 	public static final PlayerServiceBase ME = BeanFactoryUtils.get(PlayerServiceBase.class);
 
 	/**
+	 * 查询平台用户
+	 * 
+	 * @param platform
+	 * @param username
+	 * @return
+	 */
+	@DataQuery("SELECT o FROM JPlatformUser o WHERE o.platform = ? AND o.username = ?")
+	public abstract JPlatformUser findByPlatformUsername(String platform, String username);
+
+	/**
+	 * @param 查找关联平台账号
+	 * @return
+	 */
+	@Transaction(readOnly = true)
+	protected JPlatformUser getPlatformUser(JiUserBase userBase) {
+		return ME.findByPlatformUsername(",", userBase.getUsername());
+	}
+
+	/**
+	 * 获取用户角色ID
+	 * 
+	 * @param userBase
+	 * @return
+	 */
+	public Long getPlayerId(Long serverId, JiUserBase userBase) {
+		if (userBase instanceof JPlatformUser) {
+			return ((JPlatformUser) userBase).getPlayerId();
+		}
+
+		JPlatformUser platformUser = getPlatformUser(userBase);
+		return platformUser == null ? null : platformUser.getPlayerId();
+	}
+
+	/**
+	 * 查找用户角色ID
+	 * 
+	 * @param serverId
+	 * @param userId
+	 * @return
+	 */
+	@Transaction(readOnly = true)
+	@DataQuery(value = "SELECT o.id FROM JPlayer o WHERE o.serverId = ? AND o.userId = ?")
+	public abstract Long playerId(Long serverId, Long userId);
+
+	/**
+	 * 查找用户角色ID
+	 * 
+	 * @param id
+	 * @param serverId
+	 * @param userId
+	 * @return
+	 */
+	@Transaction(readOnly = true)
+	@DataQuery(value = "SELECT o.id FROM JPlayer o WHERE o.id = ? AND o.serverId = ? AND o.userId = ?")
+	public abstract Long playerId(Long id, Long serverId, Long userId);
+
+	/**
+	 * 查找用户角色ID
+	 * 
+	 * @param playerId
+	 * @param serverId
+	 * @param userId
+	 * @return
+	 */
+	public Long getPlayerId(Long playerId, Long serverId, Long userId) {
+		return playerId == null ? ME.playerId(serverId, userId) : ME.playerId(playerId, serverId, userId);
+	}
+
+	/**
+	 * 获取用户IDS
+	 * 
+	 * @param playerIds
+	 * @return
+	 */
+	@DataQuery("SELECT o.id FROM JPlayer o WHERE o.id IN :p0")
+	protected abstract Long[] getPlayerIds(long[] playerIds);
+
+	/**
+	 * 获取用户IDS
+	 * 
+	 * @param playerIds
+	 * @return
+	 */
+	@DataQuery("SELECT o.id FROM JPlayer o WHERE o.serverId IN :p0")
+	protected abstract Long[] getPlayerIdsFromServerIds(long[] serverIds);
+
+	/**
 	 * 过滤字段
 	 * 
 	 * @param name
@@ -102,16 +189,6 @@ public abstract class PlayerServiceBase {
 
 		return players;
 	}
-
-	/**
-	 * 查询平台用户
-	 * 
-	 * @param platform
-	 * @param username
-	 * @return
-	 */
-	@DataQuery("SELECT o FROM JPlatformUser o WHERE o.platform = ? AND o.username = ?")
-	public abstract JPlatformUser findByPlatformUsername(String platform, String username);
 
 	/**
 	 * 创建角色
@@ -179,81 +256,24 @@ public abstract class PlayerServiceBase {
 	}
 
 	/**
-	 * 获取用户角色ID
-	 * 
-	 * @param userBase
-	 * @return
-	 */
-	public Long getPlayerId(Long serverId, JiUserBase userBase) {
-		if (userBase instanceof JPlatformUser) {
-			return ((JPlatformUser) userBase).getPlayerId();
-		}
-
-		JPlatformUser platformUser = getPlatformUser(userBase);
-		return platformUser == null ? null : platformUser.getPlayerId();
-	}
-
-	/**
-	 * @param 查找关联平台账号
-	 * @return
-	 */
-	@Transaction(readOnly = true)
-	protected JPlatformUser getPlatformUser(JiUserBase userBase) {
-		return ME.findByPlatformUsername(",", userBase.getUsername());
-	}
-
-	/**
-	 * 查找用户角色ID
-	 * 
-	 * @param serverId
-	 * @param userId
-	 * @return
-	 */
-	@Transaction(readOnly = true)
-	@DataQuery(value = "SELECT o.id FROM JPlayer o WHERE o.serverId = ? AND o.userId = ?")
-	public abstract Long playerId(Long serverId, Long userId);
-
-	/**
-	 * 查找用户角色ID
-	 * 
-	 * @param id
-	 * @param serverId
-	 * @param userId
-	 * @return
-	 */
-	@Transaction(readOnly = true)
-	@DataQuery(value = "SELECT o.id FROM JPlayer o WHERE o.id = ? AND o.serverId = ? AND o.userId = ?")
-	public abstract Long playerId(Long id, Long serverId, Long userId);
-
-	/**
-	 * 查找用户角色ID
+	 * 获取玩家
 	 * 
 	 * @param playerId
-	 * @param serverId
-	 * @param userId
 	 * @return
 	 */
-	public Long getPlayerId(Long playerId, Long serverId, Long userId) {
-		return playerId == null ? ME.playerId(serverId, userId) : ME.playerId(playerId, serverId, userId);
+	public JbPlayer findPlayer(Long playerId) {
+		JbPlayerContext playerContext = JbPlayerContext.COMPONENT.find(playerId);
+		return playerContext == null ? getPlayer(playerId) : playerContext.getPlayer();
 	}
 
 	/**
-	 * 获取用户IDS
-	 * 
-	 * @param playerIds
+	 * @param playerId
 	 * @return
 	 */
-	@DataQuery("SELECT o.id FROM JPlayer o WHERE o.id IN :p0")
-	protected abstract Long[] getPlayerIds(long[] playerIds);
-
-	/**
-	 * 获取用户IDS
-	 * 
-	 * @param playerIds
-	 * @return
-	 */
-	@DataQuery("SELECT o.id FROM JPlayer o WHERE o.serverId IN :p0")
-	protected abstract Long[] getPlayerIdsFromServerIds(long[] serverIds);
+	@Transaction(readOnly = true)
+	protected JbPlayer getPlayer(Long playerId) {
+		return BeanDao.get(BeanDao.getSession(), JbPlayerContext.COMPONENT.PLAYER_CLASS, playerId);
+	}
 
 	/**
 	 * 添加玩家卡牌

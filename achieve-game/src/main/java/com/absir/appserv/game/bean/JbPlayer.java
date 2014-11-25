@@ -58,6 +58,9 @@ public abstract class JbPlayer extends JbBean implements ILevelExp {
 	@JaLang("宝石")
 	private int diamond;
 
+	@JaLang("竞技")
+	private int arena;
+
 	@JaLang("等级")
 	@JaEdit(groups = { JaEdit.GROUP_LIST })
 	private int level;
@@ -200,6 +203,21 @@ public abstract class JbPlayer extends JbBean implements ILevelExp {
 	 */
 	public void setDiamond(int diamond) {
 		this.diamond = diamond;
+	}
+
+	/**
+	 * @return the arena
+	 */
+	public int getArena() {
+		return arena;
+	}
+
+	/**
+	 * @param arena
+	 *            the arena to set
+	 */
+	public void setArena(int arena) {
+		this.arena = arena;
 	}
 
 	/**

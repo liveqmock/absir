@@ -1537,6 +1537,45 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	}
 
 	/**
+	 * 竞技场战斗
+	 * 
+	 * @param targetId
+	 * @return
+	 */
+	public synchronized FI arena(long targetId) {
+		JbPlayer target = PlayerServiceBase.ME.findPlayer(targetId);
+		if (target == null) {
+			throw new ServerException(ServerStatus.IN_FAILED, "player id error");
+		}
+
+		return doArena(target);
+	}
+
+	/**
+	 * 竞技场结果
+	 * 
+	 * @param target
+	 * @param VICTORY
+	 */
+	public synchronized void arenaResult(JbPlayer target, boolean victory) {
+		ArenaBase arenaBase = ArenaService.ME.getArenaBase(player.getId());
+		if (victory) {
+			arenaBase.exchange(player, target);
+
+		} else {
+			arenaBase.exchange(target, player);
+		}
+	}
+
+	/**
+	 * 竞技场战斗
+	 * 
+	 * @param target
+	 * @return
+	 */
+	protected abstract FI doArena(JbPlayer target);
+
+	/**
 	 * 任务ID
 	 * 
 	 * @param scene

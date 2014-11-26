@@ -199,8 +199,15 @@ public abstract class Api_playerBase extends PlayerServer {
 		return arenas;
 	}
 
+	@JaLang("竞技挑战")
+	public Object arena(long targetId, @Attribute JbPlayerContext playerContext) {
+		ContextMap playerMap = new ContextMap(playerContext.getPlayer());
+		playerMap.put("data", playerContext.arena(targetId));
+		return playerMap.comparedMap();
+	}
+
 	@JaLang("竞技场列表")
-	public List<JbPlayer> arena(int arena, @Attribute JbPlayerContext playerContext) {
+	public List<JbPlayer> arenas(int arena, @Attribute JbPlayerContext playerContext) {
 		return ArenaService.ME.getArenaList(arena, JdbcPage.PAGE_SIZE, playerContext.getPlayer().getServerId());
 	}
 

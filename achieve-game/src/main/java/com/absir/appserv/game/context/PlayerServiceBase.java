@@ -8,9 +8,12 @@
 package com.absir.appserv.game.context;
 
 import java.nio.channels.SocketChannel;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -273,6 +276,59 @@ public abstract class PlayerServiceBase {
 	@Transaction(readOnly = true)
 	protected JbPlayer getPlayer(Long playerId) {
 		return BeanDao.get(BeanDao.getSession(), JbPlayerContext.COMPONENT.PLAYER_CLASS, playerId);
+	}
+
+	/**
+	 * 获取玩家列表
+	 * 
+	 * @param playerIds
+	 * @return
+	 */
+	public List<JbPlayer> findPlayers(List<Long> playerIds) {
+		List<JbPlayer> players = new ArrayList<JbPlayer>(playerIds.size());
+		Map<Long, Integer> unfinds = null;
+		JbPlayerContext playerContext;
+		JbPlayer player;
+		int i = 0;
+		for (Long playerId : playerIds) {
+			playerContext = JbPlayerContext.COMPONENT.find(playerId);
+			if (playerContext == null) {
+				player = null;
+				if (unfinds == null) {
+					unfinds = new HashMap<Long, Integer>();
+				}
+
+				unfinds.put(playerId, i);
+
+			} else {
+				player = playerContext.getPlayer();
+			}
+
+			players.add(player);
+			i++;
+		}
+
+		if (unfinds != null) {
+			for (JbPlayer getPlayer : getPlayers(unfinds.keySet())) {
+				Integer index = unfinds.get(getPlayer.getId());
+				if (index != null) {
+					players.set(index, getPlayer);
+				}
+			}
+		}
+
+		return players;
+	}
+
+	/**
+	 * 获取玩家列表
+	 * 
+	 * @param playerIds
+	 * @return
+	 */
+	@Transaction(readOnly = true)
+	protected List<JbPlayer> getPlayers(Collection<Long> playerIds) {
+		return QueryDaoUtils.createQueryArray(BeanDao.getSession(), "SELECT o FROM JPlayer o WHERE o.id in (:ids)").setParameterList("ids", playerIds).list();
 	}
 
 	/**

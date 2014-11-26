@@ -208,7 +208,7 @@ public class SocketServerContext extends ActiveService<JbServer, SocketServer> i
 	}
 
 	/**
-	 * 
+	 * 开启默认
 	 */
 	protected void startDefault() {
 		List<JbServer> servers = new ArrayList<JbServer>();

@@ -8,11 +8,12 @@
 package com.absir.appserv.game.service;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.absir.appserv.data.value.DataQuery;
 import com.absir.appserv.data.value.MaxResults;
@@ -39,7 +40,17 @@ public abstract class ArenaService {
 	public static final ArenaService ME = BeanFactoryUtils.get(ArenaService.class);
 
 	/** idMapArenaBase */
-	private Map<Long, ArenaBase> idMapArenaBase = new HashMap<Long, ArenaService.ArenaBase>();
+	private Map<Long, ArenaBase> idMapArenaBase = new ConcurrentHashMap<Long, ArenaService.ArenaBase>();
+
+	/**
+	 * 最后一名
+	 * 
+	 * @param serverId
+	 * @return
+	 */
+	@Transaction(readOnly = true)
+	@DataQuery(value = "SELECT MAX(o.arena) FROM JPlayer o WHERE o.serverId = ?")
+	public abstract int maxArena(Long serverId);
 
 	/**
 	 * 查询排名
@@ -99,15 +110,10 @@ public abstract class ArenaService {
 	 */
 	@Transaction
 	@InjectOrder(value = -1)
-	@Schedule(fixedDelay = 3600000)
+	@Schedule(fixedDelay = 6 * 3600000)
 	@Stopping
 	public void saveArenas() {
-		Collection<ArenaBase> arenaBases;
-		synchronized (idMapArenaBase) {
-			arenaBases = new ArrayList<ArenaBase>(idMapArenaBase.values());
-		}
-
-		for (ArenaBase arenaBase : arenaBases) {
+		for (ArenaBase arenaBase : idMapArenaBase.values()) {
 			arenaBase.save();
 		}
 	}
@@ -196,10 +202,41 @@ public abstract class ArenaService {
 		 * @param player
 		 */
 		public void analyze(JbPlayer player) {
-			Integer arena = idArenas.get(player.getId());
-			if (arena != null) {
+			Long id = player.getId();
+			Integer arena = idArenas.get(id);
+			if (arena == null) {
+				int arn = player.getArena();
+				if (arn <= 0) {
+					arn = ArenaService.ME.maxArena(serverId) + 1;
+					setArena(id, arn);
+					player.setArena(arn);
+				}
+
+			} else {
 				player.setArena(arena);
 			}
+		}
+
+		/**
+		 * 设置排名
+		 * 
+		 * @param id
+		 * @param arena
+		 */
+		protected void setArena(Long id, Integer arena) {
+			Integer arn = idArenas.put(id, arena);
+			if (arn != null) {
+				if (arn.equals(arena)) {
+					return;
+				}
+
+				Long oid = arenaIds.get(arn);
+				if (oid != null && !oid.equals(id)) {
+					arenaIds.remove(arn);
+				}
+			}
+
+			arenaIds.put(arena, id);
 		}
 
 		/**
@@ -213,34 +250,31 @@ public abstract class ArenaService {
 			analyze(target);
 			int arena = player.getArena();
 			int targetArena = target.getArena();
-			player.setArena(targetArena);
+			if (arena < targetArena) {
+				Long id = player.getId();
+				setArena(id, targetArena);
+				if (targetArena > maxArena) {
+					maxArena = targetArena;
+				}
 
-			boolean loaded = false;
-			for (arena++; arena < targetArena; arena++) {
-				Long id = arenaIds.get(arena);
-				if (id == null) {
-					if (loaded) {
-						continue;
-					}
-
-					loaded = true;
-					load(ArenaService.ME.findIdArenas(id, arena, targetArena));
+				boolean loaded = false;
+				for (arena++; arena < targetArena; arena++) {
 					id = arenaIds.get(arena);
 					if (id == null) {
-						continue;
+						if (loaded) {
+							continue;
+						}
+
+						loaded = true;
+						load(ArenaService.ME.findIdArenas(id, arena, targetArena));
+						id = arenaIds.get(arena);
+						if (id == null) {
+							continue;
+						}
 					}
-				}
 
-				Integer old = idArenas.put(id, arena);
-				if (old != null) {
-					arenaIds.remove(old);
+					setArena(id, arena - 1);
 				}
-
-				if (arena > maxArena) {
-					maxArena = arena;
-				}
-
-				arenaIds.put(arena, id);
 			}
 		}
 
@@ -250,9 +284,8 @@ public abstract class ArenaService {
 		public void save() {
 			Map<Long, Integer> idArns = idArenas;
 			synchronized (this) {
-				maxArena = 0;
-				arenaIds = new HashMap<Integer, Long>();
-				idArenas = new HashMap<Long, Integer>();
+				arenaIds = new HashMap<Integer, Long>(arenaIds);
+				idArenas = new HashMap<Long, Integer>(idArenas);
 			}
 
 			for (final Entry<Long, Integer> entry : idArns.entrySet()) {
@@ -264,6 +297,24 @@ public abstract class ArenaService {
 						template.setArena(entry.getValue());
 					}
 				});
+			}
+
+			synchronized (this) {
+				maxArena = 0;
+				Iterator<Entry<Long, Integer>> iterator = idArenas.entrySet().iterator();
+				while (iterator.hasNext()) {
+					Entry<Long, Integer> entry = iterator.next();
+					Integer arn = idArns.get(entry.getKey());
+					if (arn == null || !arn.equals(entry.getValue())) {
+						int arenar = entry.getValue();
+						if (arenar > maxArena) {
+							maxArena = arenar;
+						}
+
+					} else {
+						iterator.remove();
+					}
+				}
 			}
 		}
 	}

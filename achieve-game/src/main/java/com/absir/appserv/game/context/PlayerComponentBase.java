@@ -187,10 +187,13 @@ public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerCo
 	 */
 	public <T extends JbPlayer> List<T> onlinePlayers(List<T> players) {
 		int size = players.size();
+		T player;
+		T onlinePlayer;
 		for (int i = 0; i < size; i++) {
-			P playerContext = find(players.get(i).getId());
-			if (playerContext != null) {
-				players.set(i, (T) playerContext.getPlayer());
+			player = players.get(i);
+			onlinePlayer = onlinePlayer(player);
+			if (player != onlinePlayer) {
+				players.set(i, onlinePlayer);
 			}
 		}
 
@@ -206,13 +209,7 @@ public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerCo
 	public <T extends JbPlayer> List<T> onlinePlayers(Iterator<T> playerIterator) {
 		List<T> players = new ArrayList<T>();
 		while (playerIterator.hasNext()) {
-			T player = playerIterator.next();
-			P playerContext = find(player.getId());
-			if (playerContext != null) {
-				player = (T) playerContext.getPlayer();
-			}
-
-			players.add(player);
+			players.add(onlinePlayer(playerIterator.next()));
 		}
 
 		return players;

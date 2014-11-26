@@ -291,6 +291,10 @@ public abstract class PlayerServiceBase {
 		JbPlayer player;
 		int i = 0;
 		for (Long playerId : playerIds) {
+			if (playerId == null) {
+				continue;
+			}
+
 			playerContext = JbPlayerContext.COMPONENT.find(playerId);
 			if (playerContext == null) {
 				player = null;

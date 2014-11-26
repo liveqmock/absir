@@ -42,6 +42,8 @@ import com.absir.appserv.game.context.value.IPropCard;
 import com.absir.appserv.game.context.value.IPropEvolute;
 import com.absir.appserv.game.context.value.IPropPlayer;
 import com.absir.appserv.game.context.value.OReward;
+import com.absir.appserv.game.service.ArenaService;
+import com.absir.appserv.game.service.ArenaService.ArenaBase;
 import com.absir.appserv.game.service.SocketService;
 import com.absir.appserv.game.utils.GameUtils;
 import com.absir.appserv.game.value.LevelExpCxt;
@@ -1521,6 +1523,17 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 		C card = getCard(cardId);
 		modifyProp(propDefine, -1, false);
 		return ((IPropCard) propInvoker).userCard(card, this);
+	}
+
+	/**
+	 * 竞技场匹配
+	 * 
+	 * @return
+	 */
+	public List<JbPlayer> getArenas() {
+		ArenaBase arenaBase = ArenaService.ME.getArenaBase(player.getId());
+		arenaBase.analyze(player);
+		return arenaBase.analyzes(PlayerServiceBase.ME.findPlayers(arenaBase.arenas(0, 1, 2)));
 	}
 
 	/**

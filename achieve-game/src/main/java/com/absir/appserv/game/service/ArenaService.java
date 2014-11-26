@@ -8,6 +8,7 @@
 package com.absir.appserv.game.service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -65,6 +66,17 @@ public abstract class ArenaService {
 	public abstract List<List<Object>> listArenas(Long serverId, Integer minArena, @MaxResults Integer maxArena);
 
 	/**
+	 * 指定排名列表
+	 * 
+	 * @param serverId
+	 * @param arenas
+	 * @return
+	 */
+	@Transaction(readOnly = true)
+	@DataQuery(value = "SELECT o.id, o.arena FROM JPlayer o WHERE o.serverId = ? AND o.arena in (:arenas)", aliasType = List.class)
+	public abstract List<List<Object>> findIdArenas(Long serverId, Collection<Integer> arenas);
+
+	/**
 	 * 查询排名
 	 * 
 	 * @param serverId
@@ -77,6 +89,21 @@ public abstract class ArenaService {
 	public abstract List<List<Object>> findIdArenas(Long serverId, Integer minArena, Integer maxArena);
 
 	/**
+	 * 竞技场列表
+	 * 
+	 * @param arena
+	 * @param arenaCount
+	 * @param serverId
+	 * @return
+	 */
+	public List<JbPlayer> getArenaList(int arena, int arenaCount, Long serverId) {
+		ArenaBase arenaBase = getArenaBase(serverId);
+		return arenaBase.analyzes(PlayerServiceBase.ME.findPlayers(arenaBase.list(arena, arenaCount)));
+	}
+
+	/**
+	 * 
+	 * 创建竞技对象
 	 * 
 	 * @return
 	 */
@@ -85,6 +112,8 @@ public abstract class ArenaService {
 	}
 
 	/**
+	 * 获取竞技对象
+	 * 
 	 * @param serverId
 	 * @return
 	 */
@@ -96,6 +125,8 @@ public abstract class ArenaService {
 				if (arenaBase == null) {
 					arenaBase = createArenaBase();
 					arenaBase.serverId = serverId;
+					int maxArena = ME.maxArena(serverId);
+					arenaBase.maxArena = maxArena < 1 ? 1 : (maxArena + 1);
 				}
 
 				idMapArenaBase.put(serverId, arenaBase);
@@ -148,13 +179,50 @@ public abstract class ArenaService {
 				Integer arn = (Integer) ids.get(1);
 				if (!arenaIds.containsKey(arn)) {
 					Long id = (Long) ids.get(0);
-					if (arn > maxArena) {
-						maxArena = arn;
-					}
-
 					arenaIds.put(arn, id);
 				}
 			}
+		}
+
+		/**
+		 * 指定排名
+		 * 
+		 * @param arena
+		 * @param arenaCount
+		 * @return
+		 */
+		public List<Long> arenas(int... arenas) {
+			Map<Integer, Integer> arenaMap = null;
+			List<Long> ids = new ArrayList<Long>();
+			Long id;
+			int index = 0;
+			for (int arena : arenas) {
+				id = arenaIds.get(arena);
+				if (id == null) {
+					if (arenaMap == null) {
+						arenaMap = new HashMap<Integer, Integer>();
+						arenaMap.put(arena, index);
+					}
+				}
+
+				index++;
+				ids.add(id);
+			}
+
+			if (arenaMap != null) {
+				List<List<Object>> idArns = ArenaService.ME.findIdArenas(serverId, arenaMap.keySet());
+				Map<Integer, Long> arnIds;
+				synchronized (this) {
+					arnIds = arenaIds;
+					load(idArns);
+				}
+
+				for (Entry<Integer, Integer> entry : arenaMap.entrySet()) {
+					ids.set(entry.getValue(), arnIds.get(entry.getKey()));
+				}
+			}
+
+			return ids;
 		}
 
 		/**
@@ -165,19 +233,17 @@ public abstract class ArenaService {
 		 * @return
 		 */
 		public List<Long> list(int arena, int arenaCount) {
-			int max = maxArena;
 			Map<Integer, Long> arnIds = arenaIds;
 			List<Long> finds = new ArrayList<Long>();
 			boolean loaded = false;
-			for (; arena < max; arena++) {
+			for (; arena < maxArena; arena++) {
 				Long id = arnIds.get(arena);
 				if (id == null) {
 					if (!loaded) {
 						loaded = true;
-						List<List<Object>> arenas = ArenaService.ME.listArenas(serverId, arena, arenaCount);
+						List<List<Object>> idArns = ArenaService.ME.listArenas(serverId, arena, arenaCount);
 						synchronized (this) {
-							load(arenas);
-							max = maxArena;
+							load(idArns);
 							arnIds = arenaIds;
 						}
 
@@ -202,12 +268,19 @@ public abstract class ArenaService {
 		 * @param player
 		 */
 		public void analyze(JbPlayer player) {
+			if (player == null) {
+				return;
+			}
+
 			Long id = player.getId();
 			Integer arena = idArenas.get(id);
 			if (arena == null) {
 				int arn = player.getArena();
 				if (arn <= 0) {
-					arn = ArenaService.ME.maxArena(serverId) + 1;
+					synchronized (this) {
+						arn = maxArena++;
+					}
+
 					setArena(id, arn);
 					player.setArena(arn);
 				}
@@ -215,6 +288,20 @@ public abstract class ArenaService {
 			} else {
 				player.setArena(arena);
 			}
+		}
+
+		/**
+		 * 实时排名
+		 * 
+		 * @param players
+		 * @return
+		 */
+		public List<JbPlayer> analyzes(List<JbPlayer> players) {
+			for (JbPlayer player : players) {
+				analyze(player);
+			}
+
+			return players;
 		}
 
 		/**
@@ -253,10 +340,6 @@ public abstract class ArenaService {
 			if (arena < targetArena) {
 				Long id = player.getId();
 				setArena(id, targetArena);
-				if (targetArena > maxArena) {
-					maxArena = targetArena;
-				}
-
 				boolean loaded = false;
 				for (arena++; arena < targetArena; arena++) {
 					id = arenaIds.get(arena);
@@ -300,18 +383,11 @@ public abstract class ArenaService {
 			}
 
 			synchronized (this) {
-				maxArena = 0;
 				Iterator<Entry<Long, Integer>> iterator = idArenas.entrySet().iterator();
 				while (iterator.hasNext()) {
 					Entry<Long, Integer> entry = iterator.next();
 					Integer arn = idArns.get(entry.getKey());
-					if (arn == null || !arn.equals(entry.getValue())) {
-						int arenar = entry.getValue();
-						if (arenar > maxArena) {
-							maxArena = arenar;
-						}
-
-					} else {
+					if (arn != null && arn.equals(entry.getValue())) {
 						iterator.remove();
 					}
 				}

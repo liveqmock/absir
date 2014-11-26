@@ -8,13 +8,17 @@
 package com.absir.appserv.game.api;
 
 import java.util.Collection;
+import java.util.List;
 
 import com.absir.appserv.game.bean.JbCard;
+import com.absir.appserv.game.bean.JbPlayer;
 import com.absir.appserv.game.bean.value.IPropDefine;
 import com.absir.appserv.game.bean.value.IRewardDefine;
 import com.absir.appserv.game.context.JbPlayerContext;
 import com.absir.appserv.game.context.PlayerServiceBase;
 import com.absir.appserv.game.context.value.IPropEvolute;
+import com.absir.appserv.game.service.ArenaService;
+import com.absir.appserv.jdbc.JdbcPage;
 import com.absir.appserv.system.bean.value.JaLang;
 import com.absir.appserv.system.server.value.Bodys;
 import com.absir.context.core.ContextMap;
@@ -168,6 +172,36 @@ public abstract class Api_playerBase extends PlayerServer {
 		ContextMap playerMap = new ContextMap(playerContext.getPlayer());
 		playerMap.put("data", playerContext.task(scene, pass, detail));
 		return playerMap.comparedMap();
+	}
+
+	/**
+	 * 竞技场匹配
+	 * 
+	 * @author absir
+	 *
+	 */
+	public static class Arenas {
+
+		/** arean */
+		public int arean;
+
+		/** players */
+		public List<JbPlayer> players;
+
+	}
+
+	@JaLang("竞技场匹配")
+	public Arenas arenas(@Attribute JbPlayerContext playerContext) {
+		List<JbPlayer> players = playerContext.getArenas();
+		Arenas arenas = new Arenas();
+		arenas.arean = playerContext.getPlayer().getArena();
+		arenas.players = players;
+		return arenas;
+	}
+
+	@JaLang("竞技场列表")
+	public List<JbPlayer> arena(int arena, @Attribute JbPlayerContext playerContext) {
+		return ArenaService.ME.getArenaList(arena, JdbcPage.PAGE_SIZE, playerContext.getPlayer().getServerId());
 	}
 
 	@JaLang("修改玩家数据")

@@ -29,6 +29,7 @@ import com.absir.context.core.ContextUtils;
 import com.absir.server.exception.ServerException;
 import com.absir.server.exception.ServerStatus;
 import com.absir.server.in.Input;
+import com.absir.server.value.Nullable;
 import com.absir.server.value.Param;
 
 /**
@@ -78,13 +79,13 @@ public abstract class Api_userBase extends ApiServer {
 	}
 
 	@JaLang("角色设置")
-	public JPlayerConfigure player() {
+	public JPlayerConfigure configure() {
 		return JConfigureUtils.getConfigure(JPlayerConfigure.class);
 	}
 
 	@JaLang("创建角色")
-	public JbPlayerContext playParam(int gender, int cardId, @Param String name) {
-		if (play(gender, name)) {
+	public JbPlayerContext playParam(int gender, int cardId, @Param String name, @Nullable @Param Long serverId) {
+		if (play(gender, name, serverId)) {
 			return playCard(cardId);
 		}
 
@@ -93,17 +94,17 @@ public abstract class Api_userBase extends ApiServer {
 
 	@JaLang("创建名称")
 	protected boolean isMatchName(String name) {
-		return NAME_PATTERN.matcher(name).matches() || PlayerServiceBase.ME.findFilter(name);
+		return name == null || NAME_PATTERN.matcher(name).matches() || PlayerServiceBase.ME.findFilter(name);
 	}
 
 	@JaLang("创建角色")
-	public boolean play(int gender, @Bodys String name) {
+	public boolean play(int gender, @Bodys String name, @Nullable @Param Long serverId) {
 		if (!isMatchName(name)) {
 			throw new ServerException(ServerStatus.ON_ERROR);
 		}
 
 		JiUserBase userBase = SecurityServiceUtils.getUserBase();
-		Long playerId = PlayerServiceBase.ME.getPlayerId(null, userBase);
+		Long playerId = PlayerServiceBase.ME.getPlayerId(serverId, userBase);
 		if (playerId == null) {
 			try {
 				PlayerServiceBase.ME.create(null, userBase, name, gender);
@@ -141,7 +142,7 @@ public abstract class Api_userBase extends ApiServer {
 			throw new ServerException(ServerStatus.IN_FAILED);
 		}
 
-		JPlayerConfigure playerConfigure = player();
+		JPlayerConfigure playerConfigure = configure();
 		if (!ArrayUtils.contains(playerConfigure.getCardIds(), cardId)) {
 			throw new ServerException(ServerStatus.NO_PARAM);
 		}

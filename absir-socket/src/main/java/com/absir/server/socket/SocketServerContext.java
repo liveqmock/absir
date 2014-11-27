@@ -337,14 +337,16 @@ public class SocketServerContext extends ActiveService<JbServer, SocketServer> i
 
 		serverContext.setClosed(false);
 		SocketServer socketServer = new SocketServer();
-		try {
-			socketServer.start(serverContext.getServer().getPort(), backlog, serverContext.getServer().getInetAddress(), bufferSize, receiveBufferSize, sendBufferSize,
-					createSocketReceiverContext(serverContext));
+		if (active.getPort() > 0) {
+			try {
+				socketServer.start(serverContext.getServer().getPort(), backlog, serverContext.getServer().getInetAddress(), bufferSize, receiveBufferSize, sendBufferSize,
+						createSocketReceiverContext(serverContext));
 
-		} catch (Throwable e) {
-			// TODO Auto-generated catch block
-			LOGGER.error("server [" + serverContext.getServer().getIp() + "] start error", e);
-			serverContext.setClosed(true);
+			} catch (Throwable e) {
+				// TODO Auto-generated catch block
+				LOGGER.error("server [" + serverContext.getServer().getIp() + "] start error", e);
+				serverContext.setClosed(true);
+			}
 		}
 
 		return socketServer;

@@ -28,7 +28,6 @@ import com.absir.appserv.system.bean.value.JeEditable;
  * @author absir
  *
  */
-@SuppressWarnings("unchecked")
 @MappedSuperclass
 public abstract class JbPlayerA<T extends PlayerAtt> extends JbBase {
 
@@ -70,11 +69,6 @@ public abstract class JbPlayerA<T extends PlayerAtt> extends JbBase {
 
 	@JaLang("数据检查")
 	private transient boolean att;
-
-	@JaLang("存档数据")
-	@Type(type = "com.absir.appserv.system.bean.type.JtJsonDynamic")
-	@JaEmbedd
-	private T playerAtt;
 
 	/**
 	 * @author absir
@@ -267,30 +261,47 @@ public abstract class JbPlayerA<T extends PlayerAtt> extends JbBase {
 	/**
 	 * @return
 	 */
-	private PlayerAtt getPlayerAtt() {
-		if (!att) {
-			// 数据安全检查
-			att = true;
-			playerAtt();
-		}
-
-		return playerAtt;
+	@JaLang("存档数据")
+	@Type(type = "com.absir.appserv.system.bean.type.JtJsonDynamic")
+	@JaEmbedd
+	public T getPlayerAtt() {
+		playerAtt();
+		return doGetPlayerAtt();
 	}
+
+	protected abstract T doGetPlayerAtt();
+
+	/**
+	 * @param playerAtt
+	 */
+	public abstract void setPlayerAtt(T playerAtt);
+
+	/**
+	 * @return
+	 */
+	protected abstract T createPlayerAtt();
 
 	/**
 	 * 数据安全检查
 	 */
 	protected void playerAtt() {
-		if (playerAtt == null) {
-			playerAtt = (T) new PlayerAtt();
+		if (!att) {
+			// 数据安全检查
+			att = true;
+			T playerAtt = getPlayerAtt();
+			if (playerAtt == null) {
+				playerAtt = createPlayerAtt();
+				setPlayerAtt(playerAtt);
+			}
+
+			playerAtt.taskProgresses = playerAtt.taskProgresses == null ? new HashMap<String, Integer>() : new HashMap<String, Integer>(playerAtt.taskProgresses);
+			playerAtt.metaRecards = playerAtt.metaRecards == null ? new HashMap<String, Integer>() : new HashMap<String, Integer>(playerAtt.metaRecards);
+			playerAtt.dailyRecards = playerAtt.dailyRecards == null ? new HashMap<String, Integer>() : new HashMap<String, Integer>(playerAtt.dailyRecards);
+			if (playerAtt.propNumbers == null) {
+				playerAtt.propNumbers = new LinkedHashMap<Serializable, Integer>();
+			}
 		}
 
-		playerAtt.taskProgresses = playerAtt.taskProgresses == null ? new HashMap<String, Integer>() : new HashMap<String, Integer>(playerAtt.taskProgresses);
-		playerAtt.metaRecards = playerAtt.metaRecards == null ? new HashMap<String, Integer>() : new HashMap<String, Integer>(playerAtt.metaRecards);
-		playerAtt.dailyRecards = playerAtt.dailyRecards == null ? new HashMap<String, Integer>() : new HashMap<String, Integer>(playerAtt.dailyRecards);
-		if (playerAtt.propNumbers == null) {
-			playerAtt.propNumbers = new LinkedHashMap<Serializable, Integer>();
-		}
 	}
 
 	/**

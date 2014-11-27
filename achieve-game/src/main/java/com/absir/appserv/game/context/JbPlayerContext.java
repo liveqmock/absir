@@ -107,7 +107,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	protected FI fight;
 
 	// 全部恢复
-	@JsonSerialize(contentAs = IBaseSerializer.class)
+	@JsonSerialize(contentUsing = IBaseSerializer.class)
 	@JaEdit(editable = JeEditable.DISABLE)
 	protected List<Recovery> recoveries = new ArrayList<Recovery>();
 
@@ -728,8 +728,8 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 */
 	protected void save() {
 		Session session = BeanDao.getSession();
-		session.save(player);
-		session.save(playerA);
+		session.merge(player);
+		session.merge(playerA);
 	}
 
 	/*
@@ -1530,7 +1530,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 * 
 	 * @return
 	 */
-	public List<JbPlayer> getArenas() {
+	public List<JbPlayer> arenas() {
 		ArenaBase arenaBase = ArenaService.ME.getArenaBase(player.getId());
 		arenaBase.analyze(player);
 		return arenaBase.analyzes(PlayerServiceBase.ME.findPlayers(arenaBase.arenas(0, 1, 2)));

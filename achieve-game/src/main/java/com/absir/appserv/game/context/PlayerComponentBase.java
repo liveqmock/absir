@@ -30,6 +30,8 @@ import com.absir.appserv.game.bean.value.IPropDefine;
 import com.absir.appserv.game.bean.value.IRewardDefine;
 import com.absir.appserv.game.bean.value.ITaskDefine;
 import com.absir.appserv.game.confiure.JPlayerConfigure;
+import com.absir.appserv.game.context.value.IPropEvolute;
+import com.absir.appserv.game.context.value.IPropPlayer;
 import com.absir.appserv.game.utils.GameUtils;
 import com.absir.appserv.game.value.IExp;
 import com.absir.appserv.game.value.LevelExpCxt;
@@ -386,5 +388,27 @@ public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerCo
 	 */
 	public float getEvoluteOdds(C target) {
 		return 1;
+	}
+
+	/**
+	 * 获取道具执行对象
+	 * 
+	 * @param propType
+	 * @return
+	 */
+	public Object getPropInvoke(String propType) {
+		Class<?> propClass = KernelClass.forName(IPropEvolute.class.getPackage().getName() + ".OProp_" + propType);
+		return KernelClass.newInstance(propClass, this);
+	}
+
+	/**
+	 * 获取奖励执行对象
+	 * 
+	 * @param rewardType
+	 * @return
+	 */
+	public Object getRewardInvoke(String rewardType) {
+		Class<?> rewardClass = KernelClass.forName(IPropPlayer.class.getPackage().getName() + ".OReward_" + rewardType);
+		return KernelClass.newInstance(rewardClass, this);
 	}
 }

@@ -8,13 +8,12 @@
 package com.absir.appserv.game.bean.value;
 
 import com.absir.appserv.game.bean.JbReward;
-import com.absir.appserv.game.value.IExp;
 
 /**
  * @author absir
  *
  */
-public interface IRewardBean extends IExp {
+public interface IRewardBean {
 
 	// 获取奖励
 	public JbReward getReward();

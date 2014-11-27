@@ -53,7 +53,7 @@ public class XlsAccessorBean extends XlsAccessor {
 	 * @param xlsBase
 	 */
 	public XlsAccessorBean(Field field, Class<?> beanClass, XlsBase xlsBase) {
-		super(field, beanClass);
+		this(field, beanClass);
 		// TODO Auto-generated constructor stub
 		if (!xlsBase.is(beanClass)) {
 			XaReferenced xaReferenced = field.getAnnotation(XaReferenced.class);

@@ -461,7 +461,7 @@ public abstract class PlayerServiceBase {
 	/**
 	 * 更新玩家在线天数
 	 */
-	@Schedule(cron = "0 24 * * *")
+	@Schedule(cron = "0 24 * * * *")
 	protected static void updateOnlines() {
 		long contextTime = ContextUtils.getContextTime();
 		for (JbPlayerContext playerContext : (Collection<JbPlayerContext>) JbPlayerContext.COMPONENT.PLAYER_CONTEXT_MAP.values()) {

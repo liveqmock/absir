@@ -49,6 +49,9 @@ public class JPlayerConfigure extends JConfigureBase {
 	@JaLang("好友数增加")
 	private int friendNumberAdd = 2;
 
+	@JaLang("竞技场行动力")
+	private int arenaEp = 7;
+
 	@JaLang("一波敌人")
 	private boolean onceEnemy;
 
@@ -185,6 +188,21 @@ public class JPlayerConfigure extends JConfigureBase {
 	 */
 	public void setFriendNumberAdd(int friendNumberAdd) {
 		this.friendNumberAdd = friendNumberAdd;
+	}
+
+	/**
+	 * @return the arenaEp
+	 */
+	public int getArenaEp() {
+		return arenaEp;
+	}
+
+	/**
+	 * @param arenaEp
+	 *            the arenaEp to set
+	 */
+	public void setArenaEp(int arenaEp) {
+		this.arenaEp = arenaEp;
 	}
 
 	/**

@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import com.absir.appserv.configure.JConfigureUtils;
 import com.absir.appserv.game.bean.JbCard;
 import com.absir.appserv.game.bean.JbPlayer;
 import com.absir.appserv.game.confiure.JPlayerConfigure;
@@ -80,7 +79,7 @@ public abstract class Api_userBase extends ApiServer {
 
 	@JaLang("角色设置")
 	public JPlayerConfigure configure() {
-		return JConfigureUtils.getConfigure(JPlayerConfigure.class);
+		return JbPlayerContext.CONFIGURE;
 	}
 
 	@JaLang("创建角色")

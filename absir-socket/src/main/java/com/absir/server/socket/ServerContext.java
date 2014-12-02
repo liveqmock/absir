@@ -83,10 +83,10 @@ public class ServerContext {
 	 * @param id
 	 * @param channelContext
 	 */
-	public synchronized void loginSocketChannelContext(Serializable id, SocketChannelContext channelContext) {
-		synchronized (channelContexts) {
-			SocketChannelContext context = channelContexts.put(id, channelContext);
-			if (context == null) {
+	public void loginSocketChannelContext(Serializable id, SocketChannelContext channelContext) {
+		SocketChannelContext context = channelContexts.put(id, channelContext);
+		if (context == null) {
+			synchronized (channelContexts) {
 				++online;
 			}
 		}
@@ -98,12 +98,13 @@ public class ServerContext {
 	 * @return
 	 */
 	public void logoutSocketChannelContext(Serializable id, SocketChannel socketChannel) {
-		synchronized (channelContexts) {
-			SocketChannelContext channelContext = channelContexts.get(id);
-			if (channelContext != null && channelContext.getSocketChannel() == socketChannel) {
+		SocketChannelContext channelContext = channelContexts.get(id);
+		if (channelContext != null && channelContext.getSocketChannel() == socketChannel) {
+			synchronized (channelContexts) {
 				--online;
-				channelContexts.remove(id);
 			}
+
+			channelContexts.remove(id);
 		}
 	}
 
@@ -111,7 +112,7 @@ public class ServerContext {
 	 * @param contextTime
 	 * @return
 	 */
-	public synchronized void stepDone(long contextTime) {
+	public void stepDone(long contextTime) {
 		Iterator<Entry<Serializable, SocketChannelContext>> iterator = channelContexts.entrySet().iterator();
 		while (iterator.hasNext()) {
 			Entry<Serializable, SocketChannelContext> entry = iterator.next();

@@ -359,7 +359,7 @@ public class SocketServerContext extends ActiveService<JbServer, SocketServer> i
 	 * @return
 	 */
 	protected SocketReceiverContext createSocketReceiverContext(ServerContext serverContext) {
-		return new SocketReceiverContext(serverContext);
+		return serverContext.getServer().isMultiPort() ? new SocketReceiverMutilContext(serverContext) : new SocketReceiverContext(serverContext);
 	}
 
 	/*

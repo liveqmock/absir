@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.nio.channels.SocketChannel;
 
 import com.absir.server.socket.ServerContext;
+import com.absir.server.socket.SocketBuffer;
 
 /**
  * @author absir
@@ -30,10 +31,11 @@ public interface SocketSessionResolver {
 	 * @param socketChannel
 	 * @param serverContext
 	 * @param buffer
-	 * @throws Throwable
+	 * @param socketBuffer
 	 * @return
+	 * @throws Throwable
 	 */
-	public Serializable register(SocketChannel socketChannel, ServerContext serverContext, byte[] buffer) throws Throwable;
+	public ServerContext register(SocketChannel socketChannel, ServerContext serverContext, byte[] buffer, SocketBuffer socketBuffer) throws Throwable;
 
 	/**
 	 * @param id

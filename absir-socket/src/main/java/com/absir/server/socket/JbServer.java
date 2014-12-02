@@ -31,6 +31,9 @@ public class JbServer extends JbBean implements JiActive {
 	@JaLang("端口号")
 	private int port;
 
+	@JaLang("混合端口")
+	private boolean multiPort;
+
 	@JaLang("服务器ip")
 	private String ip;
 
@@ -71,6 +74,21 @@ public class JbServer extends JbBean implements JiActive {
 	 */
 	public void setPort(int port) {
 		this.port = port;
+	}
+
+	/**
+	 * @return the multiPort
+	 */
+	public boolean isMultiPort() {
+		return multiPort;
+	}
+
+	/**
+	 * @param multiPort
+	 *            the multiPort to set
+	 */
+	public void setMultiPort(boolean multiPort) {
+		this.multiPort = multiPort;
 	}
 
 	/**

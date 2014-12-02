@@ -25,6 +25,7 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.hibernate.Session;
 
+import com.absir.appserv.configure.JConfigureUtils;
 import com.absir.appserv.game.bean.JbCard;
 import com.absir.appserv.game.bean.JbFriend;
 import com.absir.appserv.game.bean.JbPlayer;
@@ -37,6 +38,7 @@ import com.absir.appserv.game.bean.value.IRewardDefine;
 import com.absir.appserv.game.bean.value.ITaskDefine;
 import com.absir.appserv.game.bean.value.ITaskDefine.ITaskDetail;
 import com.absir.appserv.game.bean.value.ITaskDefine.ITaskPass;
+import com.absir.appserv.game.confiure.JPlayerConfigure;
 import com.absir.appserv.game.context.value.IFight;
 import com.absir.appserv.game.context.value.IPropCard;
 import com.absir.appserv.game.context.value.IPropEvolute;
@@ -76,6 +78,9 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 
 	// 功能组件
 	public static final PlayerComponentBase COMPONENT = BeanFactoryUtils.get(PlayerComponentBase.class);
+
+	// 玩家配置
+	public static final JPlayerConfigure CONFIGURE = JConfigureUtils.getConfigure(JPlayerConfigure.class);
 
 	// 玩家全部卡牌
 	@Transient
@@ -1530,9 +1535,38 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 * 
 	 * @return
 	 */
-	public List<JbPlayer> arenas() {
+	public List<JbPlayer> arenas(int count) {
+		int[] areans = new int[count];
 		ArenaBase arenaBase = ArenaService.ME.getArenaBase(player.getId());
 		arenaBase.analyze(player);
+		int arena = player.getArena();
+		int min = 0;
+		int iArena = arena;
+		int offset = 0;
+		float fOffset = 0.5f;
+		int arn;
+		count--;
+		for (int i = 0; i <= count; i++) {
+			iArena += offset;
+			offset = offset == 0 ? 1 : offset * 3;
+			arn = (int) (iArena * (fOffset + HelperRandom.RANDOM.nextFloat() * (fOffset < 1.0f && i == count ? (1.0f - fOffset) : 1.0f)));
+			fOffset += 0.1f;
+			if (arn < min) {
+				arn = ++min;
+
+			} else {
+				if (arn == arena) {
+					arn = arena == 2 ? 1 : (arena + 1);
+				}
+
+				if (arn > min) {
+					min = arn;
+				}
+			}
+
+			areans[i] = arn;
+		}
+
 		return arenaBase.analyzes(PlayerServiceBase.ME.findPlayers(arenaBase.arenas(0, 1, 2)));
 	}
 
@@ -1548,6 +1582,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 			throw new ServerException(ServerStatus.IN_FAILED, "player id error");
 		}
 
+		modifyEp(CONFIGURE.getArenaEp(), false);
 		return doArena(target);
 	}
 

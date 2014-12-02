@@ -192,7 +192,7 @@ public abstract class Api_playerBase extends PlayerServer {
 
 	@JaLang("竞技场匹配")
 	public Arenas arenas(@Attribute JbPlayerContext playerContext) {
-		List<JbPlayer> players = playerContext.arenas();
+		List<JbPlayer> players = playerContext.arenas(3);
 		Arenas arenas = new Arenas();
 		arenas.arean = playerContext.getPlayer().getArena();
 		arenas.players = players;

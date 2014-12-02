@@ -38,6 +38,11 @@ public interface SocketReceiver<T extends Serializable> {
 	public void unRegister(T id, SocketChannel socketChannel) throws Throwable;
 
 	/**
+	 * 
+	 */
+	public void clearAll();
+
+	/**
 	 * @param id
 	 * @param socketChannel
 	 * @param buffer

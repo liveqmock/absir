@@ -40,6 +40,7 @@ import com.absir.core.util.UtilAbsir;
 import com.absir.orm.transaction.value.Transaction;
 import com.absir.server.exception.ServerException;
 import com.absir.server.exception.ServerStatus;
+import com.absir.server.socket.ServerContext;
 import com.absir.server.socket.SocketServerContext;
 
 /**
@@ -96,6 +97,11 @@ public abstract class PlayerServiceBase {
 	 */
 	@Transaction
 	protected void selectServerId(JPlatformUser platformUser, long serverId) {
+		ServerContext serverContext = SocketServerContext.ME.getServerContext(serverId);
+		if (serverContext == null || serverContext.getServer().isMultiPort()) {
+			throw new ServerException(ServerStatus.ON_DENIED);
+		}
+
 		platformUser.setServerId(serverId);
 		platformUser.setPlayerId(ME.getPlayerId(null, serverId, platformUser.getUserId()));
 		BeanDao.getSession().merge(platformUser);
@@ -114,10 +120,6 @@ public abstract class PlayerServiceBase {
 		}
 
 		if (serverId != null && !(serverId.equals(platformUser.getServerId()))) {
-			if (SocketServerContext.ME.getServerContext(serverId) == null) {
-				throw new ServerException(ServerStatus.ON_DENIED);
-			}
-
 			ME.selectServerId(platformUser, serverId);
 		}
 

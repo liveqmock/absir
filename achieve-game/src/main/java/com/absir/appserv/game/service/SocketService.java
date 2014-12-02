@@ -14,6 +14,7 @@ import java.nio.channels.SocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.absir.appserv.game.bean.JbPlayer;
 import com.absir.appserv.game.context.JbPlayerContext;
 import com.absir.appserv.game.context.PlayerServiceBase;
 import com.absir.appserv.game.context.value.IFight;
@@ -28,7 +29,9 @@ import com.absir.bean.inject.value.Bean;
 import com.absir.context.core.ContextUtils;
 import com.absir.server.socket.InputSocket;
 import com.absir.server.socket.ServerContext;
+import com.absir.server.socket.SocketBuffer;
 import com.absir.server.socket.SocketServer;
+import com.absir.server.socket.SocketServerContext;
 import com.absir.server.socket.resolver.SocketSessionResolver;
 
 /**
@@ -60,18 +63,33 @@ public class SocketService implements SocketSessionResolver {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * com.absir.server.socket.resolver.SocketAuthorResolver#register(java.nio
-	 * .channels.SocketChannel, com.absir.server.socket.JbServerContext, byte[])
+	 * com.absir.server.socket.resolver.SocketSessionResolver#register(java.
+	 * nio.channels.SocketChannel, com.absir.server.socket.ServerContext,
+	 * byte[], com.absir.server.socket.SocketBuffer)
 	 */
 	@Override
-	public Serializable register(SocketChannel socketChannel, ServerContext serverContext, byte[] buffer) throws Throwable {
+	public ServerContext register(SocketChannel socketChannel, ServerContext serverContext, byte[] buffer, SocketBuffer socketBuffer) throws Throwable {
 		// TODO Auto-generated method stub
 		JiUserBase userBase = IdentityServiceLocal.getUserBase(new String(buffer));
 		Long id = PlayerServiceBase.ME.getPlayerId(serverContext.getServer().getId(), userBase);
 		if (id != null) {
 			JbPlayerContext playerContext = ContextUtils.getContext(JbPlayerContext.COMPONENT.PLAYER_CONTEXT_CLASS, id);
-			if (playerContext.getPlayer().getCard() == 0) {
+			JbPlayer player = playerContext.getPlayer();
+			if (player.getCard() == 0) {
 				return null;
+			}
+
+			long serverId = player.getServerId();
+			if (!serverContext.getServer().getId().equals(serverId)) {
+				if (serverContext.getServer().isMultiPort()) {
+					serverContext = SocketServerContext.ME.getServerContext(serverId);
+					if (serverContext == null) {
+						return null;
+					}
+
+				} else {
+					return null;
+				}
 			}
 
 			synchronized (playerContext) {
@@ -83,7 +101,8 @@ public class SocketService implements SocketSessionResolver {
 			}
 		}
 
-		return id;
+		socketBuffer.setId(id);
+		return serverContext;
 	}
 
 	/*

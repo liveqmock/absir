@@ -9,6 +9,8 @@ package com.absir.appserv.game.bean.value;
 
 import java.io.Serializable;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 /**
  * @author absir
  *
@@ -25,6 +27,7 @@ public interface IPropDefine {
 	public int getDiamond();
 
 	// 道具执行对象
+	@JsonIgnore
 	public Object getPropInvoker();
 
 }

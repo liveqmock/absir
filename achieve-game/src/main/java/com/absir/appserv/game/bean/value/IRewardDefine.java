@@ -7,6 +7,8 @@
  */
 package com.absir.appserv.game.bean.value;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 import com.absir.appserv.game.context.value.OReward;
 
 /**
@@ -19,6 +21,7 @@ public interface IRewardDefine extends IRewardBean {
 	public String getId();
 
 	// 获取奖励执行
+	@JsonIgnore
 	public OReward getRewardInvoker();
 
 }

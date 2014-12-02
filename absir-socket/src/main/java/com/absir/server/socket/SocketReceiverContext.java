@@ -10,6 +10,7 @@ package com.absir.server.socket;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.channels.SocketChannel;
+import java.util.Map.Entry;
 
 import com.absir.context.core.ContextUtils;
 import com.absir.server.exception.ServerException;
@@ -81,15 +82,19 @@ public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketCh
 			public void run() {
 				// TODO Auto-generated method stub
 				try {
-					Serializable id = SocketServerContext.get().getSessionResolver().register(socketChannel, serverContext, buffer);
+					ServerContext mutilContext = SocketServerContext.get().getSessionResolver().register(socketChannel, serverContext, buffer, socketBuffer);
+					Serializable id = socketBuffer.getId();
+					if (id == UN_REGISTER_ID) {
+						id = null;
+					}
+
 					if (id == null) {
 						socketBuffer.setId(null);
 						InputSocket.writeByteBuffer(socketChannel, SocketServerContext.get().getFailed());
 
 					} else {
-						socketBuffer.setId(id);
 						if (InputSocket.writeByteBuffer(socketChannel, SocketServerContext.get().getOk())) {
-							serverContext.loginSocketChannelContext(id, createSocketChannelContext(id, socketChannel));
+							registerSocketChannelContext(mutilContext, id, createSocketChannelContext(id, socketChannel));
 						}
 					}
 
@@ -98,6 +103,15 @@ public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketCh
 				}
 			}
 		});
+	}
+
+	/**
+	 * @param mutilContext
+	 * @param id
+	 * @param socketChannelContext
+	 */
+	protected void registerSocketChannelContext(ServerContext mutilContext, Serializable id, SocketChannelContext socketChannelContext) {
+		serverContext.loginSocketChannelContext(id, socketChannelContext);
 	}
 
 	/**
@@ -122,8 +136,34 @@ public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketCh
 	@Override
 	public void unRegister(Serializable id, SocketChannel socketChannel) throws Throwable {
 		// TODO Auto-generated method stub
-		serverContext.logoutSocketChannelContext(id, socketChannel);
+		unregisterSocketChannel(id, socketChannel);
 		SocketServerContext.get().getSessionResolver().unRegister(id, socketChannel, serverContext);
+	}
+
+	/**
+	 * @param id
+	 * @param socketChannel
+	 */
+	protected void unregisterSocketChannel(Serializable id, SocketChannel socketChannel) {
+		serverContext.logoutSocketChannelContext(id, socketChannel);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.server.socket.SocketReceiver#clearAll()
+	 */
+	@Override
+	public void clearAll() {
+		// TODO Auto-generated method stub
+		for (Entry<Serializable, SocketChannelContext> entry : serverContext.getChannelContexts().entrySet()) {
+			try {
+				unRegister(entry.getKey(), entry.getValue().getSocketChannel());
+
+			} catch (Throwable e) {
+				// TODO: handle exception
+			}
+		}
 	}
 
 	/*

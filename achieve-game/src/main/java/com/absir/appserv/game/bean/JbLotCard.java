@@ -11,6 +11,8 @@ import javax.persistence.MappedSuperclass;
 
 import org.hibernate.annotations.Type;
 
+import com.absir.appserv.feature.menu.value.MaEntity;
+import com.absir.appserv.feature.menu.value.MaMenu;
 import com.absir.appserv.system.bean.base.JbBean;
 import com.absir.appserv.system.bean.value.JaEdit;
 import com.absir.appserv.system.bean.value.JaLang;
@@ -20,13 +22,14 @@ import com.absir.appserv.system.bean.value.JiActive;
  * @author absir
  * 
  */
+@MaEntity(parent = @MaMenu("抽奖设置"), name = "卡组")
 @MappedSuperclass
 public class JbLotCard extends JbBean implements JiActive {
 
 	@JaLang("名称")
 	private String name;
 
-	@JaLang("抽奖卡牌")
+	@JaLang(value = "卡牌编号")
 	@JaEdit(types = "paramText")
 	@Type(type = "com.absir.appserv.system.bean.type.JtJsonDynamic")
 	private int[] cardIds;

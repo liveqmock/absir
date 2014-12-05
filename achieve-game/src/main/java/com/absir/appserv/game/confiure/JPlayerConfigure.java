@@ -37,17 +37,26 @@ public class JPlayerConfigure extends JConfigureBase {
 	@JaLang("最大等级")
 	private int maxLevel = 60;
 
-	@JaLang("购买卡牌数")
-	private int buyCardNumber = 5;
+	@JaLang("卡牌数宝石")
+	private int cardNumberDiamond = 5;
 
 	@JaLang("卡牌数增加")
 	private int cardNumberAdd = 2;
 
-	@JaLang("购买好友数")
-	private int buyFriendNumber = 10;
+	@JaLang("好友数宝石")
+	private int friendNumberDiamond = 10;
 
 	@JaLang("好友数增加")
 	private int friendNumberAdd = 2;
+
+	@JaLang("行动力宝石")
+	private int epDiamond = 50;
+
+	@JaLang("行动力增加")
+	private int epAdd = 5;
+
+	@JaLang("金钱宝石")
+	private int moneyDiamond = 50;
 
 	@JaLang("竞技场行动力")
 	private int arenaEp = 7;
@@ -131,18 +140,18 @@ public class JPlayerConfigure extends JConfigureBase {
 	}
 
 	/**
-	 * @return the buyCardNumber
+	 * @return the cardNumberDiamond
 	 */
-	public int getBuyCardNumber() {
-		return buyCardNumber;
+	public int getCardNumberDiamond() {
+		return cardNumberDiamond;
 	}
 
 	/**
-	 * @param buyCardNumber
-	 *            the buyCardNumber to set
+	 * @param cardNumberDiamond
+	 *            the cardNumberDiamond to set
 	 */
-	public void setBuyCardNumber(int buyCardNumber) {
-		this.buyCardNumber = buyCardNumber;
+	public void setCardNumberDiamond(int cardNumberDiamond) {
+		this.cardNumberDiamond = cardNumberDiamond;
 	}
 
 	/**
@@ -161,18 +170,18 @@ public class JPlayerConfigure extends JConfigureBase {
 	}
 
 	/**
-	 * @return the buyFriendNumber
+	 * @return the friendNumberDiamond
 	 */
-	public int getBuyFriendNumber() {
-		return buyFriendNumber;
+	public int getFriendNumberDiamond() {
+		return friendNumberDiamond;
 	}
 
 	/**
-	 * @param buyFriendNumber
-	 *            the buyFriendNumber to set
+	 * @param friendNumberDiamond
+	 *            the friendNumberDiamond to set
 	 */
-	public void setBuyFriendNumber(int buyFriendNumber) {
-		this.buyFriendNumber = buyFriendNumber;
+	public void setFriendNumberDiamond(int friendNumberDiamond) {
+		this.friendNumberDiamond = friendNumberDiamond;
 	}
 
 	/**
@@ -188,6 +197,51 @@ public class JPlayerConfigure extends JConfigureBase {
 	 */
 	public void setFriendNumberAdd(int friendNumberAdd) {
 		this.friendNumberAdd = friendNumberAdd;
+	}
+
+	/**
+	 * @return the epDiamond
+	 */
+	public int getEpDiamond() {
+		return epDiamond;
+	}
+
+	/**
+	 * @param epDiamond
+	 *            the epDiamond to set
+	 */
+	public void setEpDiamond(int epDiamond) {
+		this.epDiamond = epDiamond;
+	}
+
+	/**
+	 * @return the epAdd
+	 */
+	public int getEpAdd() {
+		return epAdd;
+	}
+
+	/**
+	 * @param epAdd
+	 *            the epAdd to set
+	 */
+	public void setEpAdd(int epAdd) {
+		this.epAdd = epAdd;
+	}
+
+	/**
+	 * @return the moneyDiamond
+	 */
+	public int getMoneyDiamond() {
+		return moneyDiamond;
+	}
+
+	/**
+	 * @param moneyDiamond
+	 *            the moneyDiamond to set
+	 */
+	public void setMoneyDiamond(int moneyDiamond) {
+		this.moneyDiamond = moneyDiamond;
 	}
 
 	/**

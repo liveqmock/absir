@@ -167,6 +167,20 @@ public abstract class Api_playerBase extends PlayerServer {
 		return playerMap.comparedMap();
 	}
 
+	@JaLang("购买行动力")
+	public Object ep(@Attribute JbPlayerContext playerContext) {
+		ContextMap playerMap = new ContextMap(playerContext.getPlayer());
+		playerContext.ep();
+		return playerMap.comparedMap();
+	}
+
+	@JaLang("购买金钱")
+	public Object money(@Attribute JbPlayerContext playerContext) {
+		ContextMap playerMap = new ContextMap(playerContext.getPlayer());
+		playerContext.money();
+		return playerMap.comparedMap();
+	}
+
 	@JaLang("进入任务")
 	public Object task(int scene, int pass, int detail, @Attribute JbPlayerContext playerContext) {
 		ContextMap playerMap = new ContextMap(playerContext.getPlayer());

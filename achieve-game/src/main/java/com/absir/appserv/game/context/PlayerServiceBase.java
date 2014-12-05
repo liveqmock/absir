@@ -21,8 +21,9 @@ import org.hibernate.Session;
 import com.absir.appserv.data.value.DataQuery;
 import com.absir.appserv.game.bean.JbCard;
 import com.absir.appserv.game.bean.JbPlayer;
+import com.absir.appserv.game.bean.JbPlayerMessage;
+import com.absir.appserv.game.bean.JbPlayerReward;
 import com.absir.appserv.game.bean.JbReward;
-import com.absir.appserv.game.bean.value.IRewardBean;
 import com.absir.appserv.game.service.SocketService;
 import com.absir.appserv.system.bean.JPlatformUser;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
@@ -400,6 +401,41 @@ public abstract class PlayerServiceBase {
 	}
 
 	/**
+	 * 添加玩家奖励
+	 * 
+	 * @param playerId
+	 * @param reward
+	 * @param name
+	 * @param type
+	 * @param data
+	 */
+	@Transaction
+	public void addPlayerReward(Long playerId, JbReward reward, String name, int type, String data) {
+		JbPlayerReward playerReward = JbPlayerContext.COMPONENT.createPlayerReward();
+		playerReward.setPlayerId(playerId);
+		playerReward.setReward(reward);
+		playerReward.setCreateTime(ContextUtils.getContextTime());
+		playerReward.setName(name);
+		playerReward.setType(type);
+		playerReward.setData(data);
+		processPlayerReward(playerReward);
+		BeanDao.getSession().merge(playerReward);
+		JbPlayerContext playerContext = JbPlayerContext.COMPONENT.find(playerId);
+		if (playerContext != null) {
+			playerContext.modifyRewardNumber(1);
+		}
+	}
+
+	/**
+	 * 处理玩家奖励
+	 * 
+	 * @param playerReward
+	 */
+	protected void processPlayerReward(JbPlayerReward playerReward) {
+
+	}
+
+	/**
 	 * 领取奖励
 	 * 
 	 * @param playerId
@@ -411,9 +447,9 @@ public abstract class PlayerServiceBase {
 		Session session = BeanDao.getSession();
 		Iterator<Object> iterator = QueryDaoUtils.createQueryArray(session, "SELECT o FROM JPlayerReward o WHERE o.id = ? AND o.playerId = ?", rewardId, playerId).iterate();
 		if (iterator.hasNext()) {
-			IRewardBean rewardBean = (IRewardBean) iterator.next();
-			session.delete(rewardBean);
-			return rewardBean.getReward();
+			JbPlayerReward playerReward = (JbPlayerReward) iterator.next();
+			session.delete(playerReward);
+			return playerReward.getReward();
 		}
 
 		return null;
@@ -435,7 +471,7 @@ public abstract class PlayerServiceBase {
 	 * @return
 	 */
 	@Transaction(readOnly = true)
-	public List<IRewardBean> getPlayerRewards(Long playerId, int pageIndex) {
+	public List<JbPlayerReward> getPlayerRewards(Long playerId, int pageIndex) {
 		if (--pageIndex < 0) {
 			pageIndex = 0;
 		}
@@ -480,10 +516,6 @@ public abstract class PlayerServiceBase {
 						playerModifier.doWith(playerContext.getPlayer());
 					}
 
-					if (playerContext.isExpiration()) {
-						playerContext.uninitialize();
-					}
-
 					SocketChannel socketChannel = playerContext.getSocketChannel();
 					if (socketChannel != null) {
 						SocketService.writeByteObject(socketChannel, SocketService.CALLBACK_MODIFY, contextMap.comparedMap());
@@ -493,6 +525,136 @@ public abstract class PlayerServiceBase {
 
 		} finally {
 			contextFactory.clearToken(tokenId);
+		}
+	}
+
+	/**
+	 * 添加玩家消息
+	 * 
+	 * @param playerId
+	 * @param fromPlayerId
+	 * @param reward
+	 * @param name
+	 * @param type
+	 * @param data
+	 * @param content
+	 */
+	@Transaction
+	public void addPlayerMessage(Long playerId, long fromPlayerId, JbReward reward, String name, int type, String data, String content) {
+		JbPlayerMessage playerMessage = JbPlayerContext.COMPONENT.createPlayerMessage();
+		playerMessage.setPlayerId(playerId);
+		playerMessage.setFromPlayerId(fromPlayerId);
+		playerMessage.setReward(reward);
+		playerMessage.setCreateTime(ContextUtils.getContextTime());
+		playerMessage.setName(name);
+		playerMessage.setType(type);
+		playerMessage.setData(data);
+		playerMessage.setContent(content);
+		processPlayerMessage(playerMessage);
+		BeanDao.getSession().merge(playerMessage);
+		JbPlayerContext playerContext = JbPlayerContext.COMPONENT.find(playerId);
+		if (playerContext != null) {
+			playerContext.modifyMessageNumber(1);
+		}
+	}
+
+	/**
+	 * 处理玩家消息
+	 * 
+	 * @param playerMessage
+	 */
+	protected void processPlayerMessage(JbPlayerMessage playerMessage) {
+
+	}
+
+	/**
+	 * 获取玩家消息
+	 * 
+	 * @param playerId
+	 * @param messageId
+	 */
+	@Transaction
+	public JbPlayerMessage getPlayerMessage(Long playerId, Long messageId) {
+		Session session = BeanDao.getSession();
+		Iterator<Object> iterator = QueryDaoUtils.createQueryArray(session, "SELECT o FROM JPlayerReward o WHERE o.id = ? AND o.playerId = ?", messageId, playerId).iterate();
+		if (iterator.hasNext()) {
+			JbPlayerMessage playerMessage = (JbPlayerMessage) iterator.next();
+			if (!playerMessage.isReaded()) {
+				playerMessage.setReaded(true);
+				session.merge(playerMessage);
+			}
+
+			return playerMessage;
+		}
+
+		return null;
+	}
+
+	/**
+	 * 获取玩家消息奖励
+	 * 
+	 * @param playerId
+	 * @param messageId
+	 * @return
+	 */
+	@Transaction
+	protected JbReward getPlayerMessageReward(Long playerId, Long messageId) {
+		Session session = BeanDao.getSession();
+		Iterator<Object> iterator = QueryDaoUtils.createQueryArray(session, "SELECT o FROM JPlayerReward o WHERE o.id = ? AND o.playerId = ?", messageId, playerId).iterate();
+		if (iterator.hasNext()) {
+			JbPlayerMessage playerMessage = (JbPlayerMessage) iterator.next();
+			JbReward reward = playerMessage.getReward();
+			if (reward != null) {
+				playerMessage.setReward(null);
+				session.merge(playerMessage);
+			}
+
+			return reward;
+		}
+
+		return null;
+	}
+
+	/**
+	 * 消息列表数量
+	 * 
+	 * @return
+	 */
+	protected int getMessagePageSize() {
+		return 10;
+	}
+
+	/**
+	 * 奖励列表
+	 * 
+	 * @param playerId
+	 * @return
+	 */
+	@Transaction(readOnly = true)
+	public List<JbPlayerMessage> getPlayerMessages(Long playerId, int pageIndex) {
+		if (--pageIndex < 0) {
+			pageIndex = 0;
+		}
+
+		Query query = QueryDaoUtils.createQueryArray(BeanDao.getSession(), "SELECT o FROM JPlayerMessage o WHERE o.playerId = ?", playerId);
+		List<JbPlayerMessage> playerMessages = query.setFirstResult(pageIndex * getRewardPageSize()).setMaxResults(getRewardPageSize()).setCacheable(true).list();
+		for (JbPlayerMessage playerMessage : playerMessages) {
+			processListPlayerMessage(playerMessage);
+		}
+
+		return playerMessages;
+	}
+
+	/**
+	 * 处理玩家消息列表
+	 * 
+	 * @param playerMessage
+	 */
+	protected void processListPlayerMessage(JbPlayerMessage playerMessage) {
+		playerMessage.setContent(null);
+		if (playerMessage.getReward() != null) {
+			playerMessage.setRewarded(true);
+			playerMessage.setReward(null);
 		}
 	}
 

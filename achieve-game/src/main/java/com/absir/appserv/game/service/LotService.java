@@ -21,6 +21,7 @@ import com.absir.appserv.configure.JConfigureUtils;
 import com.absir.appserv.configure.xls.XlsDao;
 import com.absir.appserv.game.bean.JbCard;
 import com.absir.appserv.game.bean.JbLotCard;
+import com.absir.appserv.game.bean.JbLotPool;
 import com.absir.appserv.game.bean.JbPlayerA;
 import com.absir.appserv.game.bean.value.ICardDefine;
 import com.absir.appserv.game.confiure.JLotConfigure;
@@ -55,11 +56,20 @@ public class LotService extends ContextService implements IEntityMerge<JbLotCard
 	/** 抽奖池参数 */
 	public static final JLotConfigure LOT_CONFIGURE = JConfigureUtils.getConfigure(JLotConfigure.class);
 
-	/** 抽奖池 */
+	/** 抽奖卡牌 */
 	private DActiver<JbLotCard> lotCardActitity;
 
-	/** 抽奖池卡组IDS */
+	/** 抽奖池 */
+	private DActiver<JbLotPool> lotPoolActitity;
+
+	/** 抽奖卡组IDS */
 	private Set<Long> lotCardIds;
+
+	/** 抽奖池卡组IDS */
+	private Set<Long> lotPoolCardIds;
+
+	/** 抽奖池道具IDS */
+	private Set<Long> lotPoolPropIds;
 
 	/** 品质卡牌抽奖组 */
 	@JsonSerialize(contentUsing = IBeanCollectionSerializer.class)
@@ -71,6 +81,7 @@ public class LotService extends ContextService implements IEntityMerge<JbLotCard
 	@Inject
 	protected void initService() {
 		lotCardActitity = new DActiver<JbLotCard>("JLotCard");
+		lotPoolActitity = new DActiver<JbLotPool>("JLotPool");
 		lotCardIds = new HashSet<Long>();
 		rareMapCard = new HashMap<Integer, List<ICardDefine>>();
 	}
@@ -91,7 +102,11 @@ public class LotService extends ContextService implements IEntityMerge<JbLotCard
 	public void step(long contextTime) {
 		// TODO Auto-generated method stub
 		if (lotCardActitity.stepNext(contextTime)) {
-			ME.reload(contextTime);
+			ME.reloadCard(contextTime);
+		}
+
+		if (lotPoolActitity.stepNext(contextTime)) {
+			ME.reloadPool(contextTime);
 		}
 	}
 
@@ -100,7 +115,7 @@ public class LotService extends ContextService implements IEntityMerge<JbLotCard
 	 */
 	@Async(notifier = true)
 	@Transaction(readOnly = true)
-	public void reload(long contextTime) {
+	public void reloadCard(long contextTime) {
 		lotCardIds.clear();
 		Map<Integer, List<ICardDefine>> rareMapCard = new HashMap<Integer, List<ICardDefine>>();
 		XlsDao<ICardDefine, Serializable> cardDefineDao = JbPlayerContext.COMPONENT.getCardDefineDao();
@@ -127,6 +142,15 @@ public class LotService extends ContextService implements IEntityMerge<JbLotCard
 		this.rareMapCard = rareMapCard;
 	}
 
+	/**
+	 * @param contextTime
+	 */
+	@Async(notifier = true)
+	@Transaction(readOnly = true)
+	public void reloadPool(long contextTime) {
+
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -137,7 +161,12 @@ public class LotService extends ContextService implements IEntityMerge<JbLotCard
 	@Override
 	public void merge(String entityName, JbLotCard entity, MergeType mergeType, Object mergeEvent) {
 		// TODO Auto-generated method stub
-		lotCardActitity.merge(entity, mergeType, mergeEvent);
+		if (entity instanceof JbLotPool) {
+			lotPoolActitity.merge((JbLotPool) entity, mergeType, mergeEvent);
+
+		} else {
+			lotCardActitity.merge(entity, mergeType, mergeEvent);
+		}
 	}
 
 	/**

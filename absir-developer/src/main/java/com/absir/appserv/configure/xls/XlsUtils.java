@@ -93,7 +93,8 @@ public abstract class XlsUtils {
 	 * @return
 	 */
 	public static <T extends XlsBase> Collection<T> getXlsBeans(Class<T> xlsClass) {
-		return getXlsDao(xlsClass).getAll();
+		XlsDao<T, Serializable> dao = getXlsDao(xlsClass);
+		return dao == null ? null : dao.getAll();
 	}
 
 	/** XLS_BASE */

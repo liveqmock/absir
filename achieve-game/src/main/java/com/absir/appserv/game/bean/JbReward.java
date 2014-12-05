@@ -10,7 +10,7 @@ package com.absir.appserv.game.bean;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.persistence.MappedSuperclass;
+import javax.persistence.Embeddable;
 
 import org.hibernate.annotations.Type;
 
@@ -21,7 +21,7 @@ import com.absir.appserv.system.bean.value.JaLang;
  * @author absir
  * 
  */
-@MappedSuperclass
+@Embeddable
 public class JbReward {
 
 	@JaLang("金钱奖励")

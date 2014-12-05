@@ -100,6 +100,24 @@ public abstract class JbPlayer extends JbBean implements ILevelExp {
 	@JaLang("队长卡牌")
 	private int card;
 
+	@JaLang("消费")
+	private int consume;
+
+	@JaLang("vip等级")
+	private int vip;
+
+	@JaLang("行动力次数")
+	private int epTimes;
+
+	@JaLang("行动力消耗")
+	private int epConsume;
+
+	@JaLang("金钱次数")
+	private int moneyTimes;
+
+	@JaLang("金钱消耗")
+	private int moneyConsume;
+
 	/**
 	 * @return the serverId
 	 */
@@ -398,6 +416,96 @@ public abstract class JbPlayer extends JbBean implements ILevelExp {
 	 */
 	public void setCard(int card) {
 		this.card = card;
+	}
+
+	/**
+	 * @return the consume
+	 */
+	public int getConsume() {
+		return consume;
+	}
+
+	/**
+	 * @param consume
+	 *            the consume to set
+	 */
+	public void setConsume(int consume) {
+		this.consume = consume;
+	}
+
+	/**
+	 * @return the vip
+	 */
+	public int getVip() {
+		return vip;
+	}
+
+	/**
+	 * @param vip
+	 *            the vip to set
+	 */
+	public void setVip(int vip) {
+		this.vip = vip;
+	}
+
+	/**
+	 * @return the epTimes
+	 */
+	public int getEpTimes() {
+		return epTimes;
+	}
+
+	/**
+	 * @param epTimes
+	 *            the epTimes to set
+	 */
+	public void setEpTimes(int epTimes) {
+		this.epTimes = epTimes;
+	}
+
+	/**
+	 * @return the epConsume
+	 */
+	public int getEpConsume() {
+		return epConsume;
+	}
+
+	/**
+	 * @param epConsume
+	 *            the epConsume to set
+	 */
+	public void setEpConsume(int epConsume) {
+		this.epConsume = epConsume;
+	}
+
+	/**
+	 * @return the moneyTimes
+	 */
+	public int getMoneyTimes() {
+		return moneyTimes;
+	}
+
+	/**
+	 * @param moneyTimes
+	 *            the moneyTimes to set
+	 */
+	public void setMoneyTimes(int moneyTimes) {
+		this.moneyTimes = moneyTimes;
+	}
+
+	/**
+	 * @return the moneyConsume
+	 */
+	public int getMoneyConsume() {
+		return moneyConsume;
+	}
+
+	/**
+	 * @param moneyConsume
+	 *            the moneyConsume to set
+	 */
+	public void setMoneyConsume(int moneyConsume) {
+		this.moneyConsume = moneyConsume;
 	}
 
 	/**

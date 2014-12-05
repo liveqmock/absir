@@ -58,7 +58,7 @@ public abstract class Api_userBase extends ApiServer {
 	protected static class UserPlayers {
 
 		/** userBase */
-		public JiUserBase userBase;
+		public JiUserBase user;
 
 		/** players */
 		public List<JbPlayer> players;
@@ -72,8 +72,8 @@ public abstract class Api_userBase extends ApiServer {
 	@JaLang("选择服务区")
 	public UserPlayers getPlayerIds(Long serverId) {
 		UserPlayers userPlayers = new UserPlayers();
-		userPlayers.userBase = SecurityServiceUtils.getUserBase();
-		userPlayers.players = PlayerServiceBase.ME.players(serverId, userPlayers.userBase);
+		userPlayers.user = SecurityServiceUtils.getUserBase();
+		userPlayers.players = PlayerServiceBase.ME.players(serverId, userPlayers.user);
 		return userPlayers;
 	}
 

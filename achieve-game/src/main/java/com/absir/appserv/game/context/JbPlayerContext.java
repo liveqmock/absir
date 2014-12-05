@@ -43,6 +43,7 @@ import com.absir.appserv.game.context.value.IFight;
 import com.absir.appserv.game.context.value.IPropCard;
 import com.absir.appserv.game.context.value.IPropEvolute;
 import com.absir.appserv.game.context.value.IPropPlayer;
+import com.absir.appserv.game.context.value.IVipDefine;
 import com.absir.appserv.game.context.value.OReward;
 import com.absir.appserv.game.service.ArenaService;
 import com.absir.appserv.game.service.ArenaService.ArenaBase;
@@ -687,8 +688,28 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 */
 	protected void initNumber(Session session) {
 		playerA.setRewardNumber(QueryDaoUtils.firstTo(QueryDaoUtils.createQueryArray(session, "SELECT COUNT(o) FROM JPlayerReward o WHERE o.playerId = ?", getId()), int.class));
-		playerA.setMessageNumber(QueryDaoUtils.firstTo(
-				QueryDaoUtils.createQueryArray(session, "SELECT SUM(o.messageNumber) FROM JFollow o WHERE o.id.eid = ? AND o.following = TRUE AND o.follower = TRUE", getId()), int.class));
+		playerA.setMessageNumber(QueryDaoUtils.firstTo(QueryDaoUtils.createQueryArray(session, "SELECT COUNT(o) FROM JPlayerMessage o WHERE o.playerId = ? AND o.readed = ?", getId(), false),
+				int.class));
+	}
+
+	/**
+	 * 修改奖励数量
+	 * 
+	 * @param number
+	 */
+	public synchronized void modifyRewardNumber(int number) {
+		playerA.setRewardNumber(playerA.getRewardNumber() + number);
+		rewardNotifier.post();
+	}
+
+	/**
+	 * 修改消息数量
+	 * 
+	 * @param number
+	 */
+	public synchronized void modifyMessageNumber(int number) {
+		playerA.setMessageNumber(playerA.getMessageNumber() + number);
+		messageNotifier.post();
 	}
 
 	/**
@@ -712,6 +733,13 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	protected void updatePlayerDay(int online) {
 		playerA.setOnline(online);
 		playerA.getDailyRecards().clear();
+		IVipDefine vipDefine = COMPONENT.getVipDefine(player.getVip());
+		if (vipDefine != null) {
+			COMPONENT.doUpdatePlayerDay(player, this, online, vipDefine);
+		}
+
+		player.setEpConsume(0);
+		player.setMoneyConsume(0);
 	}
 
 	/*
@@ -789,10 +817,9 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 				throw new ServerException(ServerStatus.IN_FAILED, "ep");
 			}
 
-		} else if (ep >= player.getMaxEp()) {
-			ep = player.getMaxEp();
+		}
 
-		} else {
+		if (ep < player.getMaxEp()) {
 			epRecovery.start();
 		}
 
@@ -1283,7 +1310,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 * @return
 	 */
 	public synchronized int card(int number) {
-		modifyDiamond(-number * COMPONENT.PLAYER_CONFIGURE.getBuyCardNumber(), false);
+		modifyDiamond(-number * COMPONENT.PLAYER_CONFIGURE.getCardNumberDiamond(), false);
 		number *= COMPONENT.PLAYER_CONFIGURE.getCardNumberAdd();
 		player.setMaxCardNumber(player.getMaxCardNumber() + number);
 		return number;
@@ -1295,7 +1322,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 * @return
 	 */
 	public synchronized int friend(int number) {
-		modifyDiamond(-number * COMPONENT.PLAYER_CONFIGURE.getBuyFriendNumber(), false);
+		modifyDiamond(-number * COMPONENT.PLAYER_CONFIGURE.getFriendNumberDiamond(), false);
 		number *= COMPONENT.PLAYER_CONFIGURE.getFriendNumberAdd();
 		player.setMaxFriendNumber(player.getMaxFriendNumber() + number);
 		return number;
@@ -1528,6 +1555,32 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 		C card = getCard(cardId);
 		modifyProp(propDefine, -1, false);
 		return ((IPropCard) propInvoker).userCard(card, this);
+	}
+
+	/**
+	 * 购买行动力
+	 */
+	public synchronized void ep() {
+		int epTime = player.getEpTimes();
+		if (epTime <= 0) {
+			throw new ServerException(ServerStatus.ON_DENIED);
+		}
+
+		COMPONENT.doEp(this);
+		player.setEpTimes(epTime - 1);
+	}
+
+	/**
+	 * 购买金钱
+	 */
+	public synchronized void money() {
+		int moneyTimes = player.getMoneyTimes();
+		if (moneyTimes <= 0) {
+			throw new ServerException(ServerStatus.ON_DENIED);
+		}
+
+		COMPONENT.doMoney(this);
+		player.setMoneyTimes(moneyTimes - 1);
 	}
 
 	/**

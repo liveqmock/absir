@@ -21,9 +21,12 @@ import com.absir.appserv.configure.xls.XlsBase;
 import com.absir.appserv.configure.xls.XlsDao;
 import com.absir.appserv.configure.xls.XlsUtils;
 import com.absir.appserv.game.bean.JbCard;
+import com.absir.appserv.game.bean.JbDiamond;
 import com.absir.appserv.game.bean.JbFriend;
 import com.absir.appserv.game.bean.JbPlayer;
 import com.absir.appserv.game.bean.JbPlayerA;
+import com.absir.appserv.game.bean.JbPlayerMessage;
+import com.absir.appserv.game.bean.JbPlayerReward;
 import com.absir.appserv.game.bean.value.ICardDefine;
 import com.absir.appserv.game.bean.value.IPlayerDefine;
 import com.absir.appserv.game.bean.value.IPropDefine;
@@ -32,6 +35,7 @@ import com.absir.appserv.game.bean.value.ITaskDefine;
 import com.absir.appserv.game.confiure.JPlayerConfigure;
 import com.absir.appserv.game.context.value.IPropEvolute;
 import com.absir.appserv.game.context.value.IPropPlayer;
+import com.absir.appserv.game.context.value.IVipDefine;
 import com.absir.appserv.game.utils.GameUtils;
 import com.absir.appserv.game.value.IExp;
 import com.absir.appserv.game.value.LevelExpCxt;
@@ -46,16 +50,16 @@ import com.absir.core.kernel.KernelClass;
  *
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerContext<C, ?, ?, ?, ?, ?, ?>, PC extends JPlayerConfigure, PD extends IPlayerDefine, CD extends ICardDefine, CE extends IExp, PP extends IPropDefine, RD extends IRewardDefine, TD extends ITaskDefine> {
+public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayer, PC extends JbPlayerContext<C, P, ?, ?, ?, ?, ?>, PG extends JPlayerConfigure, PD extends IPlayerDefine, CD extends ICardDefine, CE extends IExp, VD extends IVipDefine, PP extends IPropDefine, RD extends IRewardDefine, TD extends ITaskDefine> {
 
 	// 角色上下文类
-	public final Class<P> PLAYER_CONTEXT_CLASS;
+	public final Class<PC> PLAYER_CONTEXT_CLASS;
 
 	// 全部在线角色
-	public final Map<Long, P> PLAYER_CONTEXT_MAP;
+	public final Map<Long, PC> PLAYER_CONTEXT_MAP;
 
 	// 文件配置
-	public final PC PLAYER_CONFIGURE;
+	public final PG PLAYER_CONFIGURE;
 
 	// 角色类
 	public final Class<? extends JbPlayer> PLAYER_CLASS;
@@ -78,6 +82,9 @@ public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerCo
 	// 卡牌等级经验
 	protected List<Integer> cardLevelExps = new ArrayList<Integer>();
 
+	// VIP定义
+	protected List<VD> vipDefines;
+
 	// 道具定义
 	protected XlsDao<PP, Serializable> propDefineDao;
 
@@ -92,9 +99,9 @@ public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerCo
 	 */
 	public PlayerComponentBase() {
 		Class<?>[] componentClasses = KernelClass.componentClasses(getClass());
-		PLAYER_CONTEXT_CLASS = (Class<P>) componentClasses[1];
-		PLAYER_CONTEXT_MAP = (Map<Long, P>) (Object) ContextUtils.getContextFactory().getContextMap(PLAYER_CONTEXT_CLASS);
-		PLAYER_CONFIGURE = (PC) JConfigureUtils.getConfigure((Class<? extends JConfigureBase>) componentClasses[2]);
+		PLAYER_CONTEXT_CLASS = (Class<PC>) componentClasses[2];
+		PLAYER_CONTEXT_MAP = (Map<Long, PC>) (Object) ContextUtils.getContextFactory().getContextMap(PLAYER_CONTEXT_CLASS);
+		PLAYER_CONFIGURE = (PG) JConfigureUtils.getConfigure((Class<? extends JConfigureBase>) componentClasses[3]);
 
 		componentClasses = KernelClass.componentClasses(PLAYER_CONTEXT_CLASS);
 		PLAYER_CLASS = (Class<? extends JbPlayer>) componentClasses[1];
@@ -111,9 +118,9 @@ public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerCo
 		DynaBinder.INSTANCE.mapBind(ConfigureUtils.readPropertyMap(new File(BeanFactoryUtils.getBeanConfig().getClassPath() + "conf/PlayComponent.conf")), this);
 		// 初始化配置对象
 		Class<?>[] componentClasses = KernelClass.componentClasses(getClass());
-		playerDefines = (List<PD>) XlsUtils.getXlsBeans((Class<? extends XlsBase>) componentClasses[3]);
-		cardDefineDao = (XlsDao<CD, Serializable>) XlsUtils.getXlsDao((Class<? extends XlsBase>) componentClasses[4]);
-		cardExps = (List<IExp>) XlsUtils.getXlsDao((Class<? extends XlsBase>) componentClasses[5]).getAll();
+		playerDefines = (List<PD>) XlsUtils.getXlsBeans((Class<? extends XlsBase>) componentClasses[4]);
+		cardDefineDao = (XlsDao<CD, Serializable>) XlsUtils.getXlsDao((Class<? extends XlsBase>) componentClasses[5]);
+		cardExps = (List<IExp>) XlsUtils.getXlsBeans((Class<? extends XlsBase>) componentClasses[6]);
 		int exp = 0;
 		cardLevelExps.clear();
 		for (IExp iExp : cardExps) {
@@ -121,9 +128,10 @@ public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerCo
 			cardLevelExps.add(exp);
 		}
 
-		propDefineDao = (XlsDao<PP, Serializable>) XlsUtils.getXlsDao((Class<? extends XlsBase>) componentClasses[6]);
-		rewardDefineDao = (XlsDao<RD, Serializable>) XlsUtils.getXlsDao((Class<? extends XlsBase>) componentClasses[7]);
-		taskDefineDao = (XlsDao<TD, Serializable>) XlsUtils.getXlsDao((Class<? extends XlsBase>) componentClasses[8]);
+		vipDefines = (List<VD>) XlsUtils.getXlsBeans((Class<? extends XlsBase>) componentClasses[7]);
+		propDefineDao = (XlsDao<PP, Serializable>) XlsUtils.getXlsDao((Class<? extends XlsBase>) componentClasses[8]);
+		rewardDefineDao = (XlsDao<RD, Serializable>) XlsUtils.getXlsDao((Class<? extends XlsBase>) componentClasses[9]);
+		taskDefineDao = (XlsDao<TD, Serializable>) XlsUtils.getXlsDao((Class<? extends XlsBase>) componentClasses[10]);
 	}
 
 	/**
@@ -162,12 +170,34 @@ public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerCo
 	public abstract JbFriend createFriend();
 
 	/**
+	 * 创建用户奖励
+	 * 
+	 * @return
+	 */
+	public abstract JbPlayerReward createPlayerReward();
+
+	/**
+	 * 创建用户消息
+	 * 
+	 * @return
+	 */
+	public abstract JbPlayerMessage createPlayerMessage();
+
+	/**
+	 * 获取宝石
+	 * 
+	 * @param diamondId
+	 * @return
+	 */
+	public abstract JbDiamond getDiamond(Long diamondId);
+
+	/**
 	 * 获取在线玩家
 	 * 
 	 * @param playerId
 	 * @return
 	 */
-	public P find(Long playerId) {
+	public PC find(Long playerId) {
 		return PLAYER_CONTEXT_MAP.get(playerId);
 	}
 
@@ -178,7 +208,7 @@ public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerCo
 	 * @return
 	 */
 	public <T extends JbPlayer> T onlinePlayer(T player) {
-		P playerContext = find(player.getId());
+		PC playerContext = find(player.getId());
 		return playerContext == null ? player : (T) playerContext.getPlayer();
 	}
 
@@ -223,7 +253,7 @@ public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerCo
 	 * @param playerContext
 	 * @return
 	 */
-	public int getPlayerMaxLevel(P playerContext) {
+	public int getPlayerMaxLevel(PC playerContext) {
 		return PLAYER_CONFIGURE.getMaxLevel();
 	}
 
@@ -254,6 +284,26 @@ public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerCo
 	 */
 	public CD getCardDefine(Serializable cardId) {
 		return cardDefineDao.get(cardId);
+	}
+
+	/**
+	 * 获取VIP定义
+	 * 
+	 * @param vip
+	 * @return
+	 */
+	public VD getVipDefine(int vip) {
+		if (vipDefines == null || vipDefines.isEmpty()) {
+			return null;
+		}
+
+		if (vip <= 0) {
+			return vipDefines.get(0);
+
+		} else {
+			int size = vipDefines.size();
+			return vip < size ? vipDefines.get(vip) : vipDefines.get(size - 1);
+		}
 	}
 
 	/**
@@ -411,4 +461,90 @@ public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayerCo
 		Class<?> rewardClass = KernelClass.forName(IPropPlayer.class.getPackage().getName() + ".OReward_" + rewardType);
 		return KernelClass.newInstance(rewardClass, this);
 	}
+
+	/**
+	 * 消费宝石
+	 * 
+	 * @param player
+	 * @param diamond
+	 */
+	public void consumeDiamond(P player, int diamond) {
+		player.setDiamond(player.getDiamond() + diamond);
+		diamond += player.getConsume();
+		player.setConsume(diamond);
+		if (vipDefines != null) {
+			int size = vipDefines.size();
+			int current = player.getVip();
+			int vip = current + 1;
+			if (vip < 1) {
+				vip = 1;
+			}
+
+			for (; vip < size && diamond >= vipDefines.get(vip).getConsume(); vip++) {
+
+			}
+
+			if (current != --vip) {
+				VD currentVipDefine = getVipDefine(current);
+				VD vipDefine = getVipDefine(vip);
+				if (currentVipDefine == null || vipDefine == null || currentVipDefine == vipDefine) {
+					player.setVip(vip);
+					setPlayerVipDefine(player, currentVipDefine, vipDefine);
+				}
+			}
+		}
+	}
+
+	/**
+	 * 设置VIP等级
+	 * 
+	 * @param player
+	 * @param currentVipDefine
+	 * @param vipDefine
+	 */
+	protected void setPlayerVipDefine(P player, VD currentVipDefine, VD vipDefine) {
+		player.setEpTimes(player.getEpTimes() + vipDefine.getEpTimes() - currentVipDefine.getEpTimes());
+		player.setMoneyTimes(player.getMoneyTimes() + vipDefine.getMoneyTimes() - currentVipDefine.getMoneyTimes());
+	}
+
+	/**
+	 * 刷新玩家数据
+	 * 
+	 * @param player
+	 * @param playerContext
+	 * @param online
+	 * @param vipDefine
+	 */
+	protected void doUpdatePlayerDay(P player, PC playerContext, int online, IVipDefine vipDefine) {
+		player.setEpTimes(vipDefine.getEpTimes());
+		player.setMoneyTimes(vipDefine.getMoneyTimes());
+	}
+
+	/**
+	 * 购买行动力
+	 * 
+	 * @param player
+	 */
+	protected void doEp(PC playerContext) {
+		P player = playerContext.getPlayer();
+		int epConsume = player.getEpConsume() + 1;
+		playerContext.modifyDiamond(JbPlayerContext.CONFIGURE.getEpDiamond() * epConsume, false);
+		player.setEpConsume(epConsume);
+		playerContext.modifyEp(JbPlayerContext.CONFIGURE.getEpAdd(), true);
+	}
+
+	/**
+	 * 购买金钱
+	 * 
+	 * @param player
+	 */
+	protected void doMoney(PC playerContext) {
+		P player = playerContext.getPlayer();
+		int moneyConsume = player.getMoneyConsume() + 1;
+		playerContext.modifyDiamond(JbPlayerContext.CONFIGURE.getMoneyDiamond() * moneyConsume, false);
+		player.setMoneyConsume(moneyConsume);
+		VD vipDefine = getVipDefine(playerContext.getPlayer().getVip());
+		playerContext.modifyMoney(vipDefine.getMoneyCrop(), true);
+	}
+
 }

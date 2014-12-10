@@ -8,11 +8,15 @@
 package com.absir.appserv.system.helper;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+
+import com.absir.core.kernel.KernelObject;
 
 /**
  * @author absir
@@ -90,6 +94,241 @@ public class HelperRandom {
 		}
 
 		return null;
+	}
+
+	/**
+	 * @param rares
+	 * @return
+	 */
+	public static float getTotal(float[] rares) {
+		float total = 0;
+		for (float rare : rares) {
+			total += rare;
+		}
+
+		return total;
+	}
+
+	/**
+	 * @param rares
+	 * @return
+	 */
+	public static float getTotal(Collection<Float> rares) {
+		float total = 0;
+		for (float rare : rares) {
+			total += rare;
+		}
+
+		return total;
+	}
+
+	/**
+	 * @param rares
+	 * @return
+	 */
+	public static float[] getProbabilities(float[] rares) {
+		if (rares == null) {
+			return null;
+		}
+
+		float total = getTotal(rares);
+		int last = rares.length;
+		float[] probabilities = new float[last];
+		if (total != 0) {
+			for (last--; last >= 0; last--) {
+				probabilities[last] = rares[last] / total;
+			}
+		}
+
+		return probabilities;
+	}
+
+	/**
+	 * @param rares
+	 * @return
+	 */
+	public static float[] getProbabilities(List<Float> rares) {
+		if (rares == null) {
+			return null;
+		}
+
+		float total = getTotal(rares);
+		int last = rares.size();
+		float[] probabilities = new float[last];
+		if (total != 0) {
+			for (last--; last >= 0; last--) {
+				probabilities[last] = rares.get(last) / total;
+			}
+		}
+
+		return probabilities;
+	}
+
+	/**
+	 * @param probabilities
+	 * @return
+	 */
+	public static int randIndex(float[] probabilities) {
+		float total = RANDOM.nextFloat();
+		int i = probabilities.length;
+		while (i-- > 0 && (total -= probabilities[i]) > 0)
+			;
+		return i;
+	}
+
+	/**
+	 * @param probabilities
+	 * @param total
+	 * @return
+	 */
+	public static int randIndex(float[] probabilities, float total) {
+		total *= RANDOM.nextFloat();
+		int i = probabilities.length;
+		while (i-- > 0 && (total -= probabilities[i]) > 0)
+			;
+		return i;
+	}
+
+	/**
+	 * @param probabilities
+	 * @param total
+	 * @return
+	 */
+	public static int randIndex(List<Float> probabilities, float total) {
+		total *= RANDOM.nextFloat();
+		int i = probabilities.size();
+		while (i-- > 0 && (total -= probabilities.get(i)) > 0)
+			;
+		return i;
+	}
+
+	public static class RandomPool<T> {
+
+		/** elements */
+		private List<RandomPoolElement<T>> elements = new ArrayList<RandomPoolElement<T>>();
+
+		/** probabilities */
+		private float[] probabilities;
+
+		/**
+		 * @return the elements
+		 */
+		@Deprecated
+		public List<RandomPoolElement<T>> getElements() {
+			return elements;
+		}
+
+		/**
+		 * @return the probabilities
+		 */
+		@Deprecated
+		public float[] getProbabilities() {
+			return probabilities;
+		}
+
+		/**
+		 * @return
+		 */
+		public int size() {
+			return elements.size();
+		}
+
+		/**
+		 * @param element
+		 */
+		public void add(RandomPoolElement<T> element) {
+			elements.add(element);
+			probabilities = null;
+		}
+
+		/**
+		 * @param element
+		 * @param rare
+		 */
+		public void add(T element, float rare) {
+			add(new RandomPoolElement<T>(element, rare));
+		}
+
+		/**
+		 * @param element
+		 * @return
+		 */
+		public boolean remove(RandomPoolElement<T> element) {
+			if (elements.remove(element)) {
+				probabilities = null;
+				return true;
+			}
+
+			return false;
+		}
+
+		/**
+		 * @param element
+		 */
+		public RandomPoolElement<T> removeElement(T element) {
+			Iterator<RandomPoolElement<T>> iterator = elements.iterator();
+			while (iterator.hasNext()) {
+				RandomPoolElement<T> poolElement = iterator.next();
+				if (KernelObject.equals(element, poolElement.element)) {
+					iterator.remove();
+					probabilities = null;
+					return poolElement;
+				}
+			}
+
+			return null;
+		}
+
+		/**
+		 * 
+		 */
+		public T randElement() {
+			if (probabilities == null) {
+				float total = 0;
+				for (RandomPoolElement<T> element : elements) {
+					total += element.rare;
+				}
+
+				int last = elements.size();
+				if (last < 1) {
+					return null;
+				}
+
+				probabilities = new float[last];
+				if (total != 0) {
+					for (last--; last >= 0; last--) {
+						probabilities[last] = elements.get(last).rare / total;
+					}
+				}
+			}
+
+			return elements.get(HelperRandom.randIndex(probabilities)).element;
+		}
+	}
+
+	public static class RandomPoolElement<T> {
+
+		/** element */
+		public T element;
+
+		/** rare */
+		public float rare;
+
+		/**
+		 * 
+		 */
+		public RandomPoolElement() {
+
+		}
+
+		/**
+		 * @param element
+		 * @param rare
+		 */
+		public RandomPoolElement(T element, float rare) {
+			this.element = element;
+			this.rare = rare;
+		}
 	}
 
 	/**

@@ -9,13 +9,17 @@ package com.absir.appserv.configure.xls;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import com.absir.appserv.configure.xls.value.XaWorkbook;
 import com.absir.core.kernel.KernelClass;
+import com.absir.core.kernel.KernelLang.CallbackTemplate;
 import com.absir.core.kernel.KernelString;
 
 /**
@@ -24,6 +28,43 @@ import com.absir.core.kernel.KernelString;
  */
 @SuppressWarnings({ "unchecked" })
 public abstract class XlsUtils {
+
+	/** classMapCallbacks */
+	private static Map<Class<?>, List<CallbackTemplate<Class<?>>>> classMapCallbacks = new HashMap<Class<?>, List<CallbackTemplate<Class<?>>>>();
+
+	/**
+	 * @param xlsClass
+	 * @param callback
+	 */
+	public static void register(Class<?> xlsClass, CallbackTemplate<Class<?>> callback) {
+		List<CallbackTemplate<Class<?>>> callbacks = classMapCallbacks.get(xlsClass);
+		if (callbacks == null) {
+			callbacks = new ArrayList<CallbackTemplate<Class<?>>>();
+			classMapCallbacks.put(xlsClass, callbacks);
+		}
+
+		callbacks.add(callback);
+	}
+
+	/**
+	 * @param xlsClass
+	 * @param callback
+	 * @return
+	 */
+	public static boolean unRegister(Class<?> xlsClass, CallbackTemplate<Class<?>> callback) {
+		List<CallbackTemplate<Class<?>>> callbacks = classMapCallbacks.get(xlsClass);
+		if (callbacks != null) {
+			if (callbacks.remove(callback)) {
+				if (callbacks.isEmpty()) {
+					classMapCallbacks.remove(xlsClass);
+				}
+
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	/**
 	 * @return
@@ -60,6 +101,12 @@ public abstract class XlsUtils {
 			XaWorkbook xaWorkbook = xlsClass.getAnnotation(XaWorkbook.class);
 			String workbook = xaWorkbook == null || KernelString.isEmpty(xaWorkbook.workbook()) ? xlsClass.getSimpleName() : xaWorkbook.workbook();
 			getXlsBeans(xlsBase.getHssfWorkbook(workbook), xaWorkbook == null ? null : xaWorkbook.sheets(), xlsClass, xlsBase);
+			List<CallbackTemplate<Class<?>>> callbacks = classMapCallbacks.get(xlsClass);
+			if (callbacks != null) {
+				for (CallbackTemplate<Class<?>> callback : callbacks) {
+					callback.doWith(xlsClass);
+				}
+			}
 		}
 	}
 

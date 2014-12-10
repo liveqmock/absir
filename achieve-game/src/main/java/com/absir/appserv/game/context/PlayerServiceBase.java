@@ -91,6 +91,16 @@ public abstract class PlayerServiceBase {
 	}
 
 	/**
+	 * 服务区是否合法
+	 * 
+	 * @param serverContext
+	 * @return
+	 */
+	public boolean isSupport(ServerContext serverContext) {
+		return !(serverContext == null || serverContext.getServer().isMultiPort());
+	}
+
+	/**
 	 * 选择平台服务区
 	 * 
 	 * @param platformUser
@@ -99,7 +109,7 @@ public abstract class PlayerServiceBase {
 	@Transaction
 	protected void selectServerId(JPlatformUser platformUser, long serverId) {
 		ServerContext serverContext = SocketServerContext.ME.getServerContext(serverId);
-		if (serverContext == null || serverContext.getServer().isMultiPort()) {
+		if (!isSupport(serverContext)) {
 			throw new ServerException(ServerStatus.ON_DENIED);
 		}
 

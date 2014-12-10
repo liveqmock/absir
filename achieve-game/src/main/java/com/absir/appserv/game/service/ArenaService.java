@@ -7,6 +7,7 @@
  */
 package com.absir.appserv.game.service;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -16,9 +17,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.absir.appserv.configure.xls.XlsDao;
 import com.absir.appserv.data.value.DataQuery;
 import com.absir.appserv.data.value.MaxResults;
 import com.absir.appserv.game.bean.JbPlayer;
+import com.absir.appserv.game.bean.value.IArenaDefine;
+import com.absir.appserv.game.context.JbPlayerContext;
 import com.absir.appserv.game.context.PlayerServiceBase;
 import com.absir.bean.basis.Base;
 import com.absir.bean.core.BeanFactoryUtils;
@@ -28,11 +32,14 @@ import com.absir.bean.inject.value.Stopping;
 import com.absir.context.schedule.value.Schedule;
 import com.absir.core.kernel.KernelLang.CallbackTemplate;
 import com.absir.orm.transaction.value.Transaction;
+import com.absir.server.socket.ServerContext;
+import com.absir.server.socket.SocketServerContext;
 
 /**
  * @author absir
  *
  */
+@SuppressWarnings("unchecked")
 @Base
 @Bean
 public abstract class ArenaService {
@@ -147,6 +154,57 @@ public abstract class ArenaService {
 		for (ArenaBase arenaBase : idMapArenaBase.values()) {
 			arenaBase.save();
 		}
+	}
+
+	/**
+	 * 竞技场发奖
+	 */
+	@Transaction
+	@InjectOrder(value = -1)
+	@Schedule(cron = "0 24 * * * *")
+	@Stopping
+	public void rewardArenas() {
+		XlsDao<IArenaDefine, Serializable> arenaDefineDao = JbPlayerContext.COMPONENT.getArenaDefineDao();
+		if (arenaDefineDao != null) {
+			ArenaBase arenaBase;
+			int minArena = 1;
+			int maxArena;
+			for (ServerContext serverContext : SocketServerContext.ME.getServerContexts()) {
+				if (PlayerServiceBase.ME.isSupport(serverContext)) {
+					arenaBase = getArenaBase(serverContext.getServer().getId());
+					synchronized (arenaBase) {
+						arenaBase.save();
+						for (IArenaDefine arenaDefine : arenaDefineDao.getAll()) {
+							maxArena = arenaDefine.getArena() + 1;
+							if (maxArena <= minArena) {
+								maxArena = Integer.MAX_VALUE;
+							}
+
+							for (List<Object> arenas : findIdArenas(arenaBase.serverId, minArena, maxArena)) {
+								doArenaReward((Long) arenas.get(0), (Integer) arenas.get(1), arenaDefine);
+							}
+
+							if (maxArena == Integer.MAX_VALUE) {
+								break;
+							}
+
+							minArena = maxArena;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * 执行竞技场发奖
+	 * 
+	 * @param playerId
+	 * @param reward
+	 * @param arenaDefine
+	 */
+	protected void doArenaReward(Long playerId, int arena, IArenaDefine arenaDefine) {
+		PlayerServiceBase.ME.addPlayerReward(playerId, arenaDefine.getReward(), "arena", arena, null);
 	}
 
 	/**

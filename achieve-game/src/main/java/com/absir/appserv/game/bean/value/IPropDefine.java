@@ -17,7 +17,7 @@ import org.codehaus.jackson.annotate.JsonIgnore;
  */
 public interface IPropDefine {
 
-	// 道具编号
+	// 编号
 	public Serializable getId();
 
 	// 道具价格
@@ -25,6 +25,15 @@ public interface IPropDefine {
 
 	// 道具宝石
 	public int getDiamond();
+
+	// 品质
+	public int getRare();
+
+	// 池抽奖率
+	public float getLotPoolRare();
+
+	// 特殊池抽奖
+	public float getLotPoolSpecial();
 
 	// 道具执行对象
 	@JsonIgnore

@@ -15,20 +15,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-
 import com.absir.appserv.configure.JConfigureUtils;
 import com.absir.appserv.configure.xls.XlsDao;
+import com.absir.appserv.configure.xls.XlsUtils;
 import com.absir.appserv.game.bean.JbCard;
 import com.absir.appserv.game.bean.JbLotCard;
 import com.absir.appserv.game.bean.JbLotPool;
 import com.absir.appserv.game.bean.JbPlayerA;
 import com.absir.appserv.game.bean.value.ICardDefine;
+import com.absir.appserv.game.bean.value.IPropDefine;
 import com.absir.appserv.game.confiure.JLotConfigure;
 import com.absir.appserv.game.context.JbPlayerContext;
-import com.absir.appserv.system.bean.dto.IBeanCollectionSerializer;
 import com.absir.appserv.system.domain.DActiver;
 import com.absir.appserv.system.helper.HelperRandom;
+import com.absir.appserv.system.helper.HelperRandom.RandomPool;
 import com.absir.async.value.Async;
 import com.absir.bean.basis.Base;
 import com.absir.bean.core.BeanFactoryUtils;
@@ -36,6 +36,8 @@ import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Inject;
 import com.absir.context.core.ContextService;
 import com.absir.context.core.ContextUtils;
+import com.absir.core.kernel.KernelDyna;
+import com.absir.core.kernel.KernelLang.CallbackTemplate;
 import com.absir.orm.hibernate.boost.IEntityMerge;
 import com.absir.orm.transaction.value.Transaction;
 import com.absir.server.exception.ServerException;
@@ -56,41 +58,108 @@ public class LotService extends ContextService implements IEntityMerge<JbLotCard
 	/** 抽奖池参数 */
 	public static final JLotConfigure LOT_CONFIGURE = JConfigureUtils.getConfigure(JLotConfigure.class);
 
+	/** definedCard */
+	protected boolean definedCard;
+
 	/** 抽奖卡牌 */
 	private DActiver<JbLotCard> lotCardActitity;
 
 	/** 抽奖池 */
 	private DActiver<JbLotPool> lotPoolActitity;
 
-	/** 抽奖卡组IDS */
-	private Set<Long> lotCardIds;
-
-	/** 抽奖池卡组IDS */
-	private Set<Long> lotPoolCardIds;
-
-	/** 抽奖池道具IDS */
-	private Set<Long> lotPoolPropIds;
-
 	/** 品质卡牌抽奖组 */
-	@JsonSerialize(contentUsing = IBeanCollectionSerializer.class)
-	private Map<Integer, List<ICardDefine>> rareMapCard;
+	protected Map<Integer, RandomPool<ICardDefine>> rareMapCards;
+
+	/** 特殊卡牌抽奖组 */
+	protected RandomPool<ICardDefine> specialCards;
+
+	/** 品质卡牌池抽奖组 */
+	protected Map<Integer, RandomPool<ICardDefine>> rareMapPoolCards;
+
+	/** 特殊卡牌抽奖组 */
+	protected RandomPool<ICardDefine> specialPoolCards;
+
+	/** 品质道具池抽奖组 */
+	protected Map<Integer, RandomPool<IPropDefine>> rareMapPoolProps;
+
+	/** 特殊卡牌抽奖组 */
+	protected RandomPool<IPropDefine> specialPoolProps;
+
+	/**
+	 * @return the rareMapCards
+	 */
+	public Map<Integer, RandomPool<ICardDefine>> getRareMapCards() {
+		return rareMapCards;
+	}
+
+	/**
+	 * @return the specialCards
+	 */
+	public RandomPool<ICardDefine> getSpecialCards() {
+		return specialCards;
+	}
+
+	/**
+	 * @return the rareMapPoolCards
+	 */
+	public Map<Integer, RandomPool<ICardDefine>> getRareMapPoolCards() {
+		return rareMapPoolCards;
+	}
+
+	/**
+	 * @return the specialPoolCards
+	 */
+	public RandomPool<ICardDefine> getSpecialPoolCards() {
+		return specialPoolCards;
+	}
+
+	/**
+	 * @return the rareMapPoolProps
+	 */
+	public Map<Integer, RandomPool<IPropDefine>> getRareMapPoolProps() {
+		return rareMapPoolProps;
+	}
+
+	/**
+	 * @return the specialPoolProps
+	 */
+	public RandomPool<IPropDefine> getSpecialPoolProps() {
+		return specialPoolProps;
+	}
 
 	/**
 	 * 初始化服务
 	 */
 	@Inject
 	protected void initService() {
+		definedCard = JbPlayerContext.COMPONENT.getCardDefineDao() != null;
 		lotCardActitity = new DActiver<JbLotCard>("JLotCard");
 		lotPoolActitity = new DActiver<JbLotPool>("JLotPool");
-		lotCardIds = new HashSet<Long>();
-		rareMapCard = new HashMap<Integer, List<ICardDefine>>();
-	}
+		rareMapCards = new HashMap<Integer, RandomPool<ICardDefine>>();
+		specialCards = new RandomPool<ICardDefine>();
+		rareMapPoolCards = new HashMap<Integer, RandomPool<ICardDefine>>();
+		specialPoolCards = new RandomPool<ICardDefine>();
+		rareMapPoolProps = new HashMap<Integer, RandomPool<IPropDefine>>();
+		specialPoolProps = new RandomPool<IPropDefine>();
+		JbPlayerContext.COMPONENT.getCardDefineDao();
+		XlsUtils.register(JbPlayerContext.COMPONENT.CARD_DEFINE_CLASS, new CallbackTemplate<Class<?>>() {
 
-	/**
-	 * 获取抽奖池所有卡牌
-	 */
-	public Map<Integer, List<ICardDefine>> getRareMapCard() {
-		return rareMapCard;
+			@Override
+			public void doWith(Class<?> template) {
+				// TODO Auto-generated method stub
+				ME.reloadCard();
+				ME.reloadPool();
+			}
+		});
+
+		XlsUtils.register(JbPlayerContext.COMPONENT.PROP_DEFINE_CLASS, new CallbackTemplate<Class<?>>() {
+
+			@Override
+			public void doWith(Class<?> template) {
+				// TODO Auto-generated method stub
+				ME.reloadPool();
+			}
+		});
 	}
 
 	/*
@@ -102,12 +171,39 @@ public class LotService extends ContextService implements IEntityMerge<JbLotCard
 	public void step(long contextTime) {
 		// TODO Auto-generated method stub
 		if (lotCardActitity.stepNext(contextTime)) {
-			ME.reloadCard(contextTime);
+			ME.reloadCard();
 		}
 
 		if (lotPoolActitity.stepNext(contextTime)) {
-			ME.reloadPool(contextTime);
+			ME.reloadPool();
 		}
+	}
+
+	/**
+	 * @param rareMap
+	 * @param id
+	 * @param rare
+	 * @return
+	 */
+	protected float getRare(Map<? extends Serializable, Float> rareMap, Serializable id, float rare) {
+		Float idRare = rareMap.get(id);
+		return idRare == null ? rare : idRare;
+	}
+
+	/**
+	 * @param rareMap
+	 * @param rare
+	 * @param element
+	 * @param elementRare
+	 */
+	protected <T> void addRareMap(Map<Integer, RandomPool<T>> rareMap, Integer rare, T element, float elementRare) {
+		RandomPool<T> pool = rareMap.get(rare);
+		if (pool == null) {
+			pool = new RandomPool<T>();
+			rareMap.put(rare, pool);
+		}
+
+		pool.add(element, elementRare);
 	}
 
 	/**
@@ -115,31 +211,59 @@ public class LotService extends ContextService implements IEntityMerge<JbLotCard
 	 */
 	@Async(notifier = true)
 	@Transaction(readOnly = true)
-	public void reloadCard(long contextTime) {
-		lotCardIds.clear();
-		Map<Integer, List<ICardDefine>> rareMapCard = new HashMap<Integer, List<ICardDefine>>();
-		XlsDao<ICardDefine, Serializable> cardDefineDao = JbPlayerContext.COMPONENT.getCardDefineDao();
-		for (JbLotCard lotCard : lotCardActitity.reloadActives(contextTime)) {
-			lotCardIds.add(lotCard.getId());
-			if (lotCard.getCardIds() != null) {
-				for (int cardId : lotCard.getCardIds()) {
-					ICardDefine cardDefine = cardDefineDao.get(cardId);
-					if (cardDefine != null) {
-						List<ICardDefine> cardDefines = rareMapCard.get(cardDefine.getRare());
-						if (cardDefines == null) {
-							cardDefines = new ArrayList<ICardDefine>();
-							rareMapCard.put(cardDefine.getRare(), cardDefines);
-						}
+	public void reloadCard() {
+		if (!definedCard) {
+			return;
+		}
 
-						if (!cardDefines.contains(cardDefine)) {
-							cardDefines.add(cardDefine);
+		long contextTime = ContextUtils.getContextTime();
+		Map<Integer, Float> cardRares = new HashMap<Integer, Float>();
+		Set<Integer> cardSpecials = new HashSet<Integer>();
+		try {
+			for (JbLotCard lotCard : lotCardActitity.reloadActives(contextTime)) {
+				if (lotCard.getCardRares() != null) {
+					Integer cardId = null;
+					for (float cardRare : lotCard.getCardRares()) {
+						if (cardId == null) {
+							cardId = (int) cardRare;
+
+						} else {
+							cardRares.put(cardId, cardRare);
+							cardId = null;
 						}
 					}
 				}
+
+				if (lotCard.getCardSpecials() != null) {
+					for (int cardSpecial : lotCard.getCardSpecials()) {
+						cardSpecials.add(cardSpecial);
+					}
+				}
+			}
+
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+
+		Map<Integer, RandomPool<ICardDefine>> newRareMapCards = new HashMap<Integer, RandomPool<ICardDefine>>();
+		RandomPool<ICardDefine> newSpecialCards = new RandomPool<ICardDefine>();
+		XlsDao<ICardDefine, Serializable> cardDefineDao = JbPlayerContext.COMPONENT.getCardDefineDao();
+		for (ICardDefine cardDefine : cardDefineDao.getAll()) {
+			float rare = getRare(cardRares, cardDefine.getId(), cardDefine.getLotRare());
+			if (rare > 0) {
+				addRareMap(newRareMapCards, cardDefine.getRare(), cardDefine, rare);
+			}
+
+			if (cardDefine.getLotSpecial() > 0) {
+				newSpecialCards.add(cardDefine, cardDefine.getLotSpecial());
+
+			} else if (rare > 0 && cardSpecials.contains(cardDefine.getId())) {
+				newSpecialCards.add(cardDefine, rare);
 			}
 		}
 
-		this.rareMapCard = rareMapCard;
+		rareMapCards = newRareMapCards;
+		specialCards = newSpecialCards;
 	}
 
 	/**
@@ -147,8 +271,99 @@ public class LotService extends ContextService implements IEntityMerge<JbLotCard
 	 */
 	@Async(notifier = true)
 	@Transaction(readOnly = true)
-	public void reloadPool(long contextTime) {
+	public void reloadPool() {
+		long contextTime = ContextUtils.getContextTime();
+		Map<Integer, Float> cardRares = new HashMap<Integer, Float>();
+		Set<Integer> cardSpecials = new HashSet<Integer>();
+		Map<Serializable, Float> propRares = new HashMap<Serializable, Float>();
+		Set<Serializable> propSpecials = new HashSet<Serializable>();
+		Class<? extends Serializable> propIdType = JbPlayerContext.COMPONENT.getPropDefineDao().getIdType();
+		try {
+			for (JbLotPool lotPool : lotPoolActitity.reloadActives(contextTime)) {
+				if (lotPool.getCardRares() != null) {
+					Integer cardId = null;
+					for (float cardRare : lotPool.getCardRares()) {
+						if (cardId == null) {
+							cardId = (int) cardRare;
 
+						} else {
+							cardRares.put(cardId, cardRare);
+							cardId = null;
+						}
+					}
+				}
+
+				if (lotPool.getCardSpecials() != null) {
+					for (int cardSpecial : lotPool.getCardSpecials()) {
+						cardSpecials.add(cardSpecial);
+					}
+				}
+
+				if (lotPool.getPropRares() != null) {
+					Serializable propId = null;
+					for (Object propRare : lotPool.getPropRares()) {
+						if (propId == null) {
+							propId = KernelDyna.to(propRare, propIdType);
+
+						} else {
+							propRares.put(propId, KernelDyna.to(propRare, float.class));
+							propId = null;
+						}
+					}
+				}
+
+				if (lotPool.getPropSpecials() != null) {
+					for (Object propSpecial : lotPool.getPropSpecials()) {
+						propSpecials.add(KernelDyna.to(propSpecial, propIdType));
+					}
+				}
+			}
+
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+
+		if (definedCard) {
+			Map<Integer, RandomPool<ICardDefine>> newRareMapPoolCards = new HashMap<Integer, RandomPool<ICardDefine>>();
+			RandomPool<ICardDefine> newSpecialPoolCards = new RandomPool<ICardDefine>();
+			XlsDao<ICardDefine, Serializable> cardDefineDao = JbPlayerContext.COMPONENT.getCardDefineDao();
+			for (ICardDefine cardDefine : cardDefineDao.getAll()) {
+				float rare = getRare(cardRares, cardDefine.getId(), cardDefine.getLotPoolRare());
+				if (rare > 0) {
+					addRareMap(newRareMapPoolCards, cardDefine.getRare(), cardDefine, rare);
+				}
+
+				if (cardDefine.getLotPoolSpecial() > 0) {
+					newSpecialPoolCards.add(cardDefine, cardDefine.getLotPoolSpecial());
+
+				} else if (rare > 0 && cardSpecials.contains(cardDefine.getId())) {
+					newSpecialPoolCards.add(cardDefine, rare);
+				}
+			}
+
+			rareMapPoolCards = newRareMapPoolCards;
+			specialPoolCards = newSpecialPoolCards;
+		}
+
+		Map<Integer, RandomPool<IPropDefine>> newRareMapPoolProps = new HashMap<Integer, RandomPool<IPropDefine>>();
+		RandomPool<IPropDefine> newSpecialPoolProps = new RandomPool<IPropDefine>();
+		XlsDao<IPropDefine, Serializable> propDefineDao = JbPlayerContext.COMPONENT.getPropDefineDao();
+		for (IPropDefine propDefine : propDefineDao.getAll()) {
+			float rare = getRare(propRares, propDefine.getId(), propDefine.getLotPoolRare());
+			if (rare > 0) {
+				addRareMap(newRareMapPoolProps, propDefine.getRare(), propDefine, rare);
+			}
+
+			if (propDefine.getLotPoolSpecial() > 0) {
+				newSpecialPoolProps.add(propDefine, propDefine.getLotPoolSpecial());
+
+			} else if (rare > 0 && cardSpecials.contains(propDefine.getId())) {
+				newSpecialPoolProps.add(propDefine, rare);
+			}
+		}
+
+		rareMapPoolProps = newRareMapPoolProps;
+		specialPoolProps = newSpecialPoolProps;
 	}
 
 	/*
@@ -167,6 +382,35 @@ public class LotService extends ContextService implements IEntityMerge<JbLotCard
 		} else {
 			lotCardActitity.merge(entity, mergeType, mergeEvent);
 		}
+	}
+
+	/**
+	 * 概率抽奖
+	 * 
+	 * @param probabilities
+	 * @param rareMapPool
+	 * @return
+	 */
+	protected <T> T lotPool(float[] probabilities, Map<Integer, RandomPool<T>> rareMapPool) {
+		float rnd = HelperRandom.RANDOM.nextFloat();
+		int length = probabilities.length;
+		boolean empty = true;
+		for (int i = 0; i < length; i++) {
+			if ((rnd -= probabilities[i]) <= 0) {
+				RandomPool<T> pool = rareMapPool.get(i);
+				if (pool == null) {
+					if (empty) {
+						empty = false;
+						i = -1;
+					}
+
+				} else {
+					return pool.randElement();
+				}
+			}
+		}
+
+		throw new ServerException(ServerStatus.ON_FAIL);
 	}
 
 	/**
@@ -190,38 +434,10 @@ public class LotService extends ContextService implements IEntityMerge<JbLotCard
 				playerContext.modifyFriendShipNumber(-LOT_CONFIGURE.getFriendshipNumber(), false);
 			}
 
-			JbCard card = playerContext.gainCard(lotCardDefine(LOT_CONFIGURE.getFriendProbabilities()), 1);
+			JbCard card = playerContext.gainCard(lotPool(LOT_CONFIGURE.getFriendProbabilities(), rareMapPoolCards), 1);
 			playerContext.countCardNumber();
 			return card;
 		}
-	}
-
-	/**
-	 * 概率抽卡
-	 * 
-	 * @param probabilities
-	 * @return
-	 */
-	private ICardDefine lotCardDefine(float[] probabilities) {
-		float rnd = HelperRandom.RANDOM.nextFloat();
-		int length = probabilities.length;
-		boolean empty = true;
-		for (int i = 0; i < length; i++) {
-			if ((rnd -= probabilities[i]) <= 0) {
-				List<ICardDefine> cardDefines = rareMapCard.get(i);
-				if (cardDefines == null) {
-					if (empty) {
-						empty = false;
-						i = -1;
-					}
-
-				} else {
-					return cardDefines.get(HelperRandom.nextInt(cardDefines.size()));
-				}
-			}
-		}
-
-		throw new ServerException(ServerStatus.ON_FAIL);
 	}
 
 	/**
@@ -230,62 +446,149 @@ public class LotService extends ContextService implements IEntityMerge<JbLotCard
 	 * @param playerContext
 	 * @return
 	 */
-	public JbCard lotDiamond(JbPlayerContext playerContext) {
+	public JbCard lotCard(JbPlayerContext playerContext) {
 		if (playerContext.getAllCards().size() >= playerContext.getPlayer().getMaxCardNumber()) {
 			throw new ServerException(ServerStatus.ON_FAIL, "cardNumber");
 		}
 
 		long contextTime = ContextUtils.getContextTime();
 		JbPlayerA playerA = playerContext.getPlayerA();
-		if (playerA.getDiamondLotFree() + LOT_CONFIGURE.getDiamondFreeTime() < contextTime) {
+		if (playerA.getDiamondLotFree() + LOT_CONFIGURE.getCardDiamondFreeTime() < contextTime) {
 			playerA.setDiamondLotFree(contextTime);
 
 		} else {
-			playerContext.modifyDiamond(-LOT_CONFIGURE.getDiamondNumber(), false);
+			playerContext.modifyDiamond(-LOT_CONFIGURE.getCardDiamondNumber(), false);
 		}
 
-		JbCard card = playerContext.gainCard(lotCardDefine(LOT_CONFIGURE.getDiamondProbabilities()), 1);
+		JbCard card = playerContext.gainCard(lotPool(LOT_CONFIGURE.getCardProbabilities(), rareMapPoolCards), 1);
 		playerContext.countCardNumber();
 		return card;
 	}
 
 	/**
-	 * 抽十次送一次
+	 * 抽多次
 	 * 
 	 * @param playerContext
 	 * @return
 	 */
-	public List<JbCard> lotDiamonds(JbPlayerContext playerContext) {
+	public List<JbCard> lotCards(JbPlayerContext playerContext) {
 		if (playerContext.getAllCards().size() >= playerContext.getPlayer().getMaxCardNumber()) {
 			throw new ServerException(ServerStatus.ON_FAIL, "cardNumber");
 		}
 
-		playerContext.modifyDiamond(-LOT_CONFIGURE.getTenDiamondNumber(), false);
+		playerContext.modifyDiamond(-LOT_CONFIGURE.getSpecialCardDiamondNumber(), false);
 		List<JbCard> cards = new ArrayList<JbCard>();
-		boolean isRare = false;
-		for (int i = 0; i < 8; i++) {
-			ICardDefine cardDefine = lotCardDefine(LOT_CONFIGURE.getDiamondProbabilities());
-			if (!isRare && cardDefine.getRare() >= 5) {
-				isRare = true;
-			}
-
-			cards.add(playerContext.gainCard(cardDefine, 1));
+		for (int i = 0; i < 9; i++) {
+			cards.add(playerContext.gainCard(lotPool(LOT_CONFIGURE.getCardProbabilities(), rareMapPoolCards), 1));
 		}
 
-		if (isRare) {
-			cards.add(playerContext.gainCard(lotCardDefine(LOT_CONFIGURE.getDiamondProbabilities()), 1));
+		if (specialCards.size() > 0) {
+			cards.add(playerContext.gainCard(specialCards.randElement(), 1));
 
 		} else {
-			List<ICardDefine> cardDefines = rareMapCard.get(LOT_CONFIGURE.getTenCardDefineRare());
-			if (cardDefines == null) {
-				cards.add(playerContext.gainCard(lotCardDefine(LOT_CONFIGURE.getDiamondProbabilities()), 10));
-
-			} else {
-				cards.add(playerContext.gainCard(cardDefines.get(HelperRandom.nextInt(cardDefines.size())), 10));
-			}
+			cards.add(playerContext.gainCard(lotPool(LOT_CONFIGURE.getCardProbabilities(), rareMapPoolCards), 1));
 		}
 
 		playerContext.countCardNumber();
 		return cards;
+	}
+
+	/**
+	 * 抽奖物品
+	 * 
+	 * @author absir
+	 *
+	 */
+	public static class LotElement {
+
+		public int type;
+
+		public Serializable id;
+
+		public Object element;
+
+	}
+
+	/**
+	 * 抽奖池
+	 * 
+	 * @return
+	 */
+	protected LotElement lot(JbPlayerContext playerContext) {
+		LotElement element = new LotElement();
+		if (definedCard && HelperRandom.randIndex(LOT_CONFIGURE.getPoolProbabilities()) == 1) {
+			element.type = 1;
+			element.element = playerContext.gainCard(lotPool(LOT_CONFIGURE.getCardProbabilities(), rareMapPoolCards), 1);
+			playerContext.countCardNumber();
+
+		} else {
+			IPropDefine propDefine = lotPool(LOT_CONFIGURE.getPropProbabilities(), rareMapPoolProps);
+			element.id = propDefine.getId();
+			element.element = playerContext.modifyProp(propDefine, 1, true);
+		}
+
+		return element;
+	}
+
+	/**
+	 * 抽一次池
+	 * 
+	 * @param playerContext
+	 * @return
+	 */
+	public LotElement lotPool(JbPlayerContext playerContext) {
+		if (playerContext.getAllCards().size() >= playerContext.getPlayer().getMaxCardNumber()) {
+			throw new ServerException(ServerStatus.ON_FAIL, "cardNumber");
+		}
+
+		return lot(playerContext);
+	}
+
+	/**
+	 * 特殊抽奖池
+	 * 
+	 * @param playerContext
+	 * @return
+	 */
+	protected LotElement specialLot(JbPlayerContext playerContext) {
+		if (definedCard && specialPoolCards.size() > 0 && HelperRandom.randIndex(LOT_CONFIGURE.getPoolProbabilities()) == 1) {
+			LotElement element = new LotElement();
+			element.type = 1;
+			element.element = playerContext.gainCard(specialPoolCards.randElement(), 1);
+			playerContext.countCardNumber();
+			return element;
+
+		} else {
+			if (specialPoolProps.size() > 0) {
+				LotElement element = new LotElement();
+				IPropDefine propDefine = specialPoolProps.randElement();
+				element.id = propDefine.getId();
+				element.element = playerContext.modifyProp(propDefine, 1, true);
+				return element;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * 抽多次池
+	 * 
+	 * @param playerContext
+	 * @return
+	 */
+	public List<LotElement> lotPools(JbPlayerContext playerContext) {
+		if (playerContext.getAllCards().size() >= playerContext.getPlayer().getMaxCardNumber()) {
+			throw new ServerException(ServerStatus.ON_FAIL, "cardNumber");
+		}
+
+		List<LotElement> elements = new ArrayList<LotElement>();
+		for (int i = 0; i < 9; i++) {
+			elements.add(lot(playerContext));
+		}
+
+		LotElement element = specialLot(playerContext);
+		elements.add(element == null ? lot(playerContext) : element);
+		return elements;
 	}
 }

@@ -11,6 +11,7 @@ import com.absir.appserv.configure.JConfigureBase;
 import com.absir.appserv.feature.menu.value.MaEntity;
 import com.absir.appserv.feature.menu.value.MaMenu;
 import com.absir.appserv.system.bean.value.JaLang;
+import com.absir.appserv.system.helper.HelperRandom;
 
 /**
  * @author absir
@@ -19,59 +20,38 @@ import com.absir.appserv.system.bean.value.JaLang;
 @MaEntity(parent = @MaMenu("抽奖设置"), name = "参数")
 public class JLotConfigure extends JConfigureBase {
 
-	@JaLang("友情免费时间")
-	private long friendFreeTime = 3 * 3600000;
-
-	@JaLang("宝石免费时间")
-	private long diamondFreeTime = 12 * 3600000;
-
 	@JaLang("抽奖友情数")
 	private int friendshipNumber = 200;
 
-	@JaLang("抽奖宝石数")
-	private int diamondNumber = 20;
-
-	@JaLang("10抽奖宝石数")
-	private int tenDiamondNumber = 180;
-
-	@JaLang("10抽卡牌品质")
-	private int tenCardDefineRare = 4;
+	@JaLang("友情免费时间")
+	private long friendFreeTime = 3 * 3600000;
 
 	@JaLang("卡牌友情概率")
-	private float[] friendProbabilities = setProbabilities(new float[] { 32f, 8f, 4f, 1f, 0.5f, 0.02f });
+	private float[] friendProbabilities = HelperRandom.getProbabilities(new float[] { 32f, 8f, 4f, 1f, 0.5f, 0.02f });
 
-	@JaLang("卡牌宝石概率")
-	private float[] diamondProbabilities = setProbabilities(new float[] { 16f, 8f, 4f, 2f, 1f, 0.5f });
+	@JaLang("卡牌宝石数")
+	private int cardDiamondNumber = 20;
 
-	/**
-	 * @return the friendFreeTime
-	 */
-	public long getFriendFreeTime() {
-		return friendFreeTime;
-	}
+	@JaLang("特别卡牌宝石数")
+	private int specialCardDiamondNumber = 180;
 
-	/**
-	 * @param friendFreeTime
-	 *            the friendFreeTime to set
-	 */
-	public void setFriendFreeTime(long friendFreeTime) {
-		this.friendFreeTime = friendFreeTime;
-	}
+	@JaLang("卡牌宝石免费时间")
+	private long cardDiamondFreeTime = 12 * 3600000;
 
-	/**
-	 * @return the diamondFreeTime
-	 */
-	public long getDiamondFreeTime() {
-		return diamondFreeTime;
-	}
+	@JaLang("池宝石数")
+	private int poolDiamondNumber = 20;
 
-	/**
-	 * @param diamondFreeTime
-	 *            the diamondFreeTime to set
-	 */
-	public void setDiamondFreeTime(long diamondFreeTime) {
-		this.diamondFreeTime = diamondFreeTime;
-	}
+	@JaLang("特别池宝石数")
+	private int specialPoolDiamondNumber = 180;
+
+	@JaLang("卡牌概率")
+	private float[] cardProbabilities = HelperRandom.getProbabilities(new float[] { 16f, 8f, 4f, 2f, 1f, 0.5f });
+
+	@JaLang("池概率")
+	private float[] poolProbabilities = HelperRandom.getProbabilities(new float[] { 100, 1 });
+
+	@JaLang("道具概率")
+	private float[] propProbabilities = HelperRandom.getProbabilities(new float[] { 16f, 8f, 4f, 2f, 1f, 0.5f });
 
 	/**
 	 * @return the friendshipNumber
@@ -89,48 +69,18 @@ public class JLotConfigure extends JConfigureBase {
 	}
 
 	/**
-	 * @return the diamondNumber
+	 * @return the friendFreeTime
 	 */
-	public int getDiamondNumber() {
-		return diamondNumber;
+	public long getFriendFreeTime() {
+		return friendFreeTime;
 	}
 
 	/**
-	 * @param diamondNumber
-	 *            the diamondNumber to set
+	 * @param friendFreeTime
+	 *            the friendFreeTime to set
 	 */
-	public void setDiamondNumber(int diamondNumber) {
-		this.diamondNumber = diamondNumber;
-	}
-
-	/**
-	 * @return the tenDiamondNumber
-	 */
-	public int getTenDiamondNumber() {
-		return tenDiamondNumber;
-	}
-
-	/**
-	 * @param tenDiamondNumber
-	 *            the tenDiamondNumber to set
-	 */
-	public void setTenDiamondNumber(int tenDiamondNumber) {
-		this.tenDiamondNumber = tenDiamondNumber;
-	}
-
-	/**
-	 * @return the tenCardDefineRare
-	 */
-	public int getTenCardDefineRare() {
-		return tenCardDefineRare;
-	}
-
-	/**
-	 * @param tenCardDefineRare
-	 *            the tenCardDefineRare to set
-	 */
-	public void setTenCardDefineRare(int tenCardDefineRare) {
-		this.tenCardDefineRare = tenCardDefineRare;
+	public void setFriendFreeTime(long friendFreeTime) {
+		this.friendFreeTime = friendFreeTime;
 	}
 
 	/**
@@ -145,53 +95,127 @@ public class JLotConfigure extends JConfigureBase {
 	 *            the friendProbabilities to set
 	 */
 	public void setFriendProbabilities(float[] friendProbabilities) {
-		this.friendProbabilities = setProbabilities(friendProbabilities);
+		this.friendProbabilities = HelperRandom.getProbabilities(friendProbabilities);
 	}
 
 	/**
-	 * @param probabilities
+	 * @return the cardDiamondNumber
 	 */
-	private static float[] setProbabilities(float[] probabilities) {
-		int length = probabilities.length;
-		if (length == 0) {
-			return probabilities;
-		}
-
-		float probabilityTotle = 0;
-		for (int i = 0; i < length; i++) {
-			float probability = probabilities[i];
-			if (probability < 0) {
-				probability = 0;
-				probabilities[i] = probability;
-			}
-
-			probabilityTotle += probability;
-		}
-
-		if (probabilityTotle == 0) {
-			probabilities[0] = 1;
-
-		} else {
-			for (int i = 0; i < length; i++) {
-				probabilities[i] = probabilities[i] / probabilityTotle;
-			}
-		}
-
-		return probabilities;
+	public int getCardDiamondNumber() {
+		return cardDiamondNumber;
 	}
 
 	/**
-	 * @return the diamondProbabilities
+	 * @param cardDiamondNumber
+	 *            the cardDiamondNumber to set
 	 */
-	public float[] getDiamondProbabilities() {
-		return diamondProbabilities;
+	public void setCardDiamondNumber(int cardDiamondNumber) {
+		this.cardDiamondNumber = cardDiamondNumber;
 	}
 
 	/**
-	 * @param diamondProbabilities
-	 *            the diamondProbabilities to set
+	 * @return the specialCardDiamondNumber
 	 */
-	public void setDiamondProbabilities(float[] diamondProbabilities) {
-		this.diamondProbabilities = setProbabilities(diamondProbabilities);
+	public int getSpecialCardDiamondNumber() {
+		return specialCardDiamondNumber;
 	}
+
+	/**
+	 * @param specialCardDiamondNumber
+	 *            the specialCardDiamondNumber to set
+	 */
+	public void setSpecialCardDiamondNumber(int specialCardDiamondNumber) {
+		this.specialCardDiamondNumber = specialCardDiamondNumber;
+	}
+
+	/**
+	 * @return the cardDiamondFreeTime
+	 */
+	public long getCardDiamondFreeTime() {
+		return cardDiamondFreeTime;
+	}
+
+	/**
+	 * @param cardDiamondFreeTime
+	 *            the cardDiamondFreeTime to set
+	 */
+	public void setCardDiamondFreeTime(long cardDiamondFreeTime) {
+		this.cardDiamondFreeTime = cardDiamondFreeTime;
+	}
+
+	/**
+	 * @return the poolDiamondNumber
+	 */
+	public int getPoolDiamondNumber() {
+		return poolDiamondNumber;
+	}
+
+	/**
+	 * @param poolDiamondNumber
+	 *            the poolDiamondNumber to set
+	 */
+	public void setPoolDiamondNumber(int poolDiamondNumber) {
+		this.poolDiamondNumber = poolDiamondNumber;
+	}
+
+	/**
+	 * @return the specialPoolDiamondNumber
+	 */
+	public int getSpecialPoolDiamondNumber() {
+		return specialPoolDiamondNumber;
+	}
+
+	/**
+	 * @param specialPoolDiamondNumber
+	 *            the specialPoolDiamondNumber to set
+	 */
+	public void setSpecialPoolDiamondNumber(int specialPoolDiamondNumber) {
+		this.specialPoolDiamondNumber = specialPoolDiamondNumber;
+	}
+
+	/**
+	 * @return the cardProbabilities
+	 */
+	public float[] getCardProbabilities() {
+		return cardProbabilities;
+	}
+
+	/**
+	 * @param cardProbabilities
+	 *            the cardProbabilities to set
+	 */
+	public void setCardProbabilities(float[] cardProbabilities) {
+		this.cardProbabilities = HelperRandom.getProbabilities(cardProbabilities);
+	}
+
+	/**
+	 * @return the poolProbabilities
+	 */
+	public float[] getPoolProbabilities() {
+		return poolProbabilities;
+	}
+
+	/**
+	 * @param poolProbabilities
+	 *            the poolProbabilities to set
+	 */
+	public void setPoolProbabilities(float[] poolProbabilities) {
+		this.poolProbabilities = HelperRandom.getProbabilities(poolProbabilities);
+	}
+
+	/**
+	 * @return the propProbabilities
+	 */
+	public float[] getPropProbabilities() {
+		return propProbabilities;
+	}
+
+	/**
+	 * @param propProbabilities
+	 *            the propProbabilities to set
+	 */
+	public void setPropProbabilities(float[] propProbabilities) {
+		this.propProbabilities = HelperRandom.getProbabilities(propProbabilities);
+	}
+
 }

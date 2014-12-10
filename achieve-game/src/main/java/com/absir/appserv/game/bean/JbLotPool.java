@@ -24,9 +24,43 @@ import com.absir.appserv.system.bean.value.JaLang;
 @MappedSuperclass
 public class JbLotPool extends JbLotCard {
 
-	@JaLang("道具编号")
+	@JaLang(value = "卡牌品质")
 	@JaEdit(types = "paramText")
 	@Type(type = "com.absir.appserv.system.bean.type.JtJsonDynamic")
-	private int[] propIds;
+	private Object[] propRares;
 
+	@JaLang(value = "卡牌特别")
+	@JaEdit(types = "paramText")
+	@Type(type = "com.absir.appserv.system.bean.type.JtJsonDynamic")
+	private Object[] propSpecials;
+
+	/**
+	 * @return the propRares
+	 */
+	public Object[] getPropRares() {
+		return propRares;
+	}
+
+	/**
+	 * @param propRares
+	 *            the propRares to set
+	 */
+	public void setPropRares(Object[] propRares) {
+		this.propRares = propRares;
+	}
+
+	/**
+	 * @return the propSpecials
+	 */
+	public Object[] getPropSpecials() {
+		return propSpecials;
+	}
+
+	/**
+	 * @param propSpecials
+	 *            the propSpecials to set
+	 */
+	public void setPropSpecials(Object[] propSpecials) {
+		this.propSpecials = propSpecials;
+	}
 }

@@ -38,12 +38,12 @@ import com.absir.appserv.game.bean.value.IRewardDefine;
 import com.absir.appserv.game.bean.value.ITaskDefine;
 import com.absir.appserv.game.bean.value.ITaskDefine.ITaskDetail;
 import com.absir.appserv.game.bean.value.ITaskDefine.ITaskPass;
+import com.absir.appserv.game.bean.value.IVipDefine;
 import com.absir.appserv.game.confiure.JPlayerConfigure;
 import com.absir.appserv.game.context.value.IFight;
 import com.absir.appserv.game.context.value.IPropCard;
 import com.absir.appserv.game.context.value.IPropEvolute;
 import com.absir.appserv.game.context.value.IPropPlayer;
-import com.absir.appserv.game.context.value.IVipDefine;
 import com.absir.appserv.game.context.value.OReward;
 import com.absir.appserv.game.service.ArenaService;
 import com.absir.appserv.game.service.ArenaService.ArenaBase;
@@ -1342,12 +1342,29 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	/**
 	 * 修改道具
 	 * 
+	 * @param propId
+	 * @param size
+	 * @param force
+	 * @return
+	 */
+	public Object modifyProp(Serializable propId, int size, boolean force) {
+		IPropDefine propDefine = COMPONENT.getPropDefine(propId);
+		if (propDefine != null) {
+			return modifyProp(propDefine, size, force);
+		}
+
+		return propDefine;
+	}
+
+	/**
+	 * 修改道具
+	 * 
 	 * @param propDefine
 	 * @param size
 	 * @param force
 	 * @return
 	 */
-	public int modifyProp(IPropDefine propDefine, int size, boolean force) {
+	public Object modifyProp(IPropDefine propDefine, int size, boolean force) {
 		Map<Serializable, Integer> propNumbers = playerA.getPropNumbers();
 		synchronized (propNumbers) {
 			Integer number = propNumbers.get(propDefine);
@@ -1383,7 +1400,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 * @param size
 	 * @return
 	 */
-	public int buyProp(IPropDefine propDefine, boolean diamond, int size) {
+	public Object buyProp(IPropDefine propDefine, boolean diamond, int size) {
 		if (diamond) {
 			if (propDefine.getDiamond() <= 0) {
 				throw new ServerException(ServerStatus.NO_PARAM);
@@ -1468,13 +1485,12 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 		}
 
 		if (reward.getPropDefines() != null) {
-			rewardData.put("props", reward.getPropDefines());
+			Map<Serializable, Object> props = new HashMap<Serializable, Object>();
+			rewardData.put("props", props);
 			for (Entry<Integer, Integer> entry : reward.getPropDefines().entrySet()) {
 				IPropDefine propDefine = COMPONENT.getPropDefine(entry.getKey());
 				if (propDefine != null) {
-					for (int i = entry.getValue(); i > 0; i--) {
-						entry.setValue(modifyProp(propDefine, entry.getValue(), true));
-					}
+					props.put(propDefine.getId(), modifyProp(propDefine, entry.getValue(), true));
 				}
 			}
 		}

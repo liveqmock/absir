@@ -29,10 +29,15 @@ public class JbLotCard extends JbBean implements JiActive {
 	@JaLang("名称")
 	private String name;
 
-	@JaLang(value = "卡牌编号")
+	@JaLang(value = "卡牌品质")
 	@JaEdit(types = "paramText")
 	@Type(type = "com.absir.appserv.system.bean.type.JtJsonDynamic")
-	private int[] cardIds;
+	private float[] cardRares;
+
+	@JaLang(value = "卡牌特别")
+	@JaEdit(types = "paramText")
+	@Type(type = "com.absir.appserv.system.bean.type.JtJsonDynamic")
+	private int[] cardSpecials;
 
 	@JaLang("开始时间")
 	@JaEdit(types = "dateTime", groups = JaEdit.GROUP_LIST)
@@ -58,18 +63,33 @@ public class JbLotCard extends JbBean implements JiActive {
 	}
 
 	/**
-	 * @return the cardIds
+	 * @return the cardRares
 	 */
-	public int[] getCardIds() {
-		return cardIds;
+	public float[] getCardRares() {
+		return cardRares;
 	}
 
 	/**
-	 * @param cardIds
-	 *            the cardIds to set
+	 * @param cardRares
+	 *            the cardRares to set
 	 */
-	public void setCardIds(int[] cardIds) {
-		this.cardIds = cardIds;
+	public void setCardRares(float[] cardRares) {
+		this.cardRares = cardRares;
+	}
+
+	/**
+	 * @return the cardSpecials
+	 */
+	public int[] getCardSpecials() {
+		return cardSpecials;
+	}
+
+	/**
+	 * @param cardSpecials
+	 *            the cardSpecials to set
+	 */
+	public void setCardSpecials(int[] cardSpecials) {
+		this.cardSpecials = cardSpecials;
 	}
 
 	/**
@@ -101,4 +121,5 @@ public class JbLotCard extends JbBean implements JiActive {
 	public void setPassTime(long passTime) {
 		this.passTime = passTime;
 	}
+
 }

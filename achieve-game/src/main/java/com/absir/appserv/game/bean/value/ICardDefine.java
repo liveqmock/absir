@@ -14,11 +14,46 @@ package com.absir.appserv.game.bean.value;
 public interface ICardDefine {
 
 	/**
+	 * 编号
+	 * 
+	 * @return
+	 */
+	public Integer getId();
+
+	/**
 	 * 品质
 	 * 
 	 * @return
 	 */
 	public int getRare();
+
+	/**
+	 * 抽奖率
+	 * 
+	 * @return
+	 */
+	public float getLotRare();
+
+	/**
+	 * 特殊抽奖
+	 * 
+	 * @return
+	 */
+	public float getLotSpecial();
+
+	/**
+	 * 池抽奖率
+	 * 
+	 * @return
+	 */
+	public float getLotPoolRare();
+
+	/**
+	 * 特殊池抽奖
+	 * 
+	 * @return
+	 */
+	public float getLotPoolSpecial();
 
 	/**
 	 * 最大等级

@@ -74,6 +74,7 @@ public class ReturnedResolverView implements ReturnedResolver<String> {
 		if (returnValue != null) {
 			if (returnValue instanceof String) {
 				resolveReturnedView((String) returnValue, onPut);
+				return;
 			}
 		}
 

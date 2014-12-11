@@ -191,7 +191,6 @@ public class WebJstlView extends ReturnedResolverView implements IRender, IRende
 					request.setAttribute(PRERPARE_NAME, layout);
 					request.setAttribute(LAYOUT_BODY_NAME, content);
 					content = null;
-
 					wrapper.resetBuffer();
 					renderMergeOutputLayout((String) layout, request, response, wrapper, depth);
 				}

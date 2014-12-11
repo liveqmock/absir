@@ -24,7 +24,6 @@ import com.absir.bean.inject.value.Bean;
 import com.absir.context.core.Context;
 import com.absir.context.core.ContextUtils;
 import com.absir.core.base.IBase;
-import com.absir.core.kernel.KernelClass;
 
 /**
  * @author absir
@@ -51,7 +50,7 @@ public class ContextSupply extends CrudSupply<Context> {
 		// TODO Auto-generated method stub
 		List<BeanDefine> beanDefines = super.getBeanDefines(beanFactory, beanType);
 		if (beanDefines != null) {
-			entityNameMapIdType.put(beanType.getSimpleName(), KernelClass.componentClass(beanType));
+			entityNameMapIdType.put(beanType.getSimpleName(), ContextUtils.getIdType((Class<? extends Context>) beanType));
 		}
 
 		return beanDefines;

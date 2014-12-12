@@ -9,6 +9,7 @@ package com.absir.server.route.parameter;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.absir.bean.basis.Base;
@@ -42,7 +43,12 @@ public class ParameterResolverBinder implements ParameterResolver<Binder> {
 	public static Map<String, Object> getPropertyMap(Input input) {
 		Object properties = input.getAttribute(BINDER_MAP_NAME);
 		if (properties == null || !(properties instanceof Map)) {
-			Map<String, Object> propertyMap = BinderUtils.getDataMap(input.getParamMap());
+			Map<String, Object> paramMap = input.getParamMap();
+			Map<String, Object> propertyMap = BinderUtils.getDataMap(paramMap);
+			if (propertyMap == paramMap) {
+				propertyMap = new HashMap<String, Object>(paramMap);
+			}
+
 			input.setAttribute(BINDER_MAP_NAME, propertyMap);
 			return propertyMap;
 		}

@@ -64,7 +64,8 @@ public class BeanFactoryUtils {
 	 * @return
 	 */
 	public static <T> T get(Class<T> beanType) {
-		return get().getBeanObject(beanType);
+		BeanFactory beanFactory = get();
+		return beanFactory == null ? null : beanFactory.getBeanObject(beanType);
 	}
 
 	/**

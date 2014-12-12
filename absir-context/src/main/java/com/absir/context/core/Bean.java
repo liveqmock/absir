@@ -8,13 +8,17 @@
 package com.absir.context.core;
 
 import java.io.Serializable;
+import java.lang.reflect.TypeVariable;
 
 import com.absir.core.base.Base;
+import com.absir.core.kernel.KernelClass;
+import com.absir.core.kernel.KernelReflect;
 
 /**
  * @author absir
  * 
  */
+@SuppressWarnings("rawtypes")
 public class Bean<ID extends Serializable> extends Base<ID> {
 
 	/** id */
@@ -32,5 +36,16 @@ public class Bean<ID extends Serializable> extends Base<ID> {
 	 */
 	public void setId(ID id) {
 		this.id = id;
+	}
+
+	/** ID_VARIABLE */
+	public static final TypeVariable ID_VARIABLE = (TypeVariable) KernelReflect.declaredField(Bean.class, "id").getGenericType();
+
+	/**
+	 * @param beanClass
+	 * @return
+	 */
+	public static Class getIdType(Class<? extends Bean> beanClass) {
+		return KernelClass.rawClass(KernelClass.type(beanClass, ID_VARIABLE));
 	}
 }

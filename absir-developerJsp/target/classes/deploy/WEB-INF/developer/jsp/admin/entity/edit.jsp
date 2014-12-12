@@ -324,11 +324,6 @@
 								out.println("</div>");
 							}
 			%>
-		</div>
-		<div class="tabsFooter">
-			<div class="tabsFooterContent"></div>
-		</div>
-	</div>
 	<%
 		}
 		//编辑关联实体遍历结束
@@ -340,8 +335,13 @@
 		} --%>
 	<%
 		pageContext.removeAttribute("entity");
-		request.setAttribute("entity", entity);
-			}
+		request.setAttribute("entity", entity);%>
+		  </div>
+		</div>
+					<div class="tabsFooter">
+			<div class="tabsFooterContent"></div>
+		</div>
+			<%}
 			// 编辑关联实体结束
 			Scenario.pop(request);
 	%>

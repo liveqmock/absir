@@ -124,6 +124,14 @@ public class AopProxyUtils {
 	 * @param beanObject
 	 * @return
 	 */
+	public static <T> T getBean(T beanObject) {
+		return beanObject instanceof AopProxy ? (T) ((AopProxy) beanObject).getBeanObject() : beanObject;
+	}
+
+	/**
+	 * @param beanObject
+	 * @return
+	 */
 	public static Class<?> getBeanType(Object beanObject) {
 		if (beanObject instanceof AopProxy) {
 			AopProxy aopProxy = (AopProxy) beanObject;

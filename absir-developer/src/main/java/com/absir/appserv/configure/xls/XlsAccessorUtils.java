@@ -477,7 +477,7 @@ public class XlsAccessorUtils {
 			}
 		}
 
-		if (XlsBase.class.isAssignableFrom(beanClass) && JiUpdate.class.isAssignableFrom(beanClass)) {
+		if (XlsBase.class.isAssignableFrom(beanClass) && BeanService.ME != null && JiUpdate.class.isAssignableFrom(beanClass)) {
 			Field updateTime = KernelReflect.declaredField(beanClass, "updateTime");
 			Object updateTimeValue = null;
 			long updateTimeMillis = 0;

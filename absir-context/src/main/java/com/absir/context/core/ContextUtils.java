@@ -8,7 +8,6 @@
 package com.absir.context.core;
 
 import java.io.Serializable;
-import java.lang.reflect.TypeVariable;
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -21,9 +20,7 @@ import com.absir.context.schedule.ScheduleFactory;
 import com.absir.core.dyna.DynaBinder;
 import com.absir.core.dyna.DynaConvert;
 import com.absir.core.kernel.KernelCharset;
-import com.absir.core.kernel.KernelClass;
 import com.absir.core.kernel.KernelLang.BreakException;
-import com.absir.core.kernel.KernelReflect;
 
 /**
  * @author absir
@@ -33,9 +30,6 @@ import com.absir.core.kernel.KernelReflect;
 @Inject
 @Configure
 public abstract class ContextUtils implements IBeanDefineEager {
-
-	/** ID_VARIABLE */
-	public static final TypeVariable ID_VARIABLE = (TypeVariable) KernelReflect.declaredField(Context.class, "id").getGenericType();
 
 	/** charset */
 	private static Charset charset;
@@ -70,14 +64,6 @@ public abstract class ContextUtils implements IBeanDefineEager {
 				return null;
 			}
 		});
-	}
-
-	/**
-	 * @param contextClass
-	 * @return
-	 */
-	public static Class getIdType(Class<? extends Context> contextClass) {
-		return KernelClass.rawClass(KernelClass.type(contextClass, ID_VARIABLE));
 	}
 
 	/**

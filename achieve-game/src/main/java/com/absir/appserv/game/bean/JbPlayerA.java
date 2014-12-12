@@ -91,6 +91,66 @@ public abstract class JbPlayerA<T extends PlayerAtt> extends JbBase {
 		/** propNumbers */
 		@JaLang("道具数量")
 		public Map<Serializable, Integer> propNumbers;
+
+		/**
+		 * @return the taskProgresses
+		 */
+		public Map<String, Integer> getTaskProgresses() {
+			return taskProgresses;
+		}
+
+		/**
+		 * @param taskProgresses
+		 *            the taskProgresses to set
+		 */
+		public void setTaskProgresses(Map<String, Integer> taskProgresses) {
+			this.taskProgresses = taskProgresses;
+		}
+
+		/**
+		 * @return the metaRecards
+		 */
+		public Map<String, Integer> getMetaRecards() {
+			return metaRecards;
+		}
+
+		/**
+		 * @param metaRecards
+		 *            the metaRecards to set
+		 */
+		public void setMetaRecards(Map<String, Integer> metaRecards) {
+			this.metaRecards = metaRecards;
+		}
+
+		/**
+		 * @return the dailyRecards
+		 */
+		public Map<String, Integer> getDailyRecards() {
+			return dailyRecards;
+		}
+
+		/**
+		 * @param dailyRecards
+		 *            the dailyRecards to set
+		 */
+		public void setDailyRecards(Map<String, Integer> dailyRecards) {
+			this.dailyRecards = dailyRecards;
+		}
+
+		/**
+		 * @return the propNumbers
+		 */
+		public Map<Serializable, Integer> getPropNumbers() {
+			return propNumbers;
+		}
+
+		/**
+		 * @param propNumbers
+		 *            the propNumbers to set
+		 */
+		public void setPropNumbers(Map<Serializable, Integer> propNumbers) {
+			this.propNumbers = propNumbers;
+		}
 	}
 
 	/**

@@ -90,7 +90,9 @@ public class XlsAccessorContext extends XlsAccessorBean {
 			bean = KernelClass.newInstance(beanClass);
 			if (bean instanceof XlsBase) {
 				((XlsBase) bean).id = id;
-				bean = LangBundleImpl.ME.getLangProxy(beanName, bean);
+				if (LangBundleImpl.ME != null) {
+					bean = LangBundleImpl.ME.getLangProxy(beanName, bean);
+				}
 			}
 		}
 

@@ -23,7 +23,7 @@ public enum ServerStatus {
 	ON_DELETED(204),
 
 	/** ON_FAIL */
-	ON_FAIL(220),
+	ON_FAIL(205),
 
 	/** NO_USER */
 	NO_USER(220),

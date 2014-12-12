@@ -50,7 +50,7 @@ public class ContextSupply extends CrudSupply<Context> {
 		// TODO Auto-generated method stub
 		List<BeanDefine> beanDefines = super.getBeanDefines(beanFactory, beanType);
 		if (beanDefines != null) {
-			entityNameMapIdType.put(beanType.getSimpleName(), ContextUtils.getIdType((Class<? extends Context>) beanType));
+			entityNameMapIdType.put(beanType.getSimpleName(), Context.getIdType((Class<? extends Context>) beanType));
 		}
 
 		return beanDefines;

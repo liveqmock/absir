@@ -52,6 +52,7 @@ import com.absir.appserv.game.utils.GameUtils;
 import com.absir.appserv.game.value.LevelExpCxt;
 import com.absir.appserv.system.bean.dto.IBaseSerializer;
 import com.absir.appserv.system.bean.value.JaEdit;
+import com.absir.appserv.system.bean.value.JaLang;
 import com.absir.appserv.system.bean.value.JeEditable;
 import com.absir.appserv.system.dao.BeanDao;
 import com.absir.appserv.system.dao.utils.QueryDaoUtils;
@@ -103,11 +104,13 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	protected long onlineTime;
 
 	// SOCKET连接
+	@JaLang("连接")
 	@JsonIgnore
 	@JaEdit(editable = JeEditable.LOCKED)
 	protected SocketChannel socketChannel;
 
 	// 当前战斗
+	@JaLang("战斗")
 	@JsonIgnore
 	@JaEdit(editable = JeEditable.LOCKED)
 	protected FI fight;
@@ -115,7 +118,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	// 全部恢复
 	@JsonSerialize(contentUsing = IBaseSerializer.class)
 	@JaEdit(editable = JeEditable.DISABLE)
-	protected List<Recovery> recoveries = new ArrayList<Recovery>();
+	protected transient List<Recovery> recoveries = new ArrayList<Recovery>();
 
 	/**
 	 * 恢复
@@ -287,7 +290,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 
 	// 更改通知
 	@JsonIgnore
-	private Notifier modifierNotifier = new Notifier() {
+	private transient Notifier modifierNotifier = new Notifier() {
 
 		@Override
 		protected boolean doPost() {
@@ -305,7 +308,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 
 	// 奖励通知
 	@JsonIgnore
-	private Notifier rewardNotifier = new Notifier() {
+	private transient Notifier rewardNotifier = new Notifier() {
 
 		@Override
 		protected boolean doPost() {
@@ -323,7 +326,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 
 	// 消息通知
 	@JsonIgnore
-	private Notifier messageNotifier = new Notifier() {
+	private transient Notifier messageNotifier = new Notifier() {
 
 		@Override
 		protected boolean doPost() {
@@ -341,7 +344,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 
 	// 会话队列
 	@JsonIgnore
-	private UtilQueueBlock<Object> chatQueue = createChatQueue();
+	private transient UtilQueueBlock<Object> chatQueue = createChatQueue();
 
 	/**
 	 * 创建会话队列
@@ -441,7 +444,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 
 	// 会话通知
 	@JsonIgnore
-	private Notifier chatNotifier = new NotifierQueue() {
+	private transient Notifier chatNotifier = new NotifierQueue() {
 
 		@Override
 		protected Object getPostObject() {
@@ -479,6 +482,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	/**
 	 * @return the notifiers
 	 */
+	@JsonIgnore
 	public List<Notifier> getNotifiers() {
 		return notifiers;
 	}
@@ -486,6 +490,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	/**
 	 * @return the modifierNotifier
 	 */
+	@JsonIgnore
 	public Notifier getModifierNotifier() {
 		return modifierNotifier;
 	}
@@ -493,6 +498,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	/**
 	 * @return the rewardNotifier
 	 */
+	@JsonIgnore
 	public Notifier getRewardNotifier() {
 		return rewardNotifier;
 	}
@@ -500,6 +506,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	/**
 	 * @return the messageNotifier
 	 */
+	@JsonIgnore
 	public Notifier getMessageNotifier() {
 		return messageNotifier;
 	}
@@ -507,6 +514,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	/**
 	 * @return the chatQueue
 	 */
+	@JsonIgnore
 	public UtilQueue<Object> getChatQueue() {
 		return chatQueue;
 	}
@@ -514,6 +522,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	/**
 	 * @return the chatNotifier
 	 */
+	@JsonIgnore
 	public Notifier getChatNotifier() {
 		return chatNotifier;
 	}
@@ -916,13 +925,14 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 
 	// 设置玩家等级
 	@JsonIgnore
-	private LevelExpCxt<P> playerExpCxt;
+	private transient LevelExpCxt<P> playerExpCxt;
 
 	/**
 	 * 获取设置玩家等级
 	 * 
 	 * @return
 	 */
+	@JsonIgnore
 	public LevelExpCxt<P> getPlayerExpCxt() {
 		if (playerExpCxt == null) {
 			playerExpCxt = new LevelExpCxt<P>() {

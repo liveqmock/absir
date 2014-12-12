@@ -278,12 +278,11 @@ public class Admin_entity extends AdminServer {
 		}
 
 		binderResult.setValidation(true);
-		Map<String, Object> dataMap = ParameterResolverBinder.getPropertyMap(input);
 		if (!create) {
-			dataMap.remove(crudSupply.getIdentifierName(entityName));
+			binderData.getBinderResult().getPropertyFilter().exlcude(crudSupply.getIdentifierName(entityName));
 		}
 
-		binderData.mapBind(dataMap, entity);
+		binderData.mapBind(ParameterResolverBinder.getPropertyMap(input), entity);
 		JoEntity joEntity = (JoEntity) input.getAttribute("joEntity");
 		CrudContextUtils.crud(create ? Crud.CREATE : Crud.UPDATE, crudRecord, joEntity, entity, user, filter, binderResult, input);
 		InModel model = input.getModel();

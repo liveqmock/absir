@@ -122,10 +122,10 @@ public abstract class KernelString {
 	 * @param string
 	 * @return
 	 */
-	public static int lastIndexUncapitalizeOf(String string) {
+	public static int lastIndexCapitalizeOf(String string) {
 		int last = string.length() - 1;
 		for (; last >= 0; last--) {
-			if (unCapitalize(string.charAt(last))) {
+			if (capitalize(string.charAt(last))) {
 				return last;
 			}
 		}
@@ -137,16 +137,16 @@ public abstract class KernelString {
 	 * @param string
 	 * @return
 	 */
-	public static String lastUncapitalizeString(String string) {
-		return rightString(string, string.length() - lastIndexUncapitalizeOf(string));
+	public static String lastCapitalizeString(String string) {
+		return rightString(string, string.length() - lastIndexCapitalizeOf(string));
 	}
 
 	/**
 	 * @param string
 	 * @return
 	 */
-	public static String subLastUncapitalizeString(String string) {
-		return subLastString(string, lastIndexUncapitalizeOf(string));
+	public static String subLastCapitalizeString(String string) {
+		return subLastString(string, lastIndexCapitalizeOf(string));
 	}
 
 	/**
@@ -197,7 +197,7 @@ public abstract class KernelString {
 		StringBuilder stringBuilder = null;
 		for (int i = 0; i < length; i++) {
 			char chr = string.charAt(i);
-			if (unCapitalize(chr)) {
+			if (capitalize(chr)) {
 				if (capitalize > 0) {
 					if (capitalize == 2) {
 						stringBuilder = new StringBuilder(length * 2);
@@ -207,6 +207,9 @@ public abstract class KernelString {
 					stringBuilder.append('_');
 					stringBuilder.append(Character.toLowerCase(chr));
 					capitalize = -1;
+
+				} else {
+					stringBuilder.append(chr);
 				}
 
 			} else {
@@ -228,7 +231,7 @@ public abstract class KernelString {
 	 * @return
 	 */
 	public static String camelInvertUnderline(String string) {
-		int index = lastIndexUncapitalizeOf(string);
+		int index = lastIndexCapitalizeOf(string);
 		return camelUnderline(index > 0 ? KernelString.unCapitalize(rightString(string, string.length() - index)) + leftString(string, index) : string);
 	}
 

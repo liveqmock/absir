@@ -134,6 +134,21 @@ public class BeanFactoryUtils {
 		return beanObject;
 	}
 
+	/**
+	 * @param beanType
+	 * @return
+	 */
+	public static <T> T getPrototypeBeanObject(Class<T> beanType) {
+		BeanFactoryImpl beanFactory = getBeanFactoryImpl();
+		BeanDefine beanDefine = beanFactory.getBeanDefine(null, beanType);
+		if (beanDefine == null) {
+			beanDefine = new BeanDefinePrototype(new BeanDefineType(beanType));
+			beanFactory.registerBeanDefine(beanDefine);
+		}
+
+		return (T) beanDefine.getBeanObject(beanFactory);
+	}
+
 	/** TYPE_MAP_INSTANCE */
 	public static final Map<Class<?>, Object> TYPE_MAP_INSTANCE = new ConcurrentHashMap<Class<?>, Object>();
 

@@ -15,6 +15,7 @@ import java.util.Set;
 import net.sf.cglib.proxy.Enhancer;
 
 import com.absir.aop.value.Proxy;
+import com.absir.core.kernel.KernelClass;
 import com.absir.core.kernel.KernelCollection;
 
 /**
@@ -23,6 +24,9 @@ import com.absir.core.kernel.KernelCollection;
  */
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class AopProxyUtils {
+
+	/** enhancerClass */
+	private static Class<?> enhancerClass = KernelClass.forName("net.sf.cglib.proxy.Enhancer");
 
 	/** aopProxyClass */
 	private static Class<?>[] aopProxyClass = new Class<?>[] { AopProxy.class };
@@ -92,7 +96,7 @@ public class AopProxyUtils {
 				impl = false;
 				interfaces.add(beanType);
 
-			} else if (Modifier.isFinal(beanType.getModifiers())) {
+			} else if (enhancerClass == null || Modifier.isFinal(beanType.getModifiers())) {
 				impl = false;
 			}
 		}

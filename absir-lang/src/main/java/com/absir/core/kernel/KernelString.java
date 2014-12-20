@@ -346,7 +346,7 @@ public abstract class KernelString {
 	 */
 	public static String subLastString(String string, int index) {
 		if (index >= 0) {
-			string = string.substring(0, index - 1);
+			string = string.substring(0, index);
 		}
 
 		return string;

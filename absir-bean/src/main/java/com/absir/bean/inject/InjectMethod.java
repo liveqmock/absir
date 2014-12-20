@@ -50,7 +50,7 @@ public class InjectMethod extends InjectInvokerObserver {
 	public InjectMethod(Method method, Method beanMethod, String injectName, InjectType injectType) {
 		super(injectType);
 		this.method = method;
-		this.beanMethod = beanMethod;
+		this.beanMethod = beanMethod == null ? method : beanMethod;
 		Annotation[][] parameterAnnotations = method.getParameterAnnotations();
 		this.paramNames = BeanDefineDiscover.paramterNames(method, parameterAnnotations);
 		int length = parameterAnnotations.length;

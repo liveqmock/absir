@@ -334,6 +334,11 @@ public class BeanFactoryProvider implements IBeanConfigProvider {
 				beanFactoryAwares.add((IBeanFactoryAware) beanObject);
 			}
 
+			if (IBeanDefineSupply.class.isAssignableFrom(beanDefine.getBeanType())) {
+				Object beanObject = beanDefine.getBeanObject(beanFactory);
+				beanDefineObjects.put(beanObject, beanDefine);
+			}
+
 			if (IBeanDefineAware.class.isAssignableFrom(beanDefine.getBeanType())) {
 				Object beanObject = beanDefine.getBeanObject(beanFactory);
 				beanDefineObjects.put(beanObject, beanDefine);

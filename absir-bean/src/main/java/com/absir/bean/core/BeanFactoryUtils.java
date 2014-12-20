@@ -126,7 +126,7 @@ public class BeanFactoryUtils {
 		BeanFactoryImpl beanFactory = getBeanFactoryImpl();
 		T beanObject = beanFactory.getBeanObject(beanType);
 		if (beanObject == null) {
-			BeanDefine beanDefine = new BeanDefineOriginal(new BeanDefineType(beanType));
+			BeanDefine beanDefine = getRegisterBeanDefine(BeanScope.SINGLETON, beanType);
 			beanFactory.registerBeanDefine(beanDefine);
 			beanObject = (T) beanDefine.getBeanObject(beanFactory);
 		}
@@ -142,11 +142,21 @@ public class BeanFactoryUtils {
 		BeanFactoryImpl beanFactory = getBeanFactoryImpl();
 		BeanDefine beanDefine = beanFactory.getBeanDefine(null, beanType);
 		if (beanDefine == null) {
-			beanDefine = new BeanDefinePrototype(new BeanDefineType(beanType));
+			beanDefine = getRegisterBeanDefine(BeanScope.PROTOTYPE, beanType);
 			beanFactory.registerBeanDefine(beanDefine);
 		}
 
 		return (T) beanDefine.getBeanObject(beanFactory);
+	}
+
+	/**
+	 * @param beanScope
+	 * @param beanType
+	 * @return
+	 */
+	public static BeanDefine getRegisterBeanDefine(BeanScope beanScope, Class<?> beanType) {
+		BeanDefine beanDefine = new BeanDefineType(beanType);
+		return new BeanDefineMerged(beanDefine, beanDefine.getBeanName(), beanScope, beanDefine.getBeanComponent());
 	}
 
 	/** TYPE_MAP_INSTANCE */
@@ -161,14 +171,14 @@ public class BeanFactoryUtils {
 		if (beanObject == null) {
 			synchronized (beanType) {
 				beanObject = TYPE_MAP_INSTANCE.get(beanType);
+				BeanFactoryImpl beanFactory = getBeanFactoryImpl();
 				if (beanObject == null) {
-					beanObject = getBeanFactoryImpl().getBeanObject(beanType);
+					beanObject = beanFactory.getBeanObject(beanType);
 					if (beanObject == null) {
-						BeanDefine beanDefine = new BeanDefineOriginal(new BeanDefineType(beanType));
-						BeanFactoryImpl beanFactory = getBeanFactoryImpl();
+						BeanDefine beanDefine = getRegisterBeanDefine(BeanScope.SINGLETON, beanType);
 						beanFactory.registerBeanDefine(beanDefine);
 						beanObject = beanDefine.getBeanObject(beanFactory);
-						beanFactory.unRegisterBeanDefine(beanDefine);
+						beanFactory.unRegisterBeanObject(beanDefine.getBeanName());
 					}
 
 					TYPE_MAP_INSTANCE.put(beanType, beanObject);

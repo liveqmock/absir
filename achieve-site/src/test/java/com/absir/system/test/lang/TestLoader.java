@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import com.absir.aop.AopProxyUtils;
 import com.absir.appserv.system.bean.JUser;
+import com.absir.core.kernel.KernelString;
 import com.absir.system.test.AbstractTest;
 
 /**
@@ -31,9 +32,7 @@ public class TestLoader extends AbstractTest {
 
 	@Test
 	public void test() {
-		System.out.println(AopProxyUtils.getProxy(new JUser(), false, false).getClass());
-		System.out.println(AopProxyUtils.getProxy(new JUser(), false, false).getClass());
-		System.out.println(AopProxyUtils.getProxy(new JUser(), true, false).getClass());
-		System.out.println(AopProxyUtils.getProxy(new JUser(), true, false).getClass());
+		String name = "12345";
+		System.out.println(name.substring(0, 1));
 	}
 }

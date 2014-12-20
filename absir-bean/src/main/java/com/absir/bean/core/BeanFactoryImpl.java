@@ -831,7 +831,7 @@ public final class BeanFactoryImpl implements BeanFactory {
 			throw new RuntimeException("BeanName =" + beanDefine.getBeanName() + " has registered!");
 		}
 
-		registerBeanDefine(null, beanDefine);
+		registerBeanDefine(null, new BeanDefineRegister(beanDefine));
 		return beanDefine;
 	}
 
@@ -1012,8 +1012,10 @@ public final class BeanFactoryImpl implements BeanFactory {
 		}
 
 		Iterator<Entry<String, BeanDefine>> iterator = beanNameDefineMap.entrySet().iterator();
+		BeanDefine beanDefine;
 		while (iterator.hasNext()) {
-			if (KernelClass.isAssignableFrom(beanTypes, iterator.next().getValue().getBeanType())) {
+			beanDefine = iterator.next().getValue();
+			if (beanDefine.getClass() != BeanDefineRegister.class && KernelClass.isAssignableFrom(beanTypes, beanDefine.getBeanType())) {
 				iterator.remove();
 			}
 		}
@@ -1034,8 +1036,10 @@ public final class BeanFactoryImpl implements BeanFactory {
 		}
 
 		Iterator<Entry<String, BeanDefine>> iterator = beanNameDefineMap.entrySet().iterator();
+		BeanDefine beanDefine;
 		while (iterator.hasNext()) {
-			if (!KernelClass.isAssignableFrom(beanTypes, iterator.next().getValue().getBeanType())) {
+			beanDefine = iterator.next().getValue();
+			if (beanDefine.getClass() != BeanDefineRegister.class && !KernelClass.isAssignableFrom(beanTypes, beanDefine.getBeanType())) {
 				iterator.remove();
 			}
 		}

@@ -169,6 +169,19 @@ public class BeanFactoryWrapper implements BeanFactory {
 	 * (non-Javadoc)
 	 * 
 	 * @see
+	 * com.absir.bean.basis.BeanFactory#processBeanDefine(com.absir.bean.basis
+	 * .BeanDefine)
+	 */
+	@Override
+	public BeanDefine processBeanDefine(BeanDefine beanDefine) {
+		// TODO Auto-generated method stub
+		return beanFactory.processBeanDefine(beanDefine);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
 	 * com.absir.bean.basis.BeanFactory#processBeanObject(com.absir.bean.basis
 	 * .BeanScope, com.absir.bean.basis.BeanDefine, java.lang.Object)
 	 */
@@ -353,4 +366,5 @@ public class BeanFactoryWrapper implements BeanFactory {
 		// TODO Auto-generated method stub
 		beanFactory.unRegisterBeanSoftObject(beanObject);
 	}
+
 }

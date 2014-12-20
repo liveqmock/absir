@@ -152,7 +152,7 @@ public class BeanFactoryProvider implements IBeanConfigProvider {
 		List<IBeanDefineAware> beanDefineAwares = new ArrayList<IBeanDefineAware>();
 		List<IBeanObjectProcessor> beanObjectProcessors = new ArrayList<IBeanObjectProcessor>();
 		List<IBeanSoftReferenceAware> beanSoftReferenceAwares = new ArrayList<IBeanSoftReferenceAware>();
-		BeanFactoryImpl beanFactory = new BeanFactoryImpl(getBeanConfig(), beanNameDefineMap, beanDefineAwares, beanObjectProcessors, beanSoftReferenceAwares);
+		BeanFactoryImpl beanFactory = new BeanFactoryImpl(getBeanConfig(), beanNameDefineMap, beanDefineAwares, beanDefineProcessors, beanObjectProcessors, beanSoftReferenceAwares);
 		if (beanScanner == null) {
 			beanScanner = new BeanScanner();
 		}

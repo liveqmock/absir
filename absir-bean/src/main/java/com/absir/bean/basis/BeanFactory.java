@@ -72,6 +72,12 @@ public interface BeanFactory extends BeanSupply {
 	public Map<String, BeanDefine> getBeanDefineMap(Class<?> beanType);
 
 	/**
+	 * @param beanDefine
+	 * @return
+	 */
+	public BeanDefine processBeanDefine(BeanDefine beanDefine);
+
+	/**
 	 * @param beanScope
 	 * @param beanDefine
 	 * @param beanObject

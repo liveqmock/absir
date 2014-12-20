@@ -26,6 +26,7 @@ import com.absir.bean.basis.BeanFactory;
 import com.absir.bean.basis.BeanScope;
 import com.absir.bean.basis.BeanSupply;
 import com.absir.bean.config.IBeanDefineAware;
+import com.absir.bean.config.IBeanDefineProcessor;
 import com.absir.bean.config.IBeanObjectProcessor;
 import com.absir.bean.config.IBeanSoftReferenceAware;
 import com.absir.core.dyna.DynaBinder;
@@ -70,6 +71,9 @@ public final class BeanFactoryImpl implements BeanFactory {
 	private final List<IBeanDefineAware> beanDefineAwares;
 
 	/** beanObjectProcessors */
+	private final List<IBeanDefineProcessor> beanDefineProcessors;
+
+	/** beanObjectProcessors */
 	private final List<IBeanObjectProcessor> beanObjectProcessors;
 
 	/** beanSoftReferenceAwares */
@@ -88,13 +92,14 @@ public final class BeanFactoryImpl implements BeanFactory {
 	 * @param beanObjectProcessors
 	 * @param beanSoftReferenceAwares
 	 */
-	protected BeanFactoryImpl(BeanConfig beanConfig, ConcurrentHashMap<String, BeanDefine> beanNameDefineMap, List<IBeanDefineAware> beanDefineAwares, List<IBeanObjectProcessor> beanObjectProcessors,
-			List<IBeanSoftReferenceAware> beanSoftReferenceAwares) {
+	protected BeanFactoryImpl(BeanConfig beanConfig, ConcurrentHashMap<String, BeanDefine> beanNameDefineMap, List<IBeanDefineAware> beanDefineAwares, List<IBeanDefineProcessor> beanDefineProcessors,
+			List<IBeanObjectProcessor> beanObjectProcessors, List<IBeanSoftReferenceAware> beanSoftReferenceAwares) {
 		beanFactoryImpl = Instance;
 		Instance = this;
 		this.beanConfig = beanConfig;
 		this.beanNameDefineMap = beanNameDefineMap;
 		this.beanDefineAwares = beanDefineAwares;
+		this.beanDefineProcessors = beanDefineProcessors;
 		this.beanObjectProcessors = beanObjectProcessors;
 		this.beanSoftReferenceAwares = beanSoftReferenceAwares;
 	}
@@ -728,6 +733,27 @@ public final class BeanFactoryImpl implements BeanFactory {
 		if (beanFactoryImpl != null) {
 			addSoftReferenceBeans(filter, beans);
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.bean.basis.BeanFactory#processBeanDefine(com.absir.bean.basis
+	 * .BeanDefine)
+	 */
+	@Override
+	public BeanDefine processBeanDefine(BeanDefine beanDefine) {
+		// TODO Auto-generated method stub
+		BeanDefine define;
+		for (IBeanDefineProcessor beanDefineProcessor : beanDefineProcessors) {
+			define = beanDefineProcessor.getBeanDefine(this, beanDefine);
+			if (define != null) {
+				beanDefine = define;
+			}
+		}
+
+		return beanDefine;
 	}
 
 	/*

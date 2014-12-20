@@ -156,7 +156,7 @@ public class BeanFactoryUtils {
 	 */
 	public static BeanDefine getRegisterBeanDefine(BeanScope beanScope, Class<?> beanType) {
 		BeanDefine beanDefine = new BeanDefineType(beanType);
-		return new BeanDefineMerged(beanDefine, beanDefine.getBeanName(), beanScope, beanDefine.getBeanComponent());
+		return getBeanFactoryImpl().processBeanDefine(new BeanDefineMerged(beanDefine, beanDefine.getBeanName(), beanScope, beanDefine.getBeanComponent()));
 	}
 
 	/** TYPE_MAP_INSTANCE */

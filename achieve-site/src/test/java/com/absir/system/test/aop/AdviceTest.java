@@ -65,5 +65,9 @@ public class AdviceTest extends AbstractTestInject {
 	public void test() throws Throwable {
 		AdviceBean.ME.peek("TTT");
 	}
+	
+	public static void main(String...args) throws Throwable {
+		new AdviceTest().test();
+	}
 
 }

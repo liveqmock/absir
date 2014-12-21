@@ -55,6 +55,7 @@ import com.absir.core.kernel.KernelReflect;
  * @author absir
  * 
  */
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class BeanFactoryProvider implements IBeanConfigProvider {
 
 	/** includePackages */
@@ -301,14 +302,16 @@ public class BeanFactoryProvider implements IBeanConfigProvider {
 		// BeanDefine Processor Object Processor
 		KernelList.sortOrderable(beanObjectProcessors);
 		for (BeanDefine beanDefineProcessor : beanFactory.getBeanDefines(IBeanDefineProcessor.class)) {
-			beanFactory.processBeanObject(null, beanDefineProcessor, beanDefineProcessor.getBeanObject(beanFactory));
+			beanFactory.processBeanObject(beanDefineProcessor.getBeanScope(), beanDefineProcessor, beanDefineProcessor.getBeanObject(beanFactory));
+		}
+
+		for (BeanDefine beanObjectProcessor : beanFactory.getBeanDefines(IBeanObjectProcessor.class)) {
+			beanFactory.processBeanObject(beanObjectProcessor.getBeanScope(), beanObjectProcessor, beanObjectProcessor.getBeanObject(beanFactory));
 		}
 
 		for (Entry<Object, BeanDefine> entry : beanDefineObjects.entrySet()) {
-			Object beanObject = entry.getKey();
 			BeanDefine beanDefine = entry.getValue();
-			beanFactory.processBeanObject(null, beanDefine, beanObject);
-			processorBeanDefineObject(beanFactory, beanDefine, beanObject);
+			processorBeanDefineObject(beanFactory, beanDefine, beanDefine.getBeanObject(beanFactory));
 		}
 
 		beanDefineObjects.clear();
@@ -366,7 +369,7 @@ public class BeanFactoryProvider implements IBeanConfigProvider {
 
 		// BeanFacotry Aware Processor Object
 		for (Entry<Object, BeanDefine> entry : beanDefineObjects.entrySet()) {
-			beanFactory.processBeanObject(null, entry.getValue(), entry.getKey());
+			entry.getValue().getBeanObject(beanFactory);
 		}
 
 		KernelList.sortOrderable(beanFactoryAwares);
@@ -552,7 +555,6 @@ public class BeanFactoryProvider implements IBeanConfigProvider {
 	 * @param basisTypes
 	 * @param collections
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void registerBeanTypes(final BeanFactoryImpl beanFactory, final Collection<Class<?>> beanTypes, final Class<?>[] basisTypes, final Collection[] collections) {
 		final List<BeanDefine> beanDefines = new ArrayList<BeanDefine>();
 		for (final Class<?> beanType : beanTypes) {

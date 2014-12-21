@@ -22,6 +22,7 @@ import com.absir.appserv.system.server.value.Bodys;
 import com.absir.bean.basis.Base;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
+import com.absir.bean.inject.value.Value;
 import com.absir.context.core.ContextUtils;
 import com.absir.core.kernel.KernelArray;
 import com.absir.server.in.InMethod;
@@ -39,6 +40,9 @@ import com.absir.server.route.returned.ReturnedResolverBody;
 @Base
 @Bean
 public class ServerResolverBodys extends ReturnedResolverBody implements ParameterResolver<Object>, ParameterResolverMethod, IServerResolverBody {
+
+	@Value("bodys.trace")
+	private boolean trace;
 
 	/** ME */
 	public static final ServerResolverBodys ME = BeanFactoryUtils.get(ServerResolverBodys.class);
@@ -82,7 +86,7 @@ public class ServerResolverBodys extends ReturnedResolverBody implements Paramet
 	@Override
 	public Object getParameterValue(OnPut onPut, Object parameter, Class<?> parameterType, String beanName, RouteMethod routeMethod) throws Exception {
 		// TODO Auto-generated method stub
-		return ServerResolverBody.ME.getParameterValue(onPut.getInput().isDebug() ? ServerResolverBody.ME : this, onPut, parameter, parameterType, beanName, routeMethod);
+		return ServerResolverBody.ME.getParameterValue(trace || onPut.getInput().isDebug() ? ServerResolverBody.ME : this, onPut, parameter, parameterType, beanName, routeMethod);
 	}
 
 	/*
@@ -175,7 +179,7 @@ public class ServerResolverBodys extends ReturnedResolverBody implements Paramet
 	@Override
 	public void resolveReturnedValue(Object returnValue, Integer returned, OnPut onPut) throws Exception {
 		// TODO Auto-generated method stub
-		if (onPut.getInput().isDebug()) {
+		if (trace || onPut.getInput().isDebug()) {
 			ServerResolverBody.ME.resolveReturnedValue(returnValue, returned, onPut);
 
 		} else {

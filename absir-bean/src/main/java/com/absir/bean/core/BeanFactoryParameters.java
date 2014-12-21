@@ -39,6 +39,13 @@ public class BeanFactoryParameters extends BeanFactoryWrapper {
 		parameterIndex = 0;
 	}
 
+	/**
+	 * 
+	 */
+	public void clearParameterIndex() {
+		parameterIndex = -1;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -49,10 +56,13 @@ public class BeanFactoryParameters extends BeanFactoryWrapper {
 	@Override
 	public <T> T getBeanObject(Class<T> beanType) {
 		int length = parameters.length;
-		for (int i = parameterIndex; i < length; i++) {
+		for (int i = parameterIndex < 0 ? 0 : parameterIndex; i < length; i++) {
 			Object parameter = parameters[parameterIndex];
 			if (KernelClass.isMatchableFrom(beanType, parameter.getClass())) {
-				parameterIndex = i;
+				if (parameterIndex >= 0) {
+					parameterIndex = i;
+				}
+
 				return (T) parameter;
 			}
 		}

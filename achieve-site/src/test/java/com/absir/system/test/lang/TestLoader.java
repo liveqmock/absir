@@ -10,8 +10,6 @@ package com.absir.system.test.lang;
 import org.junit.Test;
 
 import com.absir.aop.AopProxyUtils;
-import com.absir.appserv.system.bean.JUser;
-import com.absir.core.kernel.KernelString;
 import com.absir.system.test.AbstractTest;
 
 /**
@@ -27,12 +25,21 @@ public class TestLoader extends AbstractTest {
 		return "123";
 	}
 
-	public static class T extends ATest implements ITest {
+	public static abstract class TestAop {
+
+		public String getName() {
+			return "123";
+		}
 	}
 
 	@Test
 	public void test() {
-		String name = "12345";
-		System.out.println(name.substring(0, 1));
+		TestAop testAop = (TestAop) AopProxyUtils.getProxy(null, TestAop.class, null, false, true);
+		System.out.println(testAop.getName());
+
+	}
+
+	public static void main(String... args) throws Throwable {
+		new TestLoader().test();
 	}
 }

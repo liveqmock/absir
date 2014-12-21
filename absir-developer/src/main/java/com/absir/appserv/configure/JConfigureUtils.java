@@ -56,7 +56,7 @@ public abstract class JConfigureUtils {
 					Class<? extends JConfigureBase> configureClass = Configure_Class_Map_Class.get(cls);
 					if (configureClass == null) {
 						configure = KernelClass.newInstance(cls);
-						configure = LangBundleImpl.ME.getLangProxy(cls.getSimpleName(), configure);
+						configure = LangBundleImpl.ME == null ? configure : LangBundleImpl.ME.getLangProxy(cls.getSimpleName(), configure);
 						try {
 							initConfigure(configure);
 

@@ -565,7 +565,7 @@ public abstract class CrudUtils {
 	 */
 	public static CrudProperty getCrudProperty(JoEntity joEntity, String name) {
 		CrudEntity crudEntity = getCrudEntity(joEntity);
-		if (crudEntity.crudProperties != null) {
+		if (crudEntity != null && crudEntity.crudProperties != null) {
 			for (CrudProperty crudProperty : crudEntity.crudProperties) {
 				if (crudProperty.getName().equals(name)) {
 					return crudProperty;
@@ -583,7 +583,7 @@ public abstract class CrudUtils {
 	 */
 	public static CrudPropertyReference getCrudPropertyReference(JoEntity joEntity, String name) {
 		CrudEntity crudEntity = getCrudEntity(joEntity);
-		if (crudEntity.crudPropertyReferences != null) {
+		if (crudEntity != null && crudEntity.crudPropertyReferences != null) {
 			for (CrudPropertyReference crudPropertyReference : crudEntity.crudPropertyReferences) {
 				if (crudPropertyReference.getCrudProperty().getName().equals(name)) {
 					return crudPropertyReference;

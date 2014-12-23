@@ -112,7 +112,7 @@ public abstract class AdminServer {
 		 * @param route
 		 */
 		@Inject(type = InjectType.Selectable)
-		private void setRoute(@Value(value = "${webmvc.admin.route}") String route) {
+		private void setRoute(@Value(value = "webmvc.admin.route") String route) {
 			AdminServer.route = route;
 		}
 

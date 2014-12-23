@@ -67,7 +67,7 @@ public class InjectMethod extends InjectInvokerObserver {
 				}
 
 				valueNames[i] = KernelString.isEmpty(value.value()) ? paramNames[i] : value.value();
-				if (value.defaultValue() != KernelLang.NULL_STRING) {
+				if (!KernelString.isEmpty(value.defaultValue())) {
 					defaultValues[i] = value.defaultValue();
 				}
 			}
@@ -123,7 +123,10 @@ public class InjectMethod extends InjectInvokerObserver {
 					Class<?> parameterType = parameterTypes[i];
 					parameter = beanFactory.getBeanConfig().getExpressionObject(valueName, paramName, parameterType);
 					if (parameter == null) {
-						parameter = beanFactory.getBeanConfig().getExpressionDefaultValue(defaultValues[i], paramName, parameterType);
+						valueName = defaultValues[i];
+						if (valueName != null) {
+							parameter = beanFactory.getBeanConfig().getExpressionDefaultValue(valueName, paramName, parameterType);
+						}
 					}
 				}
 

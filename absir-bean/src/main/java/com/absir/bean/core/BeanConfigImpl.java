@@ -541,7 +541,8 @@ public class BeanConfigImpl implements BeanConfig {
 	 */
 	public String getExpression(String expression, boolean strict) {
 		int fromIndex = expression.indexOf("${");
-		if (fromIndex >= 0 && fromIndex < expression.length() - 2) {
+		int length = expression.length();
+		if (fromIndex >= 0 && fromIndex < length - 2) {
 			StringBuilder stringBuilder = new StringBuilder();
 			int endIndex = 0;
 			while (true) {
@@ -550,7 +551,6 @@ public class BeanConfigImpl implements BeanConfig {
 
 				} else if (fromIndex < endIndex) {
 					if (fromIndex < 0) {
-						int length = expression.length();
 						if (length > ++endIndex) {
 							stringBuilder.append(expression.substring(endIndex, length));
 						}
@@ -567,11 +567,14 @@ public class BeanConfigImpl implements BeanConfig {
 				fromIndex += 2;
 				if (fromIndex < endIndex) {
 					Object value = getValue(expression.substring(fromIndex, endIndex));
-					if (strict && value == null) {
-						return null;
-					}
+					if (value == null) {
+						if (strict) {
+							return null;
+						}
 
-					stringBuilder.append(value);
+					} else {
+						stringBuilder.append(value);
+					}
 				}
 
 				fromIndex = expression.indexOf("${", endIndex);

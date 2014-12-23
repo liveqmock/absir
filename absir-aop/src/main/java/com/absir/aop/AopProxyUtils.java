@@ -74,6 +74,28 @@ public class AopProxyUtils {
 		}
 
 		if (beanObject != null) {
+			if (beanObject instanceof AopProxy) {
+				Class<?> aopClass = beanObject.getClass();
+				if (beanType != null) {
+					if (!beanType.isAssignableFrom(aopClass)) {
+						aopClass = null;
+					}
+				}
+
+				if (aopClass != null && interfaces != null) {
+					for (Class<?> inter : interfaces) {
+						if (!inter.isAssignableFrom(aopClass)) {
+							aopClass = null;
+							break;
+						}
+					}
+				}
+
+				if (aopClass != null) {
+					return (AopProxy) beanObject;
+				}
+			}
+
 			Class<?> beanClass = beanObject.getClass();
 			if (beanType == null) {
 				beanType = beanClass;

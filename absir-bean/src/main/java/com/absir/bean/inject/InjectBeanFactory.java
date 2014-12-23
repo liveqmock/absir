@@ -43,6 +43,7 @@ import com.absir.bean.core.BeanDefineType;
 import com.absir.bean.core.BeanFactoryImpl;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Inject;
+import com.absir.bean.inject.value.InjectConcat;
 import com.absir.bean.inject.value.InjectOrder;
 import com.absir.bean.inject.value.InjectType;
 import com.absir.bean.inject.value.Orders;
@@ -118,6 +119,13 @@ public class InjectBeanFactory implements IBeanFactorySupport, IBeanDefineSupply
 			Value value = field.getAnnotation(Value.class);
 			if (value != null) {
 				return new InjectValue(field, value);
+			}
+
+			if (field.getType().isArray() || Collection.class.isAssignableFrom(field.getType())) {
+				InjectConcat injectConcat = field.getAnnotation(InjectConcat.class);
+				if (injectConcat != null) {
+					return new InjectArrayConcat(field, injectConcat);
+				}
 			}
 
 			return null;

@@ -94,6 +94,7 @@ public class HelperClient {
 					}
 
 					if (length > 0) {
+						urlConnection.setDoOutput(true);
 						urlConnection.getOutputStream().write(postBytes, 0, length);
 					}
 				}

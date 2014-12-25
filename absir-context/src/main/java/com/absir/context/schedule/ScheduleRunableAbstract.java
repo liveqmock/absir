@@ -54,8 +54,8 @@ public abstract class ScheduleRunableAbstract implements ScheduleRunable {
 	 * @param date
 	 */
 	public final void run(Date date) {
-		runnable.run();
 		scheduleTime = getNextScheduleTime(date);
+		runnable.run();
 	}
 
 	/**

@@ -70,11 +70,38 @@ public abstract class ApiServer {
 		public int code;
 
 		/**
+		 * 
+		 */
+		public MessageCode() {
+
+		}
+
+		/**
 		 * @param e
 		 */
 		public MessageCode(Throwable e) {
+			if (e instanceof ServerException) {
+				setServerException((ServerException) e);
+
+			} else {
+				setThrowable(e);
+			}
+		}
+
+		/**
+		 * @param e
+		 */
+		public void setThrowable(Throwable e) {
 			message = e.toString();
-			code = e instanceof ServerException ? ((ServerException) e).getServerStatus().getCode() : ServerStatus.ON_ERROR.getCode();
+			code = ServerStatus.ON_ERROR.getCode();
+		}
+
+		/**
+		 * @param e
+		 */
+		public void setServerException(ServerException e) {
+			message = e.toString();
+			code = e.getServerStatus().getCode();
 		}
 	}
 
@@ -94,6 +121,18 @@ public abstract class ApiServer {
 
 		if (BeanFactoryUtils.getEnvironment().compareTo(Environment.DEBUG) <= 0 || input.isDebug() || !(e instanceof ServerException)) {
 			LOGGER.debug("on server " + input.getUri(), e);
+		}
+
+		if (e instanceof ServerException) {
+			ServerException exception = (ServerException) e;
+			Object data = exception.getExceptionData();
+			if (data != null && data instanceof MessageCode) {
+				return data;
+			}
+
+			MessageCode messageCode = new MessageCode();
+			messageCode.setServerException(exception);
+			return messageCode;
 		}
 
 		return new MessageCode(e);

@@ -360,7 +360,7 @@ public abstract class KernelClass {
 			return cls.getComponentType();
 		}
 
-		Class superClass = argumentClass(cls.getGenericSuperclass(), true);
+		Class superClass = argumentClass(cls, true);
 		return superClass == cls.getSuperclass() ? cls : superClass;
 	}
 
@@ -373,7 +373,7 @@ public abstract class KernelClass {
 			return new Class[] { cls.getComponentType() };
 		}
 
-		Class[] superClasses = argumentClasses(cls.getGenericSuperclass(), true);
+		Class[] superClasses = argumentClasses(cls, true);
 		if (superClasses.length == 1 && superClasses[0] == cls.getSuperclass()) {
 			superClasses[0] = cls;
 		}

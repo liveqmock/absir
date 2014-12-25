@@ -161,7 +161,7 @@ public abstract class ArenaService {
 	 */
 	@Transaction
 	@InjectOrder(value = -1)
-	@Schedule(cron = "0 24 * * * *")
+	@Schedule(cron = "0 0 0 * * *")
 	@Stopping
 	public void rewardArenas() {
 		XlsDao<IArenaDefine, Serializable> arenaDefineDao = JbPlayerContext.COMPONENT.getArenaDefineDao();

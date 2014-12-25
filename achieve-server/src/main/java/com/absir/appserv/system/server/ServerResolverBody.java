@@ -15,7 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig.Feature;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 import com.absir.appserv.system.server.value.Result;
@@ -63,6 +65,8 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 	protected void initResolver() {
 		objectMapper = new ObjectMapper();
 		objectMapper.setSerializationInclusion(Inclusion.NON_NULL);
+		objectMapper.configure(Feature.FAIL_ON_EMPTY_BEANS, false);
+		objectMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	}
 
 	/*

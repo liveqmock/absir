@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import com.absir.bean.basis.Environment;
 import com.absir.bean.core.BeanFactoryUtils;
+import com.absir.context.core.ContextUtils;
 import com.absir.core.helper.HelperIO;
 
 /**
@@ -94,13 +95,16 @@ public class HelperClient {
 					}
 
 					if (length > 0) {
+						// 必需的
+						urlConnection.addRequestProperty("Content-type", "text/plain");
 						urlConnection.setDoOutput(true);
+						urlConnection.connect();
 						urlConnection.getOutputStream().write(postBytes, 0, length);
 					}
 				}
 			}
 
-			return type == null || type.isAssignableFrom(String.class) ? (T) HelperIO.toString(urlConnection.getInputStream()) : openConnectionJson(urlConnection, type);
+			return type == null || type.isAssignableFrom(String.class) ? (T) HelperIO.toString(urlConnection.getInputStream(), ContextUtils.getCharset()) : openConnectionJson(urlConnection, type);
 
 		} catch (Throwable e) {
 			if (BeanFactoryUtils.getEnvironment() == Environment.DEVELOP) {

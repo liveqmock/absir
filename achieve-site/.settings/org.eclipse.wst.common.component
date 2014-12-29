@@ -14,9 +14,6 @@
         <dependent-module archiveName="absir-context-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-context/absir-context">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="absir-lang-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-lang/absir-lang">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
         <property name="context-root" value="achieve-site"/>
         <property name="java-output-path" value="/achieve-site/target/classes"/>
     </wb-module>

@@ -41,6 +41,9 @@
         <dependent-module archiveName="absir-servlet-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-servlet/absir-servlet">
             <dependency-type>uses</dependency-type>
         </dependent-module>
+        <dependent-module archiveName="absir-email-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-email/absir-email">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <dependent-module archiveName="absir-jetbrickDeveloper-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-jetbrickDeveloper/absir-jetbrickDeveloper">
             <dependency-type>uses</dependency-type>
         </dependent-module>

@@ -21,9 +21,6 @@
 		<module>absir-hibernate</module>
 		<module>absir-server</module>
 		<module>absir-servlet</module>
-		<module>absir-webapp</module>
-		<module>absir-jooq</module>
-		<module>absir-boneCP</module>
 		<module>absir-developer</module>
 		<module>achieve-server</module>
 		<module>absir-developerImpl</module>
@@ -40,16 +37,9 @@
 		<module>absir-developerWeb</module>
 		<module>absir-source</module>
 		<module>absir-yidong</module>
-		<module>absir-js</module>
 		<module>achieve-sample</module>
-		<module>absir-test</module>
-		<module>absir-beetl</module>
-		<module>absir-beetlDeveloper</module>
-		<module>absir-webit</module>
 		<module>absir-jetbrick</module>
 		<module>absir-jetbrickDeveloper</module>
-		<module>absir-tiny</module>
-		<module>absir-template</module>
 		<module>absir-qq</module>
 		<module>absir-email</module>
 		<module>absir-spring</module>

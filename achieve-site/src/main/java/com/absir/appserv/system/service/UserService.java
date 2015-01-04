@@ -7,7 +7,7 @@
  */
 package com.absir.appserv.system.service;
 
-import com.absir.appserv.system.bean.JUser;
+import com.absir.appserv.system.bean.base.IUser;
 import com.absir.appserv.system.crud.PasswordCrudFactory;
 import com.absir.appserv.system.dao.BeanDao;
 import com.absir.bean.core.BeanFactoryUtils;
@@ -30,7 +30,7 @@ public abstract class UserService {
 	 * @param user
 	 * @return
 	 */
-	public static String getPasswordEntry(String password, JUser user) {
+	public static String getPasswordEntry(String password, IUser user) {
 		return PasswordCrudFactory.getPasswordEncrypt(password, user.getSalt());
 	}
 
@@ -38,7 +38,7 @@ public abstract class UserService {
 	 * @param user
 	 */
 	@Transaction(rollback = Throwable.class)
-	public void register(JUser user) {
+	public void register(IUser user) {
 		user.setPassword(getPasswordEntry(user.getPassword(), user));
 		BeanDao.getSession().persist(user);
 	}
@@ -49,7 +49,7 @@ public abstract class UserService {
 	 * @param newPassword
 	 */
 	@Transaction(rollback = Throwable.class)
-	public void setPassword(JUser user, String password, String newPassword) {
+	public void setPassword(IUser user, String password, String newPassword) {
 		if (password != null) {
 			if (!getPasswordEntry(password, user).equals(password)) {
 				throw new ServerException(ServerStatus.ON_DENIED);

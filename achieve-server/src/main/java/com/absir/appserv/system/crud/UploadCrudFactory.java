@@ -137,11 +137,12 @@ public class UploadCrudFactory implements ICrudFactory, ICrudProcessorInput<File
 	public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd");
 
 	/**
+	 * @param hashCode
 	 * @return
 	 */
-	public String randUploadFile() {
+	public String randUploadFile(int hashCode) {
 		Date date = new Date();
-		return DATE_FORMAT.format(date) + '/' + HelperRandom.randSecendBuidler((int) date.getTime(), 16);
+		return DATE_FORMAT.format(date) + '/' + HelperRandom.randSecendBuidler((int) date.getTime(), 16, hashCode);
 	}
 
 	/**
@@ -226,7 +227,7 @@ public class UploadCrudFactory implements ICrudFactory, ICrudProcessorInput<File
 		}
 
 		extension = upload.getFilePath();
-		String uploadFile = randUploadFile() + '.' + extension;
+		String uploadFile = randUploadFile(inputStream.hashCode()) + '.' + extension;
 		upload(uploadFile, inputStream);
 		if (upload.getFileType() == null) {
 			upload.setFileType(extension);
@@ -450,7 +451,7 @@ public class UploadCrudFactory implements ICrudFactory, ICrudProcessorInput<File
 				}
 
 				if (uploadFile == null) {
-					uploadFile = randUploadFile() + "." + HelperFileName.getExtension(requestBody.getName());
+					uploadFile = randUploadFile(requestBody.hashCode()) + "." + HelperFileName.getExtension(requestBody.getName());
 				}
 
 				if (uploadStream == null) {

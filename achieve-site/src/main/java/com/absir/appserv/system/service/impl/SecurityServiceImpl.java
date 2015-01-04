@@ -16,6 +16,7 @@ import org.hibernate.Session;
 import com.absir.appserv.system.bean.JPlatformUser;
 import com.absir.appserv.system.bean.JSession;
 import com.absir.appserv.system.bean.JUser;
+import com.absir.appserv.system.bean.base.IUser;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.dao.BeanDao;
 import com.absir.appserv.system.dao.JUserDao;
@@ -92,11 +93,11 @@ public class SecurityServiceImpl extends SecurityService implements ISecuritySup
 	@Override
 	public boolean validator(JiUserBase userBase, String password, int error, long errorTime) {
 		// TODO Auto-generated method stub
-		if (password == null || !(userBase instanceof JUser)) {
+		if (password == null || !(userBase instanceof IUser)) {
 			return true;
 		}
 
-		JUser user = (JUser) userBase;
+		IUser user = (IUser) userBase;
 		long contextTime = ContextUtils.getContextTime();
 		if (error > 0 && user.getLastErrorLogin() > contextTime) {
 			return false;

@@ -14,6 +14,7 @@ import javax.persistence.Entity;
 
 import com.absir.appserv.feature.menu.value.MaEntity;
 import com.absir.appserv.feature.menu.value.MaMenu;
+import com.absir.appserv.system.bean.base.IUser;
 import com.absir.appserv.system.bean.base.JbUser;
 import com.absir.appserv.system.bean.proxy.JpMeta;
 import com.absir.appserv.system.bean.proxy.JpUserBase;
@@ -34,7 +35,7 @@ import com.absir.validator.value.NotEmpty;
 @SuppressWarnings("serial")
 @MaEntity(parent = { @MaMenu("用户管理") }, name = "用户")
 @Entity
-public class JUser extends JbUser implements JpUserBase, JpMeta, Serializable {
+public class JUser extends JbUser implements IUser, JpUserBase, JpMeta, Serializable {
 
 	@JaLang("密码")
 	@Prop(include = 1)

@@ -11,7 +11,67 @@
         <dependent-module archiveName="absir-developer-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-developer/absir-developer">
             <dependency-type>uses</dependency-type>
         </dependent-module>
+        <dependent-module archiveName="absir-server-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-server/absir-server">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <dependent-module archiveName="absir-context-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-context/absir-context">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="absir-core-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-core/absir-core">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="absir-asyn-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-asyn/absir-asyn">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="absir-aop-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-aop/absir-aop">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="absir-bean-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-bean/absir-bean">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="absir-io-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-io/absir-io">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="absir-lang-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-lang/absir-lang">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="absir-hibernate-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-hibernate/absir-hibernate">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="absir-servlet-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-servlet/absir-servlet">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="absir-jetbrickDeveloper-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-jetbrickDeveloper/absir-jetbrickDeveloper">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="absir-jetbrick-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-jetbrick/absir-jetbrick">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="absir-developerImpl-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-developerImpl/absir-developerImpl">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="absir-source-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-source/absir-source">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="absir-socket-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-socket/absir-socket">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="absir-card-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-card/absir-card">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="absir-game-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-game/absir-game">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="absir-iap-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-iap/absir-iap">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="absir-open-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-open/absir-open">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="absir-duoku-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-duoku/absir-duoku">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="absir-yidong-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/absir-yidong/absir-yidong">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <property name="context-root" value="achieve-site"/>

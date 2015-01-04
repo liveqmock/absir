@@ -468,6 +468,16 @@ public class HelperRandom {
 	/**
 	 * @param time
 	 * @param size
+	 * @param id
+	 * @return
+	 */
+	public static String randSecendBuidler(int time, int size, int id) {
+		return randSecendBuidler(time, size).append(randFormate(8, Integer.toHexString(id).toCharArray())).toString();
+	}
+
+	/**
+	 * @param time
+	 * @param size
 	 * @return
 	 */
 	public static StringBuilder randSecendBuidler(int time, int size) {

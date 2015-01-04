@@ -18,6 +18,8 @@ import java.util.Map;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import com.absir.appserv.configure.xls.value.XaWorkbook;
+import com.absir.bean.basis.Environment;
+import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.core.kernel.KernelClass;
 import com.absir.core.kernel.KernelLang.CallbackTemplate;
 import com.absir.core.kernel.KernelString;
@@ -80,6 +82,10 @@ public abstract class XlsUtils {
 
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
+						if (BeanFactoryUtils.getEnvironment() == Environment.DEVELOP) {
+							e.printStackTrace();
+						}
+
 						return null;
 					}
 

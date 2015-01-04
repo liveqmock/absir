@@ -19,8 +19,10 @@ import com.absir.appserv.system.security.SecurityManager;
 import com.absir.appserv.system.server.value.Bodys;
 import com.absir.appserv.system.service.SecurityService;
 import com.absir.appserv.system.service.impl.IdentityServiceLocal;
+import com.absir.bean.basis.Base;
 import com.absir.bean.basis.Environment;
 import com.absir.bean.core.BeanFactoryUtils;
+import com.absir.bean.inject.value.Bean;
 import com.absir.server.exception.ServerException;
 import com.absir.server.exception.ServerStatus;
 import com.absir.server.in.Input;
@@ -142,7 +144,12 @@ public abstract class ApiServer {
 	 * @author absir
 	 * 
 	 */
+	@Base
+	@Bean
 	public static class Route implements Interceptor {
+
+		/** ME */
+		public static final Route ME = BeanFactoryUtils.get(Route.class);
 
 		/*
 		 * (non-Javadoc)
@@ -153,6 +160,14 @@ public abstract class ApiServer {
 		@Override
 		public OnPut intercept(Iterator<Interceptor> iterator, Input input) throws Throwable {
 			// TODO Auto-generated method stub
+			autoLogin(input);
+			return input.intercept(iterator);
+		}
+
+		/**
+		 * @param input
+		 */
+		public void autoLogin(Input input) {
 			SecurityContext securityContext = SecurityService.ME.autoLogin("api", true, -1, input);
 			if (securityContext == null && input instanceof InputRequest) {
 				InputRequest inputRequest = (InputRequest) input;
@@ -167,8 +182,6 @@ public abstract class ApiServer {
 					SecurityService.ME.loginUser(securityManager, userBase, remember, inputRequest);
 				}
 			}
-
-			return input.intercept(iterator);
 		}
 
 		/**

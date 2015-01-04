@@ -133,11 +133,13 @@ public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayer, 
 		playerDefines = (List<PD>) XlsUtils.getXlsBeans((Class<? extends XlsBase>) componentClasses[4]);
 		cardDefineDao = (XlsDao<CD, Serializable>) XlsUtils.getXlsDao((Class<? extends XlsBase>) CARD_DEFINE_CLASS);
 		cardExps = (List<IExp>) XlsUtils.getXlsBeans((Class<? extends XlsBase>) componentClasses[6]);
-		int exp = 0;
-		cardLevelExps.clear();
-		for (IExp iExp : cardExps) {
-			exp += iExp.getExp();
-			cardLevelExps.add(exp);
+		if (cardExps != null) {
+			int exp = 0;
+			cardLevelExps.clear();
+			for (IExp iExp : cardExps) {
+				exp += iExp.getExp();
+				cardLevelExps.add(exp);
+			}
 		}
 
 		vipDefines = (List<VD>) XlsUtils.getXlsBeans((Class<? extends XlsBase>) componentClasses[7]);

@@ -38,7 +38,7 @@ public class HelperClient {
 	 * @throws IOException
 	 */
 	public static InputStream openConnection(HttpURLConnection urlConnection) throws IOException {
-		return urlConnection.getInputStream();
+		return urlConnection.getResponseCode() >= 400 ? urlConnection.getErrorStream() : urlConnection.getInputStream();
 	}
 
 	/**

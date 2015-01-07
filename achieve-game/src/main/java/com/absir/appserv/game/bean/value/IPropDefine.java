@@ -7,8 +7,6 @@
  */
 package com.absir.appserv.game.bean.value;
 
-import java.io.Serializable;
-
 import org.codehaus.jackson.annotate.JsonIgnore;
 
 /**
@@ -18,7 +16,7 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 public interface IPropDefine {
 
 	// 编号
-	public Serializable getId();
+	public String getId();
 
 	// 道具价格
 	public int getPrice();

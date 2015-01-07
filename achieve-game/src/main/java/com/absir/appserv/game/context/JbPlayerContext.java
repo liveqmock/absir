@@ -1344,7 +1344,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 * @param propId
 	 * @return
 	 */
-	public int propNumber(Serializable propId) {
+	public int propNumber(String propId) {
 		Integer number = (Integer) playerA.getPropNumbers().get(propId);
 		return number == null ? 0 : number;
 	}
@@ -1357,7 +1357,7 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 * @param force
 	 * @return
 	 */
-	public Object modifyProp(Serializable propId, int size, boolean force) {
+	public Object modifyProp(String propId, int size, boolean force) {
 		IPropDefine propDefine = COMPONENT.getPropDefine(propId);
 		if (propDefine != null) {
 			return modifyProp(propDefine, size, force);

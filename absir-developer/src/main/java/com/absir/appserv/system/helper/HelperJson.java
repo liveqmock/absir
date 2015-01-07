@@ -34,6 +34,8 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 
+import com.absir.bean.basis.Environment;
+import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.context.core.ContextUtils;
 import com.absir.core.kernel.KernelCharset;
 
@@ -87,6 +89,10 @@ public class HelperJson {
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
+			if (BeanFactoryUtils.getEnvironment() == Environment.DEVELOP) {
+				e.printStackTrace();
+			}
+
 			return null;
 		}
 	}
@@ -134,10 +140,11 @@ public class HelperJson {
 		try {
 			return decode(string);
 
-		} catch (JsonProcessingException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			if (BeanFactoryUtils.getEnvironment() == Environment.DEVELOP) {
+				e.printStackTrace();
+			}
 		}
 
 		return null;
@@ -180,10 +187,11 @@ public class HelperJson {
 		try {
 			return decode(string, toClass);
 
-		} catch (JsonProcessingException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			if (BeanFactoryUtils.getEnvironment() == Environment.DEVELOP) {
+				e.printStackTrace();
+			}
 		}
 
 		return null;
@@ -202,10 +210,11 @@ public class HelperJson {
 		try {
 			return decode(string, toType);
 
-		} catch (JsonProcessingException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			if (BeanFactoryUtils.getEnvironment() == Environment.DEVELOP) {
+				e.printStackTrace();
+			}
 		}
 
 		return null;
@@ -285,6 +294,10 @@ public class HelperJson {
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
+			if (BeanFactoryUtils.getEnvironment() == Environment.DEVELOP) {
+				e.printStackTrace();
+			}
+
 			return null;
 		}
 	}
@@ -300,6 +313,10 @@ public class HelperJson {
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
+			if (BeanFactoryUtils.getEnvironment() == Environment.DEVELOP) {
+				e.printStackTrace();
+			}
+
 			return null;
 		}
 	}
@@ -315,6 +332,10 @@ public class HelperJson {
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
+			if (BeanFactoryUtils.getEnvironment() == Environment.DEVELOP) {
+				e.printStackTrace();
+			}
+
 			return null;
 		}
 	}
@@ -331,6 +352,10 @@ public class HelperJson {
 			return xmlToMap(saxReader.read(inputStream).getRootElement());
 
 		} catch (Exception e) {
+			if (BeanFactoryUtils.getEnvironment() == Environment.DEVELOP) {
+				e.printStackTrace();
+			}
+
 			return null;
 
 		} finally {
@@ -393,7 +418,9 @@ public class HelperJson {
 			return xmlWriter.toString();
 
 		} catch (Exception e) {
-
+			if (BeanFactoryUtils.getEnvironment() == Environment.DEVELOP) {
+				e.printStackTrace();
+			}
 		}
 
 		return null;

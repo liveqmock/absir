@@ -7,7 +7,6 @@
  */
 package com.absir.appserv.game.bean;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -90,7 +89,7 @@ public abstract class JbPlayerA<T extends PlayerAtt> extends JbBase {
 
 		/** propNumbers */
 		@JaLang("道具数量")
-		public Map<Serializable, Integer> propNumbers;
+		public Map<Object, Integer> propNumbers;
 
 		/**
 		 * @return the taskProgresses
@@ -140,7 +139,7 @@ public abstract class JbPlayerA<T extends PlayerAtt> extends JbBase {
 		/**
 		 * @return the propNumbers
 		 */
-		public Map<Serializable, Integer> getPropNumbers() {
+		public Map<Object, Integer> getPropNumbers() {
 			return propNumbers;
 		}
 
@@ -148,7 +147,7 @@ public abstract class JbPlayerA<T extends PlayerAtt> extends JbBase {
 		 * @param propNumbers
 		 *            the propNumbers to set
 		 */
-		public void setPropNumbers(Map<Serializable, Integer> propNumbers) {
+		public void setPropNumbers(Map<Object, Integer> propNumbers) {
 			this.propNumbers = propNumbers;
 		}
 	}
@@ -358,7 +357,7 @@ public abstract class JbPlayerA<T extends PlayerAtt> extends JbBase {
 			playerAtt.metaRecards = playerAtt.metaRecards == null ? new HashMap<String, Integer>() : new HashMap<String, Integer>(playerAtt.metaRecards);
 			playerAtt.dailyRecards = playerAtt.dailyRecards == null ? new HashMap<String, Integer>() : new HashMap<String, Integer>(playerAtt.dailyRecards);
 			if (playerAtt.propNumbers == null) {
-				playerAtt.propNumbers = new LinkedHashMap<Serializable, Integer>();
+				playerAtt.propNumbers = new LinkedHashMap<Object, Integer>();
 			}
 		}
 
@@ -412,7 +411,7 @@ public abstract class JbPlayerA<T extends PlayerAtt> extends JbBase {
 	/**
 	 * @return the propNumbers
 	 */
-	public Map<Serializable, Integer> getPropNumbers() {
+	public Map<Object, Integer> getPropNumbers() {
 		return getPlayerAtt().propNumbers;
 	}
 
@@ -420,7 +419,7 @@ public abstract class JbPlayerA<T extends PlayerAtt> extends JbBase {
 	 * @param propNumbers
 	 *            the propNumbers to set
 	 */
-	public void setPropNumbers(Map<Serializable, Integer> propNumbers) {
+	public void setPropNumbers(Map<Object, Integer> propNumbers) {
 		getPlayerAtt().propNumbers = propNumbers;
 	}
 

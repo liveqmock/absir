@@ -56,7 +56,11 @@ public class XlsAccessorUtils {
 		if (hssfCell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
 			double value = hssfCell.getNumericCellValue();
 			int intValue = (int) value;
-			return intValue == value ? intValue : value;
+			if (value == intValue) {
+				return intValue;
+			}
+
+			return value;
 		}
 
 		if (hssfCell.getCellType() == Cell.CELL_TYPE_BOOLEAN) {

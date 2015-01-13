@@ -1357,8 +1357,8 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 * @param force
 	 * @return
 	 */
-	public Object modifyProp(String propId, int size, boolean force) {
-		IPropDefine propDefine = COMPONENT.getPropDefine(propId);
+	public Object modifyProp(Serializable propId, int size, boolean force) {
+		IPropDefine propDefine = COMPONENT.getPropDefine(propId.toString());
 		if (propDefine != null) {
 			return modifyProp(propDefine, size, force);
 		}

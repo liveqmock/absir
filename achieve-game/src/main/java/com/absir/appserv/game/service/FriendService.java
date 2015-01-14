@@ -47,7 +47,7 @@ public abstract class FriendService {
 	 * @param jdbcPage
 	 * @return
 	 */
-	@DataQuery(value = "SELECT o FROM JFriend o WHERE (o.id.eid = :p0 OR o.id.mid = :p0) AND o.accord = " + ACCORD_SUCCESS + " @ ORDER BY o.encouraging DESC, o.encouragingTime DESC")
+	@DataQuery(value = "SELECT o FROM JFriend o WHERE (o.id.eid = :p0 OR o.id.mid = :p0) AND o.accord = " + ACCORD_SUCCESS)
 	protected abstract List<JbFriend> getFriends(Long playerId, JdbcPage jdbcPage);
 
 	/**
@@ -87,7 +87,7 @@ public abstract class FriendService {
 	 * @return
 	 */
 	@Transaction(readOnly = true)
-	@DataQuery(value = "SELECT o FROM JFriend o WHERE (o.id.eid = :p0 OR o.id.mid = :p0) AND o.accord != " + ACCORD_SUCCESS + " @ ORDER BY o.encouraging DESC, o.encouragingTime DESC")
+	@DataQuery(value = "SELECT o FROM JFriend o WHERE (o.id.eid = :p0 OR o.id.mid = :p0) AND o.accord != " + ACCORD_SUCCESS)
 	public abstract List<JbFriend> getFriendings(Long playerId, JdbcPage jdbcPage);
 
 	/**

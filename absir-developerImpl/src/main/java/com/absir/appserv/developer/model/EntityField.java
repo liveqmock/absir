@@ -31,6 +31,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
+import com.absir.appserv.crud.CrudEntity;
 import com.absir.appserv.crud.CrudUtils;
 import com.absir.appserv.crud.ICrudSupply;
 import com.absir.appserv.developer.editor.EditorObject;
@@ -38,7 +39,6 @@ import com.absir.appserv.developer.editor.EditorSupply;
 import com.absir.appserv.lang.value.Langs;
 import com.absir.appserv.support.developer.IField;
 import com.absir.appserv.support.developer.JCrud;
-import com.absir.appserv.system.bean.value.JaCrud;
 import com.absir.appserv.system.bean.value.JaCrud.Crud;
 import com.absir.appserv.system.bean.value.JaEdit;
 import com.absir.appserv.system.bean.value.JaEmbedd;
@@ -115,7 +115,7 @@ public class EntityField extends DBField {
 			accessor = property.getAccessor();
 			ElementCollection elementCollection = accessor.getAnnotation(ElementCollection.class, true);
 			if (elementCollection != null) {
-				crudField.setCruds(JaCrud.ALL);
+				crudField.setCruds(CrudEntity.ALL);
 				break;
 			}
 
@@ -313,7 +313,7 @@ public class EntityField extends DBField {
 
 		// embedd curd select selects
 		if (embedd) {
-			crudField.setCruds(JaCrud.ALL);
+			crudField.setCruds(CrudEntity.ALL);
 
 		} else {
 			if (Map.class.isAssignableFrom(fieldType)) {
@@ -321,14 +321,14 @@ public class EntityField extends DBField {
 					types.add(referenceCrudKey ? "select" : "iselect");
 
 				} else if (referenceCrudKey) {
-					crudField.setCruds(JaCrud.ALL);
+					crudField.setCruds(CrudEntity.ALL);
 				}
 
 				if (valueEntityName != null) {
 					valueField.getTypes().add(referenceCrud ? "select" : "iselect");
 
 				} else if (referenceCrud) {
-					crudField.setCruds(JaCrud.ALL);
+					crudField.setCruds(CrudEntity.ALL);
 				}
 
 			} else if (Collection.class.isAssignableFrom(fieldType)) {
@@ -336,7 +336,7 @@ public class EntityField extends DBField {
 					types.add(referenceCrud ? "selects" : "iselect");
 
 				} else if (referenceCrud) {
-					crudField.setCruds(JaCrud.ALL);
+					crudField.setCruds(CrudEntity.ALL);
 				}
 
 			} else {
@@ -403,14 +403,14 @@ public class EntityField extends DBField {
 	 */
 	protected void setCrudCascadeTypes(CascadeType[] cascadeTypes) {
 		if (cascadeTypes == null) {
-			crudField.setCruds(JaCrud.ALL);
+			crudField.setCruds(CrudEntity.ALL);
 			return;
 		}
 
 		Set<Crud> cruds = new HashSet<Crud>();
 		for (CascadeType cascadeType : cascadeTypes) {
 			if (cascadeType == CascadeType.ALL) {
-				crudField.setCruds(JaCrud.ALL);
+				crudField.setCruds(CrudEntity.ALL);
 				return;
 
 			} else if (cascadeType == CascadeType.PERSIST) {
@@ -562,7 +562,7 @@ public class EntityField extends DBField {
 							if (curdField.getCrudField().getjCrud() == null) {
 								if (LangBundle.ME.isI18n() && property.getAccessor().getAnnotation(Langs.class, true) != null) {
 									JCrud jCrud = new JCrud();
-									jCrud.setJaCrud(null, BeanCrudFactory.class, KernelLang.NULL_OBJECTS, JaCrud.ALL);
+									jCrud.setJaCrud(null, BeanCrudFactory.class, KernelLang.NULL_OBJECTS, CrudEntity.ALL);
 									curdField.getCrudField().setjCrud(jCrud);
 								}
 							}

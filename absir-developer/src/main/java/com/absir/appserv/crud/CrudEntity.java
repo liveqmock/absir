@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.absir.appserv.crud.value.ICrudBean;
+import com.absir.appserv.system.bean.value.JaCrud;
 import com.absir.orm.value.JoEntity;
 
 /**
@@ -19,6 +20,9 @@ import com.absir.orm.value.JoEntity;
  * 
  */
 public class CrudEntity {
+
+	/** ALL */
+	public static final JaCrud.Crud[] ALL = new JaCrud.Crud[] { JaCrud.Crud.CREATE, JaCrud.Crud.UPDATE, JaCrud.Crud.DELETE };
 
 	/** joEntity */
 	protected JoEntity joEntity;

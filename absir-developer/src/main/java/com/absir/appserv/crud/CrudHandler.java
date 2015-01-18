@@ -186,7 +186,7 @@ public abstract class CrudHandler {
 		public boolean isSupport(Crud crud, CrudProperty crudProperty) {
 			if (filter.allow(crudProperty.getInclude(), crudProperty.getExclude()) && isSupport(crudProperty)) {
 				Crud[] cruds = crudProperty.getjCrud().getCruds();
-				if (cruds == JaCrud.ALL || KernelArray.contain(cruds, crud)) {
+				if (cruds == CrudEntity.ALL || KernelArray.contain(cruds, crud)) {
 					return true;
 				}
 			}

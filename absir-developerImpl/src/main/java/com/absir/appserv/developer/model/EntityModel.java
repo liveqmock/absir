@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.absir.appserv.crud.CrudEntity;
 import com.absir.appserv.support.developer.IField;
 import com.absir.appserv.support.developer.IModel;
 import com.absir.appserv.support.developer.JCrud;
@@ -156,7 +157,7 @@ public class EntityModel implements IModel {
 		if (!beanJaCruded) {
 			beanJaCruded = true;
 			JCrud beanCrud = new JCrud();
-			beanCrud.setJaCrud(null, BeanCrudFactory.class, KernelLang.NULL_OBJECTS, JaCrud.ALL);
+			beanCrud.setJaCrud(null, BeanCrudFactory.class, KernelLang.NULL_OBJECTS, CrudEntity.ALL);
 		}
 	}
 

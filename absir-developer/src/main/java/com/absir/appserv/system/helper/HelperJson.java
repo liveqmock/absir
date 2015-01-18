@@ -79,6 +79,10 @@ public class HelperJson {
 	 * @throws IOException
 	 */
 	public static String encode(Object obj) throws IOException {
+		if (obj == null) {
+			return null;
+		}
+
 		ObjectWriter writer = OBJECT_MAPPER.writer();
 		return writer.writeValueAsString(obj);
 	}
@@ -308,6 +312,10 @@ public class HelperJson {
 	 * @return
 	 */
 	public static <T> T decodeBase64Json(String string, Class<T> toClass) {
+		if (string == null) {
+			return null;
+		}
+
 		try {
 			return decode(decodeBase64String(string), toClass);
 
@@ -327,6 +335,10 @@ public class HelperJson {
 	 * @return
 	 */
 	public static <T> T decodeBase64Json(String string, Type toType) {
+		if (string == null) {
+			return null;
+		}
+
 		try {
 			return decode(decodeBase64String(string), toType);
 

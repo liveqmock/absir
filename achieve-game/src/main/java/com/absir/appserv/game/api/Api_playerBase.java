@@ -196,8 +196,8 @@ public abstract class Api_playerBase extends PlayerServer {
 	 */
 	public static class Arenas {
 
-		/** arean */
-		public int arean;
+		/** arena */
+		public int arena;
 
 		/** players */
 		public List<JbPlayer> players;
@@ -208,7 +208,7 @@ public abstract class Api_playerBase extends PlayerServer {
 	public Arenas arenas(@Attribute JbPlayerContext playerContext) {
 		List<JbPlayer> players = playerContext.arenas(3);
 		Arenas arenas = new Arenas();
-		arenas.arean = playerContext.getPlayer().getArena();
+		arenas.arena = playerContext.getPlayer().getArena();
 		arenas.players = players;
 		return arenas;
 	}

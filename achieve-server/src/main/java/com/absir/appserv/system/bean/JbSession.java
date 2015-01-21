@@ -13,7 +13,6 @@ import javax.persistence.MappedSuperclass;
 import com.absir.appserv.system.bean.base.JbVerifier;
 import com.absir.appserv.system.bean.value.JaEdit;
 import com.absir.appserv.system.bean.value.JaLang;
-import com.absir.appserv.system.bean.value.JaName;
 
 /**
  * @author absir
@@ -24,7 +23,6 @@ public abstract class JbSession extends JbVerifier {
 
 	@JaEdit(groups = JaEdit.GROUP_LIST)
 	@JaLang("用户编号")
-	@JaName("JUser")
 	private Long userId;
 
 	@JaEdit(groups = JaEdit.GROUP_LIST)

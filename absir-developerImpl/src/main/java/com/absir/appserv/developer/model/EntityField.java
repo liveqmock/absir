@@ -42,6 +42,7 @@ import com.absir.appserv.support.developer.JCrud;
 import com.absir.appserv.system.bean.value.JaCrud.Crud;
 import com.absir.appserv.system.bean.value.JaEdit;
 import com.absir.appserv.system.bean.value.JaEmbedd;
+import com.absir.appserv.system.bean.value.JaName;
 import com.absir.appserv.system.bean.value.JeEditable;
 import com.absir.appserv.system.crud.BeanCrudFactory;
 import com.absir.appserv.system.helper.HelperJson;
@@ -62,6 +63,8 @@ import com.absir.core.util.UtilAccessor.Accessor;
 import com.absir.core.util.UtilAnnotation;
 import com.absir.orm.hibernate.SessionFactoryUtils;
 import com.absir.orm.hibernate.boost.EntityAssoc.EntityAssocEntity;
+import com.absir.orm.value.JaClasses;
+import com.absir.orm.value.JaNames;
 import com.absir.orm.value.JiAssoc;
 import com.absir.orm.value.JiRelation;
 import com.absir.orm.value.JoEntity;
@@ -158,8 +161,10 @@ public class EntityField extends DBField {
 		Class<?> fieldType = property.getType();
 		Class[] componentClasses = property.getGenericType() == null ? KernelClass.componentClasses(fieldType) : KernelClass.componentClasses(property.getGenericType());
 		entityName = SessionFactoryUtils.getEntityNameNull(componentClasses[0]);
+		boolean mapped = false;
 		if (!typeFieldType(fieldType)) {
 			if (Map.class.isAssignableFrom(fieldType)) {
+				mapped = true;
 				canOrder = false;
 				if (targetEntity != null && targetEntity != void.class) {
 					componentClasses[1] = targetEntity;
@@ -255,6 +260,48 @@ public class EntityField extends DBField {
 						types.remove(0);
 					}
 				}
+			}
+		}
+
+		// set JaName JaNames JaClasses
+		JaName jaName = property.getAccessor().getAnnotation(JaName.class, true);
+		if (jaName != null) {
+			if (!KernelString.isEmpty(jaName.value())) {
+				entityName = jaName.value();
+			}
+
+		} else {
+			JaNames jaNames = property.getAccessor().getAnnotation(JaNames.class, true);
+			if (jaNames != null) {
+				if (!KernelString.isEmpty(jaNames.key())) {
+					entityName = jaNames.key();
+				}
+
+				if (!KernelString.isEmpty(jaNames.value())) {
+					valueEntityName = jaNames.value();
+				}
+
+			} else {
+				JaClasses jaClasses = property.getAccessor().getAnnotation(JaClasses.class, true);
+				String classEntityName = jaClasses.key() == void.class ? null : SessionFactoryUtils.getEntityNameNull(jaClasses.key());
+				if (!KernelString.isEmpty(classEntityName)) {
+					entityName = classEntityName;
+				}
+
+				classEntityName = jaClasses.value() == void.class ? null : SessionFactoryUtils.getEntityNameNull(jaClasses.value());
+				if (!KernelString.isEmpty(classEntityName)) {
+					valueEntityName = classEntityName;
+				}
+			}
+		}
+
+		if (mapped) {
+			if (crudField.getKeyJoEntity() == null && !KernelString.isEmpty(entityName)) {
+				crudField.setKeyJoEntity(new JoEntity(entityName, null));
+			}
+
+			if (crudField.getJoEntity() == null && !KernelString.isEmpty(valueEntityName)) {
+				crudField.setJoEntity(new JoEntity(valueEntityName, null));
 			}
 		}
 

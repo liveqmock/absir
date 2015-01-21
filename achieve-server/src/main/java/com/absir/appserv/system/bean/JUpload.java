@@ -51,7 +51,7 @@ public class JUpload extends JbBean implements JiPass, ICrudBean {
 
 	@JaLang(value = "关联用户", tag = "assocUser")
 	@JaEdit(groups = JaEdit.GROUP_LIST)
-	@JaName("JUser")
+	@JaName(value = "JUser")
 	private long userId;
 
 	@JaLang("创建时间")

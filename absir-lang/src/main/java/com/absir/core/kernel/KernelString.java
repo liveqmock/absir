@@ -36,7 +36,7 @@ public abstract class KernelString {
 	 * @return
 	 */
 	public static boolean empty(String string) {
-		return "".equals(string);
+		return string.length() == 0;
 	}
 
 	/**

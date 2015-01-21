@@ -38,6 +38,7 @@ import com.absir.bean.basis.Environment;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.context.core.ContextUtils;
 import com.absir.core.kernel.KernelCharset;
+import com.absir.core.kernel.KernelString;
 
 /**
  * @author absir
@@ -184,7 +185,7 @@ public class HelperJson {
 	 * @return
 	 */
 	public static <T> T decodeNull(String string, Class<T> toClass) {
-		if (string == null) {
+		if (KernelString.isEmpty(string)) {
 			return null;
 		}
 

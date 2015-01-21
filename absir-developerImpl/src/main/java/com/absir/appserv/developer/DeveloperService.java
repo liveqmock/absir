@@ -65,6 +65,7 @@ public class DeveloperService implements IDeveloper, IDeploy {
 	@Started
 	protected static void postConstruct() {
 		String deployPath = HelperFileName.normalizeNoEndSeparator(BeanFactoryUtils.getBeanConfig().getClassPath() + "/../../");
+		System.out.println("Deploy : " + deployPath);
 		for (IDeploy deploy : BeanFactoryUtils.getOrderBeanObjects(IDeploy.class)) {
 			try {
 				HelperFile.copyDirectoryOverWrite(deploy.getClass().getResource("/deploy"), new File(deployPath), false, null, true);

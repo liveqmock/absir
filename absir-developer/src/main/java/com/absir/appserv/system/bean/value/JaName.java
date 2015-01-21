@@ -26,4 +26,5 @@ public @interface JaName {
 	 * @return
 	 */
 	String value();
+
 }

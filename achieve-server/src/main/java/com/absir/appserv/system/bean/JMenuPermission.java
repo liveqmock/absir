@@ -34,12 +34,12 @@ public class JMenuPermission extends JbBase {
 	private String id;
 
 	@JaLang(value = "授权角色", tag = "allowUserRoles")
-	@JaName("JUserRole")
+	@JaName(value = "JUser")
 	@JaEdit(groups = JaEdit.GROUP_SUGGEST)
 	private long allowIds[];
 
 	@JaLang(value = "禁用角色", tag = "forbidUserRoles")
-	@JaName("JUserRole")
+	@JaName(value = "JUser")
 	@JaEdit(groups = JaEdit.GROUP_SUGGEST)
 	private long forbidIds[];
 

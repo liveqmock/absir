@@ -78,6 +78,10 @@ public class UtilAccessor {
 				if (annotation == null) {
 					method = getter ? getSetter() : getGetter();
 					annotation = method == null ? null : method.getAnnotation(annotationClass);
+					if (annotation == null && !getter) {
+						method = getSetter();
+						annotation = method == null ? null : method.getAnnotation(annotationClass);
+					}
 				}
 			}
 

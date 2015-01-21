@@ -160,9 +160,7 @@ public abstract class ArenaService {
 	 * 竞技场发奖
 	 */
 	@Transaction
-	@InjectOrder(value = -1)
 	@Schedule(cron = "0 0 0 * * *")
-	@Stopping
 	public void rewardArenas() {
 		XlsDao<IArenaDefine, Serializable> arenaDefineDao = JbPlayerContext.COMPONENT.getArenaDefineDao();
 		if (arenaDefineDao != null) {
@@ -180,8 +178,10 @@ public abstract class ArenaService {
 								maxArena = Integer.MAX_VALUE;
 							}
 
-							for (List<Object> arenas : findIdArenas(arenaBase.serverId, minArena, maxArena)) {
-								doArenaReward((Long) arenas.get(0), (Integer) arenas.get(1), arenaDefine);
+							if (arenaDefine.getReward() != null) {
+								for (List<Object> arenas : findIdArenas(arenaBase.serverId, minArena, maxArena)) {
+									doArenaReward((Long) arenas.get(0), (Integer) arenas.get(1), arenaDefine);
+								}
 							}
 
 							if (maxArena == Integer.MAX_VALUE) {

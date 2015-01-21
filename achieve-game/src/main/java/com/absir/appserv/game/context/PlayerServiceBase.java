@@ -72,7 +72,7 @@ public abstract class PlayerServiceBase {
 	 */
 	@Transaction(readOnly = true)
 	protected JPlatformUser getPlatformUser(JiUserBase userBase) {
-		return ME.findByPlatformUsername(",", userBase.getUsername());
+		return ME.findByPlatformUsername("JUser", userBase.getUsername());
 	}
 
 	/**
@@ -82,7 +82,7 @@ public abstract class PlayerServiceBase {
 	 * @return
 	 */
 	@Transaction
-	protected JPlatformUser createPlatformUser(JiUserBase userBase) {
+	public JPlatformUser createPlatformUser(JiUserBase userBase) {
 		JPlatformUser platformUser = new JPlatformUser();
 		platformUser.setPlatform(",");
 		platformUser.setUsername(userBase.getUsername());
@@ -429,7 +429,7 @@ public abstract class PlayerServiceBase {
 		playerReward.setType(type);
 		playerReward.setData(data);
 		processPlayerReward(playerReward);
-		BeanDao.getSession().merge(playerReward);
+		BeanDao.getSession().persist(playerReward);
 		JbPlayerContext playerContext = JbPlayerContext.COMPONENT.find(playerId);
 		if (playerContext != null) {
 			playerContext.modifyRewardNumber(1);

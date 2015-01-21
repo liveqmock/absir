@@ -150,6 +150,15 @@ public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayer, 
 	}
 
 	/**
+	 * 保存所有玩家数据
+	 */
+	public void saveAllPlayerContext() {
+		for (JbPlayerContext playerContext : PLAYER_CONTEXT_MAP.values()) {
+			playerContext.uninitialize();
+		}
+	}
+
+	/**
 	 * @return the cardDefineDao
 	 */
 	public XlsDao<CD, Serializable> getCardDefineDao() {

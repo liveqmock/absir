@@ -159,7 +159,7 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 	 */
 	public Object getParameterValue(IServerResolverBody body, OnPut onPut, Object parameter, Class<?> parameterType, String beanName, RouteMethod routeMethod) throws Exception {
 		// TODO Auto-generated method stub
-		if (parameter.getClass() == Result.class) {
+		if (parameter instanceof Result) {
 			Object bodyObject = onPut.getInput().getAttribute(BODY_OBJECT_NAME);
 			if (bodyObject == null) {
 				bodyObject = body.getBodyParameterValue(onPut, 0, Object.class, null, routeMethod);

@@ -283,14 +283,16 @@ public class EntityField extends DBField {
 
 			} else {
 				JaClasses jaClasses = property.getAccessor().getAnnotation(JaClasses.class, true);
-				String classEntityName = jaClasses.key() == void.class ? null : SessionFactoryUtils.getEntityNameNull(jaClasses.key());
-				if (!KernelString.isEmpty(classEntityName)) {
-					entityName = classEntityName;
-				}
+				if (jaClasses != null) {
+					String classEntityName = jaClasses.key() == void.class ? null : SessionFactoryUtils.getEntityNameNull(jaClasses.key());
+					if (!KernelString.isEmpty(classEntityName)) {
+						entityName = classEntityName;
+					}
 
-				classEntityName = jaClasses.value() == void.class ? null : SessionFactoryUtils.getEntityNameNull(jaClasses.value());
-				if (!KernelString.isEmpty(classEntityName)) {
-					valueEntityName = classEntityName;
+					classEntityName = jaClasses.value() == void.class ? null : SessionFactoryUtils.getEntityNameNull(jaClasses.value());
+					if (!KernelString.isEmpty(classEntityName)) {
+						valueEntityName = classEntityName;
+					}
 				}
 			}
 		}
@@ -363,7 +365,7 @@ public class EntityField extends DBField {
 			crudField.setCruds(CrudEntity.ALL);
 
 		} else {
-			if (Map.class.isAssignableFrom(fieldType)) {
+			if (mapped) {
 				if (entityName != null) {
 					types.add(referenceCrudKey ? "select" : "iselect");
 

@@ -30,7 +30,7 @@ import com.absir.orm.value.JaColum;
 public class JPayTrade extends JbBase {
 
 	/** id */
-	@JaLang("订单号")
+	@JaLang(value = "订单号", tag = "tradeId")
 	@Id
 	private String id;
 
@@ -40,42 +40,43 @@ public class JPayTrade extends JbBase {
 	private long createTime = ContextUtils.getContextTime();
 
 	/** uid */
-	@JaLang("用户名")
+	@JaLang(value = "用户", tag = "user")
 	@JaEdit(groups = JaEdit.GROUP_LIST)
 	private String uid;
 
 	/** name */
-	@JaLang("商品类名")
+	@JaLang(value = "商品名", tag = "goodsName")
 	@JaEdit(groups = JaEdit.GROUP_LIST)
 	private String name;
 
-	@JaLang("商品参数")
+	/** nameData */
+	@JaLang(value = "商品参数", tag = "goodsData")
 	@JaEdit(groups = JaEdit.GROUP_LIST)
 	private String nameData;
 
 	/** amount */
-	@JaLang("支付总金额")
+	@JaLang("金额")
 	@JaEdit(groups = JaEdit.GROUP_LIST)
 	private float amount;
 
 	/** status */
-	@JaLang("交易状态")
+	@JaLang(value = "交易状态", tag = "tradeStatus")
 	@JaEdit(groups = JaEdit.GROUP_LIST)
 	@JaColum(indexs = @Index(columnList = ""))
 	private JePayStatus status;
 
-	/** orderNo */
-	@JaLang("支付订单号")
+	/** tradeNo */
+	@JaLang("交易号")
 	@Column(length = 1024)
 	private String tradeNo;
 
 	/** platform */
-	@JaLang("平台名称")
+	@JaLang(value = "平台名称", tag = "platformName")
 	@JaEdit(groups = JaEdit.GROUP_LIST)
 	private String platform;
 
 	/** platformData */
-	@JaLang("平台支付参数")
+	@JaLang("平台参数")
 	private String platformData;
 
 	/**

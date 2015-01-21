@@ -26,12 +26,12 @@ import com.absir.context.core.ContextUtils;
 @Entity
 public class JPayHistory extends JbBase {
 
-	@JaLang("订单号")
+	@JaLang(value = "订单号", tag = "tradeId")
 	@Id
 	private String id;
 
 	/** id */
-	@JaLang("支付订单号")
+	@JaLang("交易号")
 	@Column(length = 1024, unique = true)
 	private String tradeNo;
 

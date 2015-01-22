@@ -463,7 +463,7 @@ public class Admin_entity extends AdminServer {
 	 * @param input
 	 */
 	@Mapping(method = InMethod.POST)
-	public void lookup(String entityName, @Body JdbcPage jdbcPage, Input input) {
+	public void lookup(String entityName, @Binder JdbcPage jdbcPage, Input input) {
 		ICrudSupply crudSupply = getCrudSupply(entityName, input);
 		suggest(entityName, crudSupply, input);
 		JdbcCondition jdbcCondition = AccessServiceUtils.suggestCondition(entityName, SecurityService.ME.getUserBase(input),

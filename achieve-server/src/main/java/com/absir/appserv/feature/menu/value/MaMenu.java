@@ -28,4 +28,9 @@ public @interface MaMenu {
 	 */
 	String ref() default "";
 
+	/**
+	 * @return
+	 */
+	String icon() default "";
+
 }

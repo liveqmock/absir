@@ -64,6 +64,10 @@ public class JMenu extends JbBean implements IMenuBean, JiTree<JMenu> {
 	@JaLang("链接类型")
 	private MeUrlType urlType;
 
+	@JaLang("图标")
+	@JaEdit(types = "icon", metas = "{type:menu}")
+	private String icon;
+
 	@JaLang(value = "子级菜单", tag = "subMenu")
 	@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 	@OneToMany(mappedBy = "parent")
@@ -174,6 +178,21 @@ public class JMenu extends JbBean implements IMenuBean, JiTree<JMenu> {
 	 */
 	public void setUrlType(MeUrlType urlType) {
 		this.urlType = urlType;
+	}
+
+	/**
+	 * @return the icon
+	 */
+	public String getIcon() {
+		return icon;
+	}
+
+	/**
+	 * @param icon
+	 *            the icon to set
+	 */
+	public void setIcon(String icon) {
+		this.icon = icon;
 	}
 
 	/**

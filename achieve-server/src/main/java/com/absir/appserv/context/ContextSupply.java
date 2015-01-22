@@ -32,7 +32,7 @@ import com.absir.core.base.IBase;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 @Bean
 @Basis
-@MaSupply(folder = "功能管理")
+@MaSupply(folder = "功能管理", icon = "feature")
 public class ContextSupply extends CrudSupply<Context> {
 
 	/** entityNameMapIdType */

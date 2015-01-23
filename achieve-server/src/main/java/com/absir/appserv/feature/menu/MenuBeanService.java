@@ -234,7 +234,10 @@ public class MenuBeanService {
 			if (menu == null) {
 				menu = menuBean;
 				menu.setParent(parent);
-				menu.setUrlType(urlType);
+				if (menu.getUrlType() == null) {
+					menu.setUrlType(urlType);
+				}
+
 				session.persist(menu);
 			}
 

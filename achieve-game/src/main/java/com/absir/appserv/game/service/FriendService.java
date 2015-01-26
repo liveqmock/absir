@@ -112,6 +112,8 @@ public abstract class FriendService {
 	 * 搜索玩家
 	 * 
 	 * @param playerId
+	 * @param serverId
+	 * @param name
 	 * @param jdbcPage
 	 * @return
 	 */
@@ -124,6 +126,7 @@ public abstract class FriendService {
 	 * @param jdbcPage
 	 * @return
 	 */
+	@Transaction(readOnly = true)
 	public Object searchFriends(JbPlayer player, String name, JdbcPage jdbcPage) {
 		return searchPlayers(player.getId(), player.getServerId(), '%' + name + '%', jdbcPage);
 	}

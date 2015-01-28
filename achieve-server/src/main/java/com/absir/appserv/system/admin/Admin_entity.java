@@ -85,21 +85,12 @@ public class Admin_entity extends AdminServer {
 	}
 
 	/**
-	 * @param entityName
-	 * @param input
-	 */
-	public void list(String entityName, Input input) {
-		list(entityName, null, input);
-	}
-
-	/**
 	 * 列表页面
 	 * 
 	 * @param entityName
 	 * @param jdbcPage
 	 * @param input
 	 */
-	@Mapping(method = InMethod.POST)
 	public void list(String entityName, @Binder JdbcPage jdbcPage, Input input) {
 		ICrudSupply crudSupply = getCrudSupply(entityName, input);
 		if (!crudSupply.support(Crud.COMPLETE)) {

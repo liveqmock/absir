@@ -14,6 +14,7 @@ import javax.script.ScriptException;
 import org.junit.Test;
 
 import com.absir.core.kernel.KernelObject;
+import com.absir.orm.hibernate.boost.IEntityMerge;
 import com.absir.system.test.AbstractTest;
 
 /**
@@ -163,7 +164,10 @@ public class TestMethod extends AbstractTest {
 
 	@Test
 	public void main() throws IOException, ScriptException, NoSuchMethodException {
-		KernelObject.declaredSend(this, "test", "abc", null, 1, null);
+		
+		//IEntityMerge<T>
+
+		// System.out.println(TI.class.getGenericSuperclass());
 
 		// System.out.println(DynaBinder.to("name", List.class));
 		// System.out.println(DynaBinder.to("name", String[].class));

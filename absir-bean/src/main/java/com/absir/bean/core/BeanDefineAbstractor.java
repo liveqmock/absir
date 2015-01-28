@@ -93,7 +93,10 @@ public abstract class BeanDefineAbstractor extends BeanDefineAbstract {
 		}
 
 		if (beanDefine != beanDefineWrapper) {
-			((BeanFactoryImpl) beanFactory).replaceRegisteredBeanDefine(beanDefine);
+			BeanDefine registeredBeanDefine = beanFactory.getBeanDefine(beanDefineWrapper.getBeanName());
+			if (registeredBeanDefine != null && BeanFactoryImpl.containBeanDefine(registeredBeanDefine, beanDefineWrapper)) {
+				BeanFactoryImpl.getBeanFactoryImpl(beanFactory).replaceRegisteredBeanDefine(beanDefine);
+			}
 		}
 
 		beanFactory.processBeanObject(beanScope, beanDefineRoot, beanObject, beanProxy);

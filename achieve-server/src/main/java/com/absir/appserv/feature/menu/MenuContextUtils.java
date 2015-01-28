@@ -29,6 +29,7 @@ import com.absir.appserv.system.admin.AdminServer;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.helper.HelperLang;
 import com.absir.appserv.system.service.utils.SecurityServiceUtils;
+import com.absir.bean.basis.Environment;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Inject;
@@ -94,7 +95,7 @@ public abstract class MenuContextUtils {
 			servletContext.setAttribute("site_route", Site_Route);
 			servletContext.setAttribute("admin_route", Admin_Route);
 
-			if (Developer.isDeveloper()) {
+			if (BeanFactoryUtils.getEnvironment() == Environment.DEVELOP) {
 				// 初始化菜单
 				MenuBeanRoot menuBeanRoot = new MenuBeanRoot();
 				// 扫瞄后台菜单

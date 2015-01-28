@@ -105,10 +105,7 @@ public class Admin_login extends AdminServer {
 				return "admin/login.failed";
 			}
 
-			if (e.getServerStatus() == ServerStatus.NO_USER) {
-				input.getModel().put("user", e.getExceptionData());
-			}
-
+			input.getModel().put("error", e.getExceptionData());
 			return "admin/login";
 		}
 

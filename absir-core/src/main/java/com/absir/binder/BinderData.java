@@ -231,6 +231,62 @@ public class BinderData extends DynaBinder {
 	}
 
 	/**
+	 * @param array
+	 * @param name
+	 * @param toClass
+	 * @return
+	 */
+	public <T> T arrayBind(Object[] array, String name, Class<T> toClass) {
+		T toObject = newInstance(toClass);
+		arrayBind(array, toObject);
+		return toObject;
+	}
+
+	/**
+	 * @param array
+	 * @param toObject
+	 */
+	public void arrayBind(Object[] array, Object toObject) {
+		if (array == null) {
+			return;
+		}
+
+		if (toObject != null) {
+			Map<String, PropertyData> propertyDatas = binderSupply.getPropertyMap(toObject.getClass());
+			if (binderResult.isValidation()) {
+				validatorSupply.getPropertyMap(toObject.getClass());
+			}
+
+			int index = 0;
+			int length = array.length;
+			if (propertyDatas != null && !propertyDatas.isEmpty()) {
+				String propertyPath = binderResult.getPropertyPath();
+				String propertyPrefix = "".equals(propertyPath) ? "" : (propertyPath + '.');
+				for (Entry<String, PropertyData> entry : propertyDatas.entrySet()) {
+					if (index >= length) {
+						return;
+					}
+
+					PropertyData propertyData = entry.getValue();
+					Property property = propertyData.getProperty();
+					if (property.getAllow() <= 0 && property.allow(binderResult.getGroup())) {
+						String name = entry.getKey();
+						Object value = array[index++];
+						binderResult.setPropertyPath(propertyPrefix + name);
+						if (!binderResult.allowPropertyPath()) {
+							continue;
+						}
+
+						bindValue(value, propertyData, property, toObject);
+					}
+				}
+
+				binderResult.setPropertyPath(propertyPath);
+			}
+		}
+	}
+
+	/**
 	 * @param value
 	 * @param propertyData
 	 * @param property

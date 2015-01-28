@@ -68,6 +68,9 @@ import com.absir.server.value.UrlDecode;
 @Bean
 public class RouteFactory implements IBeanDefineSupply, IBeanFactoryAware, IMethodEntry<Object> {
 
+	/** ME */
+	public static final RouteFactory ME = BeanFactoryUtils.get(RouteFactory.class);
+
 	@Inject
 	RouteMapping routeMapping;
 

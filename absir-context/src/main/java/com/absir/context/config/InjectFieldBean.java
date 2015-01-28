@@ -13,8 +13,8 @@ import java.lang.reflect.Type;
 
 import com.absir.bean.basis.BeanDefine;
 import com.absir.bean.basis.BeanFactory;
-import com.absir.bean.basis.ParamName;
 import com.absir.bean.basis.Environment;
+import com.absir.bean.basis.ParamName;
 import com.absir.bean.core.BeanDefineDiscover;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.InjectInvoker;
@@ -88,8 +88,7 @@ public class InjectFieldBean extends InjectInvoker {
 
 		try {
 			if (beanDefine instanceof BeanDefineReference) {
-				Object value = parameterType == null ? beanFactory.getBeanObject(beanDefine.getBeanName(), parameterClass, ((BeanDefineReference) beanDefine).isRequired()) : beanFactory
-						.getBeanObject(beanDefine.getBeanName(), parameterType, ((BeanDefineReference) beanDefine).isRequired());
+				Object value = ((BeanDefineReference) beanDefine).getBeanReference(beanFactory, paramName, parameterType == null ? parameterClass : parameterType);
 				if (value != null) {
 					accessor.set(beanObject, value);
 				}

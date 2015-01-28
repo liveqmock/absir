@@ -13,7 +13,9 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.absir.bean.basis.Base;
+import com.absir.bean.basis.BeanFactory;
 import com.absir.bean.basis.Environment;
+import com.absir.bean.config.IBeanFactoryStarted;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
 import com.absir.core.kernel.KernelUtil;
@@ -28,10 +30,28 @@ import com.absir.server.in.InModel;
  */
 @Base
 @Bean
-public class RouteAdapter {
+public class RouteAdapter implements IBeanFactoryStarted {
+
+	/** started */
+	private boolean started;
 
 	/** routeMatchers */
 	private final List<RouteMatcher> routeMatchers = new ArrayList<RouteMatcher>();
+
+	/**
+	 * @return the started
+	 */
+	public boolean isStarted() {
+		return started;
+	}
+
+	/**
+	 * @param started
+	 *            the started to set
+	 */
+	public void setStarted(boolean started) {
+		this.started = started;
+	}
 
 	/**
 	 * @return the routeMatchers
@@ -48,6 +68,10 @@ public class RouteAdapter {
 	 * @return
 	 */
 	public <T> Object[] route(String uri, IDispatcher<T> dispatcher, T req) {
+		if (!started) {
+			return null;
+		}
+
 		byte[] uries = uri.getBytes();
 		int length = uries.length;
 		int max = routeMatchers.size();
@@ -271,4 +295,28 @@ public class RouteAdapter {
 		}
 
 	};
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.core.kernel.KernelList.Orderable#getOrder()
+	 */
+	@Override
+	public int getOrder() {
+		// TODO Auto-generated method stub
+		return 1;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.bean.config.IBeanFactoryStarted#started(com.absir.bean.basis
+	 * .BeanFactory)
+	 */
+	@Override
+	public void started(BeanFactory beanFactory) {
+		// TODO Auto-generated method stub
+		started = true;
+	}
 }

@@ -38,6 +38,7 @@ import com.absir.bean.config.IBeanFactorySupport;
 import com.absir.bean.config.IBeanObjectProcessor;
 import com.absir.bean.core.BeanDefineDiscover;
 import com.absir.bean.core.BeanDefineMethod;
+import com.absir.bean.core.BeanDefineObject;
 import com.absir.bean.core.BeanDefineOriginal;
 import com.absir.bean.core.BeanDefineType;
 import com.absir.bean.core.BeanFactoryImpl;
@@ -383,7 +384,7 @@ public class InjectBeanFactory implements IBeanFactorySupport, IBeanDefineSupply
 	public List<BeanDefine> getBeanDefines(final BeanFactoryImpl beanFactory, final Class<?> beanType, final BeanDefine beanDefine) {
 		final List<BeanDefine> beanDefines = new ArrayList<BeanDefine>();
 		if (beanDefine != null) {
-			beanDefines.add(beanDefine);
+			beanDefines.add(BeanDefineObject.getBeanDefine(beanType, beanDefine));
 		}
 
 		KernelReflect.doWithDeclaredFields(beanType, new CallbackBreak<Field>() {

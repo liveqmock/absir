@@ -284,6 +284,19 @@ public class BeanFactoryWrapper implements BeanFactory {
 	 * (non-Javadoc)
 	 * 
 	 * @see
+	 * com.absir.bean.basis.BeanFactory#registerBeanDefine(com.absir.bean.basis
+	 * .BeanDefine)
+	 */
+	@Override
+	public void registerBeanDefine(BeanDefine beanDefine) {
+		// TODO Auto-generated method stub
+		beanFactory.registerBeanDefine(beanDefine);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
 	 * com.absir.bean.basis.BeanFactory#unRegisterBeanObject(java.lang.Object)
 	 */
 	@Override
@@ -340,6 +353,19 @@ public class BeanFactoryWrapper implements BeanFactory {
 	public void unRegisterWithoutBeanType(Class<?>... beanTypes) {
 		// TODO Auto-generated method stub
 		beanFactory.unRegisterWithoutBeanType(beanTypes);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.bean.basis.BeanFactory#unRegisterBeanDefine(com.absir.bean.
+	 * basis.BeanDefine)
+	 */
+	@Override
+	public void unRegisterBeanDefine(BeanDefine beanDefine) {
+		// TODO Auto-generated method stub
+		beanFactory.unRegisterBeanDefine(beanDefine);
 	}
 
 	/*

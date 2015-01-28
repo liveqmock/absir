@@ -136,21 +136,23 @@ public class InputServiceUtils {
 			List<List<Object>> metasConditions = new ArrayList<List<Object>>();
 			int size = 0;
 			for (Entry<String, String[]> entry : ((Map<String, String[]>) (Object) input.getParamMap()).entrySet()) {
-				String propertyPath = entry.getKey();
 				String value = entry.getValue()[0];
-				if (propertyPath.startsWith(".")) {
-					for (String path : propertyPath.split("\\|")) {
-						SearchServiceUtils.addSearchMetasCondition(filter, path, value, fieldMetas, metasConditions);
+				if (!KernelString.isEmpty(value)) {
+					String propertyPath = entry.getKey();
+					if (propertyPath.length() > 1 && propertyPath.charAt(0) == '.') {
+						for (String path : propertyPath.substring(1).split("\\|")) {
+							SearchServiceUtils.addSearchMetasCondition(filter, path, value, fieldMetas, metasConditions);
+						}
+
+					} else {
+						SearchServiceUtils.addSearchMetasCondition(filter, propertyPath, value, fieldMetas, metasConditions);
 					}
 
-				} else {
-					SearchServiceUtils.addSearchMetasCondition(filter, propertyPath, value, fieldMetas, metasConditions);
-				}
-
-				if (size != metasConditions.size()) {
-					size = metasConditions.size();
-					conditions.add(entry.getKey());
-					conditions.add(KernelLang.NULL_OBJECT);
+					if (size != metasConditions.size()) {
+						size = metasConditions.size();
+						conditions.add(entry.getKey());
+						conditions.add(KernelLang.NULL_OBJECT);
+					}
 				}
 			}
 

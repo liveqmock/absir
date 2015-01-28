@@ -109,6 +109,7 @@ public abstract class Api_userBase extends ApiServer {
 				PlayerServiceBase.ME.create(null, userBase, name, gender);
 
 			} catch (Throwable e) {
+				e.printStackTrace();
 				throw new ServerException(ServerStatus.ON_FAIL);
 			}
 

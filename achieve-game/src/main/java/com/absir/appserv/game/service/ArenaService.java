@@ -25,6 +25,7 @@ import com.absir.appserv.game.bean.value.IArenaDefine;
 import com.absir.appserv.game.context.JbPlayerContext;
 import com.absir.appserv.game.context.PlayerServiceBase;
 import com.absir.bean.basis.Base;
+import com.absir.bean.basis.ParamName;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.InjectOrder;
@@ -81,7 +82,7 @@ public abstract class ArenaService {
 	 */
 	@Transaction(readOnly = true)
 	@DataQuery(value = "SELECT o.id, o.arena FROM JPlayer o WHERE o.serverId = ? AND o.arena in (:arenas)", aliasType = List.class)
-	public abstract List<List<Object>> findIdArenas(Long serverId, Collection<Integer> arenas);
+	public abstract List<List<Object>> findIdArenas(Long serverId, @ParamName("arenas") Collection<Integer> arenas);
 
 	/**
 	 * 查询排名
@@ -226,6 +227,13 @@ public abstract class ArenaService {
 
 		/** idArenas */
 		protected Map<Long, Integer> idArenas = new HashMap<Long, Integer>();
+
+		/**
+		 * @return
+		 */
+		public int getMaxArena() {
+			return maxArena;
+		}
 
 		/**
 		 * 载入查询

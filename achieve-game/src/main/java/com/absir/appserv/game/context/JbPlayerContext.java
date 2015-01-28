@@ -1615,11 +1615,13 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 	 * @return
 	 */
 	public List<JbPlayer> arenas(int count) {
-		int[] areans = new int[count];
-		ArenaBase arenaBase = ArenaService.ME.getArenaBase(player.getId());
+		int[] arenas = new int[count];
+		ArenaBase arenaBase = ArenaService.ME.getArenaBase(player.getServerId());
 		arenaBase.analyze(player);
 		int arena = player.getArena();
 		int min = 0;
+		int max = arenaBase.getMaxArena() - 1;
+		int last = max - count;
 		int iArena = arena;
 		int offset = 0;
 		float fOffset = 0.5f;
@@ -1630,23 +1632,22 @@ public abstract class JbPlayerContext<C extends JbCard, P extends JbPlayer, A ex
 			offset = offset == 0 ? 1 : offset * 3;
 			arn = (int) (iArena * (fOffset + HelperRandom.RANDOM.nextFloat() * (fOffset < 1.0f && i == count ? (1.0f - fOffset) : 1.0f)));
 			fOffset += 0.1f;
-			if (arn < min) {
+			if (arn < min || arn > last++) {
 				arn = ++min;
-
-			} else {
-				if (arn == arena) {
-					arn = arena == 2 ? 1 : (arena + 1);
-				}
-
-				if (arn > min) {
-					min = arn;
-				}
 			}
 
-			areans[i] = arn;
+			if (arn == arena) {
+				arn = arena == 2 ? 1 : (arena + 1);
+			}
+
+			if (arn > min) {
+				min = arn;
+			}
+
+			arenas[i] = arn;
 		}
 
-		return arenaBase.analyzes(PlayerServiceBase.ME.findPlayers(arenaBase.arenas(0, 1, 2)));
+		return arenaBase.analyzes(PlayerServiceBase.ME.findPlayers(arenaBase.arenas(arenas)));
 	}
 
 	/**

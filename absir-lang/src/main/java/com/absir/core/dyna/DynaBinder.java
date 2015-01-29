@@ -507,6 +507,10 @@ public class DynaBinder {
 			return (T) toObject;
 
 		} else {
+			if (obj.getClass() == String.class) {
+				return to(((String) obj).split(","), name, toClass);
+			}
+
 			Object toObject = array.newInstance(1);
 			if (toObject != null) {
 				bindArrayTo(0);

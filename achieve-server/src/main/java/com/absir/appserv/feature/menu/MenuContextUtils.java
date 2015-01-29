@@ -7,7 +7,6 @@
  */
 package com.absir.appserv.feature.menu;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -21,6 +20,7 @@ import org.hibernate.SessionFactory;
 import com.absir.appserv.crud.ICrudSupply;
 import com.absir.appserv.feature.menu.value.MaEntity;
 import com.absir.appserv.feature.menu.value.MaFactory;
+import com.absir.appserv.feature.menu.value.MaMenu;
 import com.absir.appserv.feature.menu.value.MaSupply;
 import com.absir.appserv.feature.menu.value.MeUrlType;
 import com.absir.appserv.lang.LangBundleImpl;
@@ -29,6 +29,7 @@ import com.absir.appserv.system.admin.AdminServer;
 import com.absir.appserv.system.bean.proxy.JiUserBase;
 import com.absir.appserv.system.helper.HelperLang;
 import com.absir.appserv.system.service.utils.SecurityServiceUtils;
+import com.absir.bean.basis.Environment;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Inject;
@@ -94,7 +95,7 @@ public abstract class MenuContextUtils {
 			servletContext.setAttribute("site_route", Site_Route);
 			servletContext.setAttribute("admin_route", Admin_Route);
 
-			if (Developer.isDeveloper()) {
+			if (BeanFactoryUtils.getEnvironment() == Environment.DEVELOP) {
 				// 初始化菜单
 				MenuBeanRoot menuBeanRoot = new MenuBeanRoot();
 				// 扫瞄后台菜单
@@ -115,8 +116,8 @@ public abstract class MenuContextUtils {
 				for (Entry<String, Entry<Class<?>, SessionFactory>> entry : SessionFactoryUtils.get().getJpaEntityNameMapEntityClassFactory().entrySet()) {
 					Class<?> entityClass = entry.getValue().getKey();
 					if (entityClasses.add(entityClass)) {
-						addMenuBeanRoot(menuBeanRoot, entry.getKey(), entityClass, LangBundleImpl.ME.getunLang("内容管理", MenuBeanRoot.TAG), LangBundleImpl.ME.getunLang("列表", MenuBeanRoot.TAG), "list",
-								entityNames);
+						addMenuBeanRoot(menuBeanRoot, entry.getKey(), entityClass, LangBundleImpl.ME.getunLang("内容管理", MenuBeanRoot.TAG), "content",
+								LangBundleImpl.ME.getunLang("列表", MenuBeanRoot.TAG), "list", entityNames);
 					}
 				}
 
@@ -127,7 +128,7 @@ public abstract class MenuContextUtils {
 						MaSupply maSupply = KernelClass.fetchAnnotation(crudSupply.getClass(), MaSupply.class);
 						if (maSupply != null) {
 							for (Entry<String, Class<?>> entry : entityNameMapClass) {
-								addMenuBeanRoot(menuBeanRoot, entry.getKey(), entry.getValue(), maSupply.folder(), maSupply.name(), maSupply.method(), entityNames);
+								addMenuBeanRoot(menuBeanRoot, entry.getKey(), entry.getValue(), maSupply.folder(), maSupply.icon(), maSupply.name(), maSupply.method(), entityNames);
 							}
 						}
 					}
@@ -205,26 +206,38 @@ public abstract class MenuContextUtils {
 	 * 添加权限菜单
 	 * 
 	 * @param menuBeanRoot
-	 * @param rootName
+	 * @param entityName
+	 * @param entityClass
+	 * @param menuName
+	 * @param menuIcon
+	 * @param order
 	 * @param ref
 	 * @param url
-	 * @param method
-	 * @param routeType
-	 * @param parameters
-	 * @param parameterOrders
+	 * @param name
+	 * @param suffix
+	 * @param option
+	 * @param parent
+	 * @param menu
 	 */
-	public static void addMenuBeanRoot(MenuBeanRoot menuBeanRoot, String rootName, String ref, String url, Method method, Class<?> routeType, String[] parameters, int[] parameterOrders) {
-		int length = parameters == null ? 0 : parameters.length;
-		int orderLength = parameterOrders == null ? 0 : parameterOrders.length;
-		String name = length > 2 ? parameters[--length] : HelperLang.getMethodCaption(method, routeType);
-		int order = orderLength > 2 ? parameterOrders[--orderLength] : 0;
-		String folderName = length > 1 ? parameters[--length] : HelperLang.getTypeCaption(routeType);
-		int folderOrder = orderLength > 1 ? parameterOrders[--orderLength] : 0;
-		rootName = length > 0 ? parameters[--length] : rootName;
-		int rootOrder = orderLength > 0 ? parameterOrders[--orderLength] : 0;
-		menuBeanRoot = menuBeanRoot.getChildrenRoot(rootName, rootOrder, null, null, null);
-		menuBeanRoot = menuBeanRoot.getChildrenRoot(folderName, folderOrder, null, null, null);
-		menuBeanRoot = menuBeanRoot.getChildrenRoot(name, order, ref, url, KernelString.isEmpty(ref) ? null : "MENU");
+	public static void addMenuBeanRoot(MenuBeanRoot menuBeanRoot, String entityName, Class<?> entityClass, String menuName, String menuIcon, int order, String ref, String url, String name,
+			String suffix, String option, MaMenu[] parent, MaMenu menu) {
+		int length = parent == null ? 0 : parent.length;
+		int index = length - 2;
+		menuBeanRoot = menuBeanRoot.getChildrenRoot(index >= 0 ? parent[index] : null, menuName, menuIcon);
+		String entityCaption = HelperLang.getTypeCaption(entityClass, entityName);
+		menuBeanRoot = menuBeanRoot.getChildrenRoot(++index >= 0 ? parent[index] : null, entityCaption, null);
+		while (++index < length) {
+			menuBeanRoot = menuBeanRoot.getChildrenRoot(parent[index], null, null);
+		}
+
+		if (KernelString.isEmpty(url)) {
+			menuBeanRoot = menuBeanRoot.getChildrenRoot(name, order, ref, url, KernelString.isEmpty(ref) ? null : "MENU", menuIcon);
+
+		} else {
+			entityCaption = KernelString.isEmpty(name) ? entityCaption : LangBundleImpl.ME.getunLang(name, MenuBeanRoot.TAG);
+			option = LangBundleImpl.ME.getunLang(option, MenuBeanRoot.TAG);
+			menuBeanRoot.getChildrenRoot(menu, entityCaption, suffix, 0, entityName, "/entity/" + option + "/" + entityName, "ENTITY", menuIcon);
+		}
 	}
 
 	/**
@@ -234,25 +247,27 @@ public abstract class MenuContextUtils {
 	 * @param entityName
 	 * @param entityClass
 	 * @param menuName
+	 * @param menuIcon
 	 * @param suffix
 	 * @param option
 	 * @param entityNames
 	 */
-	public static void addMenuBeanRoot(MenuBeanRoot menuBeanRoot, final String entityName, Class<?> entityClass, String menuName, String suffix, String option, List<String> entityNames) {
+	public static void addMenuBeanRoot(MenuBeanRoot menuBeanRoot, final String entityName, Class<?> entityClass, String menuName, String menuIcon, String suffix, String option,
+			List<String> entityNames) {
 		String entityCaption = null;
 		MaEntity maEntity = KernelClass.fetchAnnotation(entityClass, MaEntity.class);
 		if (maEntity != null && !maEntity.closed()) {
 			entityCaption = HelperLang.getTypeCaption(entityClass, entityName);
 			int index = maEntity.parent().length - 2;
-			menuBeanRoot = menuBeanRoot.getChildrenRoot(index >= 0 ? maEntity.parent()[index] : null, menuName);
-			menuBeanRoot = menuBeanRoot.getChildrenRoot(++index >= 0 ? maEntity.parent()[index] : null, entityCaption);
+			menuBeanRoot = menuBeanRoot.getChildrenRoot(index >= 0 ? maEntity.parent()[index] : null, menuName, menuIcon);
+			menuBeanRoot = menuBeanRoot.getChildrenRoot(++index >= 0 ? maEntity.parent()[index] : null, entityCaption, null);
 			while (++index < maEntity.parent().length) {
-				menuBeanRoot = menuBeanRoot.getChildrenRoot(maEntity.parent()[index], null);
+				menuBeanRoot = menuBeanRoot.getChildrenRoot(maEntity.parent()[index], null, null);
 			}
 
 			entityCaption = KernelString.isEmpty(maEntity.name()) ? entityCaption : LangBundleImpl.ME.getunLang(maEntity.name(), MenuBeanRoot.TAG);
 			option = LangBundleImpl.ME.getunLang(option, MenuBeanRoot.TAG);
-			menuBeanRoot.getChildrenRoot(maEntity.value(), entityCaption, suffix, 0, entityName, "/entity/" + option + "/" + entityName, "ENTITY");
+			menuBeanRoot.getChildrenRoot(maEntity.value(), entityCaption, suffix, 0, entityName, "/entity/" + option + "/" + entityName, "ENTITY", null);
 		}
 
 		// 添加实体权限控制

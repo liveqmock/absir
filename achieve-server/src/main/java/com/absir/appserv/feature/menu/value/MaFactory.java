@@ -36,10 +36,10 @@ public @interface MaFactory {
 	/**
 	 * @return
 	 */
-	String[] parameters() default {};
+	MaMenu[] parent() default {};
 
 	/**
 	 * @return
 	 */
-	int[] parameterOrders() default {};
+	MaMenu menu() default @MaMenu;
 }

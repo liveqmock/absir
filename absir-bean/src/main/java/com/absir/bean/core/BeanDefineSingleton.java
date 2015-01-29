@@ -31,7 +31,7 @@ public class BeanDefineSingleton extends BeanDefineAbstract {
 	 * @param beanObject
 	 */
 	public BeanDefineSingleton(String beanName, Object beanObject) {
-		this.beanName = BeanDefineType.getBeanName(beanName, beanObject.getClass());
+		this.beanName = beanObject == null ? beanName : BeanDefineType.getBeanName(beanName, beanObject.getClass());
 		this.beanObject = beanObject;
 	}
 

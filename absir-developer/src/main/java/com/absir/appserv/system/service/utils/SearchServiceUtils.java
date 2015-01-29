@@ -7,6 +7,7 @@
  */
 package com.absir.appserv.system.service.utils;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -19,6 +20,7 @@ import com.absir.appserv.system.service.BeanService;
 import com.absir.core.dyna.DynaBinder;
 import com.absir.core.kernel.KernelCollection;
 import com.absir.core.kernel.KernelDyna;
+import com.absir.core.kernel.KernelLang;
 import com.absir.core.kernel.KernelLang.PropertyFilter;
 import com.absir.core.kernel.KernelString;
 import com.absir.orm.hibernate.SessionFactoryUtils;
@@ -68,13 +70,7 @@ public abstract class SearchServiceUtils {
 	 * @param metasConditions
 	 */
 	public static void addSearchMetasCondition(PropertyFilter filter, String propertyExpression, Object propertyValue, Map<String, Object[]> fieldMetas, List<List<Object>> metasConditions) {
-		if (propertyValue == null) {
-			return;
-
-		} else if (propertyValue instanceof String && "".equals(propertyValue)) {
-			return;
-
-		} else if (propertyValue instanceof String[] && (((String[]) propertyValue).length == 0 || KernelString.isEmpty(((String[]) propertyValue)[0]))) {
+		if (propertyValue != null && propertyValue.getClass().isArray() && Array.getLength(propertyValue) == 0) {
 			return;
 		}
 
@@ -163,12 +159,27 @@ public abstract class SearchServiceUtils {
 		String alias = jdbcCondition.getAlias();
 		List<Object> searchConditions = jdbcCondition.getConditions();
 		Class<?> fieldType = (Class<?>) metas[0];
-		if (String.class.isAssignableFrom(fieldType)) {
+		if (propertyValue == null || propertyValue == KernelLang.NULL_OBJECT) {
+			if (expression) {
+				searchConditions.add(alias + '.' + propertyName);
+
+			} else {
+				searchConditions.add(alias + '.' + propertyName + " IS NULL");
+			}
+
+			searchConditions.add(KernelLang.NULL_OBJECT);
+
+		} else if (String.class.isAssignableFrom(fieldType)) {
 			propertyValue = KernelDyna.to(propertyValue instanceof Object[] ? ((Object[]) propertyValue)[0] : propertyValue, String.class);
 			searchConditions.add(alias + '.' + (expression ? propertyName : (propertyName + " LIKE ?")));
-			searchConditions.add("%" + propertyValue + '%');
+			if (expression && propertyName.indexOf('=') > 0) {
+				searchConditions.add(propertyValue);
 
-		} else if (metas.length == 1) {
+			} else {
+				searchConditions.add("%" + propertyValue + '%');
+			}
+
+		} else if (expression || metas.length == 1) {
 			propertyValue = DynaBinderUtils.to(propertyValue instanceof Object[] ? ((Object[]) propertyValue)[0] : propertyValue, fieldType);
 			searchConditions.add(alias + '.' + propertyName);
 			searchConditions.add(propertyValue);

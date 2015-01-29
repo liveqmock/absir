@@ -572,29 +572,31 @@ public abstract class KernelClass {
 	 * @return
 	 */
 	public static int similar(Class cls, Class type) {
+		if (cls == null) {
+			return 0;
+		}
+
+		if (cls == type) {
+			return 1;
+		}
+
 		int similar = -1;
-		while (cls != null) {
-			if (similar < 0) {
-				if (type == null || cls == type) {
-					similar = 0;
-
-				} else {
-					for (Class iCls : cls.getInterfaces()) {
-						if (iCls == type) {
-							similar = 0;
-							break;
-						}
-					}
-				}
-
-			} else {
-				similar++;
+		while (cls != null && cls != Object.class) {
+			if (cls == type) {
+				return similar;
 			}
 
+			for (Class iCls : cls.getInterfaces()) {
+				if (iCls == type) {
+					return similar;
+				}
+			}
+
+			similar--;
 			cls = cls.getSuperclass();
 		}
 
-		return similar;
+		return type == null ? -similar : similar;
 	}
 
 	/**

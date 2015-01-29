@@ -14,7 +14,6 @@ import com.absir.bean.basis.BeanDefine;
 import com.absir.bean.basis.BeanFactory;
 import com.absir.bean.basis.BeanScope;
 import com.absir.bean.core.BeanDefineAbstract;
-import com.absir.core.kernel.KernelString;
 
 /**
  * @author absir
@@ -94,8 +93,7 @@ public class BeanDefineArray extends BeanDefineAbstract {
 		for (int i = 0; i < size; i++) {
 			BeanDefine beanDefine = beanDefines.get(i);
 			if (beanDefine instanceof BeanDefineReference) {
-				beanList.add(beanFactory.getBeanObject(KernelString.isEmpty(beanDefine.getBeanName()) ? paramNames[i] : beanDefine.getBeanName(), parameterTypes[i],
-						((BeanDefineReference) beanDefine).isRequired()));
+				beanList.add(((BeanDefineReference) beanDefine).getBeanReference(beanFactory, paramNames[i], parameterTypes[i]));
 
 			} else {
 				beanList.add(beanDefine.getBeanObject(beanFactory));

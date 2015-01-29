@@ -25,7 +25,7 @@ import com.absir.orm.transaction.value.Transaction;
 @SuppressWarnings("unchecked")
 @Bean
 @Basis
-@MaSupply(folder = "系统配置", name = "配置", method = "edit")
+@MaSupply(folder = "系统配置", name = "配置", method = "edit", icon = "configure")
 public class JConfigureSupply extends CrudSupply<JConfigureBase> {
 
 	/** ME */

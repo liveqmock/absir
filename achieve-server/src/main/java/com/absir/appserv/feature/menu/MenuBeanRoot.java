@@ -87,7 +87,7 @@ public class MenuBeanRoot {
 	 * @return
 	 */
 	public MenuBeanRoot getChildrenRoot(String name) {
-		return getChildrenRoot(name, 0, null, null, null);
+		return getChildrenRoot(name, 0, null, null, null, null);
 	}
 
 	/**
@@ -96,9 +96,10 @@ public class MenuBeanRoot {
 	 * @param ref
 	 * @param url
 	 * @param type
+	 * @param icon
 	 * @return
 	 */
-	public MenuBeanRoot getChildrenRoot(String name, int order, String ref, String url, String type) {
+	public MenuBeanRoot getChildrenRoot(String name, int order, String ref, String url, String type, String icon) {
 		if (name == null) {
 			return this;
 		}
@@ -113,6 +114,7 @@ public class MenuBeanRoot {
 			menuBeanRoot.menuBean.setRef(ref);
 			menuBeanRoot.menuBean.setUrl(url);
 			menuBeanRoot.menuBean.setType(type);
+			menuBeanRoot.menuBean.setIcon(icon);
 
 		} else {
 			if (menuBeanRoot.menuBean.getOrder() >= order) {
@@ -120,16 +122,20 @@ public class MenuBeanRoot {
 					menuBeanRoot.menuBean.setOrdinal(order);
 				}
 
-				if (ref != null && menuBeanRoot.menuBean.getRef() == null) {
+				if (ref != null && KernelString.isEmpty(menuBeanRoot.menuBean.getRef())) {
 					menuBeanRoot.menuBean.setRef(ref);
 				}
 
-				if (url != null && menuBeanRoot.menuBean.getUrl() == null) {
+				if (url != null && KernelString.isEmpty(menuBeanRoot.menuBean.getUrl())) {
 					menuBeanRoot.menuBean.setUrl(url);
 				}
 
-				if (type != null && menuBeanRoot.menuBean.getType() == null) {
+				if (type != null && KernelString.isEmpty(menuBeanRoot.menuBean.getType())) {
 					menuBeanRoot.menuBean.setType(type);
+				}
+
+				if (icon != null && KernelString.isEmpty(menuBeanRoot.menuBean.getIcon())) {
+					menuBeanRoot.menuBean.setIcon(icon);
 				}
 			}
 		}
@@ -140,10 +146,11 @@ public class MenuBeanRoot {
 	/**
 	 * @param maMenu
 	 * @param name
+	 * @param icon
 	 * @return
 	 */
-	public MenuBeanRoot getChildrenRoot(MaMenu maMenu, String name) {
-		return getChildrenRoot(maMenu, name, null, null);
+	public MenuBeanRoot getChildrenRoot(MaMenu maMenu, String name, String icon) {
+		return getChildrenRoot(maMenu, name, null, null, icon);
 	}
 
 	/**
@@ -151,10 +158,11 @@ public class MenuBeanRoot {
 	 * @param name
 	 * @param ref
 	 * @param url
+	 * @param icon
 	 * @return
 	 */
-	public MenuBeanRoot getChildrenRoot(MaMenu maMenu, String name, String ref, String url) {
-		return getChildrenRoot(maMenu, name, 0, ref, url);
+	public MenuBeanRoot getChildrenRoot(MaMenu maMenu, String name, String ref, String url, String icon) {
+		return getChildrenRoot(maMenu, name, 0, ref, url, icon);
 	}
 
 	/**
@@ -163,10 +171,11 @@ public class MenuBeanRoot {
 	 * @param order
 	 * @param ref
 	 * @param url
+	 * @param icon
 	 * @return
 	 */
-	public MenuBeanRoot getChildrenRoot(MaMenu maMenu, String name, int order, String ref, String url) {
-		return getChildrenRoot(maMenu, name, null, order, ref, url, null);
+	public MenuBeanRoot getChildrenRoot(MaMenu maMenu, String name, int order, String ref, String url, String icon) {
+		return getChildrenRoot(maMenu, name, null, order, ref, url, null, icon);
 	}
 
 	/**
@@ -177,9 +186,10 @@ public class MenuBeanRoot {
 	 * @param ref
 	 * @param url
 	 * @param type
+	 * @param icon
 	 * @return
 	 */
-	public MenuBeanRoot getChildrenRoot(MaMenu maMenu, String name, String suffix, int order, String ref, String url, String type) {
+	public MenuBeanRoot getChildrenRoot(MaMenu maMenu, String name, String suffix, int order, String ref, String url, String type, String icon) {
 		String caption = name;
 		if (maMenu != null) {
 			if (!KernelString.isEmpty(maMenu.value())) {
@@ -196,12 +206,16 @@ public class MenuBeanRoot {
 			if (!KernelString.isEmpty(maMenu.ref())) {
 				ref = maMenu.ref();
 			}
+
+			if (!KernelString.isEmpty(maMenu.icon())) {
+				icon = maMenu.icon();
+			}
 		}
 
 		if (caption == name && caption != null && suffix != null) {
 			caption += suffix;
 		}
 
-		return getChildrenRoot(caption, order, ref, url, type);
+		return getChildrenRoot(caption, order, ref, url, type, icon);
 	}
 }

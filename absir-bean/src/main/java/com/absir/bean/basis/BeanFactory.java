@@ -135,6 +135,11 @@ public interface BeanFactory extends BeanSupply {
 	public BeanDefine registerBeanObject(Class<?> beanType, String beanName, BeanScope beanScope, Object beanObject);
 
 	/**
+	 * @param beanDefine
+	 */
+	public void registerBeanDefine(BeanDefine beanDefine);
+
+	/**
 	 * @param beanObject
 	 */
 	public void unRegisterBeanObject(Object beanObject);
@@ -159,6 +164,11 @@ public interface BeanFactory extends BeanSupply {
 	 * @param beanTypes
 	 */
 	public void unRegisterWithoutBeanType(Class<?>... beanTypes);
+
+	/**
+	 * @param beanDefine
+	 */
+	public void unRegisterBeanDefine(BeanDefine beanDefine);
 
 	/**
 	 * @param beanObject

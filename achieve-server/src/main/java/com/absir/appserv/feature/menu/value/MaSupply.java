@@ -34,4 +34,9 @@ public @interface MaSupply {
 	 * @return
 	 */
 	String method() default "list";
+
+	/**
+	 * @return
+	 */
+	String icon() default "";
 }

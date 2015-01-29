@@ -1320,6 +1320,26 @@ public final class BeanFactoryImpl implements BeanFactory {
 	}
 
 	/**
+	 * @return
+	 */
+	public static BeanFactoryImpl getBeanFactoryImpl(BeanFactory beanFactory) {
+		while (beanFactory != null) {
+			if (beanFactory instanceof BeanFactoryImpl) {
+				return (BeanFactoryImpl) beanFactory;
+			}
+
+			if (beanFactory instanceof BeanFactoryWrapper) {
+				beanFactory = ((BeanFactoryWrapper) beanFactory).getBeanFactory();
+
+			} else {
+				break;
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * @param beanDefine
 	 * @param beanDefineClass
 	 * @return
@@ -1338,5 +1358,27 @@ public final class BeanFactoryImpl implements BeanFactory {
 		}
 
 		return null;
+	}
+
+	/**
+	 * @param beanDefine
+	 * @param define
+	 * @return
+	 */
+	public static boolean containBeanDefine(BeanDefine beanDefine, BeanDefine define) {
+		while (beanDefine != null) {
+			if (beanDefine == define) {
+				return true;
+			}
+
+			if (beanDefine instanceof BeanDefineWrapper) {
+				beanDefine = ((BeanDefineWrapper) beanDefine).getBeanDefine();
+
+			} else {
+				break;
+			}
+		}
+
+		return false;
 	}
 }

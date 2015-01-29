@@ -24,8 +24,10 @@ import org.dom4j.io.SAXReader;
 
 import com.absir.bean.basis.BeanConfig;
 import com.absir.bean.basis.BeanDefine;
+import com.absir.bean.basis.BeanFactory;
 import com.absir.bean.basis.BeanScope;
 import com.absir.bean.basis.Environment;
+import com.absir.bean.core.BeanDefineObject;
 import com.absir.bean.core.BeanDefineSingleton;
 import com.absir.bean.core.BeanFactoryImpl;
 import com.absir.bean.core.BeanFactoryProvider;
@@ -102,238 +104,13 @@ public class BeanProviderContext extends BeanFactoryProvider {
 	@Override
 	protected void registerBeanDefine(BeanFactoryImpl beanFactory, Set<String> beanDefineNames) {
 		super.registerBeanDefine(beanFactory, beanDefineNames);
-		registerBeanDefine(beanFactory.getBeanConfig().getClassPath() + "context.xml", beanFactory, beanDefineNames);
-		registerBeanDefine(beanFactory.getBeanConfig().getClassPath() + "context-" + beanFactory.getBeanConfig().getEnvironment().name().toLowerCase() + ".xml", beanFactory, beanDefineNames);
-		registerBeanDefine(beanFactory.getBeanConfig().getClassPath() + "contexts", beanFactory, beanDefineNames);
+		registerBeanDefine(beanFactory.getBeanConfig().getClassPath() + "context.xml", beanFactory, beanDefineNames, null, contextFilenames, beanNameMapAtInjectInvokers);
+		registerBeanDefine(beanFactory.getBeanConfig().getClassPath() + "context-" + beanFactory.getBeanConfig().getEnvironment().name().toLowerCase() + ".xml", beanFactory, beanDefineNames, null,
+				contextFilenames, beanNameMapAtInjectInvokers);
+		registerBeanDefine(beanFactory.getBeanConfig().getClassPath() + "contexts", beanFactory, beanDefineNames, null, contextFilenames, beanNameMapAtInjectInvokers);
 		for (String filename : contextFilenames.keySet()) {
-			registerBeanDefine(filename, beanFactory, beanDefineNames);
+			registerBeanDefine(filename, beanFactory, beanDefineNames, null, contextFilenames, beanNameMapAtInjectInvokers);
 		}
-	}
-
-	/**
-	 * @param filename
-	 * @param beanFactory
-	 * @param beanDefineNames
-	 */
-	private void registerBeanDefine(String filename, BeanFactoryImpl beanFactory, Set<String> beanDefineNames) {
-		if (contextFilenames.get(filename) != null) {
-			return;
-		}
-
-		contextFilenames.put(filename, Boolean.TRUE);
-		File xmlFile = new File(filename);
-		if (!xmlFile.exists()) {
-			return;
-		}
-
-		if (xmlFile.isDirectory()) {
-			final String environment = beanFactory.getBeanConfig().getEnvironment().name().toLowerCase();
-			File[] files = xmlFile.listFiles(new FilenameFilter() {
-
-				@Override
-				public boolean accept(File dir, String name) {
-					// TODO Auto-generated method stub
-					if (name.endsWith(".xml")) {
-						int index = name.indexOf('_');
-						return index <= 0 || name.substring(0, index).equals(environment) ? true : false;
-					}
-
-					return false;
-				}
-			});
-
-			for (File file : files) {
-				registerBeanDefine(file.getPath(), beanFactory, beanDefineNames);
-			}
-
-		} else {
-			SAXReader saxReader = new SAXReader();
-			try {
-				Element element = saxReader.read(xmlFile).getRootElement();
-				Iterator<Element> iterator = element.elementIterator();
-				while (iterator.hasNext()) {
-					Element beanElement = iterator.next();
-					if ("bean".equals(beanElement.getName())) {
-						registerBeanDefineBean(beanElement, true, beanFactory, beanDefineNames);
-					}
-				}
-
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				if (BeanFactoryUtils.getEnvironment().compareTo(Environment.DEBUG) <= 0) {
-					e.printStackTrace();
-				}
-			}
-		}
-
-	}
-
-	/**
-	 * @param beanElement
-	 * @param root
-	 * @param beanFactory
-	 * @return
-	 */
-	private BeanDefine registerBeanDefine(Element element, BeanFactoryImpl beanFactory, Set<String> beanDefineNames) {
-		Iterator<Element> iterator = element.elementIterator();
-		if (iterator.hasNext()) {
-			String name = iterator.next().getName();
-			if (KernelString.isEmpty(name)) {
-				if ("bean".equals(name)) {
-					return registerBeanDefineBean(element, false, beanFactory, beanDefineNames);
-
-				} else if ("array".equals(name)) {
-					return registerBeanDefineArray(element, beanFactory, beanDefineNames);
-
-				} else if ("map".equals(name)) {
-					return registerBeanDefineMap(element, beanFactory, beanDefineNames);
-				}
-			}
-
-		} else {
-			String ref = element.attributeValue("ref");
-			String required = element.attributeValue("required");
-			if (ref != null || required != null) {
-				return new BeanDefineReference(ref, required);
-			}
-
-			String value = element.attributeValue("value");
-			if (value == null) {
-				value = element.getText();
-			}
-
-			return new BeanDefineSingleton(beanFactory.getBeanConfig().getExpression(value));
-		}
-
-		return new BeanDefineSingleton(element.getText());
-	}
-
-	/**
-	 * @param beanElement
-	 * @param root
-	 * @param beanFactory
-	 * @param beanDefineNames
-	 * @return
-	 */
-	private BeanDefine registerBeanDefineBean(Element beanElement, boolean root, BeanFactoryImpl beanFactory, Set<String> beanDefineNames) {
-		Class<?> beanType = null;
-		try {
-			String classname = beanElement.attributeValue("class");
-			beanType = Thread.currentThread().getContextClassLoader().loadClass(classname);
-
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			if (BeanFactoryUtils.getEnvironment().compareTo(Environment.DEBUG) <= 0) {
-				e.printStackTrace();
-			}
-
-			return null;
-		}
-
-		List<InjectInvoker> injectInvokers = new ArrayList<InjectInvoker>();
-		List<Entry<String, InjectInvoker>> atInjectInvokers = new ArrayList<Entry<String, InjectInvoker>>();
-		String beanName = beanElement.attributeValue("name");
-		String beanScope = beanElement.attributeValue("scope");
-		BeanDefineArray constructorBeanDefine = null;
-		Iterator<Element> iterator = beanElement.elementIterator();
-		while (iterator.hasNext()) {
-			Element element = iterator.next();
-			String name = element.getName();
-			if ("constructor".equals(name)) {
-				constructorBeanDefine = registerBeanDefineArray(element, beanFactory, beanDefineNames);
-
-			} else if ("property".equals(name)) {
-				String propertyName = element.attributeValue("name");
-				if (propertyName == null) {
-					continue;
-				}
-
-				injectInvokers.add(new InjectFieldBean(propertyName, registerBeanDefine(element, beanFactory, beanDefineNames)));
-
-			} else if ("method".equals(name)) {
-				String methodName = element.attributeValue("name");
-				if (methodName == null) {
-					continue;
-				}
-
-				Iterator<Element> methodIterator = element.elementIterator();
-				BeanDefineArray beanDefineArray = methodIterator.hasNext() ? registerBeanDefineArray(methodIterator.next(), beanFactory, beanDefineNames) : null;
-				int size = beanDefineArray == null ? 0 : beanDefineArray.getBeanDefines().size();
-				Method method = size == 0 ? KernelReflect.assignableMethod(beanType, methodName, 0, true, true, false) : KernelReflect.assignableMethod(beanType, methodName, 0, true, true, false,
-						KernelArray.repeat(Object.class, size));
-				if (method == null) {
-					continue;
-				}
-
-				String methodAt = element.attributeValue("at");
-				InjectMethodBean injectMethodBean = new InjectMethodBean(method, beanDefineArray);
-				if (KernelString.isEmpty(methodAt)) {
-					injectInvokers.add(injectMethodBean);
-
-				} else {
-					atInjectInvokers.add(new ObjectEntry<String, InjectInvoker>(methodAt, injectMethodBean));
-				}
-			}
-		}
-
-		BeanDefine beanDefine = BeanDefineFactory.getBeanDefineBean(beanType, beanName, constructorBeanDefine);
-		((BeanDefineBean) beanDefine).getInjectInvokers().addAll(injectInvokers);
-		if (root || !KernelString.isEmpty(beanName) || !KernelString.isEmpty(beanScope)) {
-			BeanScope scope = BeanScope.SINGLETON;
-			try {
-				scope = BeanScope.valueOf(beanScope);
-
-			} catch (Exception e) {
-			}
-
-			beanDefine = new InjectBeanDefine(beanDefine, scope);
-			beanDefineNames.add(beanDefine.getBeanName());
-			beanFactory.registerBeanDefine(beanDefine);
-			beanNameMapAtInjectInvokers.put(beanDefine.getBeanName(), atInjectInvokers);
-
-		} else {
-			if (!atInjectInvokers.isEmpty()) {
-				if (beanFactory.getBeanConfig().getEnvironment() == Environment.DEBUG) {
-					System.out.println("Method at can not define for " + beanType);
-				}
-			}
-		}
-
-		return beanDefine;
-	}
-
-	/**
-	 * @param arrayElement
-	 * @param beanFactory
-	 * @param beanDefineNames
-	 * @return
-	 */
-	private BeanDefineArray registerBeanDefineArray(Element arrayElement, BeanFactoryImpl beanFactory, Set<String> beanDefineNames) {
-		BeanDefineArray beanDefineArray = new BeanDefineArray();
-		Iterator<Element> iterator = arrayElement.elementIterator();
-		while (iterator.hasNext()) {
-			beanDefineArray.getBeanDefines().add(registerBeanDefine(iterator.next(), beanFactory, beanDefineNames));
-		}
-
-		return beanDefineArray;
-	}
-
-	/**
-	 * @param MapElement
-	 * @param beanFactory
-	 * @param beanDefineNames
-	 * @return
-	 */
-	private BeanDefineMap registerBeanDefineMap(Element MapElement, BeanFactoryImpl beanFactory, Set<String> beanDefineNames) {
-		BeanDefineMap beadefineMap = new BeanDefineMap();
-		Iterator<Element> iterator = MapElement.elementIterator();
-		while (iterator.hasNext()) {
-			Element element = iterator.next();
-			String key = element.attributeValue("key");
-			beadefineMap.getBeanDefines().put(key, registerBeanDefine(element, beanFactory, beanDefineNames));
-		}
-
-		return beadefineMap;
 	}
 
 	/*
@@ -365,4 +142,258 @@ public class BeanProviderContext extends BeanFactoryProvider {
 			}
 		}
 	}
+
+	/**
+	 * @param filename
+	 * @param beanFactory
+	 * @param beanDefineNames
+	 * @param beanDefines
+	 * @param contextFilenames
+	 * @param beanNameMapAtInjectInvokers
+	 */
+	public static void registerBeanDefine(String filename, BeanFactory beanFactory, Set<String> beanDefineNames, List<BeanDefine> beanDefines, Map<String, Boolean> contextFilenames,
+			Map<String, List<Entry<String, InjectInvoker>>> beanNameMapAtInjectInvokers) {
+		if (contextFilenames != null) {
+			if (contextFilenames.get(filename) == Boolean.TRUE) {
+				return;
+			}
+
+			contextFilenames.put(filename, Boolean.TRUE);
+		}
+
+		File xmlFile = new File(filename);
+		if (!xmlFile.exists()) {
+			return;
+		}
+
+		if (xmlFile.isDirectory()) {
+			final String environment = beanFactory.getBeanConfig().getEnvironment().name().toLowerCase();
+			File[] files = xmlFile.listFiles(new FilenameFilter() {
+
+				@Override
+				public boolean accept(File dir, String name) {
+					// TODO Auto-generated method stub
+					if (name.endsWith(".xml")) {
+						int index = name.indexOf('_');
+						return index <= 0 || name.substring(0, index).equals(environment) ? true : false;
+					}
+
+					return false;
+				}
+			});
+
+			for (File file : files) {
+				registerBeanDefine(file.getPath(), beanFactory, beanDefineNames, beanDefines, contextFilenames, beanNameMapAtInjectInvokers);
+			}
+
+		} else {
+			SAXReader saxReader = new SAXReader();
+			try {
+				Element element = saxReader.read(xmlFile).getRootElement();
+				Iterator<Element> iterator = element.elementIterator();
+				while (iterator.hasNext()) {
+					Element beanElement = iterator.next();
+					if ("bean".equals(beanElement.getName())) {
+						BeanDefine beanDefine = registerBeanDefineBean(beanElement, true, beanFactory, beanDefineNames, beanNameMapAtInjectInvokers);
+						if (beanDefines != null) {
+							beanDefines.add(beanDefine);
+						}
+					}
+				}
+
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				if (BeanFactoryUtils.getEnvironment().compareTo(Environment.DEBUG) <= 0) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param noded
+	 * @param element
+	 * @param beanFactory
+	 * @param beanDefineNames
+	 * @param beanNameMapAtInjectInvokers
+	 * @return
+	 */
+	public static BeanDefine registerBeanDefine(boolean noded, Element element, BeanFactory beanFactory, Set<String> beanDefineNames,
+			Map<String, List<Entry<String, InjectInvoker>>> beanNameMapAtInjectInvokers) {
+		Iterator<Element> iterator = element.elementIterator();
+		if (iterator.hasNext()) {
+			Element node = noded ? element : iterator.next();
+			String name = node.getName();
+			if (!KernelString.isEmpty(name)) {
+				if ("bean".equals(name)) {
+					return registerBeanDefineBean(node, false, beanFactory, beanDefineNames, beanNameMapAtInjectInvokers);
+
+				} else if ("array".equals(name)) {
+					return registerBeanDefineArray(node, beanFactory, beanDefineNames, beanNameMapAtInjectInvokers);
+
+				} else if ("map".equals(name)) {
+					return registerBeanDefineMap(node, beanFactory, beanDefineNames, beanNameMapAtInjectInvokers);
+				}
+			}
+
+		} else {
+			String ref = element.attributeValue("ref");
+			String required = element.attributeValue("required");
+			if (ref != null || required != null) {
+				return new BeanDefineReference(ref, required);
+			}
+
+			String value = element.attributeValue("value");
+			if (value == null) {
+				value = element.getText();
+
+			} else if (value.equals("null")) {
+				value = null;
+			}
+
+			return new BeanDefineSingleton(value == null ? null : beanFactory.getBeanConfig().getExpression(value));
+		}
+
+		return new BeanDefineSingleton(element.getText());
+	}
+
+	/**
+	 * @param beanElement
+	 * @param root
+	 * @param beanFactory
+	 * @param beanDefineNames
+	 * @param beanNameMapAtInjectInvokers
+	 * @return
+	 */
+	public static BeanDefine registerBeanDefineBean(Element beanElement, boolean root, BeanFactory beanFactory, Set<String> beanDefineNames,
+			Map<String, List<Entry<String, InjectInvoker>>> beanNameMapAtInjectInvokers) {
+		Class<?> beanType = null;
+		try {
+			String classname = beanElement.attributeValue("class");
+			beanType = Thread.currentThread().getContextClassLoader().loadClass(classname);
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			if (BeanFactoryUtils.getEnvironment().compareTo(Environment.DEBUG) <= 0) {
+				e.printStackTrace();
+			}
+
+			return null;
+		}
+
+		List<InjectInvoker> injectInvokers = new ArrayList<InjectInvoker>();
+		List<Entry<String, InjectInvoker>> atInjectInvokers = new ArrayList<Entry<String, InjectInvoker>>();
+		String beanName = beanElement.attributeValue("name");
+		String beanScope = beanElement.attributeValue("scope");
+		BeanDefineArray constructorBeanDefine = null;
+		Iterator<Element> iterator = beanElement.elementIterator();
+		while (iterator.hasNext()) {
+			Element element = iterator.next();
+			String name = element.getName();
+			if ("constructor".equals(name)) {
+				constructorBeanDefine = registerBeanDefineArray(element, beanFactory, beanDefineNames, beanNameMapAtInjectInvokers);
+
+			} else if ("property".equals(name)) {
+				String propertyName = element.attributeValue("name");
+				if (propertyName == null) {
+					continue;
+				}
+
+				injectInvokers.add(new InjectFieldBean(propertyName, registerBeanDefine(false, element, beanFactory, beanDefineNames, beanNameMapAtInjectInvokers)));
+
+			} else if ("method".equals(name)) {
+				String methodName = element.attributeValue("name");
+				if (methodName == null) {
+					continue;
+				}
+
+				Iterator<Element> methodIterator = element.elementIterator();
+				BeanDefineArray beanDefineArray = methodIterator.hasNext() ? registerBeanDefineArray(methodIterator.next(), beanFactory, beanDefineNames, beanNameMapAtInjectInvokers) : null;
+				int size = beanDefineArray == null ? 0 : beanDefineArray.getBeanDefines().size();
+				Method method = size == 0 ? KernelReflect.assignableMethod(beanType, methodName, 0, true, true, false) : KernelReflect.assignableMethod(beanType, methodName, 0, true, true, false,
+						KernelArray.repeat(Object.class, size));
+				if (method == null) {
+					continue;
+				}
+
+				String methodAt = element.attributeValue("at");
+				InjectMethodBean injectMethodBean = new InjectMethodBean(method, beanDefineArray);
+				if (KernelString.isEmpty(methodAt)) {
+					injectInvokers.add(injectMethodBean);
+
+				} else {
+					atInjectInvokers.add(new ObjectEntry<String, InjectInvoker>(methodAt, injectMethodBean));
+				}
+			}
+		}
+
+		BeanDefine beanDefine = new BeanDefineBean(beanType, beanName, constructorBeanDefine);
+		((BeanDefineBean) beanDefine).getInjectInvokers().addAll(injectInvokers);
+		if (root || !KernelString.isEmpty(beanName) || !KernelString.isEmpty(beanScope)) {
+			BeanScope scope = BeanScope.SINGLETON;
+			try {
+				scope = BeanScope.valueOf(beanScope);
+
+			} catch (Exception e) {
+			}
+
+			beanDefine = new InjectBeanDefine(beanDefine, scope);
+			if (beanDefineNames != null) {
+				beanDefineNames.add(beanDefine.getBeanName());
+			}
+
+			if (beanNameMapAtInjectInvokers != null) {
+				beanFactory.registerBeanDefine(beanDefine);
+				beanNameMapAtInjectInvokers.put(beanDefine.getBeanName(), atInjectInvokers);
+			}
+
+		} else {
+			if (!atInjectInvokers.isEmpty()) {
+				if (beanFactory.getBeanConfig().getEnvironment().compareTo(Environment.DEBUG) <= 0) {
+					System.out.println("method at can not define for " + beanType);
+				}
+			}
+		}
+
+		return BeanDefineObject.getBeanDefine(beanType, beanDefine);
+	}
+
+	/**
+	 * @param arrayElement
+	 * @param beanFactory
+	 * @param beanDefineNames
+	 * @param beanNameMapAtInjectInvokers
+	 * @return
+	 */
+	public static BeanDefineArray registerBeanDefineArray(Element arrayElement, BeanFactory beanFactory, Set<String> beanDefineNames,
+			Map<String, List<Entry<String, InjectInvoker>>> beanNameMapAtInjectInvokers) {
+		BeanDefineArray beanDefineArray = new BeanDefineArray();
+		Iterator<Element> iterator = arrayElement.elementIterator();
+		while (iterator.hasNext()) {
+			beanDefineArray.getBeanDefines().add(registerBeanDefine(true, iterator.next(), beanFactory, beanDefineNames, beanNameMapAtInjectInvokers));
+		}
+
+		return beanDefineArray;
+	}
+
+	/**
+	 * @param MapElement
+	 * @param beanFactory
+	 * @param beanDefineNames
+	 * @param beanNameMapAtInjectInvokers
+	 * @return
+	 */
+	public static BeanDefineMap registerBeanDefineMap(Element MapElement, BeanFactory beanFactory, Set<String> beanDefineNames,
+			Map<String, List<Entry<String, InjectInvoker>>> beanNameMapAtInjectInvokers) {
+		BeanDefineMap beanDefineMap = new BeanDefineMap();
+		Iterator<Element> iterator = MapElement.elementIterator();
+		while (iterator.hasNext()) {
+			Element element = iterator.next();
+			String key = element.attributeValue("key");
+			beanDefineMap.getBeanDefines().put(key, registerBeanDefine(false, element, beanFactory, beanDefineNames, beanNameMapAtInjectInvokers));
+		}
+
+		return beanDefineMap;
+	}
+
 }

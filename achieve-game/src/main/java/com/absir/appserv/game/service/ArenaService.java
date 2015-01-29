@@ -459,6 +459,18 @@ public abstract class ArenaService {
 				}
 			}
 		}
+
+		public synchronized void exchangeFight(JbPlayer player, JbPlayer target) {
+			analyze(player);
+			analyze(target);
+			
+			int playerArena = player.getArena();
+			int targetArena = target.getArena();
+			if (playerArena > targetArena) {
+				target.setArena(playerArena);
+				player.setArena(targetArena);
+			}
+		}
 	}
 
 }

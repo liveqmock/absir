@@ -15,6 +15,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import com.absir.appserv.feature.menu.value.MaEntity;
 import com.absir.appserv.feature.menu.value.MaMenu;
+import com.absir.appserv.lang.value.Langs;
 import com.absir.appserv.system.bean.base.JbBase;
 import com.absir.appserv.system.bean.value.JaEdit;
 import com.absir.appserv.system.bean.value.JaLang;
@@ -32,6 +33,10 @@ public class JMenuPermission extends JbBase {
 	@JaLang(value = "标识", tag = "identifie")
 	@Id
 	private String id;
+
+	@JaLang("标题")
+	@JaEdit(groups = JaEdit.GROUP_LIST)
+	private String caption;
 
 	@JaLang(value = "授权角色", tag = "allowUserRoles")
 	@JaName(value = "JUser")
@@ -56,6 +61,22 @@ public class JMenuPermission extends JbBase {
 	 */
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	/**
+	 * @return the caption
+	 */
+	@Langs
+	public String getCaption() {
+		return caption;
+	}
+
+	/**
+	 * @param caption
+	 *            the caption to set
+	 */
+	public void setCaption(String caption) {
+		this.caption = caption;
 	}
 
 	/**

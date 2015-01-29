@@ -25,4 +25,8 @@ public @interface MaPermission {
 	 */
 	String value();
 
+	/**
+	 * @return
+	 */
+	String name() default "";
 }

@@ -18,6 +18,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import com.absir.appserv.feature.menu.value.MaEntity;
 import com.absir.appserv.feature.menu.value.MaMenu;
+import com.absir.appserv.lang.value.Langs;
 import com.absir.appserv.system.bean.base.JbBase;
 import com.absir.appserv.system.bean.value.JaEdit;
 import com.absir.appserv.system.bean.value.JaLang;
@@ -65,6 +66,7 @@ public class JMaMenu extends JbBase {
 	/**
 	 * @return the caption
 	 */
+	@Langs
 	public String getCaption() {
 		return caption;
 	}

@@ -8,9 +8,10 @@
 package com.absir.appserv.feature.menu;
 
 import java.lang.reflect.Method;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import net.sf.cglib.proxy.MethodProxy;
 
@@ -121,11 +122,14 @@ public class OMenuFactory extends AopMethodDefineAbstract<MenuAopInterceptor, St
 			return null;
 		}
 
+		if (!permissions.containsKey(value) || !KernelString.isEmpty(maPermission.name())) {
+			permissions.put(value, maPermission.name());
+		}
+
 		if (beanType.getAnnotation(MaPermissionRef.class) == null) {
 			return value;
 		}
 
-		permissions.add(value);
 		return null;
 	}
 
@@ -152,12 +156,17 @@ public class OMenuFactory extends AopMethodDefineAbstract<MenuAopInterceptor, St
 			return null;
 		}
 
-		permissions.add(interceptor);
+		if (maPermission != null) {
+			if (!permissions.containsKey(interceptor) || !KernelString.isEmpty(maPermission.name())) {
+				permissions.put(interceptor, maPermission.name());
+			}
+		}
+
 		return interceptor;
 	}
 
 	/** permissions */
-	private Set<String> permissions = new HashSet<String>();
+	private Map<String, String> permissions = new HashMap<String, String>();
 
 	/**
 	 * 添加菜单默认权限
@@ -167,11 +176,14 @@ public class OMenuFactory extends AopMethodDefineAbstract<MenuAopInterceptor, St
 	protected void initPermissions() {
 		if (permissions != null) {
 			Session session = BeanDao.getSession();
-			for (String ref : permissions) {
+			for (Entry<String, String> entry : permissions.entrySet()) {
+				String ref = entry.getKey();
 				JMenuPermission menuPermission = (JMenuPermission) QueryDaoUtils.select(session, "JMenuPermission", new Object[] { "o.id", ref });
 				if (menuPermission == null) {
 					menuPermission = new JMenuPermission();
 					menuPermission.setId(ref);
+					String caption = entry.getValue();
+					menuPermission.setCaption(KernelString.isEmpty(caption) ? ref : caption);
 					menuPermission.setAllowIds(new long[] { 1L });
 					session.persist(menuPermission);
 				}

@@ -105,7 +105,7 @@ public class Admin_login extends AdminServer {
 				return "admin/login.failed";
 			}
 
-			input.getModel().put("error", e.getExceptionData());
+			input.getModel().put("error", e);
 			return "admin/login";
 		}
 

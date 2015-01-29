@@ -363,7 +363,7 @@ public class RouteFactory implements IBeanDefineSupply, IBeanFactoryAware, IMeth
 				Class<?> beanClass = beanType;
 				while (beanClass != null && beanClass != Object.class) {
 					for (Method method : beanClass.getDeclaredMethods()) {
-						if (Modifier.isPublic(method.getModifiers()) && !(Modifier.isStatic(method.getModifiers()) || method.getName().charAt(0) == '_' || method.getAnnotation(Close.class) != null)) {
+						if (isMethodServering(method)) {
 							if (name == null) {
 								name = KernelString.lastString(beanDefine.getBeanType().getSimpleName(), '_');
 								routeEntry = getRouteEntry(beanType);
@@ -448,5 +448,13 @@ public class RouteFactory implements IBeanDefineSupply, IBeanFactoryAware, IMeth
 		}
 
 		return new EntitySingleton(beanObject);
+	}
+
+	/**
+	 * @param method
+	 * @return
+	 */
+	public static boolean isMethodServering(Method method) {
+		return Modifier.isPublic(method.getModifiers()) && !(Modifier.isStatic(method.getModifiers()) || method.getName().charAt(0) == '_' || method.getAnnotation(Close.class) != null);
 	}
 }

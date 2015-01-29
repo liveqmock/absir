@@ -66,6 +66,8 @@ public class AuthService {
 					return true;
 				}
 			}
+
+			return false;
 		}
 
 		// 开发者用户

@@ -48,6 +48,7 @@ import com.absir.server.exception.ServerException;
 import com.absir.server.exception.ServerStatus;
 import com.absir.server.on.OnPut;
 import com.absir.server.route.RouteDefine;
+import com.absir.server.route.RouteFactory;
 import com.absir.server.route.RouteMatcher;
 import com.absir.server.route.parameter.ParameterResolverPath;
 
@@ -138,7 +139,12 @@ public class OMenuFactory extends AopMethodDefineAbstract<MenuAopInterceptor, St
 	public String getAopInterceptor(String interceptor, String variable, Class<?> beanType, Method method) {
 		// TODO Auto-generated method stub
 		MaPermission maPermission = method.getAnnotation(MaPermission.class);
-		if (maPermission != null) {
+		if (maPermission == null) {
+			if (!RouteFactory.isMethodServering(method)) {
+				return null;
+			}
+
+		} else {
 			interceptor = maPermission.value();
 		}
 

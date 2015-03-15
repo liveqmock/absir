@@ -1,365 +1,893 @@
-\#set(page_title = @Pag.configure().sitename + ${@Pag.getLang("管理后台",
-false)}) \#tag _layout("/WEB-INF/tpl/layout.html")
-<link href="\${jui}themes/css/style.css" rel="stylesheet" media="screen" />
-<link href="\${jui}themes/purple/core.css" rel="stylesheet" media="screen" />
-<link href="\${jui}plugs/bootstrapSelect/bootstrap-select.css" rel="stylesheet" media="screen" />
-<link href="\${jui}plugs/colorpicker/css/bootstrap-colorpicker.min.css" rel="stylesheet" media="screen" />
-<link href="\${jui}plugs/uploadify/css/uploadify.css" rel="stylesheet" media="screen" />
-<link href="\${jui}plugs/Huploadify/Huploadify.css" rel="stylesheet" media="screen" />
-<link href="\${jui}plugs/kindeditor_4.1.10/themes/default/default.css" rel="stylesheet" media="screen" />
-<script src="\${jui}js/dwz.min.js"></script>
-<script src="\${jui}plugs/colorpicker/js/bootstrap-colorpicker.min.js"></script>
-<script src="\${jui}plugs/uploadify/scripts/jquery.uploadify.min.js"></script>
-<script src="\${jui}plugs/kindeditor_4.1.10/kindeditor-all.min.js"></script>
-<script src="\${jui}plugs/kindeditor_4.1.10/lang/\${locale}.js"></script>
-<script src="\${jui}plugs/Huploadify/jquery.Huploadify.min.js"></script>
-<script src="\${jui}plugs/ztree/jquery.ztree.core-3.5.min.js"></script>
-<script src="\${jui}plugs/ztree/jquery.ztree.excheck-3.5.min.js"></script>
-<script src="\${jui}plugs/ztree/jquery.ztree.exedit-3.5.min.js"></script>
-<script src="\${jui}plugs/ztree/jquery.ztree.exhide-3.5.min.js"></script>
-<script src="\${jui}plugs/icheck/icheck.min.js"></script>
-<script src="\${jui}plugs/dragsort/jquery.dragsort-0.5.1.min.js"></script>
-<script src="\${jui}plugs/clock/jqClock.min.js"></script>
-<script type="text/javascript">
-$(function(){
-    DWZ.init("\${jui}dwz.frag.xml", {
-        loginUrl:"logintimeout.html", loginTitle:"${@Pag.getLang("登录")}",
-        statusCode:{ok:200, error:300, timeout:301},
-        pageInfo:{pageNum:"pageNum", numPerPage:"numPerPage", orderField:"orderField", orderDirection:"orderDirection"},
-        keys: {statusCode:"statusCode", message:"message"},
-        ui:{hideMode:'display'},
-        debug:false,
-        callback:function(){
-            initEnv();
-            $("#topTheme").theme({themeBase:"\${jui}themes"});
-        }
-    });
-    var nowtime = new Date().getTime();
-    $("#clock").clock({"timestamp":nowtime, "format":"24", "calendar":"false"});
-});
-function MainMenuClick(event, treeId, treeNode) {
-    if (treeNode.isParent) {
-        var zTree = $.fn.zTree.getZTreeObj(treeId);
-        zTree.expandNode(treeNode);
-        return;
-    }
-    if (treeNode.target && treeNode.target == 'dialog') {
-        $.pdialog.open(treeNode.nurl, treeNode.rel, treeNode.name, {});
-    } else if (treeNode.target && treeNode.target == 'navTab') {
-        navTab.openTab(treeNode.rel, treeNode.nurl, { title: treeNode.name});
-    }
-}
-</script>
-\#define(JiUserBase USER)
-	<!--[if lte IE 7]>
-        <div id="errorie">IE too lower!</div>
-    <![endif]-->
-	<div id="layout">
-		<div id="header">
-			<div class="headerNav">
-				<a class="logo" href="\${ADMIN_ROUTE}" target=_blank><img
-					src="\${jui}images/logo.png" height="50" /></a>
-				<ul class="topnav">
-					<li>\${now().format("yyyy-MM-dd")}&nbsp;<span id="clock"></span></li>
-					<li>${@Pag.getLang("当前用户：")}\${USER.username}</li>
-					<li><a href="changepwd.html" target="dialog" mask="true"
-						rel="changepwd_page" width="400" height="260">${@Pag.getLang("修改密码")}</a></li>
-					<li><a href="\${SITE_ROUTE}" target="_blank">${@Pag.getLang("网站首页")}</a></li>
-					<li><a href="\${ADMIN_ROUTE}/login/out">${@Pag.getLang("退出")}</a></li>
-				</ul>
-				<ul class="topTheme" id="topTheme">
-					<li theme="default" class="theme_default" title="${@Pag.getLang("黑白分明")}"><i
-						class="fa fa-circle"></i></li>
-					<li theme="orange" class="theme_orange" title="${@Pag.getLang("橘子红了")}"><i
-						class="fa fa-circle"></i></li>
-					<li theme="purple" class="theme_purple" title="${@Pag.getLang("紫罗兰")}"><i
-						class="fa fa-circle"></i></li>
-					<li theme="blue" class="theme_blue" title="${@Pag.getLang("青出于蓝")}"><i
-						class="fa fa-circle"></i></li>
-					<li theme="green" class="theme_green" title="${@Pag.getLang("绿草如茵")}"><i
-						class="fa fa-circle"></i></li>
-				</ul>
-			</div>
-		</div>
-		<div id="leftside">
-			<div id="sidebar_s">
-				<div class="collapse">
-					<div class="toggleCollapse">
-						<div title="${@Pag.getLang("展开菜单")}">
-							<i class="fa fa-angle-double-right"></i>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div id="sidebar">
-				<div class="toggleCollapse">
-					<h2>${@Pag.getLang("主菜单")}</h2>
-					<div title="${@Pag.getLang("收缩菜单")}">
-						<i class="fa fa-angle-double-left"></i>
-					</div>
-				</div>
-				<div class="panel-group panel-main j-accordion" id="accordion_menu"
-					data-heightbox="#sidebar" data-offsety="24">
-					${_include("menu.html")}</div>
-			</div>
-		</div>
-		<div id="container">
-			<div id="navTab" class="tabsPage">
-				<div class="tabsPageHeader">
-					<div class="tabsPageHeaderContent">
-						<ul class="navTab-tab nav nav-tabs">
-							<li tabid="main" class="main"><a href="javascript:;"><span><span
-										class="home_icon">我的主页</span></span></a></li>
-						</ul>
-					</div>
-					<div class="tabsLeft">
-						<i class="fa fa-angle-double-left"></i>
-					</div>
-					<div class="tabsRight">
-						<i class="fa fa-angle-double-right"></i>
-					</div>
-					<div class="tabsMore">
-						<i class="fa fa-angle-double-down"></i>
-					</div>
-				</div>
-				<ul class="tabsMoreList">
-					<li><a href="javascript:;">我的主页</a></li>
-				</ul>
-				<div class="navTab-panel tabsPageContent layoutBox">
-					<div class="page unitBox">
-						<div class="accountInfo">
-							<div style="padding: 0 15px; border-bottom: 1px #DDD solid;">
-								<h4>
-									Bootstrap for DWZ富客户端框架 <a target="_blank"
-										href="http://shang.qq.com/wpa/qunwpa?idkey=0047455f3845597286edd381d54076b1e10a45c0c735115f0ee74961f70880af"><img
-										border="0" src="http://pub.idqqimg.com/wpa/images/group.png"
-										alt="[B-JUI]Bootstrap4DWZ交流群" title="[B-JUI]Bootstrap4DWZ交流群"
-										style="vertical-align: top;"></a>
-								</h4>
-								<hr style="margin: 12px 0 0px;">
-								<div class="row">
-									<div class="col-md-6">
-										<h5>
-											网址：<a href="http://www.xknaan.com/" target="_blank">http://www.xknaan.com/</a>
-										</h5>
-										<h5>
-											项目地址：<a
-												href="http://git.oschina.net/xknaan/Bootstrap_for_DWZ"
-												target="_blank">GIT</a> <a
-												href="http://www.oschina.net/p/bootstrap-for-DWZ"
-												target="_blank">OSCHINA</a>
-										</h5>
-										<h5>
-											微博地址：<a href="http://weibo.com/xknaan" target="_blank">http://weibo.com/xknaan</a>
-										</h5>
-									</div>
-									<div class="col-md-6">
-										<h5>
-											DWZ(J-UI)官网：<a href="http://www.j-ui.com/" target="_blank">http://www.j-ui.com/</a>
-										</h5>
-										<h5>
-											Bootstrap中文网：<a href="http://www.bootcss.com/"
-												target="_blank">http://www.bootcss.com/</a>
-										</h5>
-										<h5>QQ交流群：232781006</h5>
-									</div>
-								</div>
-								<h5></h5>
-							</div>
-						</div>
-						<div class="pageFormContent" layoutH="100">
-							<div style="width: 100%; overflow: hidden;">
-								<div class="row" style="padding: 0 10px;">
-									<div class="col-md-4">
-										<div class="panel panel-default">
-											<div class="panel-heading">
-												<h3 class="panel-title">账号信息</h3>
-											</div>
-											<div class="panel-body">
-												<div class="form-group">
-													<label class="control-label x80">登陆账号：</label> <span>admin</span>
-												</div>
-												<div class="form-group">
-													<label class="control-label x80">所属角色：</label> <span>超级管理员</span>
-												</div>
-												<div class="form-group">
-													<label class="control-label x80">姓名：</label> <span>admin</span>
-												</div>
-												<div class="form-group">
-													<label class="control-label x80">上次登陆：</label> <span>127.0.0.1
-														@ 2014-07-23 09:30</span>
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="col-md-4">
-										<div class="panel panel-default">
-											<div class="panel-heading">
-												<h3 class="panel-title">信息发布</h3>
-											</div>
-											<div class="panel-body">
-												<div class="form-group">
-													<label class="control-label x80">我添加的：</label> <span><a
-														href="news" target="navTab" rel="news_list" title="新闻管理">1
-															条信息</a></span>
-												</div>
-												<div class="form-group">
-													<label class="control-label x80">已删除的：</label> <span>0
-														条信息</span>
-												</div>
-												<div class="form-group" style="margin-bottom: -4px;">
-													<label class="control-label x80">快速操作：</label> <span>
-														<a href="javascript:;" class="btn btn-default btn-sm">添加信息</a>
-														<a href="javascript:;" class="btn btn-default btn-sm">审核操作</a>
-														<!--  
-                                                        <a href="javascript:;" onclick="main_add_news('内容', true);" class="btn btn-default btn-sm">添加内容</a>
-                                                        -->
-													</span>
-												</div>
-												<div class="form-group">
-													<label class="control-label x80"></label> &nbsp;
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="col-md-4">
-										<div class="panel panel-default">
-											<div class="panel-heading">
-												<h3 class="panel-title">站内消息</h3>
-											</div>
-											<div class="panel-body">
-												<table
-													class="table table-condensed table-hover table-striped"
-													width="100%">
-													<thead>
-														<tr>
-															<th class="center">时间</th>
-															<th class="center">by</th>
-															<th class="center">内容</th>
-															<th class="center">状态</th>
-														</tr>
-													</thead>
-													<tbody>
-														<tr>
-															<td class="center">07/23 09:30</td>
-															<td class="center">admin</td>
-															<td class="center">明天上午10：00开会。</td>
-															<td class="center"><span class="label label-warning">未读</span></td>
-														</tr>
-														<tr>
-															<td class="center">07/20 15:05</td>
-															<td class="center">admin</td>
-															<td class="center">项目X的完成进度通报。</td>
-															<td class="center"><span class="label label-success">已读</span></td>
-														</tr>
-													</tbody>
-												</table>
-											</div>
-										</div>
-									</div>
-									<div class="col-md-12">
-										<div class="panel panel-default">
-											<div class="panel-heading">
-												<h3 class="panel-title">最近登陆</h3>
-											</div>
-											<div class="panel-body">
-												<table class="table table-condensed table-striped"
-													width="100%">
-													<thead>
-														<tr>
-															<th class="center">时间</th>
-															<th class="center">登陆账号</th>
-															<th class="center">IP</th>
-															<th class="center">登陆状态</th>
-															<th class="center">描述</th>
-														</tr>
-													</thead>
-													<tbody>
-														<tr>
-															<td class="center">2014-07-23 09:30:44</td>
-															<td class="center">admin</td>
-															<td class="center">127.0.0.1</td>
-															<td class="center"><font color='green'>成功</font></td>
-															<td class="center">登陆成功！</td>
-														</tr>
-														<tr>
-															<td class="center">2014-07-22 17:11:38</td>
-															<td class="center">admin</td>
-															<td class="center">127.0.0.1</td>
-															<td class="center"><font color='green'>成功</font></td>
-															<td class="center">登陆成功！</td>
-														</tr>
-														<tr>
-															<td class="center">2014-07-22 09:11:13</td>
-															<td class="center">admin</td>
-															<td class="center">127.0.0.1</td>
-															<td class="center"><font color='green'>成功</font></td>
-															<td class="center">登陆成功！</td>
-														</tr>
-														<tr>
-															<td class="center">2014-07-21 11:16:35</td>
-															<td class="center">admin</td>
-															<td class="center">127.0.0.1</td>
-															<td class="center"><font color='green'>成功</font></td>
-															<td class="center">登陆成功！</td>
-														</tr>
-														<tr>
-															<td class="center">2014-07-21 10:04:41</td>
-															<td class="center">admin</td>
-															<td class="center">127.0.0.1</td>
-															<td class="center"><font color='green'>成功</font></td>
-															<td class="center">登陆成功！</td>
-														</tr>
-														<tr>
-															<td class="center">2014-07-16 11:16:37</td>
-															<td class="center">admin</td>
-															<td class="center">127.0.0.1</td>
-															<td class="center"><font color='green'>成功</font></td>
-															<td class="center">登陆成功！</td>
-														</tr>
-														<tr>
-															<td class="center">2014-07-16 10:25:38</td>
-															<td class="center">admin</td>
-															<td class="center">127.0.0.1</td>
-															<td class="center"><font color='green'>成功</font></td>
-															<td class="center">登陆成功！</td>
-														</tr>
-														<tr>
-															<td class="center">2014-07-16 10:17:06</td>
-															<td class="center">admin</td>
-															<td class="center">127.0.0.1</td>
-															<td class="center"><font color='green'>成功</font></td>
-															<td class="center">登陆成功！</td>
-														</tr>
-														<tr>
-															<td class="center">2014-07-16 10:14:23</td>
-															<td class="center">admin</td>
-															<td class="center">127.0.0.1</td>
-															<td class="center"><font color='green'>成功</font></td>
-															<td class="center">登陆成功！</td>
-														</tr>
-														<tr>
-															<td class="center">2014-07-16 09:42:01</td>
-															<td class="center">admin</td>
-															<td class="center">127.0.0.1</td>
-															<td class="center"><font color='green'>成功</font></td>
-															<td class="center">登陆成功！</td>
-														</tr>
-													</tbody>
-												</table>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div id="footer">
-		Copyright &copy; 2014 - 2015 <a href="http://absir.com/"
-			target="_blank">Achieve Server开发框架</a>
-	</div>
-	\#end
+\#set(page_title = ${Pag::getLang("管理后台", false)})
+\#set(body_class = "skin-blue") 
+\#set(page_title = Pag::configure().sitename + ${Pag::getLang("管理后台",false)})
+\#tag layout("/WEB-INF/tpl/layout.html")
+
+<div class="wrapper">
+      
+      <header class="main-header">
+        <!-- Logo -->
+        <a href="index2.html" class="logo"><b>Admin</b>LTE</a>
+        <!-- Header Navbar: style can be found in header.less -->
+        <nav class="navbar navbar-static-top" role="navigation">
+          <!-- Sidebar toggle button-->
+          <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+            <span class="sr-only">Toggle navigation</span>
+          </a>
+          <div class="navbar-custom-menu">
+            <ul class="nav navbar-nav">
+              <!-- Messages: style can be found in dropdown.less-->
+              <li class="dropdown messages-menu">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                  <i class="fa fa-envelope-o"></i>
+                  <span class="label label-success">4</span>
+                </a>
+                <ul class="dropdown-menu">
+                  <li class="header">You have 4 messages</li>
+                  <li>
+                    <!-- inner menu: contains the actual data -->
+                    <ul class="menu">
+                      <li><!-- start message -->
+                        <a href="#">
+                          <div class="pull-left">
+                            <img src="dist/img/user2-160x160.jpg" class="img-circle" alt="User Image"/>
+                          </div>
+                          <h4>
+                            Support Team
+                            <small><i class="fa fa-clock-o"></i> 5 mins</small>
+                          </h4>
+                          <p>Why not buy a new awesome theme?</p>
+                        </a>
+                      </li><!-- end message -->
+                      <li>
+                        <a href="#">
+                          <div class="pull-left">
+                            <img src="dist/img/user3-128x128.jpg" class="img-circle" alt="user image"/>
+                          </div>
+                          <h4>
+                            AdminLTE Design Team
+                            <small><i class="fa fa-clock-o"></i> 2 hours</small>
+                          </h4>
+                          <p>Why not buy a new awesome theme?</p>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="#">
+                          <div class="pull-left">
+                            <img src="dist/img/user4-128x128.jpg" class="img-circle" alt="user image"/>
+                          </div>
+                          <h4>
+                            Developers
+                            <small><i class="fa fa-clock-o"></i> Today</small>
+                          </h4>
+                          <p>Why not buy a new awesome theme?</p>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="#">
+                          <div class="pull-left">
+                            <img src="dist/img/user3-128x128.jpg" class="img-circle" alt="user image"/>
+                          </div>
+                          <h4>
+                            Sales Department
+                            <small><i class="fa fa-clock-o"></i> Yesterday</small>
+                          </h4>
+                          <p>Why not buy a new awesome theme?</p>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="#">
+                          <div class="pull-left">
+                            <img src="dist/img/user4-128x128.jpg" class="img-circle" alt="user image"/>
+                          </div>
+                          <h4>
+                            Reviewers
+                            <small><i class="fa fa-clock-o"></i> 2 days</small>
+                          </h4>
+                          <p>Why not buy a new awesome theme?</p>
+                        </a>
+                      </li>
+                    </ul>
+                  </li>
+                  <li class="footer"><a href="#">See All Messages</a></li>
+                </ul>
+              </li>
+              <!-- Notifications: style can be found in dropdown.less -->
+              <li class="dropdown notifications-menu">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                  <i class="fa fa-bell-o"></i>
+                  <span class="label label-warning">10</span>
+                </a>
+                <ul class="dropdown-menu">
+                  <li class="header">You have 10 notifications</li>
+                  <li>
+                    <!-- inner menu: contains the actual data -->
+                    <ul class="menu">
+                      <li>
+                        <a href="#">
+                          <i class="fa fa-users text-aqua"></i> 5 new members joined today
+                        </a>
+                      </li>
+                      <li>
+                        <a href="#">
+                          <i class="fa fa-warning text-yellow"></i> Very long description here that may not fit into the page and may cause design problems
+                        </a>
+                      </li>
+                      <li>
+                        <a href="#">
+                          <i class="fa fa-users text-red"></i> 5 new members joined
+                        </a>
+                      </li>
+
+                      <li>
+                        <a href="#">
+                          <i class="fa fa-shopping-cart text-green"></i> 25 sales made
+                        </a>
+                      </li>
+                      <li>
+                        <a href="#">
+                          <i class="fa fa-user text-red"></i> You changed your username
+                        </a>
+                      </li>
+                    </ul>
+                  </li>
+                  <li class="footer"><a href="#">View all</a></li>
+                </ul>
+              </li>
+              <!-- Tasks: style can be found in dropdown.less -->
+              <li class="dropdown tasks-menu">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                  <i class="fa fa-flag-o"></i>
+                  <span class="label label-danger">9</span>
+                </a>
+                <ul class="dropdown-menu">
+                  <li class="header">You have 9 tasks</li>
+                  <li>
+                    <!-- inner menu: contains the actual data -->
+                    <ul class="menu">
+                      <li><!-- Task item -->
+                        <a href="#">
+                          <h3>
+                            Design some buttons
+                            <small class="pull-right">20%</small>
+                          </h3>
+                          <div class="progress xs">
+                            <div class="progress-bar progress-bar-aqua" style="width: 20%" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">
+                              <span class="sr-only">20% Complete</span>
+                            </div>
+                          </div>
+                        </a>
+                      </li><!-- end task item -->
+                      <li><!-- Task item -->
+                        <a href="#">
+                          <h3>
+                            Create a nice theme
+                            <small class="pull-right">40%</small>
+                          </h3>
+                          <div class="progress xs">
+                            <div class="progress-bar progress-bar-green" style="width: 40%" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">
+                              <span class="sr-only">40% Complete</span>
+                            </div>
+                          </div>
+                        </a>
+                      </li><!-- end task item -->
+                      <li><!-- Task item -->
+                        <a href="#">
+                          <h3>
+                            Some task I need to do
+                            <small class="pull-right">60%</small>
+                          </h3>
+                          <div class="progress xs">
+                            <div class="progress-bar progress-bar-red" style="width: 60%" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">
+                              <span class="sr-only">60% Complete</span>
+                            </div>
+                          </div>
+                        </a>
+                      </li><!-- end task item -->
+                      <li><!-- Task item -->
+                        <a href="#">
+                          <h3>
+                            Make beautiful transitions
+                            <small class="pull-right">80%</small>
+                          </h3>
+                          <div class="progress xs">
+                            <div class="progress-bar progress-bar-yellow" style="width: 80%" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">
+                              <span class="sr-only">80% Complete</span>
+                            </div>
+                          </div>
+                        </a>
+                      </li><!-- end task item -->
+                    </ul>
+                  </li>
+                  <li class="footer">
+                    <a href="#">View all tasks</a>
+                  </li>
+                </ul>
+              </li>
+              <!-- User Account: style can be found in dropdown.less -->
+              <li class="dropdown user user-menu">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                  <img src="dist/img/user2-160x160.jpg" class="user-image" alt="User Image"/>
+                  <span class="hidden-xs">Alexander Pierce</span>
+                </a>
+                <ul class="dropdown-menu">
+                  <!-- User image -->
+                  <li class="user-header">
+                    <img src="dist/img/user2-160x160.jpg" class="img-circle" alt="User Image" />
+                    <p>
+                      Alexander Pierce - Web Developer
+                      <small>Member since Nov. 2012</small>
+                    </p>
+                  </li>
+                  <!-- Menu Body -->
+                  <li class="user-body">
+                    <div class="col-xs-4 text-center">
+                      <a href="#">Followers</a>
+                    </div>
+                    <div class="col-xs-4 text-center">
+                      <a href="#">Sales</a>
+                    </div>
+                    <div class="col-xs-4 text-center">
+                      <a href="#">Friends</a>
+                    </div>
+                  </li>
+                  <!-- Menu Footer-->
+                  <li class="user-footer">
+                    <div class="pull-left">
+                      <a href="#" class="btn btn-default btn-flat">Profile</a>
+                    </div>
+                    <div class="pull-right">
+                      <a href="#" class="btn btn-default btn-flat">Sign out</a>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </header>
+      <!-- Left side column. contains the logo and sidebar -->
+      <aside class="main-sidebar">
+        <!-- sidebar: style can be found in sidebar.less -->
+        <section class="sidebar">
+          <!-- Sidebar user panel -->
+          <div class="user-panel">
+            <div class="pull-left image">
+              <img src="dist/img/user2-160x160.jpg" class="img-circle" alt="User Image" />
+            </div>
+            <div class="pull-left info">
+              <p>Alexander Pierce</p>
+
+              <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+            </div>
+          </div>
+          <!-- search form -->
+          <form action="#" method="get" class="sidebar-form">
+            <div class="input-group">
+              <input type="text" name="q" class="form-control" placeholder="Search..."/>
+              <span class="input-group-btn">
+                <button type='submit' name='search' id='search-btn' class="btn btn-flat"><i class="fa fa-search"></i></button>
+              </span>
+            </div>
+          </form>
+          <!-- /.search form -->
+          <!-- sidebar menu: : style can be found in sidebar.less -->
+          <ul class="sidebar-menu">
+            <li class="header">MAIN NAVIGATION</li>
+            <li class="active treeview">
+              <a href="#">
+                <i class="fa fa-dashboard"></i> <span>Dashboard</span> <i class="fa fa-angle-left pull-right"></i>
+              </a>
+              <ul class="treeview-menu">
+                <li class="active"><a href="index.html"><i class="fa fa-circle-o"></i> Dashboard v1</a></li>
+                <li><a href="index2.html"><i class="fa fa-circle-o"></i> Dashboard v2</a></li>
+              </ul>
+            </li>
+            <li class="treeview">
+              <a href="#">
+                <i class="fa fa-files-o"></i>
+                <span>Layout Options</span>
+                <span class="label label-primary pull-right">4</span>
+              </a>
+              <ul class="treeview-menu">
+                <li><a href="pages/layout/top-nav.html"><i class="fa fa-circle-o"></i> Top Navigation</a></li>
+                <li><a href="pages/layout/boxed.html"><i class="fa fa-circle-o"></i> Boxed</a></li>
+                <li><a href="pages/layout/fixed.html"><i class="fa fa-circle-o"></i> Fixed</a></li>
+                <li><a href="pages/layout/collapsed-sidebar.html"><i class="fa fa-circle-o"></i> Collapsed Sidebar</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="pages/widgets.html">
+                <i class="fa fa-th"></i> <span>Widgets</span> <small class="label pull-right bg-green">new</small>
+              </a>
+            </li>
+            <li class="treeview">
+              <a href="#">
+                <i class="fa fa-pie-chart"></i>
+                <span>Charts</span>
+                <i class="fa fa-angle-left pull-right"></i>
+              </a>
+              <ul class="treeview-menu">
+                <li><a href="pages/charts/morris.html"><i class="fa fa-circle-o"></i> Morris</a></li>
+                <li><a href="pages/charts/flot.html"><i class="fa fa-circle-o"></i> Flot</a></li>
+                <li><a href="pages/charts/inline.html"><i class="fa fa-circle-o"></i> Inline charts</a></li>
+              </ul>
+            </li>
+            <li class="treeview">
+              <a href="#">
+                <i class="fa fa-laptop"></i>
+                <span>UI Elements</span>
+                <i class="fa fa-angle-left pull-right"></i>
+              </a>
+              <ul class="treeview-menu">
+                <li><a href="pages/UI/general.html"><i class="fa fa-circle-o"></i> General</a></li>
+                <li><a href="pages/UI/icons.html"><i class="fa fa-circle-o"></i> Icons</a></li>
+                <li><a href="pages/UI/buttons.html"><i class="fa fa-circle-o"></i> Buttons</a></li>
+                <li><a href="pages/UI/sliders.html"><i class="fa fa-circle-o"></i> Sliders</a></li>
+                <li><a href="pages/UI/timeline.html"><i class="fa fa-circle-o"></i> Timeline</a></li>
+                <li><a href="pages/UI/modals.html"><i class="fa fa-circle-o"></i> Modals</a></li>
+              </ul>
+            </li>
+            <li class="treeview">
+              <a href="#">
+                <i class="fa fa-edit"></i> <span>Forms</span>
+                <i class="fa fa-angle-left pull-right"></i>
+              </a>
+              <ul class="treeview-menu">
+                <li><a href="pages/forms/general.html"><i class="fa fa-circle-o"></i> General Elements</a></li>
+                <li><a href="pages/forms/advanced.html"><i class="fa fa-circle-o"></i> Advanced Elements</a></li>
+                <li><a href="pages/forms/editors.html"><i class="fa fa-circle-o"></i> Editors</a></li>
+              </ul>
+            </li>
+            <li class="treeview">
+              <a href="#">
+                <i class="fa fa-table"></i> <span>Tables</span>
+                <i class="fa fa-angle-left pull-right"></i>
+              </a>
+              <ul class="treeview-menu">
+                <li><a href="pages/tables/simple.html"><i class="fa fa-circle-o"></i> Simple tables</a></li>
+                <li><a href="pages/tables/data.html"><i class="fa fa-circle-o"></i> Data tables</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="pages/calendar.html">
+                <i class="fa fa-calendar"></i> <span>Calendar</span>
+                <small class="label pull-right bg-red">3</small>
+              </a>
+            </li>
+            <li>
+              <a href="pages/mailbox/mailbox.html">
+                <i class="fa fa-envelope"></i> <span>Mailbox</span>
+                <small class="label pull-right bg-yellow">12</small>
+              </a>
+            </li>
+            <li class="treeview">
+              <a href="#">
+                <i class="fa fa-folder"></i> <span>Examples</span>
+                <i class="fa fa-angle-left pull-right"></i>
+              </a>
+              <ul class="treeview-menu">
+                <li><a href="pages/examples/invoice.html"><i class="fa fa-circle-o"></i> Invoice</a></li>
+                <li><a href="pages/examples/login.html"><i class="fa fa-circle-o"></i> Login</a></li>
+                <li><a href="pages/examples/register.html"><i class="fa fa-circle-o"></i> Register</a></li>
+                <li><a href="pages/examples/lockscreen.html"><i class="fa fa-circle-o"></i> Lockscreen</a></li>
+                <li><a href="pages/examples/404.html"><i class="fa fa-circle-o"></i> 404 Error</a></li>
+                <li><a href="pages/examples/500.html"><i class="fa fa-circle-o"></i> 500 Error</a></li>
+                <li><a href="pages/examples/blank.html"><i class="fa fa-circle-o"></i> Blank Page</a></li>
+              </ul>
+            </li>
+            <li class="treeview">
+              <a href="#">
+                <i class="fa fa-share"></i> <span>Multilevel</span>
+                <i class="fa fa-angle-left pull-right"></i>
+              </a>
+              <ul class="treeview-menu">
+                <li><a href="#"><i class="fa fa-circle-o"></i> Level One</a></li>
+                <li>
+                  <a href="#"><i class="fa fa-circle-o"></i> Level One <i class="fa fa-angle-left pull-right"></i></a>
+                  <ul class="treeview-menu">
+                    <li><a href="#"><i class="fa fa-circle-o"></i> Level Two</a></li>
+                    <li>
+                      <a href="#"><i class="fa fa-circle-o"></i> Level Two <i class="fa fa-angle-left pull-right"></i></a>
+                      <ul class="treeview-menu">
+                        <li><a href="#"><i class="fa fa-circle-o"></i> Level Three</a></li>
+                        <li><a href="#"><i class="fa fa-circle-o"></i> Level Three</a></li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+                <li><a href="#"><i class="fa fa-circle-o"></i> Level One</a></li>
+              </ul>
+            </li>
+            <li><a href="documentation/index.html"><i class="fa fa-book"></i> Documentation</a></li>
+            <li class="header">LABELS</li>
+            <li><a href="#"><i class="fa fa-circle-o text-danger"></i> Important</a></li>
+            <li><a href="#"><i class="fa fa-circle-o text-warning"></i> Warning</a></li>
+            <li><a href="#"><i class="fa fa-circle-o text-info"></i> Information</a></li>
+          </ul>
+        </section>
+        <!-- /.sidebar -->
+      </aside>
+
+      <!-- Right side column. Contains the navbar and content of the page -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <h1>
+            Dashboard
+            <small>Control panel</small>
+          </h1>
+          <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li class="active">Dashboard</li>
+          </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+          <!-- Small boxes (Stat box) -->
+          <div class="row">
+            <div class="col-lg-3 col-xs-6">
+              <!-- small box -->
+              <div class="small-box bg-aqua">
+                <div class="inner">
+                  <h3>150</h3>
+                  <p>New Orders</p>
+                </div>
+                <div class="icon">
+                  <i class="ion ion-bag"></i>
+                </div>
+                <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+              </div>
+            </div><!-- ./col -->
+            <div class="col-lg-3 col-xs-6">
+              <!-- small box -->
+              <div class="small-box bg-green">
+                <div class="inner">
+                  <h3>53<sup style="font-size: 20px">%</sup></h3>
+                  <p>Bounce Rate</p>
+                </div>
+                <div class="icon">
+                  <i class="ion ion-stats-bars"></i>
+                </div>
+                <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+              </div>
+            </div><!-- ./col -->
+            <div class="col-lg-3 col-xs-6">
+              <!-- small box -->
+              <div class="small-box bg-yellow">
+                <div class="inner">
+                  <h3>44</h3>
+                  <p>User Registrations</p>
+                </div>
+                <div class="icon">
+                  <i class="ion ion-person-add"></i>
+                </div>
+                <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+              </div>
+            </div><!-- ./col -->
+            <div class="col-lg-3 col-xs-6">
+              <!-- small box -->
+              <div class="small-box bg-red">
+                <div class="inner">
+                  <h3>65</h3>
+                  <p>Unique Visitors</p>
+                </div>
+                <div class="icon">
+                  <i class="ion ion-pie-graph"></i>
+                </div>
+                <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+              </div>
+            </div><!-- ./col -->
+          </div><!-- /.row -->
+          <!-- Main row -->
+          <div class="row">
+            <!-- Left col -->
+            <section class="col-lg-7 connectedSortable">
+              <!-- Custom tabs (Charts with tabs)-->
+              <div class="nav-tabs-custom">
+                <!-- Tabs within a box -->
+                <ul class="nav nav-tabs pull-right">
+                  <li class="active"><a href="#revenue-chart" data-toggle="tab">Area</a></li>
+                  <li><a href="#sales-chart" data-toggle="tab">Donut</a></li>
+                  <li class="pull-left header"><i class="fa fa-inbox"></i> Sales</li>
+                </ul>
+                <div class="tab-content no-padding">
+                  <!-- Morris chart - Sales -->
+                  <div class="chart tab-pane active" id="revenue-chart" style="position: relative; height: 300px;"></div>
+                  <div class="chart tab-pane" id="sales-chart" style="position: relative; height: 300px;"></div>
+                </div>
+              </div><!-- /.nav-tabs-custom -->
+
+              <!-- Chat box -->
+              <div class="box box-success">
+                <div class="box-header">
+                  <i class="fa fa-comments-o"></i>
+                  <h3 class="box-title">Chat</h3>
+                  <div class="box-tools pull-right" data-toggle="tooltip" title="Status">
+                    <div class="btn-group" data-toggle="btn-toggle" >
+                      <button type="button" class="btn btn-default btn-sm active"><i class="fa fa-square text-green"></i></button>
+                      <button type="button" class="btn btn-default btn-sm"><i class="fa fa-square text-red"></i></button>
+                    </div>
+                  </div>
+                </div>
+                <div class="box-body chat" id="chat-box">
+                  <!-- chat item -->
+                  <div class="item">
+                    <img src="dist/img/user4-128x128.jpg" alt="user image" class="online"/>
+                    <p class="message">
+                      <a href="#" class="name">
+                        <small class="text-muted pull-right"><i class="fa fa-clock-o"></i> 2:15</small>
+                        Mike Doe
+                      </a>
+                      I would like to meet you to discuss the latest news about
+                      the arrival of the new theme. They say it is going to be one the
+                      best themes on the market
+                    </p>
+                    <div class="attachment">
+                      <h4>Attachments:</h4>
+                      <p class="filename">
+                        Theme-thumbnail-image.jpg
+                      </p>
+                      <div class="pull-right">
+                        <button class="btn btn-primary btn-sm btn-flat">Open</button>
+                      </div>
+                    </div><!-- /.attachment -->
+                  </div><!-- /.item -->
+                  <!-- chat item -->
+                  <div class="item">
+                    <img src="dist/img/user3-128x128.jpg" alt="user image" class="offline"/>
+                    <p class="message">
+                      <a href="#" class="name">
+                        <small class="text-muted pull-right"><i class="fa fa-clock-o"></i> 5:15</small>
+                        Alexander Pierce
+                      </a>
+                      I would like to meet you to discuss the latest news about
+                      the arrival of the new theme. They say it is going to be one the
+                      best themes on the market
+                    </p>
+                  </div><!-- /.item -->
+                  <!-- chat item -->
+                  <div class="item">
+                    <img src="dist/img/user2-160x160.jpg" alt="user image" class="offline"/>
+                    <p class="message">
+                      <a href="#" class="name">
+                        <small class="text-muted pull-right"><i class="fa fa-clock-o"></i> 5:30</small>
+                        Susan Doe
+                      </a>
+                      I would like to meet you to discuss the latest news about
+                      the arrival of the new theme. They say it is going to be one the
+                      best themes on the market
+                    </p>
+                  </div><!-- /.item -->
+                </div><!-- /.chat -->
+                <div class="box-footer">
+                  <div class="input-group">
+                    <input class="form-control" placeholder="Type message..."/>
+                    <div class="input-group-btn">
+                      <button class="btn btn-success"><i class="fa fa-plus"></i></button>
+                    </div>
+                  </div>
+                </div>
+              </div><!-- /.box (chat box) -->
+
+              <!-- TO DO List -->
+              <div class="box box-primary">
+                <div class="box-header">
+                  <i class="ion ion-clipboard"></i>
+                  <h3 class="box-title">To Do List</h3>
+                  <div class="box-tools pull-right">
+                    <ul class="pagination pagination-sm inline">
+                      <li><a href="#">&laquo;</a></li>
+                      <li><a href="#">1</a></li>
+                      <li><a href="#">2</a></li>
+                      <li><a href="#">3</a></li>
+                      <li><a href="#">&raquo;</a></li>
+                    </ul>
+                  </div>
+                </div><!-- /.box-header -->
+                <div class="box-body">
+                  <ul class="todo-list">
+                    <li>
+                      <!-- drag handle -->
+                      <span class="handle">
+                        <i class="fa fa-ellipsis-v"></i>
+                        <i class="fa fa-ellipsis-v"></i>
+                      </span>
+                      <!-- checkbox -->
+                      <input type="checkbox" value="" name=""/>
+                      <!-- todo text -->
+                      <span class="text">Design a nice theme</span>
+                      <!-- Emphasis label -->
+                      <small class="label label-danger"><i class="fa fa-clock-o"></i> 2 mins</small>
+                      <!-- General tools such as edit or delete-->
+                      <div class="tools">
+                        <i class="fa fa-edit"></i>
+                        <i class="fa fa-trash-o"></i>
+                      </div>
+                    </li>
+                    <li>
+                      <span class="handle">
+                        <i class="fa fa-ellipsis-v"></i>
+                        <i class="fa fa-ellipsis-v"></i>
+                      </span>
+                      <input type="checkbox" value="" name=""/>
+                      <span class="text">Make the theme responsive</span>
+                      <small class="label label-info"><i class="fa fa-clock-o"></i> 4 hours</small>
+                      <div class="tools">
+                        <i class="fa fa-edit"></i>
+                        <i class="fa fa-trash-o"></i>
+                      </div>
+                    </li>
+                    <li>
+                      <span class="handle">
+                        <i class="fa fa-ellipsis-v"></i>
+                        <i class="fa fa-ellipsis-v"></i>
+                      </span>
+                      <input type="checkbox" value="" name=""/>
+                      <span class="text">Let theme shine like a star</span>
+                      <small class="label label-warning"><i class="fa fa-clock-o"></i> 1 day</small>
+                      <div class="tools">
+                        <i class="fa fa-edit"></i>
+                        <i class="fa fa-trash-o"></i>
+                      </div>
+                    </li>
+                    <li>
+                      <span class="handle">
+                        <i class="fa fa-ellipsis-v"></i>
+                        <i class="fa fa-ellipsis-v"></i>
+                      </span>
+                      <input type="checkbox" value="" name=""/>
+                      <span class="text">Let theme shine like a star</span>
+                      <small class="label label-success"><i class="fa fa-clock-o"></i> 3 days</small>
+                      <div class="tools">
+                        <i class="fa fa-edit"></i>
+                        <i class="fa fa-trash-o"></i>
+                      </div>
+                    </li>
+                    <li>
+                      <span class="handle">
+                        <i class="fa fa-ellipsis-v"></i>
+                        <i class="fa fa-ellipsis-v"></i>
+                      </span>
+                      <input type="checkbox" value="" name=""/>
+                      <span class="text">Check your messages and notifications</span>
+                      <small class="label label-primary"><i class="fa fa-clock-o"></i> 1 week</small>
+                      <div class="tools">
+                        <i class="fa fa-edit"></i>
+                        <i class="fa fa-trash-o"></i>
+                      </div>
+                    </li>
+                    <li>
+                      <span class="handle">
+                        <i class="fa fa-ellipsis-v"></i>
+                        <i class="fa fa-ellipsis-v"></i>
+                      </span>
+                      <input type="checkbox" value="" name=""/>
+                      <span class="text">Let theme shine like a star</span>
+                      <small class="label label-default"><i class="fa fa-clock-o"></i> 1 month</small>
+                      <div class="tools">
+                        <i class="fa fa-edit"></i>
+                        <i class="fa fa-trash-o"></i>
+                      </div>
+                    </li>
+                  </ul>
+                </div><!-- /.box-body -->
+                <div class="box-footer clearfix no-border">
+                  <button class="btn btn-default pull-right"><i class="fa fa-plus"></i> Add item</button>
+                </div>
+              </div><!-- /.box -->
+
+              <!-- quick email widget -->
+              <div class="box box-info">
+                <div class="box-header">
+                  <i class="fa fa-envelope"></i>
+                  <h3 class="box-title">Quick Email</h3>
+                  <!-- tools box -->
+                  <div class="pull-right box-tools">
+                    <button class="btn btn-info btn-sm" data-widget="remove" data-toggle="tooltip" title="Remove"><i class="fa fa-times"></i></button>
+                  </div><!-- /. tools -->
+                </div>
+                <div class="box-body">
+                  <form action="#" method="post">
+                    <div class="form-group">
+                      <input type="email" class="form-control" name="emailto" placeholder="Email to:"/>
+                    </div>
+                    <div class="form-group">
+                      <input type="text" class="form-control" name="subject" placeholder="Subject"/>
+                    </div>
+                    <div>
+                      <textarea class="textarea" placeholder="Message" style="width: 100%; height: 125px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
+                    </div>
+                  </form>
+                </div>
+                <div class="box-footer clearfix">
+                  <button class="pull-right btn btn-default" id="sendEmail">Send <i class="fa fa-arrow-circle-right"></i></button>
+                </div>
+              </div>
+
+            </section><!-- /.Left col -->
+            <!-- right col (We are only adding the ID to make the widgets sortable)-->
+            <section class="col-lg-5 connectedSortable">
+
+              <!-- Map box -->
+              <div class="box box-solid bg-light-blue-gradient">
+                <div class="box-header">
+                  <!-- tools box -->
+                  <div class="pull-right box-tools">
+                    <button class="btn btn-primary btn-sm daterange pull-right" data-toggle="tooltip" title="Date range"><i class="fa fa-calendar"></i></button>
+                    <button class="btn btn-primary btn-sm pull-right" data-widget='collapse' data-toggle="tooltip" title="Collapse" style="margin-right: 5px;"><i class="fa fa-minus"></i></button>
+                  </div><!-- /. tools -->
+
+                  <i class="fa fa-map-marker"></i>
+                  <h3 class="box-title">
+                    Visitors
+                  </h3>
+                </div>
+                <div class="box-body">
+                  <div id="world-map" style="height: 250px; width: 100%;"></div>
+                </div><!-- /.box-body-->
+                <div class="box-footer no-border">
+                  <div class="row">
+                    <div class="col-xs-4 text-center" style="border-right: 1px solid #f4f4f4">
+                      <div id="sparkline-1"></div>
+                      <div class="knob-label">Visitors</div>
+                    </div><!-- ./col -->
+                    <div class="col-xs-4 text-center" style="border-right: 1px solid #f4f4f4">
+                      <div id="sparkline-2"></div>
+                      <div class="knob-label">Online</div>
+                    </div><!-- ./col -->
+                    <div class="col-xs-4 text-center">
+                      <div id="sparkline-3"></div>
+                      <div class="knob-label">Exists</div>
+                    </div><!-- ./col -->
+                  </div><!-- /.row -->
+                </div>
+              </div>
+              <!-- /.box -->
+
+              <!-- solid sales graph -->
+              <div class="box box-solid bg-teal-gradient">
+                <div class="box-header">
+                  <i class="fa fa-th"></i>
+                  <h3 class="box-title">Sales Graph</h3>
+                  <div class="box-tools pull-right">
+                    <button class="btn bg-teal btn-sm" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    <button class="btn bg-teal btn-sm" data-widget="remove"><i class="fa fa-times"></i></button>
+                  </div>
+                </div>
+                <div class="box-body border-radius-none">
+                  <div class="chart" id="line-chart" style="height: 250px;"></div>
+                </div><!-- /.box-body -->
+                <div class="box-footer no-border">
+                  <div class="row">
+                    <div class="col-xs-4 text-center" style="border-right: 1px solid #f4f4f4">
+                      <input type="text" class="knob" data-readonly="true" value="20" data-width="60" data-height="60" data-fgColor="#39CCCC"/>
+                      <div class="knob-label">Mail-Orders</div>
+                    </div><!-- ./col -->
+                    <div class="col-xs-4 text-center" style="border-right: 1px solid #f4f4f4">
+                      <input type="text" class="knob" data-readonly="true" value="50" data-width="60" data-height="60" data-fgColor="#39CCCC"/>
+                      <div class="knob-label">Online</div>
+                    </div><!-- ./col -->
+                    <div class="col-xs-4 text-center">
+                      <input type="text" class="knob" data-readonly="true" value="30" data-width="60" data-height="60" data-fgColor="#39CCCC"/>
+                      <div class="knob-label">In-Store</div>
+                    </div><!-- ./col -->
+                  </div><!-- /.row -->
+                </div><!-- /.box-footer -->
+              </div><!-- /.box -->
+
+              <!-- Calendar -->
+              <div class="box box-solid bg-green-gradient">
+                <div class="box-header">
+                  <i class="fa fa-calendar"></i>
+                  <h3 class="box-title">Calendar</h3>
+                  <!-- tools box -->
+                  <div class="pull-right box-tools">
+                    <!-- button with a dropdown -->
+                    <div class="btn-group">
+                      <button class="btn btn-success btn-sm dropdown-toggle" data-toggle="dropdown"><i class="fa fa-bars"></i></button>
+                      <ul class="dropdown-menu pull-right" role="menu">
+                        <li><a href="#">Add new event</a></li>
+                        <li><a href="#">Clear events</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#">View calendar</a></li>
+                      </ul>
+                    </div>
+                    <button class="btn btn-success btn-sm" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    <button class="btn btn-success btn-sm" data-widget="remove"><i class="fa fa-times"></i></button>
+                  </div><!-- /. tools -->
+                </div><!-- /.box-header -->
+                <div class="box-body no-padding">
+                  <!--The calendar -->
+                  <div id="calendar" style="width: 100%"></div>
+                </div><!-- /.box-body -->
+                <div class="box-footer text-black">
+                  <div class="row">
+                    <div class="col-sm-6">
+                      <!-- Progress bars -->
+                      <div class="clearfix">
+                        <span class="pull-left">Task #1</span>
+                        <small class="pull-right">90%</small>
+                      </div>
+                      <div class="progress xs">
+                        <div class="progress-bar progress-bar-green" style="width: 90%;"></div>
+                      </div>
+
+                      <div class="clearfix">
+                        <span class="pull-left">Task #2</span>
+                        <small class="pull-right">70%</small>
+                      </div>
+                      <div class="progress xs">
+                        <div class="progress-bar progress-bar-green" style="width: 70%;"></div>
+                      </div>
+                    </div><!-- /.col -->
+                    <div class="col-sm-6">
+                      <div class="clearfix">
+                        <span class="pull-left">Task #3</span>
+                        <small class="pull-right">60%</small>
+                      </div>
+                      <div class="progress xs">
+                        <div class="progress-bar progress-bar-green" style="width: 60%;"></div>
+                      </div>
+
+                      <div class="clearfix">
+                        <span class="pull-left">Task #4</span>
+                        <small class="pull-right">40%</small>
+                      </div>
+                      <div class="progress xs">
+                        <div class="progress-bar progress-bar-green" style="width: 40%;"></div>
+                      </div>
+                    </div><!-- /.col -->
+                  </div><!-- /.row -->
+                </div>
+              </div><!-- /.box -->
+
+            </section><!-- right col -->
+          </div><!-- /.row (main row) -->
+
+        </section><!-- /.content -->
+      </div><!-- /.content-wrapper -->
+      <footer class="main-footer">
+        <div class="pull-right hidden-xs">
+          <b>Version</b> 2.0
+        </div>
+        <strong>Copyright &copy; 2014-2015 <a href="http://almsaeedstudio.com">Almsaeed Studio</a>.</strong> All rights reserved.
+      </footer>
+    </div><!-- ./wrapper -->
+
+\#define(Object lte) #set(lte = SITE_ROUTE + "/static/lte/")
+    <script src="\${lte}plugins/jQuery/jQuery-2.1.3.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.11.2/jquery-ui.min.js" type="text/javascript"></script>
+    <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+    <script>
+      $.widget.bridge('uibutton', $.ui.button);
+    </script>
+    <!-- Bootstrap 3.3.2 JS -->
+    <script src="bootstrap/js/bootstrap.min.js" type="text/javascript"></script>    
+    <!-- Morris.js charts -->
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+    <script src="plugins/morris/morris.min.js" type="text/javascript"></script>
+    <!-- Sparkline -->
+    <script src="plugins/sparkline/jquery.sparkline.min.js" type="text/javascript"></script>
+    <!-- jvectormap -->
+    <script src="plugins/jvectormap/jquery-jvectormap-1.2.2.min.js" type="text/javascript"></script>
+    <script src="plugins/jvectormap/jquery-jvectormap-world-mill-en.js" type="text/javascript"></script>
+    <!-- jQuery Knob Chart -->
+    <script src="plugins/knob/jquery.knob.js" type="text/javascript"></script>
+    <!-- daterangepicker -->
+    <script src="plugins/daterangepicker/daterangepicker.js" type="text/javascript"></script>
+    <!-- datepicker -->
+    <script src="plugins/datepicker/bootstrap-datepicker.js" type="text/javascript"></script>
+    <!-- Bootstrap WYSIHTML5 -->
+    <script src="plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js" type="text/javascript"></script>
+    <!-- iCheck -->
+    <script src="plugins/iCheck/icheck.min.js" type="text/javascript"></script>
+    <!-- Slimscroll -->
+    <script src="plugins/slimScroll/jquery.slimscroll.min.js" type="text/javascript"></script>
+    <!-- FastClick -->
+    <script src='plugins/fastclick/fastclick.min.js'></script>
+    <!-- AdminLTE App -->
+    <script src="dist/js/app.min.js" type="text/javascript"></script>
+
+\#end

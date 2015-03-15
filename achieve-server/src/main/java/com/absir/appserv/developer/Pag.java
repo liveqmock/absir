@@ -10,6 +10,8 @@ package com.absir.appserv.developer;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -40,6 +42,7 @@ import com.absir.servlet.InDispathFilter;
  * @author absir
  *
  */
+@SuppressWarnings("unchecked")
 @Inject
 public class Pag {
 
@@ -273,5 +276,81 @@ public class Pag {
 		}
 
 		return null;
+	}
+
+	/** NAME_TAG */
+	private static final String NAME_TAG = Pag.class.getName() + "@NAME_TAG";
+
+	/** NAME_TAGS */
+	private static final String NAME_TAGS = Pag.class.getName() + "@NAME_TAGS";
+
+	/**
+	 * @param input
+	 * @param tag
+	 * @return
+	 */
+	public static Map<String, Object> getNameTag(Input input, String tag) {
+		Object nameTag;
+		if (tag == null) {
+			nameTag = input.getModel().get(NAME_TAG);
+
+		} else {
+			nameTag = input.getModel().get(NAME_TAGS);
+			if (nameTag != null) {
+				nameTag = nameTag instanceof Map ? ((Map<String, Object>) nameTag).get(tag) : null;
+			}
+		}
+
+		return nameTag == null || !(nameTag instanceof Map) ? null : (Map<String, Object>) nameTag;
+	}
+
+	/**
+	 * @param input
+	 * @param name
+	 * @param tag
+	 * @param value
+	 */
+	public static void setNameTag(Input input, String name, String tag, String value) {
+		Object nameTag;
+		Map<String, Object> nameTagMap;
+		if (tag == null) {
+			nameTag = input.getModel().get(NAME_TAG);
+			if (nameTag == null || !(nameTag instanceof Map)) {
+				nameTagMap = new LinkedHashMap<String, Object>();
+
+			} else {
+				nameTagMap = (Map<String, Object>) nameTag;
+				input.getModel().put(NAME_TAG, nameTagMap);
+			}
+
+		} else {
+			nameTag = input.getModel().get(NAME_TAGS);
+			if (nameTag == null || !(nameTag instanceof Map)) {
+				nameTagMap = new HashMap<String, Object>();
+
+			} else {
+				nameTagMap = (Map<String, Object>) nameTag;
+				input.getModel().put(NAME_TAGS, nameTagMap);
+			}
+
+			if (nameTag == nameTagMap) {
+				nameTag = nameTagMap.get(tag);
+				if (nameTag != null && nameTag instanceof Map) {
+					nameTagMap = (Map<String, Object>) nameTag;
+					nameTag = null;
+				}
+			}
+
+			if (nameTag != null) {
+				nameTag = new LinkedHashMap<String, Object>();
+				nameTagMap.put(tag, nameTag);
+				nameTagMap = (Map<String, Object>) nameTag;
+				nameTag = null;
+			}
+		}
+
+		if (nameTag != nameTagMap || !nameTagMap.containsKey(name)) {
+			nameTagMap.put(name, value);
+		}
 	}
 }

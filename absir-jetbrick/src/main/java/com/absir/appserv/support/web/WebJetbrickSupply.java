@@ -10,23 +10,21 @@ package com.absir.appserv.support.web;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
 
-import jetbrick.template.JetContext;
+import jetbrick.io.resource.Resource;
 import jetbrick.template.JetEngine;
-import jetbrick.template.JetGlobalVariables;
-import jetbrick.template.JetTemplate;
+import jetbrick.template.JetGlobalContext;
 import jetbrick.template.VariableResolverBean;
-import jetbrick.template.resource.Resource;
-import jetbrick.template.runtime.JetPageContext;
+import jetbrick.template.runtime.InterpretContext;
 import jetbrick.template.runtime.JetTagContext;
 import jetbrick.template.web.JetWebContext;
-import jetbrick.template.web.JetWebEngineLoader;
+import jetbrick.template.web.JetWebEngine;
+import jetbrick.util.PathUtils;
 
 import com.absir.appserv.developer.Pag;
 import com.absir.appserv.developer.Scenario;
@@ -82,55 +80,35 @@ public class WebJetbrickSupply implements IMethodSupport<ConfigureFound> {
 	 */
 	public static JetEngine getEngine() {
 		if (engine == null) {
-			ServletContext servletContext = InDispathFilter.getServletContext();
-			if (servletContext == null) {
-				engine = JetEngine.create();
-
-			} else {
-				JetWebEngineLoader.setServletContext(servletContext);
-				engine = JetWebEngineLoader.getJetEngine();
-			}
-
 			Properties configProperties = new Properties();
 			BeanConfigImpl.readProperties(null, (Map<String, Object>) (Object) configProperties, new File(BeanFactoryUtils.getBeanConfig().getClassPath("jetbrick.properties")), null);
-			engine.getConfig().load(configProperties);
-			VariableResolverBean.load(engine, engine.getConfig());
-			JetGlobalVariables globalVariables = engine.getGlobalVariables();
-			if (globalVariables == null) {
-				KernelObject.declaredSet(engine, "globalVariables", new WebGlobalVariables() {
+			ServletContext servletContext = InDispathFilter.getServletContext();
+			if (servletContext == null) {
+				engine = JetEngine.create(configProperties);
 
-					/** map */
-					private Map<String, Object> variables = new HashMap<String, Object>();
-
-					@Override
-					public Object get(JetContext context, String name) {
-						// TODO Auto-generated method stub
-						return variables.get(name);
-					}
-
-					@Override
-					public void register(String name, Object variable) {
-						// TODO Auto-generated method stub
-						variables.put(name, variable);
-					}
-				});
-
-				globalVariables = engine.getGlobalVariables();
+			} else {
+				engine = JetWebEngine.create(servletContext, configProperties, null);
 			}
 
-			if (globalVariables != null && globalVariables instanceof WebGlobalVariables) {
-				WebGlobalVariables webGlobalVariables = (WebGlobalVariables) globalVariables;
-				webGlobalVariables.register("APP_NAME", MenuContextUtils.getAppName());
-				webGlobalVariables.register("SITE_ROUTE", MenuContextUtils.getSiteRoute());
-				webGlobalVariables.register("ADMIN_ROUTE", MenuContextUtils.getAdminRoute());
+			JetGlobalContext globalContext = engine.getGlobalContext();
+			if (globalContext == null) {
+				globalContext = new JetGlobalContext();
+				KernelObject.declaredSet(engine, "globalContext", globalContext);
+				globalContext = engine.getGlobalContext();
 			}
 
-			getVariableResolverBean().getVariableResolver().addImportClass(JoEntity.class.getName());
-			getVariableResolverBean().getVariableResolver().addImportClass(IMenuBean.class.getName());
-			getVariableResolverBean().getVariableResolver().addImportPackage(KernelObject.class.getPackage().getName());
-			getVariableResolverBean().getVariableResolver().addImportPackage(JEmbedLL.class.getPackage().getName());
-			getVariableResolverBean().getVariableResolver().addImportPackage(JiUserBase.class.getPackage().getName());
-			getVariableResolverBean().getVariableResolver().addImportPackage(Pag.class.getPackage().getName());
+			if (globalContext != null) {
+				globalContext.set("APP_NAME", MenuContextUtils.getAppName());
+				globalContext.set("SITE_ROUTE", MenuContextUtils.getSiteRoute());
+				globalContext.set("ADMIN_ROUTE", MenuContextUtils.getAdminRoute());
+			}
+
+			getVariableResolverBean().importClass(JoEntity.class.getName());
+			getVariableResolverBean().importClass(IMenuBean.class.getName());
+			getVariableResolverBean().importPackage(KernelObject.class.getPackage().getName());
+			getVariableResolverBean().importPackage(JEmbedLL.class.getPackage().getName());
+			getVariableResolverBean().importPackage(JiUserBase.class.getPackage().getName());
+			getVariableResolverBean().importPackage(Pag.class.getPackage().getName());
 		}
 
 		return engine;
@@ -160,7 +138,7 @@ public class WebJetbrickSupply implements IMethodSupport<ConfigureFound> {
 				}
 
 				if (resourceLoaderRoot == null) {
-					resourceLoaderRoot = resource.getAbsolutePath();
+					resourceLoaderRoot = resource.getRelativePathName();
 				}
 
 				resourceLoaderRoot = HelperFileName.getFullPathNoEndSeparator(resourceLoaderRoot + "/");
@@ -398,8 +376,8 @@ public class WebJetbrickSupply implements IMethodSupport<ConfigureFound> {
 	 * @throws IOException
 	 */
 	@BaFunction
-	public static JetPageContext pageContext(JetPageContext ctx) throws IOException {
-		return ctx;
+	public static InterpretContext getContext() throws IOException {
+		return InterpretContext.current();
 	}
 
 	/**
@@ -409,8 +387,8 @@ public class WebJetbrickSupply implements IMethodSupport<ConfigureFound> {
 	 * @throws IOException
 	 */
 	@BaFunction
-	public static String _include(JetPageContext ctx, String include) throws IOException {
-		return _include(ctx, include, include);
+	public static String pagInclude(String include) throws IOException {
+		return pagInclude(include, include);
 	}
 
 	/**
@@ -421,8 +399,9 @@ public class WebJetbrickSupply implements IMethodSupport<ConfigureFound> {
 	 * @throws IOException
 	 */
 	@BaFunction
-	public static String _include(JetPageContext ctx, String include, String generate) throws IOException {
-		return Pag.getInclude(include, generate, ctx, ctx.getContext().get(JetWebContext.REQUEST));
+	public static String pagInclude(String include, String generate) throws IOException {
+		InterpretContext ctx = InterpretContext.current();
+		return Pag.getInclude(include, generate, ctx, ctx.getValueStack().getValue(JetWebContext.REQUEST));
 	}
 
 	/**
@@ -430,11 +409,11 @@ public class WebJetbrickSupply implements IMethodSupport<ConfigureFound> {
 	 * @param name
 	 */
 	@BaTag
-	public static void _name(JetTagContext ctx, String name) {
-		Object request = ctx.getContext().get(JetWebContext.REQUEST);
+	public static void scenarioTag(JetTagContext ctx, String name) {
+		Object request = ctx.getValueStack().getValue(JetWebContext.REQUEST);
 		if (request != null && request instanceof ServletRequest) {
 			if (Scenario.requestName((ServletRequest) request, name)) {
-				ctx.writeBodyContent();
+				ctx.invoke();
 			}
 		}
 	}
@@ -444,8 +423,8 @@ public class WebJetbrickSupply implements IMethodSupport<ConfigureFound> {
 	 * @param file
 	 */
 	@BaTag
-	public static void _layout(JetTagContext ctx, String file) {
-		_layout(ctx, file, null);
+	public static void layout(JetTagContext ctx, String file) {
+		layout(ctx, file, null);
 	}
 
 	/**
@@ -454,18 +433,30 @@ public class WebJetbrickSupply implements IMethodSupport<ConfigureFound> {
 	 * @param parameters
 	 */
 	@BaTag
-	public static void _layout(JetTagContext ctx, String file, Map<String, Object> parameters) {
-		JetContext context;
-		if (parameters == null || parameters.size() == 0) {
-			context = ctx.getContext();
+	public static void layout(JetTagContext ctx, String file, Map<String, Object> parameters) {
+		ctx.getValueStack().setLocal("bodyContent", ctx.getBodyContent());
+		file = PathUtils.getRelativePath(ctx.getInterpretContext().getTemplate().getName(), file);
+		ctx.getInterpretContext().doIncludeCall(file, parameters, null);
+	}
 
-		} else {
-			context = new JetContext(ctx.getContext(), parameters);
-		}
+	/**
+	 * @param ctx
+	 * @param file
+	 */
+	@BaTag
+	public static void preLayout(JetTagContext ctx, String file) {
+		preLayout(ctx, file, null);
+	}
 
-		ctx.getContext().put("bodyContent", new TagWrapper(ctx));
-		file = ctx.getPageContext().getAbsolutionName(file);
-		JetTemplate template = ctx.getEngine().getTemplate(file);
-		template.render(context, ctx.getWriter());
+	/**
+	 * @param ctx
+	 * @param file
+	 * @param parameters
+	 */
+	@BaTag
+	public static void preLayout(JetTagContext ctx, String file, Map<String, Object> parameters) {
+		ctx.getValueStack().setLocal("bodyContent", new TagWrapper(ctx));
+		file = PathUtils.getRelativePath(ctx.getInterpretContext().getTemplate().getName(), file);
+		ctx.getInterpretContext().doIncludeCall(file, parameters, null);
 	}
 }

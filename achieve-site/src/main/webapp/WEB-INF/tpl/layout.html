@@ -1,34 +1,26 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-#define(Object jui)
-#set(jui = SITE_ROUTE + "/static/jui/")
-#set(locale = @Pag.locale())
-<link href="${jui}themes/css/bootstrap.min.css" rel="stylesheet" media="screen"/>
-<link href="${jui}themes/css/FA/css/font-awesome.min.css" rel="stylesheet" media="screen" />
-<link href="${jui}plugs/validationEngine/validationEngine.jquery.css" rel="stylesheet" media="screen" />
-<!--[if lte IE 7]>
-<link href="${jui}themes/css/ie7.css" rel="stylesheet" />
+<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
+#set(locale = Pag::locale()) 
+#define(Object lte) #set(lte = SITE_ROUTE + "/static/lte/")
+<link href="${lte}bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+<link href="${SITE_ROUTE}/static/net/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+<link href="${lte}dist/css/AdminLTE.min.css" rel="stylesheet" type="text/css" />
+<link href="${lte}plugins/iCheck/square/blue.css" rel="stylesheet" type="text/css" />
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+        <script src="${SITE_ROUTE}/static/net/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="${SITE_ROUTE}/static/net/libs/respond.js/1.3.0/respond.min.js"></script>
 <![endif]-->
-<!--[if lte IE 9]>
-<script src="${jui}js/speedup.js"></script>
-<script src="${jui}plugs/other/respond.js"></script>
-<![endif]-->
-<script src="${jui}js/jquery-1.7.2.min.js"></script>
-<script src="${jui}js/jquery.cookie.js"></script>
-<script src="${jui}plugs/other/jquery.autosize.js"></script>
-<script src="${jui}plugs/bootstrap.min.js"></script>
-<script src="${jui}plugs/bootstrapSelect/bootstrap-select.min.js"></script>
-<script src="${jui}plugs/bootstrapTags/bootstrap-tags.min.js"></script>
-<script src="${jui}plugs/validationEngine/jquery.validationEngine.min.js"></script>
-<script src="${jui}plugs/validationEngine/jquery.validationEngine-${locale}.js"></script>
-<link rel="icon" href="${SITE_ROUTE}/favicon.ico">
-<link rel="apple-touch-icon-precomposed" href="${SITE_ROUTE}/apple-touch-icon-precomposed.png">
 <title>${page_title}</title>
-${page_header}</head>
-<body>
-${bodyContent}</body>
-${page_footer}</html>
+${page_header}
+</head>
+<body class="${body_class}">
+${bodyContent}
+</body>
+${page_footer}
+</html>

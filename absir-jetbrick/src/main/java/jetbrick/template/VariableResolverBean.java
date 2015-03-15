@@ -9,58 +9,92 @@ package jetbrick.template;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Properties;
 
-import jetbrick.template.parser.VariableResolver;
-import jetbrick.template.runtime.JetPageContext;
+import jetbrick.bean.KlassInfo;
+import jetbrick.bean.MethodInfo;
+import jetbrick.template.resolver.GlobalResolver;
+import jetbrick.template.resolver.clazz.ClassResolver;
+import jetbrick.template.resolver.function.FunctionInvokerResolver;
+import jetbrick.template.resolver.method.MethodInvokerResolver;
+import jetbrick.template.resolver.tag.TagInvokerResolver;
 import jetbrick.template.runtime.JetTagContext;
 
+import com.absir.core.dyna.DynaBinder;
 import com.absir.core.kernel.KernelObject;
 
 /**
  * @author absir
  *
  */
-@SuppressWarnings("unchecked")
 public class VariableResolverBean {
 
 	/**
 	 * @param engine
-	 * @param config
+	 * @param configProperties
 	 */
-	public static void load(JetEngine engine, JetConfig config) {
-		engine.load(config);
+	public static void load(JetEngine engine, Properties configProperties) {
+		DynaBinder.INSTANCE.bind(configProperties, null, engine.getConfig().getClass(), engine.getConfig());
 	}
 
-	/** variableResolver */
-	private VariableResolver variableResolver;
+	/** engine */
+	protected JetEngine engine;
 
-	private Map<String, List<Method>> methodMap1 = new HashMap<String, List<Method>>(64);
-	private Map<String, List<Method>> methodMap2 = new HashMap<String, List<Method>>(32);
-	private Map<String, List<Method>> functionMap1 = new HashMap<String, List<Method>>(32);
-	private Map<String, List<Method>> functionMap2 = new HashMap<String, List<Method>>();
-	private Map<String, List<Method>> tagMap = new HashMap<String, List<Method>>();
+	/** variableResolver */
+	private GlobalResolver variableResolver;
+
+	/** classResolver */
+	private final ClassResolver classResolver;
+
+	/** methodInvokerResolver */
+	private final MethodInvokerResolver methodInvokerResolver;
+
+	/** functionInvokerResolver */
+	private final FunctionInvokerResolver functionInvokerResolver;
+
+	/** tagInvokerResolver */
+	private final TagInvokerResolver tagInvokerResolver;
 
 	/**
 	 * @param engine
 	 */
 	public VariableResolverBean(JetEngine engine) {
-		variableResolver = engine.getVariableResolver();
-		methodMap1 = (Map<String, List<Method>>) KernelObject.declaredGet(variableResolver, "methodMap1");
-		methodMap2 = (Map<String, List<Method>>) KernelObject.declaredGet(variableResolver, "methodMap2");
-		functionMap1 = (Map<String, List<Method>>) KernelObject.declaredGet(variableResolver, "functionMap1");
-		functionMap2 = (Map<String, List<Method>>) KernelObject.declaredGet(variableResolver, "functionMap2");
-		tagMap = (Map<String, List<Method>>) KernelObject.declaredGet(variableResolver, "tagMap");
+		this.engine = engine;
+		variableResolver = engine.getGlobalResolver();
+		classResolver = (ClassResolver) KernelObject.declaredGet(variableResolver, "classResolver");
+		methodInvokerResolver = (MethodInvokerResolver) KernelObject.declaredGet(variableResolver, "methodInvokerResolver");
+		functionInvokerResolver = (FunctionInvokerResolver) KernelObject.declaredGet(variableResolver, "functionInvokerResolver");
+		tagInvokerResolver = (TagInvokerResolver) KernelObject.declaredGet(variableResolver, "tagInvokerResolver");
 	}
 
 	/**
 	 * @return the variableResolver
 	 */
-	public VariableResolver getVariableResolver() {
+	public GlobalResolver getVariableResolver() {
 		return variableResolver;
+	}
+
+	/**
+	 * @param name
+	 */
+	public void importClass(String name) {
+		classResolver.importClass(name);
+	}
+
+	/**
+	 * @param name
+	 */
+	public void importPackage(String name) {
+		classResolver.importClass(name + ".*");
+	}
+
+	/**
+	 * @param method
+	 * @return
+	 */
+	public MethodInfo create(Method method) {
+		KlassInfo klass = KlassInfo.create(method.getDeclaringClass());
+		return klass.getDeclaredMethod(method.getName(), method.getParameterTypes());
 	}
 
 	/**
@@ -74,23 +108,10 @@ public class VariableResolverBean {
 		}
 		int modifiers = method.getModifiers();
 		if (Modifier.isPublic(modifiers) && Modifier.isStatic(modifiers)) {
-			// String name = method.getName();
-
-			List<Method> list;
-			if (parameterTypes.length > 1 && JetPageContext.class.equals(parameterTypes[1])) {
-				list = methodMap2.get(name);
-				if (list == null) {
-					list = new ArrayList<Method>(4);
-					methodMap2.put(name, list);
-				}
-			} else {
-				list = methodMap1.get(name);
-				if (list == null) {
-					list = new ArrayList<Method>(4);
-					methodMap1.put(name, list);
-				}
+			MethodInfo methodInfo = create(method);
+			if (methodInfo != null) {
+				methodInvokerResolver.register(methodInfo);
 			}
-			list.add(method);
 		}
 	}
 
@@ -101,24 +122,10 @@ public class VariableResolverBean {
 	public void registerFunction(String name, Method method) {
 		int modifiers = method.getModifiers();
 		if (Modifier.isPublic(modifiers) && Modifier.isStatic(modifiers)) {
-			// String name = method.getName();
-
-			List<Method> list;
-			Class<?>[] parameterTypes = method.getParameterTypes();
-			if (parameterTypes.length > 0 && JetPageContext.class.equals(parameterTypes[0])) {
-				list = functionMap2.get(name);
-				if (list == null) {
-					list = new ArrayList<Method>(4);
-					functionMap2.put(name, list);
-				}
-			} else {
-				list = functionMap1.get(name);
-				if (list == null) {
-					list = new ArrayList<Method>(4);
-					functionMap1.put(name, list);
-				}
+			MethodInfo methodInfo = create(method);
+			if (methodInfo != null) {
+				functionInvokerResolver.register(methodInfo);
 			}
-			list.add(method);
 		}
 	}
 
@@ -134,13 +141,10 @@ public class VariableResolverBean {
 			}
 			Class<?>[] parameterTypes = method.getParameterTypes();
 			if (parameterTypes.length > 0 && JetTagContext.class.equals(parameterTypes[0])) {
-				// String name = method.getName();
-				List<Method> list = tagMap.get(name);
-				if (list == null) {
-					list = new ArrayList<Method>(4);
-					tagMap.put(name, list);
+				MethodInfo methodInfo = create(method);
+				if (methodInfo != null) {
+					tagInvokerResolver.register(methodInfo);
 				}
-				list.add(method);
 			}
 		}
 	}

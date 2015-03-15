@@ -11,8 +11,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import jetbrick.template.JetTemplate;
-import jetbrick.template.runtime.JetPageContext;
+import jetbrick.template.runtime.InterpretContext;
 import jetbrick.template.web.JetWebContext;
+import jetbrick.util.PathUtils;
 
 import com.absir.appserv.developer.Pag.IPagLang;
 import com.absir.appserv.system.server.ServerDiyView;
@@ -34,8 +35,8 @@ public class WebJetbrickView extends ServerDiyView implements IPagLang {
 	 * @param path
 	 * @return
 	 */
-	public static String getFullPath(JetPageContext context, String path) {
-		return context.getAbsolutionName(path);
+	public static String getFullPath(JetTemplate template, String path) {
+		return PathUtils.getRelativePath(template.getName(), path);
 	}
 
 	/** prefix */
@@ -93,9 +94,8 @@ public class WebJetbrickView extends ServerDiyView implements IPagLang {
 	@Override
 	public void include(String path, Object... renders) throws IOException {
 		// TODO Auto-generated method stub
-		JetPageContext context = (JetPageContext) renders[0];
-		JetTemplate template = context.getEngine().getTemplate(path);
-		template.render(context.getContext(), context.getWriter());
+		InterpretContext context = InterpretContext.current();
+		context.doIncludeCall(path, null, null);
 	}
 
 	/*
@@ -107,7 +107,7 @@ public class WebJetbrickView extends ServerDiyView implements IPagLang {
 	@Override
 	public String getPath(Object... renders) throws IOException {
 		// TODO Auto-generated method stub
-		JetPageContext context = (JetPageContext) renders[0];
+		InterpretContext context = InterpretContext.current();
 		return context.getTemplate().getName();
 	}
 
@@ -121,7 +121,7 @@ public class WebJetbrickView extends ServerDiyView implements IPagLang {
 	@Override
 	public String getFullPath(String path, Object... renders) throws IOException {
 		// TODO Auto-generated method stub
-		return getFullPath((JetPageContext) renders[0], path);
+		return getFullPath(InterpretContext.current().getTemplate(), path);
 	}
 
 	/*
@@ -147,8 +147,8 @@ public class WebJetbrickView extends ServerDiyView implements IPagLang {
 	@Override
 	public void rend(OutputStream outputStream, String path, Object... renders) throws IOException {
 		// TODO Auto-generated method stub
-		JetPageContext context = (JetPageContext) renders[0];
-		context.getEngine().getTemplate(path).render(context.getContext(), outputStream);
+		JetWebContext context = (JetWebContext) renders[0];
+		WebJetbrickSupply.getEngine().getTemplate(path).render(context, outputStream);
 	}
 
 	/*
@@ -197,8 +197,7 @@ public class WebJetbrickView extends ServerDiyView implements IPagLang {
 	@Override
 	protected Object[] getRenders(Object render, InputRequest input) {
 		// TODO Auto-generated method stub
-		JetPageContext context = new WebJetbrickContext(new JetWebContext(input.getRequest(), input.getResponse(), input.getModel()), WebJetbrickSupply.getEngine());
-		return new Object[] { context, input.getRequest() };
+		return new Object[] { new JetWebContext(input.getRequest(), input.getResponse(), input.getModel()), input.getRequest() };
 	}
 
 	/*
@@ -211,9 +210,8 @@ public class WebJetbrickView extends ServerDiyView implements IPagLang {
 	@Override
 	protected void renderView(String view, Object[] renders, InputRequest input) throws Exception {
 		// TODO Auto-generated method stub
-		JetPageContext context = renders == null ? new WebJetbrickContext(new JetWebContext(input.getRequest(), input.getResponse(), input.getModel()), WebJetbrickSupply.getEngine())
-				: (JetPageContext) renders[0];
-		context.getEngine().getTemplate(view).render(context.getContext(), input.getResponse().getOutputStream());
+		JetWebContext context = renders == null ? new JetWebContext(input.getRequest(), input.getResponse(), input.getModel()) : (JetWebContext) renders[0];
+		WebJetbrickSupply.getEngine().getTemplate(view).render(context, input.getResponse().getOutputStream());
 	}
 
 	/*
@@ -225,6 +223,6 @@ public class WebJetbrickView extends ServerDiyView implements IPagLang {
 	@Override
 	public String getPagLang(String transferredName) {
 		// TODO Auto-generated method stub
-		return "@Pag.lang(" + transferredName + ")";
+		return "Pag::lang(" + transferredName + ")";
 	}
 }

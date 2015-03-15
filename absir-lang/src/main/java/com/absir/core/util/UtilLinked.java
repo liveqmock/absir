@@ -32,6 +32,7 @@ public class UtilLinked<T> {
 	 */
 	public synchronized void add(T element) {
 		addList.add(element);
+		removeList.remove(element);
 	}
 
 	/**
@@ -92,5 +93,12 @@ public class UtilLinked<T> {
 	 */
 	public Iterator<T> iterator() {
 		return list.iterator();
+	}
+
+	/**
+	 * @return the list
+	 */
+	public LinkedList<T> getList() {
+		return list;
 	}
 }

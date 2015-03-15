@@ -65,7 +65,7 @@ public class UtilPool<K, V extends Element<? extends K>> {
 	 * @return
 	 */
 	public V get(K key) {
-		return poolMap.remove(key);
+		return poolMap.get(key);
 	}
 
 	/**

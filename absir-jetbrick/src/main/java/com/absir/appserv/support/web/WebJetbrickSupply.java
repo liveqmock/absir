@@ -52,6 +52,7 @@ import com.absir.core.kernel.KernelString;
 import com.absir.core.util.UtilAccessor;
 import com.absir.core.util.UtilAccessor.Accessor;
 import com.absir.orm.value.JoEntity;
+import com.absir.server.exception.ServerException;
 import com.absir.servlet.InDispathFilter;
 
 /**
@@ -108,6 +109,7 @@ public class WebJetbrickSupply implements IMethodSupport<ConfigureFound> {
 			getVariableResolverBean().importPackage(KernelObject.class.getPackage().getName());
 			getVariableResolverBean().importPackage(JEmbedLL.class.getPackage().getName());
 			getVariableResolverBean().importPackage(JiUserBase.class.getPackage().getName());
+			getVariableResolverBean().importPackage(ServerException.class.getPackage().getName());
 			getVariableResolverBean().importPackage(Pag.class.getPackage().getName());
 		}
 

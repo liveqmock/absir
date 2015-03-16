@@ -190,6 +190,7 @@ public class AopDefineProcessor implements IBeanDefineSupply, IBeanDefineProcess
 	 * @param methodMapMethodDefines
 	 */
 	private static void addAopInterceptors(int length, List<AopInterceptorHolder> aopInterceptorHolders, Class<?> beanType, Class<?> beanClass, Map<Method, Set<AopMethodDefine>> methodMapMethodDefines) {
+		List<Method> bridgeMethods = null;
 		for (Method method : beanClass.getDeclaredMethods()) {
 			Method beanMethod = null;
 			if (!(Modifier.isStatic(method.getModifiers()) || Modifier.isPrivate(method.getModifiers()) || Modifier.isFinal(method.getModifiers()))) {
@@ -215,6 +216,21 @@ public class AopDefineProcessor implements IBeanDefineSupply, IBeanDefineProcess
 							}
 
 							aopMethodDefine.setAopInterceptor(interceptor, holder.aopInterceptor, beanType, method, beanMethod);
+							if (bridgeMethods == null) {
+								bridgeMethods = new ArrayList<Method>();
+								for (Method bridgeMethod : beanType.getDeclaredMethods()) {
+									if (bridgeMethod.isBridge()) {
+										bridgeMethods.add(bridgeMethod);
+									}
+								}
+							}
+
+							Class<?>[] parameterTypes = beanMethod.getParameterTypes();
+							for (Method bridgeMethod : bridgeMethods) {
+								if (bridgeMethod.getName().equals(beanMethod.getName()) && KernelClass.isAssignableFrom(bridgeMethod.getParameterTypes(), parameterTypes)) {
+									aopMethodDefine.setAopInterceptor(interceptor, holder.aopInterceptor, beanType, method, bridgeMethod);
+								}
+							}
 						}
 					}
 				}

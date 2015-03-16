@@ -19,6 +19,7 @@ import com.absir.appserv.developer.Pag.IPagLang;
 import com.absir.appserv.system.server.ServerDiyView;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Value;
+import com.absir.context.core.ContextUtils;
 import com.absir.servlet.InputRequest;
 
 /**
@@ -210,7 +211,15 @@ public class WebJetbrickView extends ServerDiyView implements IPagLang {
 	@Override
 	protected void renderView(String view, Object[] renders, InputRequest input) throws Exception {
 		// TODO Auto-generated method stub
-		JetWebContext context = renders == null ? new JetWebContext(input.getRequest(), input.getResponse(), input.getModel()) : (JetWebContext) renders[0];
+		JetWebContext context;
+		if (renders == null) {
+			context = new JetWebContext(input.getRequest(), input.getResponse(), input.getModel());
+			context.put("contextTime", ContextUtils.getContextTime());
+
+		} else {
+			context = (JetWebContext) renders[0];
+		}
+
 		WebJetbrickSupply.getEngine().getTemplate(view).render(context, input.getResponse().getOutputStream());
 	}
 

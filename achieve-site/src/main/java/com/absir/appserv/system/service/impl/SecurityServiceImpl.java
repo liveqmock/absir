@@ -149,11 +149,16 @@ public class SecurityServiceImpl extends SecurityService implements ISecuritySup
 		return user;
 	}
 
-	/**
-	 * @param userBase
-	 * @return
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.system.service.SecurityService#createSecurityContext
+	 * (com.absir.appserv.system.bean.proxy.JiUserBase, java.lang.String)
 	 */
+	@Override
 	protected SecurityContext createSecurityContext(JiUserBase userBase, String sessionId) {
+		// TODO Auto-generated method stub
 		SecurityContext securityContext = ContextUtils.getContext(SecurityContext.class, sessionId);
 		if (userBase.getClass() == JUser.class) {
 			securityContext.setSecuritySupply(this);
@@ -249,7 +254,7 @@ public class SecurityServiceImpl extends SecurityService implements ISecuritySup
 	public void merge(String entityName, JUser entity, MergeType mergeType, Object mergeEvent) {
 		// TODO Auto-generated method stub
 		new Exception().printStackTrace();
-		if (mergeType == MergeType.UPDATE || mergeType == MergeType.DELETE) {
+		if ((mergeType == MergeType.UPDATE && !entity.isSlient()) || mergeType == MergeType.DELETE) {
 			Iterator<String> iterator = QueryDaoUtils.createQueryArray(BeanDao.getSession(), "SELECT o.id FROM JSession o WHERE o.userId = ? AND o.passTime > ?", entity.getUserId(),
 					ContextUtils.getContextTime()).iterate();
 			while (iterator.hasNext()) {

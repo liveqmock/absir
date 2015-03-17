@@ -188,6 +188,16 @@ public class WebJetbrickView extends ServerDiyView implements IPagLang {
 		return null;
 	}
 
+	/**
+	 * @param input
+	 * @return
+	 */
+	protected JetWebContext createWebContext(InputRequest input) {
+		JetWebContext context = new JetWebContext(input.getRequest(), input.getResponse(), input.getModel());
+		context.put("contextTime", ContextUtils.getContextTime());
+		return context;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -198,7 +208,7 @@ public class WebJetbrickView extends ServerDiyView implements IPagLang {
 	@Override
 	protected Object[] getRenders(Object render, InputRequest input) {
 		// TODO Auto-generated method stub
-		return new Object[] { new JetWebContext(input.getRequest(), input.getResponse(), input.getModel()), input.getRequest() };
+		return new Object[] { createWebContext(input), input.getRequest() };
 	}
 
 	/*
@@ -211,15 +221,7 @@ public class WebJetbrickView extends ServerDiyView implements IPagLang {
 	@Override
 	protected void renderView(String view, Object[] renders, InputRequest input) throws Exception {
 		// TODO Auto-generated method stub
-		JetWebContext context;
-		if (renders == null) {
-			context = new JetWebContext(input.getRequest(), input.getResponse(), input.getModel());
-			context.put("contextTime", ContextUtils.getContextTime());
-
-		} else {
-			context = (JetWebContext) renders[0];
-		}
-
+		JetWebContext context = renders == null ? createWebContext(input) : (JetWebContext) renders[0];
 		WebJetbrickSupply.getEngine().getTemplate(view).render(context, input.getResponse().getOutputStream());
 	}
 

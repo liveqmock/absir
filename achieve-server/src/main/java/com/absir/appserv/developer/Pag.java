@@ -186,7 +186,7 @@ public class Pag {
 	 * @throws IOException
 	 */
 	public static String getInclude(String include, Object... renders) throws IOException {
-		return getInclude(include, include, renders);
+		return getIncludeGen(include, include, renders);
 	}
 
 	/**
@@ -196,7 +196,7 @@ public class Pag {
 	 * @return
 	 * @throws IOException
 	 */
-	public static String getInclude(String include, String generate, Object... renders) throws IOException {
+	public static String getIncludeGen(String include, String generate, Object... renders) throws IOException {
 		RenderUtils.generate(include, generate, renders);
 		return IRender.ME.include(include);
 	}

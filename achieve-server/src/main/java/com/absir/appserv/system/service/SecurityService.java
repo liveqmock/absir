@@ -122,6 +122,13 @@ public abstract class SecurityService implements ISecurityService, ISecurity, IG
 	protected abstract void loginSecurity(SecurityContext securityContext, JiUserBase userBase);
 
 	/**
+	 * @param userBase
+	 * @param sessionId
+	 * @return
+	 */
+	protected abstract SecurityContext createSecurityContext(JiUserBase userBase, String sessionId);
+
+	/**
 	 * @param securityManager
 	 * @param userBase
 	 * @param remember
@@ -131,7 +138,7 @@ public abstract class SecurityService implements ISecurityService, ISecurity, IG
 	public SecurityContext loginUser(SecurityManager securityManager, JiUserBase userBase, long remember, InputRequest inputRequest) {
 		long contextTime = ContextUtils.getContextTime();
 		String sessionId = VerifierService.randVerifierId(inputRequest.getRequest());
-		SecurityContext securityContext = ContextUtils.getContext(SecurityContext.class, sessionId);
+		SecurityContext securityContext = createSecurityContext(userBase, sessionId);
 		securityContext.setUser(userBase);
 		securityContext.setAddress(inputRequest.getAddress());
 		securityContext.setAgent(inputRequest.getRequest().getHeader("user-agent"));

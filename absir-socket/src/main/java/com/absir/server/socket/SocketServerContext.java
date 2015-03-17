@@ -47,39 +47,39 @@ public class SocketServerContext extends ActiveService<JbServer, SocketServer> i
 	public static SocketServerContext ME = BeanFactoryUtils.get(SocketServerContext.class);
 
 	/** LOGGER */
-	private static final Logger LOGGER = LoggerFactory.getLogger(SocketServerContext.class);
+	protected static final Logger LOGGER = LoggerFactory.getLogger(SocketServerContext.class);
 
 	/** option */
 	@Value("server.socket.option")
-	private boolean option = false;
+	protected boolean option = false;
 
 	/** port */
 	@Value("server.socket.port")
-	private int port = 18890;
+	protected int port = 18890;
 
 	/** ip */
 	@Value("server.socket.ip")
-	private String ip;
+	protected String ip;
 
 	/** ip */
 	@Value("server.socket.ipv6")
-	private String ipv6;
+	protected String ipv6;
 
 	/** backlog */
 	@Value("server.socket.backlog")
-	private int backlog = 50;
+	protected int backlog = 50;
 
 	/** bufferSize */
 	@Value("server.socket.bufferSize")
-	private int bufferSize = 1024;
+	protected int bufferSize = 1024;
 
 	/** bufferSize */
 	@Value("server.socket.receiveBufferSize")
-	private int receiveBufferSize = 10240;
+	protected int receiveBufferSize = 10240;
 
 	/** bufferSize */
 	@Value("server.socket.sendBufferSize")
-	private int sendBufferSize = 10240;
+	protected int sendBufferSize = 10240;
 
 	/** beat */
 	@Value("server.socket.beat")
@@ -318,6 +318,15 @@ public class SocketServerContext extends ActiveService<JbServer, SocketServer> i
 		return false;
 	}
 
+	/**
+	 * 创建服务
+	 * 
+	 * @return
+	 */
+	protected SocketServer createSocketServer() {
+		return new SocketServer();
+	}
+
 	/*
 	 * 开启服务
 	 * 
@@ -336,7 +345,7 @@ public class SocketServerContext extends ActiveService<JbServer, SocketServer> i
 		}
 
 		serverContext.setClosed(false);
-		SocketServer socketServer = new SocketServer();
+		SocketServer socketServer = createSocketServer();
 		if (active.getPort() > 0) {
 			try {
 				socketServer.start(serverContext.getServer().getPort(), backlog, serverContext.getServer().getInetAddress(), bufferSize, receiveBufferSize, sendBufferSize,

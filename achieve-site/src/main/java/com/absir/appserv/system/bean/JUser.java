@@ -11,6 +11,7 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Transient;
 
 import com.absir.appserv.feature.menu.value.MaEntity;
 import com.absir.appserv.feature.menu.value.MaMenu;
@@ -73,6 +74,10 @@ public class JUser extends JbUser implements IUser, JpUserBase, JpMeta, Serializ
 	@JaLang("手机")
 	@Prop(include = 1)
 	private String mobile;
+
+	@JaLang("沉默")
+	@Transient
+	private transient boolean slient;
 
 	/*
 	 * (non-Javadoc)
@@ -188,5 +193,20 @@ public class JUser extends JbUser implements IUser, JpUserBase, JpMeta, Serializ
 	 */
 	public void setMobile(String mobile) {
 		this.mobile = mobile;
+	}
+
+	/**
+	 * @return the slient
+	 */
+	public boolean isSlient() {
+		return slient;
+	}
+
+	/**
+	 * @param slient
+	 *            the slient to set
+	 */
+	public void setSlient(boolean slient) {
+		this.slient = slient;
 	}
 }

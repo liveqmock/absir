@@ -36,7 +36,7 @@ public class SocketChannelResolver implements ParameterResolver<Object> {
 
 	/** bufferMax */
 	@Value("socket.buffer.max")
-	private long bufferMax = 10240;
+	protected long bufferMax = 10240;
 
 	/**
 	 * @return

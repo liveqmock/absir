@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServletResponse;
 import com.absir.bean.basis.BeanFactory;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.context.core.ContextUtils;
-import com.absir.core.dyna.DynaBinder;
 import com.absir.core.kernel.KernelDyna;
 import com.absir.server.in.InDispatcher;
 import com.absir.server.in.InMethod;
@@ -44,6 +43,9 @@ public class InDispathFilter extends InDispatcher<HttpServletRequest, HttpServle
 
 	/** contextPathLength */
 	private int contextPathLength;
+
+	/** uriContextPath */
+	private String uriContextPath;
 
 	/** uriContextPathLength */
 	private int uriContextPathLength;
@@ -87,7 +89,8 @@ public class InDispathFilter extends InDispatcher<HttpServletRequest, HttpServle
 		}
 
 		contextPathLength = contextPath.length();
-		uriContextPathLength = DynaBinder.to(filterConfig.getInitParameter("uri"), boolean.class) ? (contextPathLength + 2) : -1;
+		uriContextPath = filterConfig.getInitParameter("uri");
+		uriContextPathLength = uriContextPath == null ? -1 : (contextPathLength + uriContextPath.length());
 		String urlDecodeing = filterConfig.getInitParameter("urlDecode");
 		if (urlDecodeing == null) {
 			BeanFactory beanFactory = BeanFactoryUtils.get();
@@ -129,7 +132,7 @@ public class InDispathFilter extends InDispatcher<HttpServletRequest, HttpServle
 			String uri = ((HttpServletRequest) request).getRequestURI();
 			int length = uri.length();
 			if (length >= contextPathLength) {
-				if (length == uriContextPathLength && uri.endsWith("/u")) {
+				if (length == uriContextPathLength && uri.endsWith(uriContextPath)) {
 					String u = request.getParameter("uri");
 					return u == null ? "u" : u;
 				}

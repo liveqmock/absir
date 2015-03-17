@@ -118,7 +118,7 @@ public class SocketServer {
 													}
 
 												} else {
-													receiver.receiveByteBuffer(socketBuffer.getId(), socketChannel, socketBuffer.getBuff());
+													receiver.receiveByteBuffer(socketChannel, socketBuffer);
 												}
 
 												SocketChannelResolver.ME.readByteBufferDone(socketBuffer);

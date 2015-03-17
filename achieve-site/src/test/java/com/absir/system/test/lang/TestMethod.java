@@ -13,8 +13,6 @@ import javax.script.ScriptException;
 
 import org.junit.Test;
 
-import com.absir.core.kernel.KernelObject;
-import com.absir.orm.hibernate.boost.IEntityMerge;
 import com.absir.system.test.AbstractTest;
 
 /**

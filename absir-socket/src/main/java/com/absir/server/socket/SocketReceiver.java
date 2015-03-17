@@ -43,10 +43,9 @@ public interface SocketReceiver<T extends Serializable> {
 	public void clearAll();
 
 	/**
-	 * @param id
 	 * @param socketChannel
-	 * @param buffer
+	 * @param socketBuffer
 	 * @throws Throwable
 	 */
-	public void receiveByteBuffer(T id, SocketChannel socketChannel, byte[] buffer) throws Throwable;
+	public void receiveByteBuffer(SocketChannel socketChannel, SocketBuffer socketBuffer) throws Throwable;
 }

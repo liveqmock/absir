@@ -7,7 +7,6 @@
  */
 package com.absir.server.socket;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.nio.channels.SocketChannel;
 import java.util.Map.Entry;
@@ -31,7 +30,7 @@ import com.absir.server.socket.InputSocket.InputSocketAtt;
 public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketChannel> implements SocketReceiver<Serializable> {
 
 	/** serverContext */
-	private ServerContext serverContext;
+	protected ServerContext serverContext;
 
 	/** UN_REGISTER_ID */
 	@SuppressWarnings("serial")
@@ -174,44 +173,41 @@ public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketCh
 	 * , java.nio.channels.SocketChannel, byte[])
 	 */
 	@Override
-	public void receiveByteBuffer(final Serializable id, final SocketChannel socketChannel, final byte[] buffer) throws Throwable {
+	public void receiveByteBuffer(final SocketChannel socketChannel, final SocketBuffer socketBuffer) throws Throwable {
 		// TODO Auto-generated method stub
-		if (id == null || id == UN_REGISTER_ID) {
-			throw new ServerException(ServerStatus.NO_LOGIN);
-		}
-
+		doDenied(socketChannel, socketBuffer);
 		ContextUtils.getThreadPoolExecutor().execute(new Runnable() {
 
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
-				if (!doBeat(id, socketChannel, buffer, SocketServerContext.get().getBeat())) {
-					if (buffer.length > 1) {
-						InputSocketAtt inputSocketAtt = new InputSocketAtt(id, buffer);
-						try {
-							if (on(inputSocketAtt.getUrl(), inputSocketAtt, socketChannel)) {
-								return;
-							}
-
-						} catch (Throwable e) {
-						}
-
-						InputSocket.writeByteBufferSuccess(socketChannel, false, inputSocketAtt.getCallbackIndex(), NONE_RESPONSE_BYTES);
-					}
+				if (!doBeat(socketChannel, socketBuffer, SocketServerContext.get().getBeat())) {
+					doDispath(socketChannel, socketBuffer);
 				}
 			}
 		});
 	}
 
 	/**
-	 * @param id
 	 * @param socketChannel
-	 * @param buffer
+	 * @param socketBuffer
+	 */
+	protected void doDenied(SocketChannel socketChannel, SocketBuffer socketBuffer) {
+		Serializable id = socketBuffer.getId();
+		if (id == null || id == UN_REGISTER_ID) {
+			throw new ServerException(ServerStatus.NO_LOGIN);
+		}
+	}
+
+	/**
+	 * @param socketChannel
+	 * @param socketBuffer
 	 * @param beat
 	 * @return
-	 * @throws IOException
 	 */
-	protected boolean doBeat(final Serializable id, final SocketChannel socketChannel, byte[] buffer, final byte[] beat) {
+	protected boolean doBeat(final SocketChannel socketChannel, SocketBuffer socketBuffer, final byte[] beat) {
+		final Serializable id = socketBuffer.getId();
+		byte[] buffer = socketBuffer.getBuff();
 		int length = beat.length;
 		if (buffer.length == length) {
 			for (int i = 0; i < length; i++) {
@@ -236,6 +232,27 @@ public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketCh
 		}
 
 		return false;
+	}
+
+	/**
+	 * @param socketChannel
+	 * @param socketBuffer
+	 */
+	protected void doDispath(final SocketChannel socketChannel, SocketBuffer socketBuffer) {
+		Serializable id = socketBuffer.getId();
+		byte[] buffer = socketBuffer.getBuff();
+		if (buffer.length > 1) {
+			InputSocketAtt inputSocketAtt = new InputSocketAtt(id, buffer);
+			try {
+				if (on(inputSocketAtt.getUrl(), inputSocketAtt, socketChannel)) {
+					return;
+				}
+
+			} catch (Throwable e) {
+			}
+
+			InputSocket.writeByteBufferSuccess(socketChannel, false, inputSocketAtt.getCallbackIndex(), NONE_RESPONSE_BYTES);
+		}
 	}
 
 	/*
@@ -276,10 +293,10 @@ public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketCh
 	}
 
 	/** NONE_RESPONSE */
-	private static final String NONE_RESPONSE = "";
+	public static final String NONE_RESPONSE = "";
 
 	/** NONE_RESPONSE_BYTES */
-	private static final byte[] NONE_RESPONSE_BYTES = NONE_RESPONSE.getBytes();
+	public static final byte[] NONE_RESPONSE_BYTES = NONE_RESPONSE.getBytes();
 
 	/*
 	 * (non-Javadoc)

@@ -59,7 +59,7 @@ public class WebJetbrickView extends ServerDiyView implements IPagLang {
 	 * @return
 	 */
 	protected String diyInclude() {
-		return echo("@_include(\",\")");
+		return echo("Pag::getInclude(\",\")");
 	}
 
 	/*

@@ -50,7 +50,11 @@ public class XlsAccessorParam extends XlsAccessor {
 			return null;
 		}
 
-		String[] params = HelperString.split(value, ',');
+		String[] params = HelperString.split(value, ';');
+		if (params.length == 1) {
+			params = HelperString.split(value, ',');
+		}
+
 		Object paramsValue = params;
 		if (xlsClass != null) {
 			XlsDao xlsDao = XlsUtils.getXlsDao(xlsClass);

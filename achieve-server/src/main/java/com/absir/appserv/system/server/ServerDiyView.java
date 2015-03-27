@@ -56,7 +56,7 @@ public abstract class ServerDiyView extends ReturnedResolverView implements IRen
 	 * @return
 	 */
 	protected String diyInclude() {
-		return echo("Pag.getInclude(\",\")");
+		return echo("Pag.include(\",\")");
 	}
 
 	/**
@@ -103,7 +103,6 @@ public abstract class ServerDiyView extends ReturnedResolverView implements IRen
 		request.setAttribute("input", input);
 		Object[] renders = null;
 		int diy = 0;
-		Object render = getRender(view, input);
 		if (IDeveloper.ME != null) {
 			diy = IDeveloper.ME.diy(request);
 			if (diy == 1) {
@@ -117,7 +116,8 @@ public abstract class ServerDiyView extends ReturnedResolverView implements IRen
 				view = diyView;
 
 			} else if (diy == 2 || BeanFactoryUtils.getEnvironment() != Environment.PRODUCT) {
-				renders = getRenders(render, input);
+				renders = getRenders(null, input);
+				input.setAttribute(READERS_NAME, renders);
 				IDeveloper.ME.generate(view, view, renders);
 			}
 		}
@@ -145,6 +145,17 @@ public abstract class ServerDiyView extends ReturnedResolverView implements IRen
 		}
 
 		return "";
+	}
+
+	/** READERS_NAME */
+	private static final String READERS_NAME = ServerDiyView.class + "@READERS_NAME";
+
+	/**
+	 * @param input
+	 * @return
+	 */
+	public static Object[] getRenders(Input input) {
+		return (Object[]) input.getAttribute(READERS_NAME);
 	}
 
 	/**

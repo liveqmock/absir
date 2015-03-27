@@ -27,6 +27,7 @@ import com.absir.appserv.support.developer.IRender;
 import com.absir.appserv.support.developer.RenderUtils;
 import com.absir.appserv.system.configure.JSiteConfigure;
 import com.absir.appserv.system.helper.HelperLang;
+import com.absir.appserv.system.server.ServerDiyView;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Inject;
 import com.absir.context.lang.LangBundle;
@@ -177,6 +178,15 @@ public class Pag {
 	 */
 	public static List<OMenuBean> menu(String name) {
 		return MenuContextUtils.getMenuBeans(name);
+	}
+
+	/**
+	 * @param include
+	 * @return
+	 * @throws IOException
+	 */
+	public static String include(String include) throws IOException {
+		return getInclude(include, ServerDiyView.getRenders(OnPut.get().getInput()));
 	}
 
 	/**

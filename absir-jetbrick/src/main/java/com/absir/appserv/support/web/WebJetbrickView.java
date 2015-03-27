@@ -59,7 +59,7 @@ public class WebJetbrickView extends ServerDiyView implements IPagLang {
 	 * @return
 	 */
 	protected String diyInclude() {
-		return echo("Pag::getInclude(\",\")");
+		return echo("Pag.include(\",\")");
 	}
 
 	/*
@@ -208,7 +208,7 @@ public class WebJetbrickView extends ServerDiyView implements IPagLang {
 	@Override
 	protected Object[] getRenders(Object render, InputRequest input) {
 		// TODO Auto-generated method stub
-		return new Object[] { createWebContext(input), input.getRequest() };
+		return new Object[] { render == null ? createWebContext(input) : render, input.getRequest() };
 	}
 
 	/*

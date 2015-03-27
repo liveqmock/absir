@@ -253,7 +253,6 @@ public class SecurityServiceImpl extends SecurityService implements ISecuritySup
 	@Override
 	public void merge(String entityName, JUser entity, MergeType mergeType, Object mergeEvent) {
 		// TODO Auto-generated method stub
-		new Exception().printStackTrace();
 		if ((mergeType == MergeType.UPDATE && !entity.isSlient()) || mergeType == MergeType.DELETE) {
 			Iterator<String> iterator = QueryDaoUtils.createQueryArray(BeanDao.getSession(), "SELECT o.id FROM JSession o WHERE o.userId = ? AND o.passTime > ?", entity.getUserId(),
 					ContextUtils.getContextTime()).iterate();

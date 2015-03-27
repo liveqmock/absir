@@ -55,9 +55,9 @@ public class SocketChannelResolver implements ParameterResolver<Object> {
 			if (socketBuffer.getBuff() == null) {
 				int lengthIndex = socketBuffer.getLengthIndex();
 				if (lengthIndex < 4) {
-					int buffLength = lengthIndex == 0 ? buffer[position] : socketBuffer.getLength();
+					int buffLength = buffer[position] & 0xFF;
 					if (lengthIndex > 0) {
-						buffLength += buffer[position] << (8 * lengthIndex);
+						buffLength = socketBuffer.getLength() + (buffLength << (8 * lengthIndex));
 					}
 
 					socketBuffer.setLength(buffLength);

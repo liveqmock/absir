@@ -88,7 +88,7 @@
 		<snapshotRepository>
 			<id>nexus-snapshots</id>
 			<name>nexus distribution snapshot repository</name>
-			<url>http://o.absir.com:8080/nexus/content/repositories/snapshots/</url>
+			<url>http://o.absir.com:58080/nexus/content/repositories/snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>
 </project>

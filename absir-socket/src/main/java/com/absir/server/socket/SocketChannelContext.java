@@ -10,6 +10,7 @@ package com.absir.server.socket;
 import java.nio.channels.SocketChannel;
 
 import com.absir.context.core.ContextBase;
+import com.absir.context.core.ContextUtils;
 
 /**
  * @author absir
@@ -19,6 +20,9 @@ public class SocketChannelContext extends ContextBase {
 
 	/** socketChannel */
 	private SocketChannel socketChannel;
+
+	/** socketReceiverContext */
+	private SocketReceiverContext socketReceiverContext;
 
 	/**
 	 * @return the socketChannel
@@ -35,6 +39,21 @@ public class SocketChannelContext extends ContextBase {
 		this.socketChannel = socketChannel;
 	}
 
+	/**
+	 * @return the socketReceiverContext
+	 */
+	public SocketReceiverContext getSocketReceiverContext() {
+		return socketReceiverContext;
+	}
+
+	/**
+	 * @param socketReceiverContext
+	 *            the socketReceiverContext to set
+	 */
+	public void setSocketReceiverContext(SocketReceiverContext socketReceiverContext) {
+		this.socketReceiverContext = socketReceiverContext;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -44,4 +63,30 @@ public class SocketChannelContext extends ContextBase {
 	protected long getLifeTime() {
 		return SocketServerContext.get().getTimeout();
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.context.core.ContextBase#stepDone(long)
+	 */
+	@Override
+	public boolean stepDone(long contextTime) {
+		// TODO Auto-generated method stub
+		boolean stepDone = super.stepDone(contextTime);
+		if (stepDone && socketChannel != null) {
+			retainAt();
+			stepDone = true;
+			ContextUtils.getThreadPoolExecutor().execute(new Runnable() {
+
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					InputSocket.writeByteBuffer(socketChannel, SocketServerContext.get().getBeat());
+				}
+			});
+		}
+
+		return stepDone;
+	}
+
 }

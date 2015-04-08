@@ -44,6 +44,8 @@
 		<module>absir-spring</module>
 		<module>absir-scene</module>
 		<module>achieve-game</module>
+		<module>absir-slave</module>
+		<module>absir-client</module>
 	</modules>
 	<dependencies>
 		<dependency>

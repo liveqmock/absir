@@ -67,11 +67,13 @@ public abstract class PlayerServiceBase {
 	public abstract JPlatformUser findByPlatformUsername(String platform, String username);
 
 	/**
-	 * @param 查找关联平台账号
+	 * 查找关联平台账号
+	 * 
+	 * @param
 	 * @return
 	 */
 	@Transaction(readOnly = true)
-	protected JPlatformUser getPlatformUser(JiUserBase userBase) {
+	public JPlatformUser findPlatformUser(JiUserBase userBase) {
 		return ME.findByPlatformUsername("JUser", userBase.getUsername());
 	}
 
@@ -84,9 +86,34 @@ public abstract class PlayerServiceBase {
 	@Transaction
 	public JPlatformUser createPlatformUser(JiUserBase userBase) {
 		JPlatformUser platformUser = new JPlatformUser();
-		platformUser.setPlatform(",");
+		platformUser.setPlatform("JUser");
 		platformUser.setUsername(userBase.getUsername());
 		BeanDao.getSession().persist(platformUser);
+		return platformUser;
+	}
+
+	/**
+	 * 获取关联平台账号
+	 * 
+	 * @param userBase
+	 * @return
+	 */
+	public JPlatformUser getPlatformUser(JiUserBase userBase) {
+		if (userBase instanceof JPlatformUser) {
+			return (JPlatformUser) userBase;
+		}
+
+		JPlatformUser platformUser = ME.findPlatformUser(userBase);
+		if (platformUser == null) {
+			try {
+				platformUser = ME.createPlatformUser(userBase);
+
+			} catch (Exception e) {
+				// TODO: handle exception
+				platformUser = ME.findPlatformUser(userBase);
+			}
+		}
+
 		return platformUser;
 	}
 
@@ -125,7 +152,7 @@ public abstract class PlayerServiceBase {
 	 * @return
 	 */
 	public Long getPlayerId(Long serverId, JiUserBase userBase) {
-		JPlatformUser platformUser = userBase instanceof JPlatformUser ? (JPlatformUser) userBase : getPlatformUser(userBase);
+		JPlatformUser platformUser = ME.getPlatformUser(userBase);
 		if (platformUser == null) {
 			return null;
 		}
@@ -209,7 +236,7 @@ public abstract class PlayerServiceBase {
 	 */
 	@Transaction(readOnly = true)
 	public List<JbPlayer> players(Long serverId, JiUserBase userBase) {
-		JPlatformUser platformUser = ((JPlatformUser) userBase);
+		JPlatformUser platformUser = ME.getPlatformUser(userBase);
 		boolean userDirty = false;
 		Session session = BeanDao.getSession();
 		if (serverId == null) {
@@ -256,17 +283,7 @@ public abstract class PlayerServiceBase {
 	 */
 	@Transaction(rollback = Exception.class)
 	public JbPlayer create(Long serverId, JiUserBase userBase, String name, int gender) {
-		JPlatformUser platformUser = null;
-		if (userBase instanceof JPlatformUser) {
-			platformUser = ((JPlatformUser) userBase);
-
-		} else {
-			platformUser = ME.getPlatformUser(userBase);
-			if (platformUser == null) {
-				platformUser = createPlatformUser(userBase);
-			}
-		}
-
+		JPlatformUser platformUser = ME.getPlatformUser(userBase);
 		if (serverId == null) {
 			serverId = platformUser.getServerId();
 

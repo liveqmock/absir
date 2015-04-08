@@ -45,11 +45,12 @@ public class SocketServer {
 	 * @param bufferSize
 	 * @param receiveBufferSize
 	 * @param sendBufferSize
+	 * @param channelResolver
 	 * @param receiver
 	 * @throws IOException
 	 */
-	public synchronized void start(int port, int backlog, InetAddress inetAddress, final int bufferSize, int receiveBufferSize, final int sendBufferSize, final SocketReceiver receiver)
-			throws IOException {
+	public synchronized void start(int port, int backlog, InetAddress inetAddress, final int bufferSize, int receiveBufferSize, final int sendBufferSize, final SocketChannelResolver channelResolver,
+			final SocketReceiver receiver) throws IOException {
 		if (serverSocketChannel != null) {
 			throw new ServerException(ServerStatus.IN_FAILED);
 		}
@@ -82,6 +83,7 @@ public class SocketServer {
 								socketChannel.configureBlocking(false);
 								socketChannel.socket().setSendBufferSize(sendBufferSize);
 								try {
+									// 处理注册请求
 									if (receiver.accept(socketChannel)) {
 										socketChannel.register(selector, SelectionKey.OP_READ);
 										continue;
@@ -101,14 +103,14 @@ public class SocketServer {
 									int length = socketChannel.read(buffer);
 									if (length > 0) {
 										if (socketBuffer == null) {
-											socketBuffer = SocketChannelResolver.ME.createSocketBuff();
+											socketBuffer = channelResolver.createSocketBuff();
 											key.attach(socketBuffer);
 										}
 
 										byte[] array = buffer.array();
 										int position = 0;
 										while (position < length) {
-											position = SocketChannelResolver.ME.readByteBuffer(socketBuffer, array, position, length);
+											position = channelResolver.readByteBuffer(socketBuffer, array, position, length);
 											if (socketBuffer.getBuff() != null && socketBuffer.getLength() <= socketBuffer.getBuffLengthIndex()) {
 												if (socketBuffer.getId() == null) {
 													receiver.register(socketChannel, socketBuffer);
@@ -121,7 +123,7 @@ public class SocketServer {
 													receiver.receiveByteBuffer(socketChannel, socketBuffer);
 												}
 
-												SocketChannelResolver.ME.readByteBufferDone(socketBuffer);
+												channelResolver.readByteBufferDone(socketBuffer);
 											}
 
 											position++;
@@ -131,7 +133,7 @@ public class SocketServer {
 									}
 
 								} catch (Throwable e) {
-									 // e.printStackTrace();
+									// e.printStackTrace();
 								}
 
 								// 注销请求
@@ -188,7 +190,6 @@ public class SocketServer {
 	 */
 	public static void close(SocketChannel socketChannel) {
 		try {
-			// new Exception().printStackTrace();
 			socketChannel.close();
 
 		} catch (Throwable e) {

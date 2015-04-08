@@ -31,6 +31,7 @@ import com.absir.bean.inject.value.Value;
 import com.absir.core.kernel.KernelClass;
 import com.absir.orm.hibernate.SessionFactoryUtils;
 import com.absir.orm.hibernate.boost.IEntityMerge;
+import com.absir.server.socket.resolver.SocketChannelResolver;
 import com.absir.server.socket.resolver.SocketSessionResolver;
 
 /**
@@ -348,7 +349,7 @@ public class SocketServerContext extends ActiveService<JbServer, SocketServer> i
 		SocketServer socketServer = createSocketServer();
 		if (active.getPort() > 0) {
 			try {
-				socketServer.start(serverContext.getServer().getPort(), backlog, serverContext.getServer().getInetAddress(), bufferSize, receiveBufferSize, sendBufferSize,
+				socketServer.start(serverContext.getServer().getPort(), backlog, serverContext.getServer().getInetAddress(), bufferSize, receiveBufferSize, sendBufferSize, SocketChannelResolver.ME,
 						createSocketReceiverContext(serverContext));
 
 			} catch (Throwable e) {

@@ -121,6 +121,7 @@ public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketCh
 	protected SocketChannelContext createSocketChannelContext(Serializable id, SocketChannel socketChannel) {
 		SocketChannelContext socketChannelContext = new SocketChannelContext();
 		socketChannelContext.setSocketChannel(socketChannel);
+		socketChannelContext.setSocketReceiverContext(this);
 		socketChannelContext.retainAt();
 		return socketChannelContext;
 	}
@@ -207,6 +208,9 @@ public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketCh
 	 */
 	protected boolean doBeat(final SocketChannel socketChannel, SocketBuffer socketBuffer, final byte[] beat) {
 		final Serializable id = socketBuffer.getId();
+		// 数据心跳
+		serverContext.getChannelContexts().get(id).retainAt();
+		// 回复心跳
 		byte[] buffer = socketBuffer.getBuff();
 		int length = beat.length;
 		if (buffer.length == length) {
@@ -216,7 +220,6 @@ public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketCh
 				}
 			}
 
-			serverContext.getChannelContexts().get(id).retainAt();
 			ContextUtils.getThreadPoolExecutor().execute(new Runnable() {
 
 				@Override

@@ -98,10 +98,10 @@ public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketCh
 
 					if (id == null) {
 						socketBuffer.setId(null);
-						InputSocket.writeByteBuffer(socketChannel, SocketServerContext.ME.getFailed());
+						InputSocketImpl.writeByteBuffer(socketChannel, SocketServerContext.ME.getFailed());
 
 					} else {
-						if (InputSocket.writeByteBuffer(socketChannel, SocketServerContext.ME.getOk())) {
+						if (InputSocketImpl.writeByteBuffer(socketChannel, SocketServerContext.ME.getOk())) {
 							registerSocketChannelContext(mutilContext, id, createSocketChannelContext(id, socketChannel));
 						}
 					}
@@ -235,7 +235,7 @@ public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketCh
 				public void run() {
 					// TODO Auto-generated method stub
 					if (getSocketSessionResolver().doBeat(id, socketChannel, serverContext)) {
-						InputSocket.writeByteBuffer(socketChannel, beat);
+						InputSocketImpl.writeByteBuffer(socketChannel, beat);
 					}
 				}
 			});
@@ -263,7 +263,7 @@ public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketCh
 			} catch (Throwable e) {
 			}
 
-			InputSocket.writeByteBufferSuccess(socketChannel, false, inputSocketAtt.getCallbackIndex(), NONE_RESPONSE_BYTES);
+			InputSocketImpl.writeByteBufferSuccess(socketChannel, false, inputSocketAtt.getCallbackIndex(), InputSocket.NONE_RESPONSE_BYTES);
 		}
 	}
 
@@ -300,15 +300,9 @@ public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketCh
 	@Override
 	protected Input input(String uri, InMethod inMethod, InModel model, InputSocketAtt req, SocketChannel res) {
 		// TODO Auto-generated method stub
-		InputSocket socketInput = new InputSocket(model, req, res);
+		InputSocketImpl socketInput = new InputSocketImpl(model, req, res);
 		return socketInput;
 	}
-
-	/** NONE_RESPONSE */
-	public static final String NONE_RESPONSE = "";
-
-	/** NONE_RESPONSE_BYTES */
-	public static final byte[] NONE_RESPONSE_BYTES = NONE_RESPONSE.getBytes();
 
 	/*
 	 * (non-Javadoc)
@@ -323,7 +317,7 @@ public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketCh
 		if (onPut.getReturnValue() == null) {
 			ReturnedResolver<?> returnedResolver = onPut.getReturnedResolver();
 			if (returnedResolver != null && returnedResolver instanceof ReturnedResolverBody) {
-				onPut.setReturnValue(NONE_RESPONSE);
+				onPut.setReturnValue(InputSocket.NONE_RESPONSE);
 			}
 		}
 

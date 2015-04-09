@@ -81,7 +81,7 @@ public class SocketChannelContext extends ContextBase {
 				@Override
 				public void run() {
 					// TODO Auto-generated method stub
-					InputSocket.writeByteBuffer(socketChannel, SocketServerContext.ME.getBeat());
+					InputSocketImpl.writeByteBuffer(socketChannel, SocketServerContext.ME.getBeat());
 				}
 			});
 		}

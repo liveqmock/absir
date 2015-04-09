@@ -27,7 +27,7 @@ import com.absir.bean.basis.Environment;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
 import com.absir.context.core.ContextUtils;
-import com.absir.server.socket.InputSocket;
+import com.absir.server.socket.InputSocketImpl;
 import com.absir.server.socket.ServerContext;
 import com.absir.server.socket.SocketBuffer;
 import com.absir.server.socket.SocketServer;
@@ -263,7 +263,7 @@ public class SocketService implements SocketSessionResolver {
 		try {
 			ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 			HelperServer.zipCompress(bytes, 0, bytes.length, outStream);
-			InputSocket.writeByteBuffer(socketChannel, callbackIndex, outStream.toByteArray());
+			InputSocketImpl.writeByteBuffer(socketChannel, callbackIndex, outStream.toByteArray());
 			return true;
 
 		} catch (Throwable e) {

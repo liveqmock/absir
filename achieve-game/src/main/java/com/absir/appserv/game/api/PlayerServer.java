@@ -15,7 +15,7 @@ import com.absir.context.core.ContextUtils;
 import com.absir.server.exception.ServerException;
 import com.absir.server.exception.ServerStatus;
 import com.absir.server.in.Input;
-import com.absir.server.socket.InputSocket;
+import com.absir.server.socket.InputSocketImpl;
 
 /**
  * @author absir
@@ -35,7 +35,7 @@ public class PlayerServer extends ApiServer {
 	protected SecurityContext onAuthentication(Input input) throws Throwable {
 		SecurityContext securityContext = super.onAuthentication(input);
 		if (securityContext == null) {
-			if (input instanceof InputSocket) {
+			if (input instanceof InputSocketImpl) {
 				Long playerId = (Long) input.getId();
 				JbPlayerContext playerContext = ContextUtils.getContext(JbPlayerContext.COMPONENT.PLAYER_CONTEXT_CLASS, playerId);
 				setPlayerContext(input, playerContext);

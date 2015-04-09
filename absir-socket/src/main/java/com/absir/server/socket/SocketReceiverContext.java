@@ -22,6 +22,8 @@ import com.absir.server.on.OnPut;
 import com.absir.server.route.returned.ReturnedResolver;
 import com.absir.server.route.returned.ReturnedResolverBody;
 import com.absir.server.socket.InputSocket.InputSocketAtt;
+import com.absir.server.socket.SocketServerContext.SessionResolver;
+import com.absir.server.socket.resolver.SocketSessionResolver;
 
 /**
  * @author absir
@@ -51,6 +53,13 @@ public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketCh
 		return serverContext;
 	}
 
+	/**
+	 * @return
+	 */
+	public SocketSessionResolver getSocketSessionResolver() {
+		return SessionResolver.ME;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -61,7 +70,7 @@ public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketCh
 	@Override
 	public boolean accept(SocketChannel socketChannel) throws Throwable {
 		// TODO Auto-generated method stub
-		return SocketServerContext.get().getSessionResolver().accept(socketChannel, serverContext);
+		return getSocketSessionResolver().accept(socketChannel, serverContext);
 	}
 
 	/*
@@ -81,7 +90,7 @@ public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketCh
 			public void run() {
 				// TODO Auto-generated method stub
 				try {
-					ServerContext mutilContext = SocketServerContext.get().getSessionResolver().register(socketChannel, serverContext, buffer, socketBuffer);
+					ServerContext mutilContext = getSocketSessionResolver().register(socketChannel, serverContext, buffer, socketBuffer);
 					Serializable id = socketBuffer.getId();
 					if (id == UN_REGISTER_ID) {
 						id = null;
@@ -89,10 +98,10 @@ public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketCh
 
 					if (id == null) {
 						socketBuffer.setId(null);
-						InputSocket.writeByteBuffer(socketChannel, SocketServerContext.get().getFailed());
+						InputSocket.writeByteBuffer(socketChannel, SocketServerContext.ME.getFailed());
 
 					} else {
-						if (InputSocket.writeByteBuffer(socketChannel, SocketServerContext.get().getOk())) {
+						if (InputSocket.writeByteBuffer(socketChannel, SocketServerContext.ME.getOk())) {
 							registerSocketChannelContext(mutilContext, id, createSocketChannelContext(id, socketChannel));
 						}
 					}
@@ -137,7 +146,7 @@ public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketCh
 	public void unRegister(Serializable id, SocketChannel socketChannel) throws Throwable {
 		// TODO Auto-generated method stub
 		unregisterSocketChannel(id, socketChannel);
-		SocketServerContext.get().getSessionResolver().unRegister(id, socketChannel, serverContext);
+		getSocketSessionResolver().unRegister(id, socketChannel, serverContext);
 	}
 
 	/**
@@ -182,7 +191,7 @@ public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketCh
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
-				if (!doBeat(socketChannel, socketBuffer, SocketServerContext.get().getBeat())) {
+				if (!doBeat(socketChannel, socketBuffer, SocketServerContext.ME.getBeat())) {
 					doDispath(socketChannel, socketBuffer);
 				}
 			}
@@ -225,7 +234,7 @@ public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketCh
 				@Override
 				public void run() {
 					// TODO Auto-generated method stub
-					if (SocketServerContext.get().getSessionResolver().doBeat(id, socketChannel, serverContext)) {
+					if (getSocketSessionResolver().doBeat(id, socketChannel, serverContext)) {
 						InputSocket.writeByteBuffer(socketChannel, beat);
 					}
 				}

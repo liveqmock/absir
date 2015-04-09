@@ -61,7 +61,7 @@ public class SocketChannelContext extends ContextBase {
 	 */
 	@Override
 	protected long getLifeTime() {
-		return SocketServerContext.get().getTimeout();
+		return SocketServerContext.ME.getTimeout();
 	}
 
 	/*
@@ -81,7 +81,7 @@ public class SocketChannelContext extends ContextBase {
 				@Override
 				public void run() {
 					// TODO Auto-generated method stub
-					InputSocket.writeByteBuffer(socketChannel, SocketServerContext.get().getBeat());
+					InputSocket.writeByteBuffer(socketChannel, SocketServerContext.ME.getBeat());
 				}
 			});
 		}

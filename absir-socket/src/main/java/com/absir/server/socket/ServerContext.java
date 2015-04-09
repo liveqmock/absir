@@ -12,7 +12,9 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -25,15 +27,16 @@ public class ServerContext {
 	/** server */
 	private JbServer server;
 
-	/** online */
-	private long online;
-
 	/** closed */
 	private boolean closed;
 
 	/** channelContexts */
 	@JsonIgnore
-	private Map<Serializable, SocketChannelContext> channelContexts = new ConcurrentHashMap<Serializable, SocketChannelContext>();
+	private Map<Serializable, SocketChannelContext> channelContexts = new ConcurrentSkipListMap<Serializable, SocketChannelContext>();
+
+	/** channelContextSet */
+	@JsonIgnore
+	private Set<SocketChannelContext> channelContextSet = new ConcurrentSkipListSet<SocketChannelContext>();
 
 	/**
 	 * @return the server
@@ -54,7 +57,7 @@ public class ServerContext {
 	 * @return the online
 	 */
 	public long getOnline() {
-		return online;
+		return channelContexts.size() + channelContextSet.size();
 	}
 
 	/**
@@ -80,15 +83,20 @@ public class ServerContext {
 	}
 
 	/**
+	 * @return the channelContextSet
+	 */
+	public Set<SocketChannelContext> getChannelContextSet() {
+		return channelContextSet;
+	}
+
+	/**
 	 * @param id
 	 * @param channelContext
 	 */
 	public void loginSocketChannelContext(Serializable id, SocketChannelContext channelContext) {
 		SocketChannelContext context = channelContexts.put(id, channelContext);
-		if (context == null) {
-			synchronized (channelContexts) {
-				++online;
-			}
+		if (context != null) {
+			channelContextSet.add(channelContext);
 		}
 	}
 
@@ -98,13 +106,12 @@ public class ServerContext {
 	 * @return
 	 */
 	public void logoutSocketChannelContext(Serializable id, SocketChannel socketChannel) {
-		SocketChannelContext channelContext = channelContexts.get(id);
-		if (channelContext != null && channelContext.getSocketChannel() == socketChannel) {
-			synchronized (channelContexts) {
-				--online;
+		SocketChannelContext context = channelContexts.remove(id);
+		if (context == null || context.getSocketChannel() != socketChannel) {
+			channelContextSet.remove(socketChannel);
+			if (context != null) {
+				channelContextSet.add(context);
 			}
-
-			channelContexts.remove(id);
 		}
 	}
 
@@ -119,6 +126,15 @@ public class ServerContext {
 			SocketChannelContext socketChannelContext = entry.getValue();
 			if (socketChannelContext.stepDone(contextTime)) {
 				iterator.remove();
+				SocketServer.close(socketChannelContext.getSocketChannel());
+			}
+		}
+
+		Iterator<SocketChannelContext> setIterator = channelContextSet.iterator();
+		while (iterator.hasNext()) {
+			SocketChannelContext socketChannelContext = setIterator.next();
+			if (socketChannelContext.stepDone(contextTime)) {
+				setIterator.remove();
 				SocketServer.close(socketChannelContext.getSocketChannel());
 			}
 		}

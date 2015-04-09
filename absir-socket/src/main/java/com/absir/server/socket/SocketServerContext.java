@@ -8,6 +8,9 @@
 package com.absir.server.socket;
 
 import java.io.Serializable;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -29,9 +32,11 @@ import com.absir.bean.inject.value.Started;
 import com.absir.bean.inject.value.Stopping;
 import com.absir.bean.inject.value.Value;
 import com.absir.core.kernel.KernelClass;
+import com.absir.core.kernel.KernelString;
 import com.absir.orm.hibernate.SessionFactoryUtils;
 import com.absir.orm.hibernate.boost.IEntityMerge;
 import com.absir.server.socket.resolver.SocketChannelResolver;
+import com.absir.server.socket.resolver.SocketChannelResolverImpl;
 import com.absir.server.socket.resolver.SocketSessionResolver;
 
 /**
@@ -44,8 +49,40 @@ import com.absir.server.socket.resolver.SocketSessionResolver;
 public class SocketServerContext extends ActiveService<JbServer, SocketServer> implements IEntityMerge<JbServer> {
 
 	/** ME */
+	public static final SocketServerContext ME = BeanFactoryUtils.get(SocketServerContext.class);
+
+	/**
+	 * @author absir
+	 *
+	 */
 	@Inject
-	public static SocketServerContext ME = BeanFactoryUtils.get(SocketServerContext.class);
+	public static interface ChannelResolver extends SocketChannelResolver {
+
+		/** ME */
+		public static final ChannelResolver ME = BeanFactoryUtils.get(ChannelResolver.class);
+	}
+
+	/**
+	 * @author absir
+	 *
+	 */
+	@Base
+	@Bean
+	public static class ChannelResolverImpl extends SocketChannelResolverImpl implements ChannelResolver {
+
+	}
+
+	/**
+	 * @author absir
+	 *
+	 */
+	@Inject
+	public static interface SessionResolver extends SocketSessionResolver {
+
+		/** ME */
+		public static final SessionResolver ME = BeanFactoryUtils.get(SessionResolver.class);
+
+	}
 
 	/** LOGGER */
 	protected static final Logger LOGGER = LoggerFactory.getLogger(SocketServerContext.class);
@@ -63,8 +100,8 @@ public class SocketServerContext extends ActiveService<JbServer, SocketServer> i
 	protected String ip;
 
 	/** ip */
-	@Value("server.socket.ipv6")
-	protected String ipv6;
+	@Value("server.socket.ipV6")
+	protected String ipV6;
 
 	/** backlog */
 	@Value("server.socket.backlog")
@@ -105,9 +142,6 @@ public class SocketServerContext extends ActiveService<JbServer, SocketServer> i
 	/** serverClass */
 	private Class<? extends JbServer> serverClass = (Class<? extends JbServer>) SessionFactoryUtils.getEntityClass("JServer");
 
-	/** sessionResolver */
-	private SocketSessionResolver sessionResolver = BeanFactoryUtils.get(SocketSessionResolver.class);
-
 	/** socketServerContextMap */
 	private DActiverMap<JbServer, ServerContext> serverContextMap = new DActiverMap<JbServer, ServerContext>() {
 
@@ -143,10 +177,52 @@ public class SocketServerContext extends ActiveService<JbServer, SocketServer> i
 	};
 
 	/**
-	 * @return
+	 * @return the port
 	 */
-	public static SocketServerContext get() {
-		return ME;
+	public int getPort() {
+		return port;
+	}
+
+	/**
+	 * @return the ip
+	 */
+	public String getIp() {
+		return ip;
+	}
+
+	/**
+	 * @return the ipV6
+	 */
+	public String getIpV6() {
+		return ipV6;
+	}
+
+	/**
+	 * @return the backlog
+	 */
+	public int getBacklog() {
+		return backlog;
+	}
+
+	/**
+	 * @return the bufferSize
+	 */
+	public int getBufferSize() {
+		return bufferSize;
+	}
+
+	/**
+	 * @return the receiveBufferSize
+	 */
+	public int getReceiveBufferSize() {
+		return receiveBufferSize;
+	}
+
+	/**
+	 * @return the sendBufferSize
+	 */
+	public int getSendBufferSize() {
+		return sendBufferSize;
 	}
 
 	/**
@@ -185,10 +261,25 @@ public class SocketServerContext extends ActiveService<JbServer, SocketServer> i
 	}
 
 	/**
-	 * @return the sessionResolver
+	 * @param ip
+	 * @param ipV6
+	 * @return
 	 */
-	public SocketSessionResolver getSessionResolver() {
-		return sessionResolver;
+	public static InetAddress getInetAddress(String ip, String ipV6) {
+		try {
+			if (!KernelString.isEmpty(ipV6)) {
+				return Inet6Address.getByName(ipV6);
+			}
+
+			if (!KernelString.isEmpty(ip)) {
+				return Inet4Address.getByName(ip);
+			}
+
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+
+		return null;
 	}
 
 	/**
@@ -217,6 +308,8 @@ public class SocketServerContext extends ActiveService<JbServer, SocketServer> i
 		if (server != null) {
 			server.setId(0L);
 			server.setPort(port);
+			server.setIp(ip);
+			server.setIpV6(ipV6);
 			servers.add(server);
 		}
 
@@ -349,7 +442,7 @@ public class SocketServerContext extends ActiveService<JbServer, SocketServer> i
 		SocketServer socketServer = createSocketServer();
 		if (active.getPort() > 0) {
 			try {
-				socketServer.start(serverContext.getServer().getPort(), backlog, serverContext.getServer().getInetAddress(), bufferSize, receiveBufferSize, sendBufferSize, SocketChannelResolver.ME,
+				socketServer.start(active.getPort(), backlog, getInetAddress(active.getIp(), active.getIpV6()), bufferSize, receiveBufferSize, sendBufferSize, ChannelResolver.ME,
 						createSocketReceiverContext(serverContext));
 
 			} catch (Throwable e) {

@@ -7,16 +7,11 @@
  */
 package com.absir.server.socket;
 
-import java.net.Inet6Address;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
 import javax.persistence.MappedSuperclass;
 
 import com.absir.appserv.system.bean.base.JbBean;
 import com.absir.appserv.system.bean.value.JaLang;
 import com.absir.appserv.system.bean.value.JiActive;
-import com.absir.core.kernel.KernelString;
 
 /**
  * @author absir
@@ -99,6 +94,14 @@ public class JbServer extends JbBean implements JiActive {
 	}
 
 	/**
+	 * @param ip
+	 *            the ip to set
+	 */
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
+
+	/**
 	 * @return the ipV6
 	 */
 	public String getIpV6() {
@@ -106,19 +109,11 @@ public class JbServer extends JbBean implements JiActive {
 	}
 
 	/**
-	 * @return
-	 * @throws UnknownHostException
+	 * @param ipV6
+	 *            the ipV6 to set
 	 */
-	public InetAddress getInetAddress() throws UnknownHostException {
-		if (!KernelString.isEmpty(ipV6)) {
-			return Inet6Address.getByName(ipV6);
-		}
-
-		if (!KernelString.isEmpty(ip)) {
-			return Inet6Address.getByName(ip);
-		}
-
-		return null;
+	public void setIpV6(String ipV6) {
+		this.ipV6 = ipV6;
 	}
 
 	/**

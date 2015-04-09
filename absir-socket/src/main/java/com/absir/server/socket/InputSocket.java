@@ -23,6 +23,7 @@ import com.absir.server.exception.ServerStatus;
 import com.absir.server.in.InMethod;
 import com.absir.server.in.InModel;
 import com.absir.server.in.Input;
+import com.absir.server.socket.SocketServerContext.ChannelResolver;
 import com.absir.server.socket.resolver.SocketChannelResolver;
 
 /**
@@ -320,7 +321,17 @@ public class InputSocket extends Input {
 	 * @return
 	 */
 	public static boolean writeByteBuffer(SocketChannel socketChannel, byte[] bytes) {
-		byte[] buffer = SocketChannelResolver.ME.writeByteBuffer(socketChannel, 0, bytes);
+		return writeByteBuffer(ChannelResolver.ME, socketChannel, bytes);
+	}
+
+	/**
+	 * @param channelResolver
+	 * @param socketChannel
+	 * @param bytes
+	 * @return
+	 */
+	public static boolean writeByteBuffer(SocketChannelResolver channelResolver, SocketChannel socketChannel, byte[] bytes) {
+		byte[] buffer = channelResolver.writeByteBuffer(socketChannel, 0, bytes);
 		try {
 			socketChannel.write(ByteBuffer.wrap(buffer));
 			return true;
@@ -342,6 +353,17 @@ public class InputSocket extends Input {
 	}
 
 	/**
+	 * @param channelResolver
+	 * @param socketChannel
+	 * @param callbackIndex
+	 * @param bytes
+	 * @return
+	 */
+	public static boolean writeByteBuffer(SocketChannelResolver channelResolver, SocketChannel socketChannel, int callbackIndex, byte[] bytes) {
+		return writeByteBuffer(channelResolver, socketChannel, (byte) 0, callbackIndex, bytes);
+	}
+
+	/**
 	 * @param socketChannel
 	 * @param flag
 	 * @param callbackIndex
@@ -349,8 +371,20 @@ public class InputSocket extends Input {
 	 * @return
 	 */
 	public static boolean writeByteBuffer(SocketChannel socketChannel, byte flag, int callbackIndex, byte[] bytes) {
+		return writeByteBuffer(ChannelResolver.ME, socketChannel, flag, callbackIndex, bytes);
+	}
+
+	/**
+	 * @param channelResolver
+	 * @param socketChannel
+	 * @param flag
+	 * @param callbackIndex
+	 * @param bytes
+	 * @return
+	 */
+	public static boolean writeByteBuffer(SocketChannelResolver channelResolver, SocketChannel socketChannel, byte flag, int callbackIndex, byte[] bytes) {
 		int headerLength = callbackIndex == 0 ? 1 : 5;
-		byte[] buffer = SocketChannelResolver.ME.writeByteBuffer(socketChannel, headerLength, bytes);
+		byte[] buffer = channelResolver.writeByteBuffer(socketChannel, headerLength, bytes);
 		headerLength = buffer.length - bytes.length - headerLength;
 		if (callbackIndex != 0) {
 			flag |= InputSocketAtt.CALL_BACK_FLAG;
@@ -376,6 +410,18 @@ public class InputSocket extends Input {
 	 * @return
 	 */
 	public static boolean writeByteBufferSuccess(SocketChannel socketChannel, boolean success, int callbackIndex, byte[] bytes) {
-		return writeByteBuffer(socketChannel, success == true ? 0 : InputSocketAtt.DEBUG_FLAG, callbackIndex, bytes);
+		return writeByteBufferSuccess(ChannelResolver.ME, socketChannel, success, callbackIndex, bytes);
+	}
+
+	/**
+	 * @param channelResolver
+	 * @param socketChannel
+	 * @param success
+	 * @param callbackIndex
+	 * @param bytes
+	 * @return
+	 */
+	public static boolean writeByteBufferSuccess(SocketChannelResolver channelResolver, SocketChannel socketChannel, boolean success, int callbackIndex, byte[] bytes) {
+		return writeByteBuffer(channelResolver, socketChannel, success == true ? 0 : InputSocketAtt.DEBUG_FLAG, callbackIndex, bytes);
 	}
 }

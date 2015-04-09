@@ -9,9 +9,8 @@ package com.absir.appserv.game.value;
 
 import java.io.Serializable;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-
 import com.absir.appserv.game.utils.GameUtils;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author absir

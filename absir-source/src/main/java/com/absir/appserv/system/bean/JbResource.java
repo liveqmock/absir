@@ -10,10 +10,9 @@ package com.absir.appserv.system.bean;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-
 import com.absir.appserv.system.bean.base.JbBase;
 import com.absir.appserv.system.bean.proxy.JiUpdate;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author absir

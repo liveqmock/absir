@@ -21,8 +21,6 @@ import java.util.Map.Entry;
 import javax.persistence.Embedded;
 import javax.persistence.Transient;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.hibernate.Session;
 
 import com.absir.appserv.configure.JConfigureUtils;
@@ -68,6 +66,8 @@ import com.absir.core.util.UtilQueueBlock;
 import com.absir.property.value.Allow;
 import com.absir.server.exception.ServerException;
 import com.absir.server.exception.ServerStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * @author absir

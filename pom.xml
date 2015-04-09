@@ -46,6 +46,7 @@
 		<module>achieve-game</module>
 		<module>absir-slave</module>
 		<module>absir-client</module>
+		<module>absir-master</module>
 	</modules>
 	<dependencies>
 		<dependency>

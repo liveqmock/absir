@@ -9,9 +9,8 @@ package com.absir.appserv.configure.xls;
 
 import java.io.Serializable;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-
 import com.absir.appserv.system.bean.proxy.JiUpdate;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author absir

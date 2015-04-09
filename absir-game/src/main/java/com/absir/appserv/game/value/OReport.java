@@ -10,9 +10,8 @@ package com.absir.appserv.game.value;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-
 import com.absir.appserv.system.bean.dto.EnumSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * @author absir

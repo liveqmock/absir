@@ -15,11 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig.Feature;
-import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-
 import com.absir.appserv.system.server.value.Result;
 import com.absir.bean.basis.Base;
 import com.absir.bean.core.BeanFactoryUtils;
@@ -36,6 +31,10 @@ import com.absir.server.route.parameter.ParameterResolver;
 import com.absir.server.route.parameter.ParameterResolverMethod;
 import com.absir.server.route.returned.ReturnedResolverBody;
 import com.absir.server.value.Body;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
  * @author absir
@@ -64,9 +63,9 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 	@Inject
 	protected void initResolver() {
 		objectMapper = new ObjectMapper();
-		objectMapper.setSerializationInclusion(Inclusion.NON_NULL);
-		objectMapper.configure(Feature.FAIL_ON_EMPTY_BEANS, false);
-		objectMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		objectMapper.setSerializationInclusion(Include.NON_NULL);
+		objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	}
 
 	/*

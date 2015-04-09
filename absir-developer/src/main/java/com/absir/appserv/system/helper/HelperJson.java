@@ -18,16 +18,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.codec.binary.Base64;
-import org.codehaus.jackson.JsonProcessingException;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.ObjectReader;
-import org.codehaus.jackson.map.ObjectWriter;
-import org.codehaus.jackson.map.SerializationConfig.Feature;
-import org.codehaus.jackson.map.introspect.AnnotatedClass;
-import org.codehaus.jackson.map.introspect.JacksonAnnotationIntrospector;
-import org.codehaus.jackson.map.ser.impl.SimpleBeanPropertyFilter;
-import org.codehaus.jackson.map.ser.impl.SimpleFilterProvider;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -39,6 +29,14 @@ import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.context.core.ContextUtils;
 import com.absir.core.kernel.KernelCharset;
 import com.absir.core.kernel.KernelString;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 /**
  * @author absir
@@ -51,27 +49,9 @@ public class HelperJson {
 	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	static {
-		// OBJECT_MAPPER.setVisibility(JsonMethod.FIELD, Visibility.ANY);
-		OBJECT_MAPPER.configure(Feature.FAIL_ON_EMPTY_BEANS, false);
-		OBJECT_MAPPER.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-	}
-
-	/**
-	 * @author absir
-	 * 
-	 */
-	public static class HelperIntrospector extends JacksonAnnotationIntrospector {
-
-		/**
-		 * 
-		 */
-		public HelperIntrospector() {
-		}
-
-		@Override
-		public Object findFilterId(AnnotatedClass ac) {
-			return super.findFilterId(ac);
-		}
+		// OBJECT_MAPPER.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+		OBJECT_MAPPER.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+		OBJECT_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	}
 
 	/**

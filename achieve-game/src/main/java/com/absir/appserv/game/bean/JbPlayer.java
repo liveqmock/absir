@@ -10,8 +10,6 @@ package com.absir.appserv.game.bean;
 import javax.persistence.Index;
 import javax.persistence.MappedSuperclass;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-
 import com.absir.appserv.game.value.ILevelExp;
 import com.absir.appserv.system.bean.JPlatformUser;
 import com.absir.appserv.system.bean.base.JbBean;
@@ -19,6 +17,7 @@ import com.absir.appserv.system.bean.value.JaEdit;
 import com.absir.appserv.system.bean.value.JaLang;
 import com.absir.orm.value.JaClasses;
 import com.absir.orm.value.JaColum;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author absir

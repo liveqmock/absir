@@ -9,9 +9,8 @@ package com.absir.appserv.game.bean;
 
 import javax.persistence.MappedSuperclass;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-
 import com.absir.appserv.system.bean.base.JbBeanLL;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author absir

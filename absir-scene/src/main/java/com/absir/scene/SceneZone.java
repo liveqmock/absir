@@ -10,11 +10,10 @@ package com.absir.scene;
 import java.util.Iterator;
 import java.util.List;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-
 import com.absir.appserv.game.value.OReportDetail;
 import com.absir.context.bean.IStep;
 import com.absir.core.util.UtilLinked;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author absir

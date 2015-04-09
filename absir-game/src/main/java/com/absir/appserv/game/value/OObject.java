@@ -13,11 +13,10 @@ import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-
 import com.absir.appserv.game.utils.GameUtils;
 import com.absir.appserv.system.bean.dto.IBaseSerializer;
 import com.absir.appserv.system.bean.proxy.JiBase;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * @author absir

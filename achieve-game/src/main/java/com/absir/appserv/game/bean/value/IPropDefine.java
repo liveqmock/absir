@@ -7,7 +7,7 @@
  */
 package com.absir.appserv.game.bean.value;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author absir

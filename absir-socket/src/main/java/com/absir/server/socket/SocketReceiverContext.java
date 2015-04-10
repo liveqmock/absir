@@ -254,17 +254,33 @@ public class SocketReceiverContext extends InDispatcher<InputSocketAtt, SocketCh
 		Serializable id = socketBuffer.getId();
 		byte[] buffer = socketBuffer.getBuff();
 		if (buffer.length > 1) {
-			InputSocketAtt inputSocketAtt = new InputSocketAtt(id, buffer);
-			try {
-				if (on(inputSocketAtt.getUrl(), inputSocketAtt, socketChannel)) {
-					return;
+			byte flag = buffer[0];
+			if ((flag & InputSocketAtt.RESPONSE_FLAG) == 0) {
+				InputSocketAtt inputSocketAtt = new InputSocketAtt(id, buffer);
+				try {
+					if (on(inputSocketAtt.getUrl(), inputSocketAtt, socketChannel)) {
+						return;
+					}
+
+				} catch (Throwable e) {
 				}
 
-			} catch (Throwable e) {
-			}
+				InputSocketImpl.writeByteBufferSuccess(socketChannel, false, inputSocketAtt.getCallbackIndex(), InputSocket.NONE_RESPONSE_BYTES);
 
-			InputSocketImpl.writeByteBufferSuccess(socketChannel, false, inputSocketAtt.getCallbackIndex(), InputSocket.NONE_RESPONSE_BYTES);
+			} else {
+				doResponse(socketChannel, id, flag, buffer);
+			}
 		}
+	}
+
+	/**
+	 * @param socketChannel
+	 * @param id
+	 * @param flag
+	 * @param buffer
+	 */
+	protected void doResponse(SocketChannel socketChannel, Serializable id, byte flag, byte[] buffer) {
+
 	}
 
 	/*

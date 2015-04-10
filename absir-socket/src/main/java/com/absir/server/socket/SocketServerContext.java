@@ -113,11 +113,11 @@ public class SocketServerContext extends ActiveService<JbServer, SocketServer> i
 
 	/** bufferSize */
 	@Value("server.socket.receiveBufferSize")
-	protected int receiveBufferSize = 10240;
+	protected int receiveBufferSize = 20480;
 
 	/** bufferSize */
 	@Value("server.socket.sendBufferSize")
-	protected int sendBufferSize = 10240;
+	protected int sendBufferSize = 20480;
 
 	/** beat */
 	@Value("server.socket.beat")

@@ -7,12 +7,12 @@
  */
 package com.absir.appserv.system.server;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +21,7 @@ import com.absir.bean.basis.Base;
 import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Inject;
+import com.absir.bean.inject.value.InjectType;
 import com.absir.binder.BinderData;
 import com.absir.context.core.ContextUtils;
 import com.absir.core.helper.HelperIO;
@@ -34,11 +35,9 @@ import com.absir.server.route.parameter.ParameterResolver;
 import com.absir.server.route.parameter.ParameterResolverMethod;
 import com.absir.server.route.returned.ReturnedResolverBody;
 import com.absir.server.value.Body;
+import com.absir.servlet.InputRequest;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
@@ -48,7 +47,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
  */
 @Base
 @Bean
-public class ServerResolverBody extends ReturnedResolverBody implements ParameterResolver<Object>, ParameterResolverMethod, IServerResolverBody {
+public class ServerResolverBody extends ReturnedResolverBody implements ParameterResolver<Object>, ParameterResolverMethod, IServerResolverBody, IServerBodyConverter {
 
 	/** ME */
 	public static final ServerResolverBody ME = BeanFactoryUtils.get(ServerResolverBody.class);
@@ -63,15 +62,33 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 		return objectMapper;
 	}
 
+	/** keyMapBodyConverter */
+	protected Map<String, IServerBodyConverter> keyMapBodyConverter;
+
 	/**
-	 * @return
+	 * @param bodyConverters
 	 */
-	@Inject
-	protected void initResolver() {
+	@Inject(type = InjectType.Selectable)
+	protected void initResolver(IServerBodyConverter[] bodyConverters) {
 		objectMapper = new ObjectMapper();
 		objectMapper.setSerializationInclusion(Include.NON_NULL);
 		objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		if (bodyConverters != null && bodyConverters.length > 0) {
+			keyMapBodyConverter = new HashMap<String, IServerBodyConverter>();
+			for (IServerBodyConverter bodyConverter : bodyConverters) {
+				String[] keys = bodyConverter.getRegisterKeys();
+				if (keys != null) {
+					for (String key : keys) {
+						keyMapBodyConverter.put(key.toLowerCase(), bodyConverter);
+					}
+				}
+			}
+
+			if (keyMapBodyConverter.isEmpty()) {
+				keyMapBodyConverter = null;
+			}
+		}
 	}
 
 	/*
@@ -248,40 +265,114 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 		}
 	}
 
+	/** SERVER_BODY_CONVERTER_NAME */
+	public static final String SERVER_BODY_CONVERTER_NAME = ServerResolverBody.class + "@SERVER_BODY_CONVERTER_NAME";
+
 	/**
 	 * @param onPut
-	 * @param group
+	 * @return
+	 */
+	public IServerBodyConverter getServerBodyConverter(OnPut onPut) {
+		if (keyMapBodyConverter == null) {
+			return this;
+		}
+
+		Input input = onPut.getInput();
+		Object converter = input.getAttribute(SERVER_BODY_CONVERTER_NAME);
+		if (converter == null) {
+			IServerBodyConverter bodyConverter = null;
+			if (input instanceof InputRequest) {
+				String contentType = ((InputRequest) input).getRequest().getHeader("content-type");
+				if (contentType != null) {
+					bodyConverter = keyMapBodyConverter.get(contentType.toLowerCase());
+				}
+			}
+
+			if (bodyConverter == null) {
+				bodyConverter = this;
+			}
+
+			setServerBodyConverter(input, bodyConverter);
+			return bodyConverter;
+		}
+
+		return converter instanceof IServerBodyConverter ? (IServerBodyConverter) converter : this;
+	}
+
+	/**
 	 * @param input
-	 * @param parameterType
-	 * @return
-	 * @throws JsonParseException
-	 * @throws JsonMappingException
-	 * @throws IOException
+	 * @param bodyConverter
 	 */
+	public void setServerBodyConverter(Input input, IServerBodyConverter bodyConverter) {
+		input.setAttribute(SERVER_BODY_CONVERTER_NAME, bodyConverter);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.absir.core.kernel.KernelList.Orderable#getOrder()
+	 */
+	@Override
+	public int getOrder() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.system.server.IServerBodyConverter#getRegisterKeys()
+	 */
+	@Override
+	public String[] getRegisterKeys() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.system.server.IServerBodyConverter#readBodyParameterValue
+	 * (com.absir.server.on.OnPut, int, java.lang.String, java.lang.Class)
+	 */
+	@Override
 	public Object readBodyParameterValue(OnPut onPut, int group, String input, Class<?> parameterType) throws Exception {
-		return objectMapper.readValue(input, parameterType);
+		// TODO Auto-generated method stub
+		IServerBodyConverter converter = getServerBodyConverter(onPut);
+		return converter == null || converter == this ? objectMapper.readValue(input, parameterType) : converter.readBodyParameterValue(onPut, group, input, parameterType);
 	}
 
-	/**
-	 * @param onPut
-	 * @param group
-	 * @param inputStream
-	 * @param parameterType
-	 * @return
-	 * @throws JsonParseException
-	 * @throws JsonMappingException
-	 * @throws IOException
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.system.server.IServerBodyConverter#readBodyParameterValue
+	 * (com.absir.server.on.OnPut, int, java.io.InputStream, java.lang.Class)
 	 */
+	@Override
 	public Object readBodyParameterValue(OnPut onPut, int group, InputStream inputStream, Class<?> parameterType) throws Exception {
-		return objectMapper.readValue(inputStream, parameterType);
+		// TODO Auto-generated method stub
+		IServerBodyConverter converter = getServerBodyConverter(onPut);
+		return converter == null || converter == this ? objectMapper.readValue(inputStream, parameterType) : converter.readBodyParameterValue(onPut, group, inputStream, parameterType);
 	}
 
-	/**
-	 * @param returnValue
-	 * @return
-	 * @throws JsonProcessingException
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.system.server.IServerBodyConverter#writeAsBytes(com
+	 * .absir.server.on.OnPut, java.lang.Object)
 	 */
+	@Override
 	public byte[] writeAsBytes(OnPut onPut, Object returnValue) throws Exception {
+		// TODO Auto-generated method stub
+		IServerBodyConverter converter = getServerBodyConverter(onPut);
+		if (converter != null && converter != this) {
+			return converter.writeAsBytes(onPut, returnValue);
+		}
+
 		if (returnValue.getClass() == String.class) {
 			return ((String) returnValue).getBytes(ContextUtils.getCharset());
 		}
@@ -289,13 +380,22 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 		return objectMapper.writeValueAsBytes(returnValue);
 	}
 
-	/**
-	 * @param onPut
-	 * @param returnValue
-	 * @param outputStream
-	 * @throws IOException
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.appserv.system.server.IServerBodyConverter#writeValue(com.absir
+	 * .server.on.OnPut, java.lang.Object, java.io.OutputStream)
 	 */
+	@Override
 	public void writeValue(OnPut onPut, Object returnValue, OutputStream outputStream) throws Exception {
+		// TODO Auto-generated method stub
+		IServerBodyConverter converter = getServerBodyConverter(onPut);
+		if (converter != null && converter != this) {
+			converter.writeValue(onPut, returnValue, outputStream);
+			return;
+		}
+
 		if (returnValue.getClass() == String.class) {
 			HelperIO.write((String) returnValue, outputStream, ContextUtils.getCharset());
 

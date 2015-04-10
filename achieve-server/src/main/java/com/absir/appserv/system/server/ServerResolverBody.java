@@ -7,6 +7,7 @@
  */
 package com.absir.appserv.system.server;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
@@ -21,6 +22,8 @@ import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
 import com.absir.bean.inject.value.Inject;
 import com.absir.binder.BinderData;
+import com.absir.context.core.ContextUtils;
+import com.absir.core.helper.HelperIO;
 import com.absir.core.kernel.KernelArray;
 import com.absir.core.kernel.KernelString;
 import com.absir.server.in.InMethod;
@@ -32,7 +35,10 @@ import com.absir.server.route.parameter.ParameterResolverMethod;
 import com.absir.server.route.returned.ReturnedResolverBody;
 import com.absir.server.value.Body;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
@@ -194,7 +200,7 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 		}
 
 		InputStream inputStream = input.getInputStream();
-		return inputStream == null ? objectMapper.readValue(input.getInput(), parameterType) : objectMapper.readValue(inputStream, parameterType);
+		return inputStream == null ? readBodyParameterValue(onPut, group, input.getInput(), parameterType) : readBodyParameterValue(onPut, group, inputStream, parameterType);
 	}
 
 	/*
@@ -232,18 +238,70 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 			Input input = onPut.getInput();
 			input.setCharacterEncoding(charset);
 			input.setContentTypeCharset(contentTypeCharset);
-			if (returnValue.getClass() == String.class) {
-				onPut.getInput().write((String) returnValue);
+			OutputStream outputStream = input.getOutputStream();
+			if (outputStream == null) {
+				input.write(writeAsBytes(onPut, returnValue));
 
 			} else {
-				OutputStream outputStream = input.getOutputStream();
-				if (outputStream == null) {
-					input.write(objectMapper.writeValueAsBytes(returnValue));
-
-				} else {
-					objectMapper.writeValue(outputStream, returnValue);
-				}
+				writeValue(onPut, returnValue, outputStream);
 			}
 		}
 	}
+
+	/**
+	 * @param onPut
+	 * @param group
+	 * @param input
+	 * @param parameterType
+	 * @return
+	 * @throws JsonParseException
+	 * @throws JsonMappingException
+	 * @throws IOException
+	 */
+	public Object readBodyParameterValue(OnPut onPut, int group, String input, Class<?> parameterType) throws Exception {
+		return objectMapper.readValue(input, parameterType);
+	}
+
+	/**
+	 * @param onPut
+	 * @param group
+	 * @param inputStream
+	 * @param parameterType
+	 * @return
+	 * @throws JsonParseException
+	 * @throws JsonMappingException
+	 * @throws IOException
+	 */
+	public Object readBodyParameterValue(OnPut onPut, int group, InputStream inputStream, Class<?> parameterType) throws Exception {
+		return objectMapper.readValue(inputStream, parameterType);
+	}
+
+	/**
+	 * @param returnValue
+	 * @return
+	 * @throws JsonProcessingException
+	 */
+	public byte[] writeAsBytes(OnPut onPut, Object returnValue) throws Exception {
+		if (returnValue.getClass() == String.class) {
+			return ((String) returnValue).getBytes(ContextUtils.getCharset());
+		}
+
+		return objectMapper.writeValueAsBytes(returnValue);
+	}
+
+	/**
+	 * @param onPut
+	 * @param returnValue
+	 * @param outputStream
+	 * @throws IOException
+	 */
+	public void writeValue(OnPut onPut, Object returnValue, OutputStream outputStream) throws Exception {
+		if (returnValue.getClass() == String.class) {
+			HelperIO.write((String) returnValue, outputStream, ContextUtils.getCharset());
+
+		} else {
+			objectMapper.writeValue(outputStream, returnValue);
+		}
+	}
+
 }

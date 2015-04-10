@@ -40,8 +40,8 @@ import com.absir.core.util.UtilNode;
 @Bean
 public class ScheduleFactory implements IMethodInject<Schedule> {
 
-	/** logger */
-	private final Logger logger = LoggerFactory.getLogger(ScheduleFactory.class);
+	/** LOGGER */
+	private static final Logger LOGGER = LoggerFactory.getLogger(ScheduleFactory.class);
 
 	/** scheduleRunables */
 	@Inject(type = InjectType.Selectable)
@@ -73,7 +73,7 @@ public class ScheduleFactory implements IMethodInject<Schedule> {
 							runable.run(date);
 
 						} catch (Throwable e) {
-							logger.error("failed!", e);
+							LOGGER.error("failed!", e);
 						}
 
 						if (runable.getScheduleTime() <= 0) {
@@ -103,7 +103,7 @@ public class ScheduleFactory implements IMethodInject<Schedule> {
 								schedule.run(date);
 
 							} catch (Throwable e) {
-								logger.error("failed!", e);
+								LOGGER.error("failed!", e);
 							}
 
 							if (schedule.getScheduleTime() <= 0) {

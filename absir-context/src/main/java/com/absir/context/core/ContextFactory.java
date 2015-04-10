@@ -47,8 +47,8 @@ import com.absir.core.util.UtilAtom;
 @Bean
 public class ContextFactory {
 
-	/** logger */
-	protected final Logger logger = LoggerFactory.getLogger(ContextFactory.class);
+	/** LOGGER */
+	protected static final Logger LOGGER = LoggerFactory.getLogger(ContextFactory.class);
 
 	/** contextTime */
 	private long contextTime = System.currentTimeMillis();
@@ -105,7 +105,7 @@ public class ContextFactory {
 								contextBase.uninitialize();
 
 							} catch (Throwable e) {
-								logger.error("failed!", e);
+								LOGGER.error("failed!", e);
 
 							} finally {
 								utilAtom.decrement();
@@ -155,7 +155,7 @@ public class ContextFactory {
 									}
 
 								} catch (Throwable e) {
-									logger.error("failed!", e);
+									LOGGER.error("failed!", e);
 
 								} finally {
 									utilAtom.decrement();

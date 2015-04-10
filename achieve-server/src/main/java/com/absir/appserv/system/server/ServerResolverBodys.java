@@ -86,7 +86,7 @@ public class ServerResolverBodys extends ReturnedResolverBody implements Paramet
 	@Override
 	public Object getParameterValue(OnPut onPut, Object parameter, Class<?> parameterType, String beanName, RouteMethod routeMethod) throws Exception {
 		// TODO Auto-generated method stub
-		return ServerResolverBody.ME.getParameterValue(trace || onPut.getInput().isDebug() ? ServerResolverBody.ME : this, onPut, parameter, parameterType, beanName, routeMethod);
+		return ServerResolverBody.ME.getParameterValue(!trace || onPut.getInput().isDebug() ? ServerResolverBody.ME : this, onPut, parameter, parameterType, beanName, routeMethod);
 	}
 
 	/*
@@ -113,7 +113,7 @@ public class ServerResolverBodys extends ReturnedResolverBody implements Paramet
 
 		GZIPInputStream gzipInputStream = new GZIPInputStream(inputStream);
 		try {
-			return ServerResolverBody.ME.getObjectMapper().readValue(gzipInputStream, parameterType);
+			return ServerResolverBody.ME.readBodyParameterValue(onPut, group, gzipInputStream, parameterType);
 
 		} finally {
 			gzipInputStream.close();
@@ -179,7 +179,7 @@ public class ServerResolverBodys extends ReturnedResolverBody implements Paramet
 	@Override
 	public void resolveReturnedValue(Object returnValue, Integer returned, OnPut onPut) throws Exception {
 		// TODO Auto-generated method stub
-		if (trace || onPut.getInput().isDebug()) {
+		if (!trace || onPut.getInput().isDebug()) {
 			ServerResolverBody.ME.resolveReturnedValue(returnValue, returned, onPut);
 
 		} else {
@@ -199,8 +199,7 @@ public class ServerResolverBodys extends ReturnedResolverBody implements Paramet
 			Input input = onPut.getInput();
 			input.setCharacterEncoding(serverResolverBody.getCharset());
 			input.setContentTypeCharset(serverResolverBody.getContentTypeCharset());
-			byte[] bufferBytes = returnValue.getClass() == String.class ? ((String) returnValue).getBytes(ContextUtils.getCharset()) : serverResolverBody.getObjectMapper().writeValueAsBytes(
-					returnValue);
+			byte[] bufferBytes = ServerResolverBody.ME.writeAsBytes(onPut, returnValue);
 			OutputStream outputStream = input.getOutputStream();
 			if (outputStream == null) {
 				ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

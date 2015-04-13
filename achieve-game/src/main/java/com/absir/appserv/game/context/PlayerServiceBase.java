@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -55,6 +56,19 @@ public abstract class PlayerServiceBase {
 
 	/** ME */
 	public static final PlayerServiceBase ME = BeanFactoryUtils.get(PlayerServiceBase.class);
+
+	/** 用户名验证 */
+	public static final Pattern NAME_PATTERN = Pattern.compile("([\\w]|[\\u4e00-\\u9fa5]){2,8}");
+
+	/**
+	 * 检测用户名是否可用
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public boolean isMatchName(String name) {
+		return name == null || NAME_PATTERN.matcher(name).matches() || PlayerServiceBase.ME.findFilter(name);
+	}
 
 	/**
 	 * 查询平台用户
@@ -111,6 +125,32 @@ public abstract class PlayerServiceBase {
 			} catch (Exception e) {
 				// TODO: handle exception
 				platformUser = ME.findPlatformUser(userBase);
+			}
+		}
+
+		return platformUser;
+	}
+
+	/**
+	 * 获取关联平台账号
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	@Transaction
+	public JPlatformUser getPlatformUser(Long userId) {
+		Session session = BeanDao.getSession();
+		JPlatformUser platformUser = BeanDao.get(session, JPlatformUser.class, userId);
+		if (platformUser == null) {
+			platformUser = new JPlatformUser();
+			platformUser.setId(userId);
+			try {
+				session.persist(platformUser);
+
+			} catch (Exception e) {
+				// TODO: handle exception
+				session.clear();
+				platformUser = BeanDao.get(session, JPlatformUser.class, userId);
 			}
 		}
 

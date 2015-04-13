@@ -8,7 +8,6 @@
 package com.absir.appserv.game.api;
 
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -37,9 +36,6 @@ import com.absir.server.value.Param;
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public abstract class Api_userBase extends ApiServer {
-
-	/** 用户名验证 */
-	public static final Pattern NAME_PATTERN = Pattern.compile("([\\w]|[\\u4e00-\\u9fa5]){2,8}");
 
 	@JaLang("登录帐号")
 	public JiUserBase login() {
@@ -91,14 +87,9 @@ public abstract class Api_userBase extends ApiServer {
 		return null;
 	}
 
-	@JaLang("创建名称")
-	protected boolean isMatchName(String name) {
-		return name == null || NAME_PATTERN.matcher(name).matches() || PlayerServiceBase.ME.findFilter(name);
-	}
-
 	@JaLang("创建角色")
 	public boolean play(int gender, @Bodys String name, @Nullable @Param Long serverId) {
-		if (!isMatchName(name)) {
+		if (!PlayerServiceBase.ME.isMatchName(name)) {
 			throw new ServerException(ServerStatus.ON_ERROR);
 		}
 

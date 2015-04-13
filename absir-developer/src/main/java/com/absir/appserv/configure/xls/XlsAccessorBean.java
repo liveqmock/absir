@@ -252,7 +252,7 @@ public class XlsAccessorBean extends XlsAccessor {
 	 */
 	@Override
 	public XlsCell getHeader() {
-		XlsCell xlsCell = super.getHeader();
+		XlsCell xlsCell = new XlsCell();
 		if (accessors != null) {
 			List<XlsCell> cells = new ArrayList<XlsCell>();
 			for (XlsAccessor accessor : accessors) {

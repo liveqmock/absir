@@ -427,12 +427,13 @@ public class XlsAccessorUtils {
 				maxColumn = 0;
 			}
 
+			int headerMax = -1;
 			int endColumn = lastColumn;
 			while (firstRow < lastRow) {
 				int headerCount = 0;
 				row = hssfSheet.getRow(firstRow);
 				if (maxColumn > 0) {
-					endColumn = Math.min(row.getPhysicalNumberOfCells(), maxColumn);
+					endColumn = row == null ? 0 : Math.min(row.getPhysicalNumberOfCells(), maxColumn);
 				}
 
 				for (int column = firstColumn; column < endColumn; column++) {
@@ -446,9 +447,11 @@ public class XlsAccessorUtils {
 				}
 
 				firstRow++;
-				if (headerCount >= columnCount) {
+				if (headerCount >= columnCount || headerMax >= headerCount) {
 					break;
 				}
+
+				headerMax = headerCount;
 			}
 
 			List<Object> cells = new ArrayList<Object>();

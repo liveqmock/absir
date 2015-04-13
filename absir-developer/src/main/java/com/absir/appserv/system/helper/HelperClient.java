@@ -38,7 +38,26 @@ public class HelperClient {
 	 * @throws IOException
 	 */
 	public static InputStream openConnection(HttpURLConnection urlConnection) throws IOException {
-		return urlConnection.getResponseCode() >= 400 ? urlConnection.getErrorStream() : urlConnection.getInputStream();
+		InputStream inputStream = urlConnection.getResponseCode() >= 400 ? null : urlConnection.getInputStream();
+		return inputStream == null ? urlConnection.getErrorStream() : inputStream;
+	}
+
+	/**
+	 * @param urlConnection
+	 * @param type
+	 * @return
+	 * @throws IOException
+	 */
+	public static <T> T openConnection(HttpURLConnection urlConnection, Class<T> type) throws IOException {
+		if (type == null || type == InputStream.class) {
+			return (T) openConnection(urlConnection);
+
+		} else if (type == String.class) {
+			return (T) HelperIO.toString(openConnection(urlConnection), ContextUtils.getCharset());
+
+		} else {
+			return openConnectionJson(urlConnection, type);
+		}
 	}
 
 	/**
@@ -80,31 +99,117 @@ public class HelperClient {
 	 * @param url
 	 * @param post
 	 * @param postBytes
+	 * @param type
+	 * @return
+	 */
+	public static <T> T openConnection(String url, boolean post, byte[] postBytes, Class<T> type) {
+		return openConnection(url, post, postBytes, 0, type);
+	}
+
+	/**
+	 * @param url
+	 * @param post
+	 * @param postBytes
+	 * @param off
+	 * @param type
+	 * @return
+	 */
+	public static <T> T openConnection(String url, boolean post, byte[] postBytes, int off, Class<T> type) {
+		return openConnection(url, post, postBytes, off, 0, type);
+	}
+
+	/**
+	 * @param url
+	 * @param post
+	 * @param postBytes
+	 * @param off
+	 * @param len
+	 * @return
+	 * @throws Exception
+	 */
+	public static HttpURLConnection openConnection(String url, boolean post, byte[] postBytes, int off, int len) throws Exception {
+		HttpURLConnection urlConnection = (HttpURLConnection) (new URL(url)).openConnection();
+		if (post || postBytes != null) {
+			urlConnection.setRequestMethod("POST");
+			if (postBytes != null) {
+				if (len <= 0) {
+					len = postBytes.length;
+				}
+
+				if (len > 0) {
+					// 必需的
+					urlConnection.addRequestProperty("Content-type", "text/plain");
+					urlConnection.setDoOutput(true);
+					urlConnection.connect();
+					urlConnection.getOutputStream().write(postBytes, off, len);
+				}
+			}
+		}
+
+		return urlConnection;
+	}
+
+	/**
+	 * @param url
+	 * @param post
+	 * @param postBytes
+	 * @param offset
 	 * @param length
 	 * @param type
 	 * @return
 	 */
-	public static <T> T openConnection(String url, boolean post, byte[] postBytes, int length, Class<T> type) {
+	public static <T> T openConnection(String url, boolean post, byte[] postBytes, int off, int len, Class<T> type) {
 		try {
-			HttpURLConnection urlConnection = (HttpURLConnection) (new URL(url)).openConnection();
-			if (post || postBytes != null) {
-				urlConnection.setRequestMethod("POST");
-				if (postBytes != null) {
-					if (length <= 0) {
-						length = postBytes.length;
-					}
+			HttpURLConnection urlConnection = openConnection(url, post, postBytes, off, len);
+			return openConnection(urlConnection, type);
 
-					if (length > 0) {
-						// 必需的
-						urlConnection.addRequestProperty("Content-type", "text/plain");
-						urlConnection.setDoOutput(true);
-						urlConnection.connect();
-						urlConnection.getOutputStream().write(postBytes, 0, length);
-					}
-				}
+		} catch (Throwable e) {
+			if (BeanFactoryUtils.getEnvironment() == Environment.DEVELOP) {
+				e.printStackTrace();
 			}
 
-			return type == null || type.isAssignableFrom(String.class) ? (T) HelperIO.toString(urlConnection.getInputStream(), ContextUtils.getCharset()) : openConnectionJson(urlConnection, type);
+			LOGGER.error("", e);
+		}
+
+		return null;
+	}
+
+	/**
+	 * @author absir
+	 *
+	 * @param <T>
+	 */
+	public static class DResponse<T> {
+
+		/** code */
+		public int code;
+
+		/** inputStream */
+		public InputStream input;
+
+		/** value */
+		public T value;
+
+	}
+
+	/**
+	 * @param url
+	 * @param post
+	 * @param postBytes
+	 * @param off
+	 * @param len
+	 * @param type
+	 * @return
+	 */
+	public static <T> DResponse<T> requestConnection(String url, boolean post, byte[] postBytes, int off, int len, Class<T> type) {
+		try {
+			HttpURLConnection urlConnection = openConnection(url, post, postBytes, off, len);
+			DResponse<T> response = new DResponse<T>();
+			response.code = urlConnection.getResponseCode();
+			response.input = openConnection(urlConnection);
+			if (response.code == 200) {
+				response.value = openConnection(urlConnection, type);
+			}
 
 		} catch (Throwable e) {
 			if (BeanFactoryUtils.getEnvironment() == Environment.DEVELOP) {

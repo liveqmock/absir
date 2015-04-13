@@ -130,9 +130,9 @@ public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayer, 
 		DynaBinder.INSTANCE.mapBind(ConfigureUtils.readPropertyMap(new File(BeanFactoryUtils.getBeanConfig().getClassPath() + "conf/PlayComponent.conf")), this);
 		// 初始化配置对象
 		Class<?>[] componentClasses = KernelClass.componentClasses(getClass());
-		playerDefines = (List<PD>) XlsUtils.getXlsBeans((Class<? extends XlsBase>) componentClasses[4]);
+		playerDefines = DynaBinder.to(XlsUtils.getXlsBeans((Class<? extends XlsBase>) componentClasses[4]), List.class);
 		cardDefineDao = (XlsDao<CD, Serializable>) XlsUtils.getXlsDao((Class<? extends XlsBase>) CARD_DEFINE_CLASS);
-		cardExps = (List<IExp>) XlsUtils.getXlsBeans((Class<? extends XlsBase>) componentClasses[6]);
+		cardExps = DynaBinder.to(XlsUtils.getXlsBeans((Class<? extends XlsBase>) componentClasses[6]), List.class);
 		if (cardExps != null) {
 			int exp = 0;
 			cardLevelExps.clear();
@@ -142,7 +142,7 @@ public abstract class PlayerComponentBase<C extends JbCard, P extends JbPlayer, 
 			}
 		}
 
-		vipDefines = (List<VD>) XlsUtils.getXlsBeans((Class<? extends XlsBase>) componentClasses[7]);
+		vipDefines = DynaBinder.to(XlsUtils.getXlsBeans((Class<? extends XlsBase>) componentClasses[7]), List.class);
 		propDefineDao = (XlsDao<PP, Serializable>) XlsUtils.getXlsDao((Class<? extends XlsBase>) PROP_DEFINE_CLASS);
 		rewardDefineDao = (XlsDao<RD, Serializable>) XlsUtils.getXlsDao((Class<? extends XlsBase>) componentClasses[9]);
 		taskDefineDao = (XlsDao<TD, Serializable>) XlsUtils.getXlsDao((Class<? extends XlsBase>) componentClasses[10]);

@@ -7,14 +7,21 @@
  */
 package com.absir.server.route.returned;
 
+import java.io.OutputStream;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.absir.bean.basis.Base;
+import com.absir.bean.core.BeanFactoryUtils;
 import com.absir.bean.inject.value.Bean;
+import com.absir.bean.inject.value.Inject;
+import com.absir.bean.inject.value.InjectType;
 import com.absir.bean.inject.value.Value;
 import com.absir.context.core.ContextUtils;
 import com.absir.server.in.Input;
 import com.absir.server.on.OnPut;
+import com.absir.server.route.body.IBodyConverter;
 import com.absir.server.value.Body;
 
 /**
@@ -25,12 +32,60 @@ import com.absir.server.value.Body;
 @Bean
 public class ReturnedResolverBody implements ReturnedResolver<Integer> {
 
+	/** ME */
+	public static final ReturnedResolverBody ME = BeanFactoryUtils.get(ReturnedResolverBody.class);
+
 	/** charset */
 	protected String charset = ContextUtils.getCharset().displayName();
 
 	/** contentTypeCharset */
 	@Value("server.body.contentType")
 	protected String contentTypeCharset = "text/html;" + charset;
+
+	/** typeMapConverter */
+	protected Map<String, IBodyConverter> typeMapConverter;
+
+	/**
+	 * @param bodyConverters
+	 */
+	@Inject(type = InjectType.Selectable)
+	protected void initResolver(IBodyConverter[] bodyConverters) {
+		if (bodyConverters != null && bodyConverters.length > 0) {
+			typeMapConverter = new HashMap<String, IBodyConverter>();
+			for (IBodyConverter bodyConverter : bodyConverters) {
+				String[] types = bodyConverter.getContentTypes();
+				if (types != null) {
+					for (String type : types) {
+						typeMapConverter.put(type.toLowerCase(), bodyConverter);
+					}
+				}
+			}
+
+			if (typeMapConverter.isEmpty()) {
+				typeMapConverter = null;
+			}
+		}
+	}
+
+	/** BODY_CONVERTER_NAME */
+	protected static final String BODY_CONVERTER_NAME = ReturnedResolverBody.class + "@BODY_CONVERTER_NAME";
+
+	/**
+	 * @param input
+	 * @return
+	 */
+	public IBodyConverter getBodyConverter(Input input) {
+		Object converter = input.getAttribute(BODY_CONVERTER_NAME);
+		return converter == null || !(converter instanceof IBodyConverter) ? null : (IBodyConverter) converter;
+	}
+
+	/**
+	 * @param input
+	 * @param converter
+	 */
+	public void setBodyConverter(Input input, IBodyConverter converter) {
+		input.setAttribute(BODY_CONVERTER_NAME, converter);
+	}
 
 	/**
 	 * @return the charset
@@ -88,7 +143,19 @@ public class ReturnedResolverBody implements ReturnedResolver<Integer> {
 			Input input = onPut.getInput();
 			input.setCharacterEncoding(charset);
 			input.setContentTypeCharset(contentTypeCharset);
-			input.write(returnValue.toString());
+			IBodyConverter converter = getBodyConverter(input);
+			if (converter == null) {
+				input.write(returnValue.toString());
+
+			} else {
+				OutputStream outputStream = input.getOutputStream();
+				if (outputStream == null) {
+					input.write(converter.writeAsBytes(onPut, returnValue));
+
+				} else {
+					converter.writeValue(onPut, returnValue, outputStream);
+				}
+			}
 		}
 	}
 }

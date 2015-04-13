@@ -113,7 +113,7 @@ public class ServerResolverBodys extends ReturnedResolverBody implements Paramet
 
 		GZIPInputStream gzipInputStream = new GZIPInputStream(inputStream);
 		try {
-			return ServerResolverBody.ME.readBodyParameterValue(onPut, group, gzipInputStream, parameterType);
+			return ServerResolverBody.ME.getBodyConverter(input).readBodyParameterValue(onPut, group, gzipInputStream, parameterType);
 
 		} finally {
 			gzipInputStream.close();
@@ -199,7 +199,7 @@ public class ServerResolverBodys extends ReturnedResolverBody implements Paramet
 			Input input = onPut.getInput();
 			input.setCharacterEncoding(serverResolverBody.getCharset());
 			input.setContentTypeCharset(serverResolverBody.getContentTypeCharset());
-			byte[] bufferBytes = ServerResolverBody.ME.writeAsBytes(onPut, returnValue);
+			byte[] bufferBytes = ServerResolverBody.ME.getBodyConverter(input).writeAsBytes(onPut, returnValue);
 			OutputStream outputStream = input.getOutputStream();
 			if (outputStream == null) {
 				ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

@@ -496,13 +496,10 @@ public class SocketServerContext extends ActiveService<JbServer, SocketServer> i
 	protected void reloadActives(long contextTime) {
 		// TODO Auto-generated method stub
 		List<JbServer> servers = QueryDaoUtils.createQueryArray(BeanDao.getSession(), "SELECT o FROM JServer o").list();
+		serverContextMap.setActives(servers);
+		super.reloadActives(contextTime);
 		if (!option && servers.isEmpty()) {
-			option = true;
 			startDefault();
-
-		} else {
-			serverContextMap.setActives(servers);
-			super.reloadActives(contextTime);
 		}
 	}
 }

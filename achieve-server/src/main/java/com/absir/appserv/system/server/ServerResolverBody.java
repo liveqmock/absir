@@ -12,7 +12,6 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +30,7 @@ import com.absir.server.in.InMethod;
 import com.absir.server.in.Input;
 import com.absir.server.on.OnPut;
 import com.absir.server.route.RouteMethod;
+import com.absir.server.route.body.IBodyConverter;
 import com.absir.server.route.parameter.ParameterResolver;
 import com.absir.server.route.parameter.ParameterResolverMethod;
 import com.absir.server.route.returned.ReturnedResolverBody;
@@ -47,7 +47,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
  */
 @Base
 @Bean
-public class ServerResolverBody extends ReturnedResolverBody implements ParameterResolver<Object>, ParameterResolverMethod, IServerResolverBody, IServerBodyConverter {
+public class ServerResolverBody extends ReturnedResolverBody implements ParameterResolver<Object>, ParameterResolverMethod, IServerResolverBody, IBodyConverter {
 
 	/** ME */
 	public static final ServerResolverBody ME = BeanFactoryUtils.get(ServerResolverBody.class);
@@ -62,33 +62,50 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 		return objectMapper;
 	}
 
-	/** keyMapBodyConverter */
-	protected Map<String, IServerBodyConverter> keyMapBodyConverter;
-
 	/**
 	 * @param bodyConverters
 	 */
 	@Inject(type = InjectType.Selectable)
-	protected void initResolver(IServerBodyConverter[] bodyConverters) {
+	protected void initResolver(IBodyConverter[] bodyConverters) {
+		super.initResolver(bodyConverters);
 		objectMapper = new ObjectMapper();
 		objectMapper.setSerializationInclusion(Include.NON_NULL);
 		objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		if (bodyConverters != null && bodyConverters.length > 0) {
-			keyMapBodyConverter = new HashMap<String, IServerBodyConverter>();
-			for (IServerBodyConverter bodyConverter : bodyConverters) {
-				String[] keys = bodyConverter.getRegisterKeys();
-				if (keys != null) {
-					for (String key : keys) {
-						keyMapBodyConverter.put(key.toLowerCase(), bodyConverter);
-					}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.absir.server.route.returned.ReturnedResolverBody#getBodyConverter
+	 * (com.absir.server.in.Input)
+	 */
+	@Override
+	public IBodyConverter getBodyConverter(Input input) {
+		// TODO Auto-generated method stub
+		Object converter = input.getAttribute(BODY_CONVERTER_NAME);
+		if (converter == null) {
+			IBodyConverter bodyConverter = null;
+			if (input instanceof InputRequest) {
+				String contentType = ((InputRequest) input).getRequest().getContentType();
+				if (contentType != null) {
+					bodyConverter = typeMapConverter.get(contentType);
 				}
 			}
 
-			if (keyMapBodyConverter.isEmpty()) {
-				keyMapBodyConverter = null;
+			if (bodyConverter == null) {
+				bodyConverter = this;
 			}
+
+			setBodyConverter(input, bodyConverter);
+			return bodyConverter;
+
+		} else if (!(converter instanceof IBodyConverter)) {
+			return this;
 		}
+
+		return (IBodyConverter) converter;
 	}
 
 	/*
@@ -152,9 +169,6 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 		return body == null ? null : body.value();
 	}
 
-	/** BODY_OBJECT_NAME */
-	private static final String BODY_OBJECT_NAME = ServerResolverBody.class.getName() + "@BODY_OBJECT_NAME";
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -168,6 +182,9 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 		// TODO Auto-generated method stub
 		return getParameterValue(this, onPut, parameter, parameterType, beanName, routeMethod);
 	}
+
+	/** BODY_OBJECT_NAME */
+	protected static final String BODY_OBJECT_NAME = ServerResolverBody.class.getName() + "@BODY_OBJECT_NAME";
 
 	/**
 	 * @param body
@@ -217,7 +234,8 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 		}
 
 		InputStream inputStream = input.getInputStream();
-		return inputStream == null ? readBodyParameterValue(onPut, group, input.getInput(), parameterType) : readBodyParameterValue(onPut, group, inputStream, parameterType);
+		IBodyConverter converter = getBodyConverter(input);
+		return inputStream == null ? converter.readBodyParameterValue(onPut, group, input.getInput(), parameterType) : converter.readBodyParameterValue(onPut, group, inputStream, parameterType);
 	}
 
 	/*
@@ -257,54 +275,12 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 			input.setContentTypeCharset(contentTypeCharset);
 			OutputStream outputStream = input.getOutputStream();
 			if (outputStream == null) {
-				input.write(writeAsBytes(onPut, returnValue));
+				input.write(getBodyConverter(input).writeAsBytes(onPut, returnValue));
 
 			} else {
-				writeValue(onPut, returnValue, outputStream);
+				getBodyConverter(input).writeValue(onPut, returnValue, outputStream);
 			}
 		}
-	}
-
-	/** SERVER_BODY_CONVERTER_NAME */
-	public static final String SERVER_BODY_CONVERTER_NAME = ServerResolverBody.class + "@SERVER_BODY_CONVERTER_NAME";
-
-	/**
-	 * @param onPut
-	 * @return
-	 */
-	public IServerBodyConverter getServerBodyConverter(OnPut onPut) {
-		if (keyMapBodyConverter == null) {
-			return this;
-		}
-
-		Input input = onPut.getInput();
-		Object converter = input.getAttribute(SERVER_BODY_CONVERTER_NAME);
-		if (converter == null) {
-			IServerBodyConverter bodyConverter = null;
-			if (input instanceof InputRequest) {
-				String contentType = ((InputRequest) input).getRequest().getHeader("content-type");
-				if (contentType != null) {
-					bodyConverter = keyMapBodyConverter.get(contentType.toLowerCase());
-				}
-			}
-
-			if (bodyConverter == null) {
-				bodyConverter = this;
-			}
-
-			setServerBodyConverter(input, bodyConverter);
-			return bodyConverter;
-		}
-
-		return converter instanceof IServerBodyConverter ? (IServerBodyConverter) converter : this;
-	}
-
-	/**
-	 * @param input
-	 * @param bodyConverter
-	 */
-	public void setServerBodyConverter(Input input, IServerBodyConverter bodyConverter) {
-		input.setAttribute(SERVER_BODY_CONVERTER_NAME, bodyConverter);
 	}
 
 	/*
@@ -321,11 +297,10 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * com.absir.appserv.system.server.IServerBodyConverter#getRegisterKeys()
+	 * @see com.absir.server.route.body.IBodyConverter#getContentTypes()
 	 */
 	@Override
-	public String[] getRegisterKeys() {
+	public String[] getContentTypes() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -340,8 +315,7 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 	@Override
 	public Object readBodyParameterValue(OnPut onPut, int group, String input, Class<?> parameterType) throws Exception {
 		// TODO Auto-generated method stub
-		IServerBodyConverter converter = getServerBodyConverter(onPut);
-		return converter == null || converter == this ? objectMapper.readValue(input, parameterType) : converter.readBodyParameterValue(onPut, group, input, parameterType);
+		return objectMapper.readValue(input, parameterType);
 	}
 
 	/*
@@ -354,8 +328,7 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 	@Override
 	public Object readBodyParameterValue(OnPut onPut, int group, InputStream inputStream, Class<?> parameterType) throws Exception {
 		// TODO Auto-generated method stub
-		IServerBodyConverter converter = getServerBodyConverter(onPut);
-		return converter == null || converter == this ? objectMapper.readValue(inputStream, parameterType) : converter.readBodyParameterValue(onPut, group, inputStream, parameterType);
+		return objectMapper.readValue(inputStream, parameterType);
 	}
 
 	/*
@@ -368,11 +341,6 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 	@Override
 	public byte[] writeAsBytes(OnPut onPut, Object returnValue) throws Exception {
 		// TODO Auto-generated method stub
-		IServerBodyConverter converter = getServerBodyConverter(onPut);
-		if (converter != null && converter != this) {
-			return converter.writeAsBytes(onPut, returnValue);
-		}
-
 		if (returnValue.getClass() == String.class) {
 			return ((String) returnValue).getBytes(ContextUtils.getCharset());
 		}
@@ -390,12 +358,6 @@ public class ServerResolverBody extends ReturnedResolverBody implements Paramete
 	@Override
 	public void writeValue(OnPut onPut, Object returnValue, OutputStream outputStream) throws Exception {
 		// TODO Auto-generated method stub
-		IServerBodyConverter converter = getServerBodyConverter(onPut);
-		if (converter != null && converter != this) {
-			converter.writeValue(onPut, returnValue, outputStream);
-			return;
-		}
-
 		if (returnValue.getClass() == String.class) {
 			HelperIO.write((String) returnValue, outputStream, ContextUtils.getCharset());
 
